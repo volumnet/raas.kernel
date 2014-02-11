@@ -1,0 +1,203 @@
+<?php
+/**
+ * Файл класса контейнера полей
+ * @package RAAS
+ * @version 4.2
+ * @author Alex V. Surnin <info@volumnet.ru>
+ * @copyright 2013, Volume Networks
+ */       
+namespace RAAS;
+
+/**
+ * Класс контейнера полей
+ * @package RAAS
+ * @property callable $check Кастомизированный метод проверки ошибок. Возвращает array массив ошибок формата метода Field::getErrors - см. описание там
+ * @property callable $export Кастомизированный метод назначения переменных для сохранения.
+ * @property callable $import Кастомизированный метод импорта переменных.
+ * @property callable $oncommit Кастомизированный метод, вызываемый после коммита формы.
+ * @property string $errorEmptyString Идентификатор строки перевода "Необходимо заполнить поле %s"
+ * @property string $errorInvalidString Идентификатор строки перевода "Поле %s заполнено неправильно"
+ * @property string $errorEmptyFileString Идентификатор строки перевода "Необходимо загрузить файл %s"
+ * @property string $errorInvalidFileString Идентификатор строки перевода "Файл %s недопустимого формата"
+ * @property string $errorDoesntMatch Идентификатор строки перевода "Пароль и его подтверждение не совпадают"
+ */       
+class FieldContainer extends FormElement
+{
+	/**
+     * Тип поля $children
+     */
+    const childrenType = 'RAAS\FieldCollection';
+
+    /**
+     * Кастомизированный метод проверки ошибок
+     * @var callable
+     */
+    protected $check;
+
+    /**
+     * Кастомизированный метод назначения переменных для сохранения
+     * @var callable
+     */
+    protected $export;
+
+    /**
+     * Кастомизированный метод импорта переменных
+     * @var callable
+     */
+    protected $import;
+
+    /**
+     * Кастомизированный метод, вызываемый после коммита формы
+     * @var callable
+     */
+    protected $oncommit;
+
+    /**
+     * Идентификатор строки перевода "Необходимо заполнить поле %s"
+     * @var string
+     */
+    protected $errorEmptyString;
+
+    /**
+     * Идентификатор строки перевода "Поле %s заполнено неправильно"
+     * @var string
+     */
+    protected $errorInvalidString;
+
+    /**
+     * Идентификатор строки перевода "Необходимо загрузить %s"
+     * @var string
+     */
+    protected $errorEmptyFileString = '';
+
+    /**
+     * Идентификатор строки перевода "Файл %s недопустимого формата"
+     * @var string
+     */
+    protected $errorInvalidFileString = '';
+
+    /**
+     * Идентификатор строки перевода "Пароль и его подтверждение не совпадают"
+     * @var string
+     */
+    protected $errorDoesntMatch;
+
+    public function __set($var, $val)
+    {
+        switch ($var){
+            case 'check': case 'export': case 'import': case 'oncommit':
+                if (is_callable($val)) {
+                    $this->$var = $val;
+                }
+                break;
+            case 'errorEmptyString': case 'errorInvalidString': case 'errorEmptyFileString': case 'errorInvalidFileString': case 'errorHasntUploadedString':
+                $this->$var = (string)$val;
+                break;
+            default:
+                parent::__set($var, $val);
+                break;
+        }
+    }
+    
+    public function __get($var)
+    {
+        switch ($var) {
+            case 'errorEmptyString': case 'errorInvalidString': case 'errorEmptyFileString': case 'errorInvalidFileString': case 'errorDoesntMatch':
+                return (string)($this->$var ? $this->$var : $this->Parent->__get($var));
+                break;
+            default:
+                return parent::__get($var);
+                break;
+        }
+    }
+
+
+    /**
+     * Проверка ошибок
+     * @return array массив ошибок вида array('name' => 'код ошибки', 'value' => 'имя поля', 'description' => 'текстовое описание ошибки');
+     */
+    public function getErrors()
+    {
+        $localError = array();
+        foreach ($this->children as $row) {
+            if ($f = $row->check) {
+                $e = $f($row);
+                if (isset($e) && is_array($e) && (array_values($e) != $e)) {
+                    $e = array($e);
+                }
+            } else {
+                $e = $row->getErrors();
+            }
+            if ($e) {
+                $localError = array_merge($localError, $e);
+            }
+        }
+        return $localError;
+    }
+
+    /**
+     * Назначение полей
+     */
+    public function exportDefault()
+    {
+        foreach ($this->children as $row) {
+            if ($f = $row->export) {
+                $f($row);
+            } else {
+                $row->exportDefault();
+            }
+        }
+    }
+
+    /**
+     * Импорт значений из полей
+     */
+    public function importDefault()
+    {
+        $DATA = array();
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $DATA = $_POST;
+        } elseif ($this->Form->Item && $this->Form->Item->__id()) {
+            foreach ($this->children as $row) {
+                if ($row instanceof Field) {
+                    if ($f = $row->import) {
+                        $DATA[$row->name] = $f($row);
+                    } else {
+                        $DATA[$row->name] = $row->importDefault();
+                    }
+                } else {
+                    if ($f = $row->import) {
+                        $DATA = array_merge($DATA, (array)$f($row));
+                    } else {
+                        $DATA = array_merge($DATA, (array)$row->importDefault());
+                    }
+                }
+            }
+        } else {
+            foreach ($this->children as $row) {
+                if ($row instanceof Field) {
+                    if ($row->default !== null) {
+                        $DATA[$row->name] = $row->default;
+                    }
+                } else {
+                    $DATA = array_merge($DATA, (array)$row->importDefault());
+                }
+            }
+        }
+        return $DATA;
+    }
+    
+    /**
+     * Функция, выполняемая после коммита полей
+     */
+    public function oncommitDefault()
+    {
+        foreach ($this->children as $row) {
+            if ($f = $row->oncommit) {
+                $f($row);
+            } else {
+                $row->oncommitDefault();
+            }
+        }
+    }
+}

@@ -1,0 +1,28 @@
+<?php
+/**
+ * Файл интерфейса веб-представления контекста
+ * @package RAAS
+ * @version 4.1
+ * @author Alex V. Surnin <info@volumnet.ru>
+ * @copyright 2012, Volume Networks
+ */
+namespace RAAS;
+
+/**
+ * Интерфейс веб-представления контекста RAAS
+ * 
+ * Контекст представляет собой собственно приложение, любой пакет или модуль
+ * @package RAAS
+ * @property-read string publicURL URL папки с шаблонами
+ * @property string $template название подключаемого шаблона в виде "пакет/модуль:шаблон", "пакет:шаблон" 
+ *           или "шаблон" = "текущий_пакет/текущий_модуль:шаблон"
+ */       
+interface IContext_View_Web extends IAbstract_Context_View
+{
+     /**
+     * Поиск шаблона в группах от частного к общему
+     * @param string $file наименование шаблона
+     * @return string путь к найденному файлу шаблона (если есть в указанной группе, берется оттуда, в противном случае из общей группы шаблонов)
+     */         
+    function tmp($file);
+}
