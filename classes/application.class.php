@@ -815,7 +815,7 @@ final class Application extends \SOME\Singleton implements IContext
                     require_once $this->includeDir . '/phpQuery-onefile.php';
                     break;
                 case 'Mustache_Engine':
-                    require_once $this->includeDir . '/Mustache/Autoloader.php';
+                    require_once $this->includeDir . '/mustache/src/Mustache/Autoloader.php';
                     \Mustache_Autoloader::register();
                     break;
             }
