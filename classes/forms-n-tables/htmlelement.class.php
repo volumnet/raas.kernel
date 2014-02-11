@@ -93,7 +93,9 @@ abstract class HTMLElement
                 $this->$var = (string)$val;
                 break;
             default:
-                $this->attrs[$var] = (string)$val;
+                if (is_scalar($val)) {
+                    $this->attrs[$var] = (string)$val;
+                }
                 break;
         }
 

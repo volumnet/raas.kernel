@@ -1,4 +1,5 @@
 @import 'bootstrap.css';
+@import 'bootstrap-fix.css';
 
 html { background: #8cf; }
 body { 
