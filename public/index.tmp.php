@@ -96,9 +96,12 @@ function rowContextMenu(array $SUBMENU = null)
         </script>
     <?php } ?>
     <script type="text/javascript" src="<?php echo $VIEW->publicURL?>/colorpicker/js/colorpicker.js"></script>
-    <script type="text/javascript" src="<?php echo $VIEW->publicURL?>/contextmenu/jquery.ui.position.js"></script>
+    <script type="text/javascript" src="<?php echo $VIEW->publicURL?>/context.js"></script>
+    <script type="text/javascript">
+    jQuery(document).ready(function($) {
+      context.init({preventDoubleContext: false});
+    });</script>
     <script type="text/javascript" src="<?php echo $VIEW->publicURL?>/bootstrap-multiselect.js"></script>
-    <script type="text/javascript" src="<?php echo $VIEW->publicURL?>/bootstrap-contextmenu.js"></script>
     <script type="text/javascript" src="<?php echo $VIEW->publicURL?>/codemirror/lib/codemirror.js"></script>
     <script type="text/javascript" src="<?php echo $VIEW->publicURL?>/codemirror/mode/xml/xml.js"></script>
     <script type="text/javascript" src="<?php echo $VIEW->publicURL?>/codemirror/mode/javascript/javascript.js"></script>
