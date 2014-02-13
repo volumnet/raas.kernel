@@ -302,6 +302,7 @@ class View_Web extends Abstract_View implements IContext_View_Web
         header ('Cache-Control: no-cache, must-revalidate');
         header ('Pragma: no-cache');
         header('Content-Type: text/html; charset=UTF-8');
+        header('X-XSS-Protection: 0');
         ob_clean();
         include $this->tmp('index');
         $content = ob_get_contents();
