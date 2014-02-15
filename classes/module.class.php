@@ -233,32 +233,41 @@ abstract class Module extends \SOME\Singleton implements IRightsContext
         $NS = \SOME\Namespaces::getNSArray($class);
         $classname = \SOME\Namespaces::getClass($class);
         if ($myNS == $NS) {
-            if (is_file($this->classesDir . '/' . strtolower($classname) . '.class.php')) {
-                require_once ($this->classesDir . '/' . strtolower($classname) . '.class.php');
-            } elseif (is_file($this->classesDir . '/' . strtolower($classname) . '.interface.php')) {
-                require_once ($this->classesDir . '/' . strtolower($classname) . '.interface.php');
-            } elseif ($classname == 'Access') {
-                $callback = 'namespace %s; class %s extends \\RAAS\\Access {}';
-                eval(sprintf($callback, implode('\\', $NS), $classname));
-            } elseif (preg_match('/^Controller_(.*?)?$/i', $classname, $regs)) {
-                $callback = 'namespace %s; class %s extends \%s\Abstract_Controller { protected static $instance; public function __call($name, $args){} }';
-                eval(sprintf($callback, implode('\\', $NS), $classname, implode('\\', $NS)));
-            } elseif (preg_match('/^View_Chunk?$/i', $classname, $regs)) {
-                $callback = ' namespace %s;
-                              class View_Chunk extends \\RAAS\\Module_View_Chunk {
-                                  protected static $instance; 
-                                  public function __call($name, $args) { 
-                                      $this->assignVars(isset($args[0]) ? $args[0] : array());
-                                      $this->template = $name; 
-                                  }
-                              }';
-                eval(sprintf($callback, implode('\\', $NS)));
-            } elseif (preg_match('/^View_(.*?)?$/i', $classname, $regs)) {
-                $callback = ' namespace %s;
-                              class %s extends \RAAS\Module_View_%s {
-                                  protected static $instance; public function __call($name, $args) { $this->assignVars(isset($args[0]) ? $args[0] : array()); }
-                              }';
-                eval(sprintf($callback, implode('\\', $NS), $classname, $regs[1]));
+            $rdi = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->classesDir));
+            foreach ($rdi as $f) {
+                if (($f->getFileName() == strtolower($classname) . '.class.php') || ($f->getFileName() == strtolower($classname) . '.interface.php')) {
+                    require_once $f->getPathName();
+                    break;
+                }
+            }
+            if (!class_exists($class, false) && !interface_exists($class, false)) {
+                if (is_file($this->classesDir . '/' . strtolower($classname) . '.class.php')) {
+                    require_once ($this->classesDir . '/' . strtolower($classname) . '.class.php');
+                } elseif (is_file($this->classesDir . '/' . strtolower($classname) . '.interface.php')) {
+                    require_once ($this->classesDir . '/' . strtolower($classname) . '.interface.php');
+                } elseif ($classname == 'Access') {
+                    $callback = 'namespace %s; class %s extends \\RAAS\\Access {}';
+                    eval(sprintf($callback, implode('\\', $NS), $classname));
+                } elseif (preg_match('/^Controller_(.*?)?$/i', $classname, $regs)) {
+                    $callback = 'namespace %s; class %s extends \%s\Abstract_Controller { protected static $instance; public function __call($name, $args){} }';
+                    eval(sprintf($callback, implode('\\', $NS), $classname, implode('\\', $NS)));
+                } elseif (preg_match('/^View_Chunk?$/i', $classname, $regs)) {
+                    $callback = ' namespace %s;
+                                  class View_Chunk extends \\RAAS\\Module_View_Chunk {
+                                      protected static $instance; 
+                                      public function __call($name, $args) { 
+                                          $this->assignVars(isset($args[0]) ? $args[0] : array());
+                                          $this->template = $name; 
+                                      }
+                                  }';
+                    eval(sprintf($callback, implode('\\', $NS)));
+                } elseif (preg_match('/^View_(.*?)?$/i', $classname, $regs)) {
+                    $callback = ' namespace %s;
+                                  class %s extends \RAAS\Module_View_%s {
+                                      protected static $instance; public function __call($name, $args) { $this->assignVars(isset($args[0]) ? $args[0] : array()); }
+                                  }';
+                    eval(sprintf($callback, implode('\\', $NS), $classname, $regs[1]));
+                }
             }
         }
     }
