@@ -215,11 +215,17 @@ abstract class Module extends \SOME\Singleton implements IRightsContext
     }
 
 
-    public function access(IOwner $Owner)
+    public function access(IOwner $Owner = null)
     {
+        if ($Owner === null) {
+            $Owner = $this->application->user;
+        }
         $NS = \SOME\Namespaces::getNSArray(\get_called_class());
         $classname = implode('\\', $NS) . '\\Access';
-        return new $classname($Owner);
+        if (class_exists($classname)) {
+            return new $classname($Owner);
+        }
+        return null;
     }
 
 

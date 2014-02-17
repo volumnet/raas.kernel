@@ -6,6 +6,23 @@ function showMenu(array $SUBMENU, $type = null)
     if ($SUBMENU) {
         foreach ($SUBMENU as $row) {
             $attrs = '';
+            // Проверка прав доступа
+            $href = $row['href'];
+            $href = parse_url($href, PHP_URL_QUERY);
+            parse_str($href, $href);
+            if (isset($_GET['p'], $_GET['m']) && isset(\RAAS\Application::i()->packages[$_GET['p']]->modules[$_GET['m']])) {
+                $ctx = \RAAS\Application::i()->packages[$_GET['p']]->modules[$_GET['m']];
+            } elseif (isset($_GET['p']) && isset(\RAAS\Application::i()->packages[$_GET['p']])) {
+                $ctx = \RAAS\Application::i()->activePackage;
+            } else {
+                $ctx = \RAAS\Application::i()->context;
+            }
+            if ($access = $ctx->access()) {
+                if (!$access->A($row['href'])) {
+                    continue;
+                }
+            }
+
             foreach ($row as $key => $val) {
                 if (!in_array($key, array('name', 'href', 'submenu', 'counter', 'active', 'icon'))) {
                     $attrs .= ' ' . htmlspecialchars($key) . '="' . htmlspecialchars($val) . '"';
@@ -38,7 +55,7 @@ function showMenu(array $SUBMENU, $type = null)
             }
             $text .= '</li>';
         }
-        if ($level) {
+        if ($text && $level) {
             $text = '<ul>' . $text . '</ul>';
         }
         return $text;        
@@ -47,10 +64,12 @@ function showMenu(array $SUBMENU, $type = null)
 function rowContextMenu(array $SUBMENU = null)
 {
     if ($SUBMENU) {
-        return '<div class="btn-group pull-right">
-                <a href="#" class="btn dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></a> 
-                <ul class="dropdown-menu">' . showMenu($SUBMENU) . '</ul>
-              </div>';
+        if ($text = showMenu($SUBMENU)) {
+            return '<div class="btn-group pull-right">
+                      <a href="#" class="btn dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></a> 
+                      <ul class="dropdown-menu">' . $text . '</ul>
+                    </div>';
+        }
     }
     return '';
 }

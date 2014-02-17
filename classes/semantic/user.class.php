@@ -22,6 +22,7 @@ class User extends \SOME\SOME implements IOwner
 
     public function commit()
     {
+        Access::flushRights($this);
         parent::commit();
         if (isset($this->_SET_groups)) {
             $this->add_groups($this->_SET_groups, true);

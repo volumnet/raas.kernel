@@ -140,7 +140,7 @@ abstract class Access
     
     public function canDo($sub = null, $action = null, $id = null)
     {
-        return (($this->Owner instanceof User) && $this->Owner->root) || ($this->mask = 1);
+        return (($this->Owner instanceof User) && $this->Owner->root) || ($this->mask == 1);
     }
     
     
@@ -156,13 +156,20 @@ abstract class Access
     
     protected static function inherit($child, $parent)
     {
-        return null;
+        return array_merge((array)$parent, (array)$child);
     }
     
     
     protected static function merge($a, $b)
     {
-        return null;
+        $temp = array();
+        foreach ((array)$a as $key => $val) {
+            $temp[$key] = (isset($temp[$key]) ? $temp[$key] : 0) + $val;
+        }
+        foreach ((array)$b as $key => $val) {
+            $temp[$key] = (isset($temp[$key]) ? $temp[$key] : 0) + $val;
+        }
+        return $temp;
     }
     
     
