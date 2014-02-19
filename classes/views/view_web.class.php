@@ -88,10 +88,16 @@ class View_Web extends Abstract_View implements IContext_View_Web
     protected $css;
     
     /**
-     * Набор подключаемых JS-файлов
+     * Набор подключаемых JS-файлов после документа
      * @var \ArrayObject
      */
     protected $js;
+    
+    /**
+     * Набор подключаемых JS-файлов в шапке
+     * @var \ArrayObject
+     */
+    protected $head_js;
     
     /**
      * Начался рендеринг шаблонов
@@ -115,7 +121,7 @@ class View_Web extends Abstract_View implements IContext_View_Web
      * Имена контейнеров-массивов
      * @var array     
      */         
-    private static $arrayContainers = array('data', 'content', 'localError', 'css', 'js');
+    private static $arrayContainers = array('data', 'content', 'localError', 'css', 'js', 'head_js');
     
     /**
      * Имена контейнеров-строк

@@ -130,6 +130,9 @@ function rowContextMenu(array $SUBMENU = null)
     <script type="text/javascript" src="<?php echo $VIEW->publicURL?>/codemirror/mode/php/php.js"></script>
     <script type="text/javascript" src="<?php echo $VIEW->publicURL?>/ckeditor/ckeditor.js"></script>
     <script type="text/javascript" src="<?php echo $VIEW->publicURL?>/ckeditor/adapters/jquery.js"></script>
+    <?php foreach ($VIEW->head_js as $js) { ?>
+        <script src="<?php echo $js?>" type="text/javascript"></script>
+    <?php } ?>
   </head>
   <body>
     <?php if ($APPLICATION->activePackage) { ?>
