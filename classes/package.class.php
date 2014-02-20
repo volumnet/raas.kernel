@@ -16,6 +16,7 @@ namespace RAAS;
  * @property-read \RAAS\Abstract_Package_View $view представление пакета
  * @property-read array(\RAAS\Module) $modules массив загруженных модулей
  * @property \RAAS\Module $activeModule активный модуль
+ * @property \RAAS\Updater $updater мастер обновлений
  */       
 abstract class Package extends \SOME\Singleton implements IRightsContext
 {
@@ -58,6 +59,14 @@ abstract class Package extends \SOME\Singleton implements IRightsContext
                 break;
             case 'modules': case 'activeModule':
                 return isset($this->$var) ? $this->$var : null;
+                break;
+            case 'updater':
+                $NS = \SOME\Namespaces::getNS($this);
+                $classname = $NS . '\\Updater';
+                if (class_exists($classname)) {
+                    $u = new $classname($this);
+                    return $u;
+                }
                 break;
             
             // Файлы и директории
@@ -211,6 +220,7 @@ abstract class Package extends \SOME\Singleton implements IRightsContext
     public function install()
     {
         if (!$this->registryGet('installDate')) {
+            $this->updater;
             $SQL_query = (is_file($this->installFile) ? file_get_contents($this->installFile) : "");
             if ($SQL_query) {
                 $this->SQL->query($this->prepareSQL($SQL_query));
@@ -295,7 +305,7 @@ abstract class Package extends \SOME\Singleton implements IRightsContext
                 if (is_file($this->baseDir . '/' . strtolower($m) . '/classes/module.class.php')) {
                     require_once ($this->baseDir . '/' . strtolower($m) . '/classes/module.class.php');
                     $classname = implode('\\', $NS) . '\\Module';
-                    $classname::i()->init();
+                    $classname::i();
                 }
             } else {
                 $rdi = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->classesDir));

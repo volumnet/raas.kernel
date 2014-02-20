@@ -14,6 +14,7 @@ namespace RAAS;
  * @property-read \RAAS\Package $parent объект родительского пакета
  * @property-read \RAAS\Abstract_Module_Controller $controller контроллер модуля
  * @property-read \RAAS\Abstract_Module_View $view представление модуля
+ * @property \RAAS\Updater $updater мастер обновлений
  */       
 abstract class Module extends \SOME\Singleton implements IRightsContext
 {
@@ -51,6 +52,14 @@ abstract class Module extends \SOME\Singleton implements IRightsContext
                 break;
             case 'view':
                 return $this->controller->view;
+                break;
+            case 'updater':
+                $NS = \SOME\Namespaces::getNS($this);
+                $classname = $NS . '\\Updater';
+                if (class_exists($classname)) {
+                    $u = new $classname($this);
+                    return $u;
+                }
                 break;
             
             // Файлы и директории
@@ -177,6 +186,7 @@ abstract class Module extends \SOME\Singleton implements IRightsContext
     public function install()
     {
         if (!$this->registryGet('installDate')) {
+            $u = $this->updater;
             $SQL_query = (is_file($this->installFile) ? file_get_contents($this->installFile) : "");
             if ($SQL_query) {
                 $this->SQL->query($this->prepareSQL($SQL_query));
