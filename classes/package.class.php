@@ -294,7 +294,7 @@ abstract class Package extends \SOME\Singleton implements IRightsContext
      * Функция автозагрузки классов
      * @param string $class наименование класса с пространством имен
      */
-    private function autoload($class)
+    public function autoload($class)
     {
         $myNS = \SOME\Namespaces::getNSArray(\get_called_class());
         $NS = \SOME\Namespaces::getNSArray($class);

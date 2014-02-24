@@ -11,8 +11,8 @@ namespace RAAS;
 /**
  * Класс абстрактного представления абстрактного подмодуля RAAS
  * @package RAAS
- * @property-read \RAAS\Sub $module ссылка на экземпляр подмодуля
- * @property-read \RAAS\Sub $model ссылка на экземпляр подмодуля
+ * @property-read \RAAS\IRightsContext $module ссылка на экземпляр подмодуля
+ * @property-read \RAAS\IRightsContext $model ссылка на экземпляр подмодуля
  * @property-read \RAAS\Abstract_Package_View $parent ссылка на экземпляр активного представления пакета
  */       
 abstract class Abstract_Sub_View extends \SOME\Singleton

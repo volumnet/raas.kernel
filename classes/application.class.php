@@ -778,7 +778,7 @@ final class Application extends \SOME\Singleton implements IContext
      * Функция автозагрузки классов
      * @param string $class наименование класса с пространством имен
      */
-    private function autoload($class)
+    public function autoload($class)
     {
         $NS = \SOME\Namespaces::getNSArray($class);
         $classname = \SOME\Namespaces::getClass($class);
