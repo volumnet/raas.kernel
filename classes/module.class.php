@@ -156,7 +156,9 @@ abstract class Module extends \SOME\Singleton implements IRightsContext
         $classname = \SOME\Namespaces::getNS(\get_called_class()) . '\\' . \SOME\Namespaces::getClass($this->application->controller);
         if (class_exists($classname)) {
             $this->controller = $classname::i();
-            $this->install();
+            if ($this->SQL) {
+                $this->install();
+            }
         } else {
             return false;
             //throw new Exception($this->application->view->_('INVALID_CONTROLLER_FOR_MODULE'));
@@ -257,11 +259,7 @@ abstract class Module extends \SOME\Singleton implements IRightsContext
                 }
             }
             if (!class_exists($class, false) && !interface_exists($class, false)) {
-                if (is_file($this->classesDir . '/' . strtolower($classname) . '.class.php')) {
-                    require_once ($this->classesDir . '/' . strtolower($classname) . '.class.php');
-                } elseif (is_file($this->classesDir . '/' . strtolower($classname) . '.interface.php')) {
-                    require_once ($this->classesDir . '/' . strtolower($classname) . '.interface.php');
-                } elseif ($classname == 'Access') {
+                if ($classname == 'Access') {
                     $callback = 'namespace %s; class %s extends \\RAAS\\Access {}';
                     eval(sprintf($callback, implode('\\', $NS), $classname));
                 } elseif (preg_match('/^Controller_(.*?)?$/i', $classname, $regs)) {

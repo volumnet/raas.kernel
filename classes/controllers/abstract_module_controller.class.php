@@ -67,13 +67,15 @@ abstract class Abstract_Module_Controller extends \SOME\Singleton implements IAb
      */         
     protected function init()
     {
-        $classname = \SOME\Namespaces::getClass($this->parent->view);
-        $NS = \SOME\Namespaces::getNS($this);
-        $classname = $NS . '\\' . $classname;
-        if (class_exists($classname)) {
-            $this->view = $classname::i();
-        } else {
-            throw new Exception($this->application->view->_('INVALID_VIEW_FOR_MODULE'));
+        if ($this->parent->view) {
+            $classname = \SOME\Namespaces::getClass($this->parent->view);
+            $NS = \SOME\Namespaces::getNS($this);
+            $classname = $NS . '\\' . $classname;
+            if (class_exists($classname)) {
+                $this->view = $classname::i();
+            } else {
+                throw new Exception($this->application->view->_('INVALID_VIEW_FOR_MODULE'));
+            }
         }
     }
     
