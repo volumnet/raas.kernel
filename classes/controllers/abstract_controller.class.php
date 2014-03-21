@@ -254,6 +254,7 @@ abstract class Abstract_Controller extends \SOME\Singleton implements IAbstract_
                 $Form->Item->root = 1;
             },
             'import' => function() { return ($_SERVER['REQUEST_METHOD'] == 'POST') ? $_POST : array(); },
+            'redirect' => function() {},
             'children' => array(
                 array('name' => 'login', 'maxlength' => 16, 'required' => 'required', 'caption' => $this->view->_('LOGIN_NAME')), 
                 array(

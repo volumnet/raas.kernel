@@ -81,24 +81,16 @@ class Controller_Web extends Abstract_Controller
             'caption' => $this->view->_('CONFIGURE_DB'),
             'commit' => function() use ($t) { $t->model->configureDB($_POST); },
             'children' => array(
-                array(
-                    'type' => 'select', 
-                    'name' => 'dbtype', 
-                    'required' => 'required', 
-                    'caption' => $this->view->_('DBTYPE'), 
-                    'placeholder' => $this->view->_('SELECT_DATABASE'),
-                    'children' => $CONTENT['databases'],
-                    'default' => $this->model->dbtype
-                ),
+                array('type' => 'hidden', 'name' => 'dbtype', 'default' => 'mysql'),
                 array(
                     'name' => 'dbhost', 
                     'required' => 'required', 
                     'caption' => $this->view->_('DBHOST'), 
-                    'default' => ($this->model->dbhost ? $this->model->dbhost : 'localhost')
+                    'default' => ($this->model->dbhost ? $this->model->dbhost : '127.0.0.1')
                 ),
-                array('name' => 'dbuser', 'required' => 'required', 'caption' => $this->view->_('DBUSER'), 'default' => $this->model->dbuser),
+                array('name' => 'dbuser', 'required' => 'required', 'caption' => $this->view->_('DBUSER'), 'default' => 'root'),
                 array('type' => 'password', 'name' => 'dbpass', 'caption' => $this->view->_('DBPASS')),
-                array('name' => 'dbname', 'required' => 'required', 'caption' => $this->view->_('DBNAME'), 'default' => $this->model->dbname),
+                array('name' => 'dbname', 'required' => 'required', 'caption' => $this->view->_('DBNAME'), 'default' => $_SERVER['HTTP_HOST']),
                 array('name' => 'dbprefix', 'caption' => $this->view->_('DBPREFIX'), 'default' => $this->model->dbprefix),
                 array(
                     'type' => 'select', 
