@@ -395,9 +395,8 @@ final class Application extends \SOME\Singleton implements IContext
             $this->exceptions[] = $e;
         }
         if ($this->debug) {
-            $t = $e->getTrace();
             //if (!$this->view->renderStarted) {
-                echo '<pre class="error">' . $e->getMessage() . ' in ' . $t[0]['file'] . ' on line ' . $t[0]['line'] . ' ' . print_r ($e->getTraceAsString(), 1) . '</pre>';
+                echo '<pre class="error">' . $e->getMessage() . ' in ' . $e->getFile() . ' on line ' . $e->getLine() . ' ' . $e->getTraceAsString() . '</pre>';
             //}
         }
         return $e;
