@@ -164,7 +164,7 @@ jQuery(function($) {
             $('input[data-type="time"]', thisObj).timepicker({ timeFormat: 'hh:mm' });
             $('input[data-type="month"]', thisObj).datepicker({ dateFormat: 'yy-mm' });
             
-            $('input[data-type="datetime-local"], input:visible[data-type="datetime"]', thisObj).not('[disabled]').each(function() {
+            $('input[data-type="datetime-local"], input[data-type="datetime"]', thisObj).not('[disabled]').each(function() {
                 if (!Modernizr.inputtypes.datetime) {
                     $(this).val($(this).val().replace(/T/, ' '));
                 }
