@@ -324,25 +324,7 @@ class View_Web extends Abstract_View implements IContext_View_Web
      */         
     public function debugShowException(\Exception $e)
     {
-        $t = $e->getTrace();
-        $text = '';
-        if (isset($t[0]['file'])) {
-            $f = $t[0]['file'];
-        } elseif (isset($t[0]['args'][2])) {
-            $f = $t[0]['args'][2];
-        }
-        if (isset($t[0]['line'])) {
-            $l = $t[0]['line'];
-        } elseif (isset($t[0]['args'][3])) {
-            $l = $t[0]['args'][3];
-        }
-        $text .= $e->getMessage(); 
-        if (isset($f)) {
-            $text .= ' on file [' . htmlspecialchars($f) . ']';
-        }
-        if (isset($l)) {
-            $text .= ' on line ' . (int)$l;
-        }
+        $text .= $e->getMessage() . $e->getTraceAsString();
         return $text;
     }
     
