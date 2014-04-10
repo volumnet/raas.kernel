@@ -434,6 +434,13 @@ class Field extends OptionContainer
                     return date('Y-m-d', strtotime($x));
                 }
                 break;
+            case 'time':
+                $x = $this->Form->Item->{$this->name}; 
+                if (strtotime($x) > 0) {
+                    return date('H:i', strtotime($x));
+                }
+                return '';
+                break;
             case 'datetime': case 'datetime-local':
                 $x = $this->Form->Item->{$this->name}; 
                 if (strtotime($x) > 0) {
