@@ -122,6 +122,7 @@ class Sub_Modules extends \RAAS\Abstract_Sub_Controller
                             if (!(in_array($_POST[$row->name], array(Level::GRANT_ALL, Level::REVOKE_ALL)) || ($lev->id && (get_class($lev->Context) == get_class($Context))))) {
                                 continue;
                             }
+                            Access::flushRights();
                         }
                         $Context->registrySet($row->name, isset($_POST[$row->name]) ? $_POST[$row->name] : '');
                     }
