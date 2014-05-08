@@ -102,6 +102,7 @@ function rowContextMenu(array $SUBMENU = null)
     <![endif]-->
     <script src="<?php echo $VIEW->publicURL?>/jquery.js" type="text/javascript"></script>
     <script src="<?php echo $VIEW->publicURL?>/jquery.scrollTo.js" type="text/javascript"></script>
+    <script src="<?php echo $VIEW->publicURL?>/jquery.form.js" type="text/javascript"></script>
     <script src="<?php echo $VIEW->publicURL?>/bootstrap.js" type="text/javascript"></script>
     <script src="<?php echo $VIEW->publicURL?>/jquery.raas.js" type="text/javascript"></script>
     <script type="text/javascript" src="<?php echo $VIEW->publicURL?>/jquery-ui/js/jquery-ui-1.8.23.custom.min.js"></script>
