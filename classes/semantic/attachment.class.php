@@ -167,10 +167,16 @@ class Attachment extends \SOME\SOME
     
     public function createThumbnail()
     {
-        \SOME\Thumbnail::make($this->file, $this->tn, $this->tnsize ? $this->tnsize : self::tnsize, -1, \SOME\Thumbnail::THUMBNAIL_CROP, true);
-        chmod($this->tn, 0777);
-        \SOME\Thumbnail::make($this->file, $this->small, $this->tnsize ? $this->tnsize : self::tnsize, -1, \SOME\Thumbnail::THUMBNAIL_FRAME, true);
-        chmod($this->small, 0777);
+        if (is_file($this->file) && $this->image) {
+            \SOME\Thumbnail::make($this->file, $this->tn, $this->tnsize ? $this->tnsize : self::tnsize, -1, \SOME\Thumbnail::THUMBNAIL_CROP, true);
+            if ($this->tn) {
+                chmod($this->tn, 0777);
+            }
+            \SOME\Thumbnail::make($this->file, $this->small, $this->tnsize ? $this->tnsize : self::tnsize, -1, \SOME\Thumbnail::THUMBNAIL_FRAME, true);
+            if ($this->small) {
+                chmod($this->small, 0777);
+            }
+        }
     }
     
     

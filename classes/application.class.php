@@ -616,21 +616,23 @@ final class Application extends \SOME\Singleton implements IContext
                         Attachment::delete($row);
                     }
                 }
-                if ($row->tn && !is_file($row->tn)) {
-                    if (is_file($old_file = $this->filesDir . '/' . pathinfo($row->realname, PATHINFO_FILENAME) . '_tn.jpg')) {
-                        rename($old_file, $row->tn);
-                    } else {
-                        $row->createThumbnail();
+                if ($row->image) {
+                    if ($row->tn && !is_file($row->tn)) {
+                        if (is_file($old_file = $this->filesDir . '/' . pathinfo($row->realname, PATHINFO_FILENAME) . '_tn.jpg')) {
+                            rename($old_file, $row->tn);
+                        } else {
+                            $row->createThumbnail();
+                        }
                     }
-                }
-                if ($row->small && !is_file($row->small)) {
-                    if (is_file($old_file = $this->filesDir . '/' . pathinfo($row->realname, PATHINFO_FILENAME) . '_small.' . $row->ext)) {
-                        rename($old_file, $row->small);
-                    } else {
-                        $row->createThumbnail();
+                    if ($row->small && !is_file($row->small)) {
+                        if (is_file($old_file = $this->filesDir . '/' . pathinfo($row->realname, PATHINFO_FILENAME) . '_small.' . $row->ext)) {
+                            rename($old_file, $row->small);
+                        } else {
+                            $row->createThumbnail();
+                        }
                     }
+                    $row->createThumbnail();
                 }
-                $row->createThumbnail();
             }
         }
     }
