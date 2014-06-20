@@ -386,15 +386,19 @@ abstract class Abstract_Controller extends \SOME\Singleton implements IAbstract_
      */         
     protected function httpAuth()
     {
+        foreach ($_SERVER as $key => $val) {
+            if (preg_match('/^(REDIRECT_)+/i', $key)) {
+                $nkey = preg_replace('/^(REDIRECT_)+/i', '', $key);
+                if (!isset($_SERVER[$nkey])) {
+                    $_SERVER[$nkey] = $val;
+                }
+            }
+        }
         if (!$_SERVER['PHP_AUTH_USER'] || !$_SERVER['PHP_AUTH_PW']) {
             if (isset($_SERVER['HTTP_AUTHORIZATION'])) {
                 list($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']) = explode(':' , base64_decode(substr($_SERVER['HTTP_AUTHORIZATION'], 6)));
-            } elseif (isset($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])) {
-                list($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']) = explode(':' , base64_decode(substr($_SERVER['REDIRECT_HTTP_AUTHORIZATION'], 6)));
             } elseif (isset($_SERVER['REMOTE_USER'])) {
                 list($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']) = explode(':' , base64_decode(substr($_SERVER['REMOTE_USER'], 6)));
-            } elseif (isset($_SERVER['REDIRECT_REMOTE_USER'])) {
-                list($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']) = explode(':' , base64_decode(substr($_SERVER['REDIRECT_REMOTE_USER'], 6)));
             }
         }
         if (
