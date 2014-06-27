@@ -79,7 +79,10 @@ class Controller_Web extends Abstract_Controller
         $t = $this;
         $Form = new Form(array(
             'caption' => $this->view->_('CONFIGURE_DB'),
-            'commit' => function() use ($t) { $t->model->configureDB($_POST); },
+            'commit' => function() use ($t) { 
+                $t->model->configureDB($_POST); 
+                new Redirector();
+            },
             'children' => array(
                 array('type' => 'hidden', 'name' => 'dbtype', 'default' => 'mysql'),
                 array(
