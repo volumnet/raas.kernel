@@ -22,6 +22,19 @@ class Updater
         $this->Context = $Context;
     }
 
+
+    public function preInstall() 
+    {
+        return true;
+    }
+
+
+    public function postInstall() 
+    {
+        return true;
+    }
+
+
     public function columns($table)
     {
         return array_map(function($x) { return $x['Field']; }, $this->SQL->get("SHOW FIELDS FROM " . $table));

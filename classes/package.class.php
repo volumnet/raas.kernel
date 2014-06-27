@@ -223,10 +223,12 @@ abstract class Package extends \SOME\Singleton implements IRightsContext
     {
         if (!$this->registryGet('installDate')) {
             $u = $this->updater;
+            $u->preInstall();
             $SQL_query = (is_file($this->installFile) ? file_get_contents($this->installFile) : "");
             if ($SQL_query) {
                 $this->SQL->query($this->prepareSQL($SQL_query));
             }
+            $u->postInstall();
             $this->SQL->add($this->dbprefix . "registry", array('m' => $this->mid, 'name' => 'installDate', 'value' => date('Y-m-d H:i:s'), 'locked' => 1));
             if ($this->application->debug) {
                 $this->registrySet('isActive', 1);
