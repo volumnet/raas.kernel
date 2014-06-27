@@ -1,6 +1,6 @@
 [submodule "include/some"]
 	path = include/some
-	url = https://AVS1985@bitbucket.org/volumnet/some.git
+	url = https://github.com/volumnet/some4.git
 [submodule "include/mustache"]
 	path = include/mustache
 	url = https://github.com/bobthecow/mustache.php.git
