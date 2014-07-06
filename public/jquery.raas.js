@@ -150,7 +150,8 @@ jQuery(function($) {
             var thisObj = this;
             var clearDate = $('<a href="#" class="jsClearDate"><i class="icon-remove-circle"></i></a>', thisObj).click(function() { $(this).prev('input').val(''); return false; });
             var codeSettings = {
-                'php': { lineNumbers: true, mode: "application/x-httpd-php", indentUnit: 2, indentWithTabs: false, enterMode: "keep", tabMode: "shift", tabSize: 2 }
+                'php': { lineNumbers: true, mode: "application/x-httpd-php", indentUnit: 2, indentWithTabs: false, enterMode: "keep", tabMode: "shift", tabSize: 2 },
+                'html': { lineNumbers: true, mode: "text/html", indentUnit: 2, indentWithTabs: false, enterMode: "keep", tabMode: "shift", tabSize: 2 }
             };
             
             $('input[type="date"], input[type="time"], input[type="month"], input[type="datetime-local"], input[type="datetime"]', thisObj).not('[disabled]').each(function() {
