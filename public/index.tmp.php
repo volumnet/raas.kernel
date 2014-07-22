@@ -218,7 +218,7 @@ function rowContextMenu(array $SUBMENU = null)
                 <h4><?php echo FOLLOWING_ERRORS_FOUND?>:</h4>
                 <ul class="error">
                   <?php foreach ($localError as $row) { ?>
-                      <li><?php echo htmlspecialchars($row)?></li>
+                      <li><?php echo nl2br(htmlspecialchars($row))?></li>
                   <?php } ?>
                 </ul>
               </div>
