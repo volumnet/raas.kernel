@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS {$DBPREFIX$}levels (
 CREATE TABLE IF NOT EXISTS {$DBPREFIX$}registry (
   m varchar(32) NOT NULL DEFAULT '' COMMENT 'MID',
   `name` varchar(32) NOT NULL DEFAULT '' COMMENT 'Key',
-  `value` varchar(255) NOT NULL DEFAULT '' COMMENT 'Value',
+  `value` TEXT NULL DEFAULT NULL COMMENT 'Value',
   locked tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT 'Locked',
   PRIMARY KEY (m,`name`),
   KEY m (m),
