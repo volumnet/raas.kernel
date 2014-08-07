@@ -532,4 +532,11 @@ abstract class CustomField extends \SOME\SOME
         }
         return $temp;
     }
+
+
+    public static function delete($object)
+    {
+        $this->deleteValues();
+        parent::delete($object);
+    }
 }
