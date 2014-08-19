@@ -204,9 +204,16 @@ jQuery(function($) {
                 options.change = function(e, ui) {
                     $(obj).val(parseFloat(ui.value));
                     $(ui.handle).closest('.ui-slider').attr('title', ui.value);
-                    
+                    $(this).closest('.input-range-container').find('.range-value').text(ui.value);
                 }
-                $(this).attr('readonly', 'readonly').hide().after('<div class="input-range"></div>').next('div').slider(options).slider('widget').attr('title', $(this).val());
+                $(this).attr('readonly', 'readonly')
+                       .hide()
+                       .after('<div class="input-range-container"><div class="input-range"></div><div class="range-value">' + $(this).val() + '</div></div>')
+                       .next('div')
+                       .children('.input-range')
+                       .slider(options)
+                       .slider('widget')
+                       .attr('title', $(this).val());
             });
             $('select[multiple]').not('[disabled]', thisObj).multiselect({
                 buttonText: function(options, select) {

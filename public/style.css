@@ -102,7 +102,8 @@ ul.tree li a.jsTreeMinus { background-image: url('img/bullet_toggle_minus.png');
 .jsRepo, *[data-role="raas-repo"] { display: none; }
 .colorpicker { z-index: 9999; }
 .colorpicker input { width: auto; }
-div.input-range { max-width: 270px; }
+div.input-range { width: 270px; display: inline-block; }
+div.range-value { display: inline-block; margin-left: 10px; }
 
 input[disabled], select[disabled], textarea[disabled], input[readonly], select[readonly], textarea[readonly] {
     cursor: default;
