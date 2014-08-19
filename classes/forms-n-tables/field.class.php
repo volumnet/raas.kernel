@@ -413,7 +413,7 @@ class Field extends OptionContainer
                 if (is_array($_POST[$this->name])) {
                     $Item->{$this->name} = array_values(array_unique(array_map($f, $_POST[$this->name])));
                 } else {
-                    $Item->{$this->name} = $f($_POST[$this->name]);
+                    $Item->{$this->name} = call_user_func($f, $_POST[$this->name]);
                 }
                 break;
         }
@@ -498,7 +498,7 @@ class Field extends OptionContainer
                     $Item->{$this->name} = $v;
                 }
             } else {
-                if ($v = $f($_FILES[$this->name])) {
+                if ($v = call_user_func($f, $_FILES[$this->name])) {
                     $Item->{$this->name} = $v;
                 }
             }
