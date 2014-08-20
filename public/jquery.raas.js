@@ -177,7 +177,7 @@ jQuery(function($) {
                 onBeforeShow: function () { $(this).ColorPickerSetColor(this.value.replace(/#/, '')); },
                 onSubmit: function (hsb, hex, rgb, el) { $(el).val('#' + hex); }
             });
-            $('input:visible[type="range"]', thisObj).not('[disabled]').each(function() {
+            $('input[type="range"]', thisObj).not('[disabled]').each(function() {
                 if (($(this).attr('type') == 'number') && Modernizr.inputtypes.number) {
                     return;
                 }
