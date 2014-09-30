@@ -536,7 +536,7 @@ abstract class CustomField extends \SOME\SOME
 
     public static function delete($object)
     {
-        $this->deleteValues();
+        $object->deleteValues();
         parent::delete($object);
     }
 }
