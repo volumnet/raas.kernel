@@ -104,7 +104,7 @@ abstract class Abstract_Controller extends \RAAS\Abstract_Package_Controller
                 )
             )
         ));
-        $this->view->admin_users_edit_user($Form->process());
+        ViewSub_Users::i()->edit_user($Form->process());
     }
 
     protected function main()

@@ -246,15 +246,15 @@ class Form extends FieldContainer
             $this->isPost = true;
             if (isset($_POST['@cancel'])) {
                 if ($f = $this->cancel) {
-                    $f($this);
+                    call_user_func($f, $this);
                 } elseif ($f = $this->redirect) {
-                    $f($this);
+                    call_user_func($f, $this);
                 } else {
                     $this->redirectDefault();
                 }
             } else {
                 if ($f = $this->check) {
-                    $this->localError = $f($this);
+                    $this->localError = call_user_func($f, $this);
                 } else {
                     $this->localError = $this->getErrors();
                 }
@@ -263,10 +263,10 @@ class Form extends FieldContainer
                 }
                 if (!$this->localError) {
                     if ($f = $this->commit) {
-                        $f($this);
+                        call_user_func($f, $this);
                     } elseif ($this->Item) {
                         if ($f = $this->export) {
-                            $f($this);
+                            call_user_func($f, $this);
                         } else {
                             $this->exportDefault();
                         }
@@ -275,12 +275,12 @@ class Form extends FieldContainer
                     $this->success = true;
                 
                     if ($f = $this->oncommit) {
-                        $f($this);
+                        call_user_func($f, $this);
                     } else {
                         $this->oncommitDefault();
                     }
                     if ($f = $this->redirect) {
-                        $f($this);
+                        call_user_func($f, $this);
                     } else {
                         $this->redirectDefault();
                     }
@@ -288,7 +288,7 @@ class Form extends FieldContainer
             }
         }
         if ($f = $this->import) {
-            $this->DATA = $f($this);
+            $this->DATA = call_user_func($f, $this);
         } else {
             $this->DATA = $this->importDefault();
         }

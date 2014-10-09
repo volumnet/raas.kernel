@@ -117,7 +117,7 @@ class Table extends TableElement
                         $R->source = $row;
                         $R->Parent = $this;
                         if ($f = $this->callback) {
-                            $f($R, $i);
+                            call_user_func($f, $R, $i);
                         }
                         $Set[] = $R;
                     }

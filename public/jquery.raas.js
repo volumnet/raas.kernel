@@ -1,27 +1,103 @@
 jQuery(function($) {
-    $.fn.extend({
-        RAAS_tree: function() {
-            $('ul', this).hide();
-            $('li:has(ul)', this).prepend('<a href="#" class="jsTreePlus"></a>');
-            $('ul:has(input:checked)', this).show().closest('li').children('a.jsTreePlus').removeClass('jsTreePlus').addClass('jsTreeMinus');
-            $(this).on('click', 'a.jsTreePlus', function() { 
-                $(this).removeClass('jsTreePlus').addClass('jsTreeMinus').closest('li').children('ul').slideDown();
-                 return false;
-            });
-            $(this).on('click', 'a.jsTreeMinus', function() { 
-                $(this).removeClass('jsTreeMinus').addClass('jsTreePlus').closest('li').children('ul').slideUp();
-                return false;
-            });
-            $('input:checkbox', this).click(function() {
-                var checked = $(this).attr('checked');
-                if (checked) {
-                    $(this).closest('li').find('ul input:checkbox').attr('checked', 'checked');
+    $.fn.RAAS_tree = function(method)
+    {
+        var $thisObj;
+        var methods = {
+            hideUL: function($obj)
+            {
+                $('ul', $obj).hide();
+            },
+            addPluses: function($obj)
+            {
+                $('li:has(ul)', $obj).prepend('<a href="#" class="jsTreePlus" data-role="fold-subtree"></a>');
+            },
+            unfold: function($obj, slowly)
+            {
+                $obj.children('[data-role="fold-subtree"]').removeClass('jsTreePlus').addClass('jsTreeMinus');
+                if (slowly) {
+                    $obj.find('> ul').slideDown();
                 } else {
-                    $(this).closest('li').find('ul input:checkbox').removeAttr('checked');
+                    $obj.find('> ul').show();
                 }
-            })
-        },
-        
+            },
+            fold: function($obj, slowly)
+            {
+                $obj.children('[data-role="fold-subtree"]').removeClass('jsTreeMinus').addClass('jsTreePlus');
+                if (slowly) {
+                    $obj.find('> ul').slideUp();
+                } else {
+                    $obj.find('> ul').hide();
+                }
+            },
+            clickPlus: function() 
+            { 
+                methods.unfold($(this).closest('li'), true);
+                return false;
+            },
+            clickMinus: function()
+            {
+                methods.fold($(this).closest('li'), true);
+                return false;
+            },
+            clickCheckbox: function()
+            {
+                var group;
+                var $li = $(this).closest('li');
+                var $obj = $li.find('ul input:checkbox');
+                if (group = $obj.attr('data-group')) {
+                    $obj = $obj.filter(function(index) {
+                        return ($(this).attr('data-group') == group);
+                    });
+                }
+                if ($(this).is(':checked')) {
+                    $obj.attr('checked', 'checked');
+                } else {
+                    $obj.removeAttr('checked');
+                }
+                if ($('input:checkbox:checked', $li).length > 0) {
+                    methods.unfold($li, true);
+                } else {
+                    methods.fold($li, true);
+                }
+            },
+            clickCheckboxAccurate: function(e)
+            {
+                if ($(this).is(':checked')) {
+                    $(this).removeAttr('checked');
+                } else {
+                    $(this).attr('checked', 'checked');
+                }
+                e.stopPropagation();
+                e.preventDefault();
+                return false;
+            },
+            clickCheckboxAccurateLabel: function(e)
+            {
+                methods.clickCheckboxAccurate.call($(this).find('> input:checkbox')[0], e);
+                return false;
+            },
+            init : function(options) { 
+                $thisObj = $(this);
+                methods.hideUL($thisObj);
+                methods.addPluses($thisObj);
+                methods.unfold($('li:has(input:checked)', $thisObj), false);
+                $thisObj.on('click', '.jsTreePlus[data-role="fold-subtree"]', methods.clickPlus);
+                $thisObj.on('click', '.jsTreeMinus[data-role="fold-subtree"]', methods.clickMinus);
+                $('input:checkbox', $thisObj).on('click', methods.clickCheckbox);
+                $('input:checkbox', $thisObj).on('contextmenu', methods.clickCheckboxAccurate)
+                $('label:has(>input[type="checkbox"])', $thisObj).on('contextmenu', methods.clickCheckboxAccurateLabel)
+            },
+        };
+    
+        // логика вызова метода
+        if ( methods[method] ) {
+            return methods[ method ].apply(this, Array.prototype.slice.call(arguments, 1));
+        } else if (typeof method === 'object' || !method) {
+            return methods.init.apply(this, arguments);
+        }
+    };
+
+    $.fn.extend({
         RAAS_fillSelect: function(fill) {
             var text;
             $(this).empty();
@@ -177,7 +253,7 @@ jQuery(function($) {
                 onBeforeShow: function () { $(this).ColorPickerSetColor(this.value.replace(/#/, '')); },
                 onSubmit: function (hsb, hex, rgb, el) { $(el).val('#' + hex); }
             });
-            $('input:visible[type="range"]', thisObj).not('[disabled]').each(function() {
+            $('input[type="range"]', thisObj).not('[disabled]').each(function() {
                 if (($(this).attr('type') == 'number') && Modernizr.inputtypes.number) {
                     return;
                 }
@@ -204,9 +280,16 @@ jQuery(function($) {
                 options.change = function(e, ui) {
                     $(obj).val(parseFloat(ui.value));
                     $(ui.handle).closest('.ui-slider').attr('title', ui.value);
-                    
+                    $(this).closest('.input-range-container').find('.range-value').text(ui.value);
                 }
-                $(this).attr('readonly', 'readonly').hide().after('<div class="input-range"></div>').next('div').slider(options).slider('widget').attr('title', $(this).val());
+                $(this).attr('readonly', 'readonly')
+                       .hide()
+                       .after('<div class="input-range-container"><div class="input-range"></div><div class="range-value">' + $(this).val() + '</div></div>')
+                       .next('div')
+                       .children('.input-range')
+                       .slider(options)
+                       .slider('widget')
+                       .attr('title', $(this).val());
             });
             $('select[multiple]').not('[disabled]', thisObj).multiselect({
                 buttonText: function(options, select) {

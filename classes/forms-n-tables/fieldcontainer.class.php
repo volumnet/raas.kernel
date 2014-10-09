@@ -121,7 +121,7 @@ class FieldContainer extends FormElement
         $localError = array();
         foreach ($this->children as $row) {
             if ($f = $row->check) {
-                $e = $f($row);
+                $e = call_user_func($f, $row);
                 if (isset($e) && is_array($e) && (array_values($e) != $e)) {
                     $e = array($e);
                 }
@@ -142,7 +142,7 @@ class FieldContainer extends FormElement
     {
         foreach ($this->children as $row) {
             if ($f = $row->export) {
-                $f($row);
+                call_user_func($f, $row);
             } else {
                 $row->exportDefault();
             }
@@ -161,13 +161,13 @@ class FieldContainer extends FormElement
             foreach ($this->children as $row) {
                 if ($row instanceof Field) {
                     if ($f = $row->import) {
-                        $DATA[$row->name] = $f($row);
+                        $DATA[$row->name] = call_user_func($f, $row);
                     } else {
                         $DATA[$row->name] = $row->importDefault();
                     }
                 } else {
                     if ($f = $row->import) {
-                        $DATA = array_merge($DATA, (array)$f($row));
+                        $DATA = array_merge($DATA, (array)call_user_func($f, $row));
                     } else {
                         $DATA = array_merge($DATA, (array)$row->importDefault());
                     }
@@ -194,7 +194,7 @@ class FieldContainer extends FormElement
     {
         foreach ($this->children as $row) {
             if ($f = $row->oncommit) {
-                $f($row);
+                call_user_func($f, $row);
             } else {
                 $row->oncommitDefault();
             }
