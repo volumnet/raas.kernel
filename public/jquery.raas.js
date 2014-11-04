@@ -97,6 +97,71 @@ jQuery(function($) {
         }
     };
 
+    $.fn.RAAS_menuTree = function(method)
+    {
+        var $thisObj;
+        var defaultParams = { shownLevel: 2 };
+        var params = {};
+        var methods = {
+            hideUL: function($obj)
+            {
+                $('ul', $obj).hide();
+            },
+            addPluses: function($obj)
+            {
+                $('li:has(ul)', $obj).prepend('<a href="#" class="jsTreePlus" data-role="fold-subtree"></a>');
+            },
+            unfold: function($obj, slowly)
+            {
+                $obj.children('[data-role="fold-subtree"]').removeClass('jsTreePlus').addClass('jsTreeMinus');
+                if (slowly) {
+                    $obj.find('> ul').slideDown();
+                } else {
+                    $obj.find('> ul').show();
+                }
+            },
+            fold: function($obj, slowly)
+            {
+                $obj.children('[data-role="fold-subtree"]').removeClass('jsTreeMinus').addClass('jsTreePlus');
+                if (slowly) {
+                    $obj.find('> ul').slideUp();
+                } else {
+                    $obj.find('> ul').hide();
+                }
+            },
+            clickPlus: function() 
+            { 
+                methods.unfold($(this).closest('li'), true);
+                return false;
+            },
+            clickMinus: function()
+            {
+                methods.fold($(this).closest('li'), true);
+                return false;
+            },
+            init : function(options) { 
+                params = $.extend(defaultParams, params);
+                var sel = '';
+                for (var i = 0; i < params.shownLevel; i++) {
+                    sel += 'ul ';
+                }
+                $thisObj = $(sel, this);
+                methods.hideUL($thisObj);
+                methods.addPluses($thisObj);
+                methods.unfold($('li.active', $thisObj), false);
+                $thisObj.on('click', '.jsTreePlus[data-role="fold-subtree"]', methods.clickPlus);
+                $thisObj.on('click', '.jsTreeMinus[data-role="fold-subtree"]', methods.clickMinus);
+            },
+        };
+    
+        // логика вызова метода
+        if ( methods[method] ) {
+            return methods[ method ].apply(this, Array.prototype.slice.call(arguments, 1));
+        } else if (typeof method === 'object' || !method) {
+            return methods.init.apply(this, arguments);
+        }
+    };
+
     $.fn.extend({
         RAAS_fillSelect: function(fill) {
             var text;

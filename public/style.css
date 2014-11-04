@@ -93,11 +93,12 @@ h1 { text-shadow: 1px 1px 0px #ccc; }
 ul.tree { padding-top: 5px; padding-left: 15px; }
 ul.tree li li { font-size: 12px; }
 ul.tree li li li { font-size: 10px; }
-ul.tree li a.jsTreePlus, ul.tree li a.jsTreeMinus { 
+ul li a.jsTreePlus, ul li a.jsTreeMinus { 
     height: 16px; width: 16px; position: absolute; background: url('img/bullet_toggle_plus.png') 0 0 no-repeat; top: 4px; left: -19px; 
 }
-ul.tree li li a.jsTreePlus, ul.tree li li a.jsTreeMinus { top: 2px; left: -19px; }
-ul.tree li a.jsTreeMinus { background-image: url('img/bullet_toggle_minus.png'); }
+ul li li a.jsTreePlus, ul li li a.jsTreeMinus { top: 2px; left: -19px; }
+ul li a.jsTreeMinus { background-image: url('img/bullet_toggle_minus.png'); }
+
 
 .jsRepo, *[data-role="raas-repo"] { display: none; }
 .colorpicker { z-index: 9999; }
