@@ -39,4 +39,5 @@ jQuery(function($) {
     $('*[data-role="raas-repo-element"]:not(:has([data-role="raas-repo-move"])), *[data-role="raas-repo"]:not(:has([data-role="raas-repo-move"]))')
         .append('<a href="#" data-role="raas-repo-move"><i class="icon icon-resize-vertical"></i></a>');
     $('*[data-role="raas-repo-block"]').each(function() { $(this).RAAS_repo() });
+    $('nav.menuLeft ul').RAAS_menuTree();
 });
