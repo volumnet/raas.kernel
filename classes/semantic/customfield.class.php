@@ -178,6 +178,9 @@ abstract class CustomField extends \SOME\SOME
                 $att = new Attachment((int)$value);
                 return $att;
                 break;
+            case 'number':
+                return str_replace(',', '.', (float)$value);
+                break;
             case 'datetime': case 'datetime-local':
                 $value = str_replace(' ', 'T', $value);
                 break;
@@ -201,6 +204,9 @@ abstract class CustomField extends \SOME\SOME
             case 'image': case 'file':
                 $values = array_map(function($x) { return new Attachment((int)$x); }, $values);
                 break;
+            case 'number':
+                return array_map(function($x) { return str_replace(',', '.', $x); }, $values);
+                break;
             case 'datetime': case 'datetime-local':
                 $values = array_map(function($x) { return str_replace(' ', 'T', $x); }, $values);
                 break;
@@ -217,6 +223,9 @@ abstract class CustomField extends \SOME\SOME
         switch ($this->datatype) {
             case 'datetime': case 'datetime-local':
                 $x = str_replace('T', ' ', $x);
+                break;
+            case 'number':
+                return str_replace(',', '.', (float)$x);
                 break;
             case 'checkbox': case 'radio': case 'select':
                 if ($this->multiple || ($this->datatype != 'checkbox')) {
@@ -245,6 +254,9 @@ abstract class CustomField extends \SOME\SOME
     public function setValue($value, $index = 0)
     {
         switch ($this->datatype) {
+            case 'number':
+                $value = (float)str_replace(',', '.', (float)$value);
+                break;
             case 'datetime': case 'datetime-local':
                 $value = str_replace('T', ' ', $value);
                 break;

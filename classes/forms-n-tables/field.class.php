@@ -250,6 +250,9 @@ class Field extends OptionContainer
             case 'image': case 'file':
                 return is_uploaded_file($val);
                 break;
+            case 'number':
+                return (float)str_replace(',', '.', $val);
+                break;
             default:
                 return true;
                 break;
@@ -281,6 +284,7 @@ class Field extends OptionContainer
                 return (bool)filter_var($val, FILTER_VALIDATE_EMAIL);
                 break;
             case 'number': case 'range':
+                $val = str_replace(',', '.', (float)$val);
                 if (!is_numeric($val)) {
                     return false;
                 } elseif ($this->min_val && ($val < $this->min_val)) {
@@ -387,8 +391,11 @@ class Field extends OptionContainer
             case 'datetime': case 'datetime-local':
                 $f = function($x) { return strtotime(str_replace('T', ' ', $x)) > 0 ? date('Y-m-d H:i:s', strtotime(str_replace('T', ' ', $x))) : '0000-00-00 00:00:00'; };
                 break;
-            case 'number': case 'range': case 'year':
+            case 'year':
                 $f = 'intval';
+                break;
+            case 'number': case 'range':
+                $f = function($x) { return floatval(str_replace(',', '.', $x)); };
                 break;
             case 'time':
                 $f = function($x) { return strtotime($x) > 0 ? date('H:i:s', strtotime($x)) : '00:00:00'; };
@@ -447,6 +454,11 @@ class Field extends OptionContainer
                     return date('Y-m-d H:i', strtotime($x));
                 }
                 return '';
+                break;
+            case 'number':
+                $x = (float)$this->Form->Item->{$this->name}; 
+                $x = str_replace(',', '.', $x);
+                return $x;
                 break;
             default:
                 return $this->Form->Item->{$this->name};
