@@ -37,12 +37,12 @@ class StdSub extends Abstract_Sub_Controller
      *                              автоматически заменять параметр $url на 'history:back'
      * @param callable|bool $filter дополнительное условие - для выполнения фактического действия должен быть TRUE, 
      *                              либо (если callable) возвращать TRUE от объекта $Item
-     * @param \SOME\SOME $Parent родительский элемент для дополнительной фильтрации
+     * @param mixed $where Дополнительное условие для поиска, например, общность родительских элементов
      */         
-    public static function move_up(\SOME\SOME $Item, $url = 'history::back', $conditionalBack = true, $filter = true, $Parent = null)
+    public static function move_up(\SOME\SOME $Item, $url = 'history::back', $conditionalBack = true, $filter = true, $where = null)
     {
         if ($Item->id && (is_callable($filter) ? $filter($Item) : (bool)$filter)) {
-            $Item->reorder((isset($_GET['step']) && (int)$_GET['step']) ? -1 * abs((int)$_GET['step']) : -1, $Parent);
+            $Item->reorder((isset($_GET['step']) && (int)$_GET['step']) ? -1 * abs((int)$_GET['step']) : -1, $where);
             $Item->commit();
         }
         new Redirector(($conditionalBack && isset($_GET['back'])) ? 'history:back' : $url);
@@ -57,12 +57,12 @@ class StdSub extends Abstract_Sub_Controller
      *                              автоматически заменять параметр $url на 'history:back'
      * @param callable|bool $filter дополнительное условие - для выполнения фактического действия должен быть TRUE, 
      *                              либо (если callable) возвращать TRUE от объекта $Item
-     * @param \SOME\SOME $Parent родительский элемент для дополнительной фильтрации
+     * @param mixed $where Дополнительное условие для поиска, например, общность родительских элементов
      */         
-    public static function move_down(\SOME\SOME $Item, $url = 'history::back', $conditionalBack = true, $filter = true, $Parent = null)
+    public static function move_down(\SOME\SOME $Item, $url = 'history::back', $conditionalBack = true, $filter = true, $where = null)
     {
         if ($Item->id && (is_callable($filter) ? $filter($Item) : (bool)$filter)) {
-            $Item->reorder((isset($_GET['step']) && (int)$_GET['step']) ? abs((int)$_GET['step']) : 1, $Parent);
+            $Item->reorder((isset($_GET['step']) && (int)$_GET['step']) ? abs((int)$_GET['step']) : 1, $where);
             $Item->commit();
         }
         new Redirector(($conditionalBack && isset($_GET['back'])) ? 'history:back' : $url);
