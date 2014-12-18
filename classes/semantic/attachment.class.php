@@ -127,6 +127,16 @@ class Attachment extends \SOME\SOME
         if (is_file($this->dirpath . '/' . pathinfo($this->realname, PATHINFO_FILENAME) . '_tn.jpg')) {
             unlink($this->dirpath . '/' . pathinfo($this->realname, PATHINFO_FILENAME) . '_tn.jpg');
         }
+        if (is_file($this->dirpath . '/' . pathinfo($this->realname, PATHINFO_FILENAME) . '_small.jpg')) {
+            unlink($this->dirpath . '/' . pathinfo($this->realname, PATHINFO_FILENAME) . '_small.jpg');
+        }
+        $temp = pathinfo($this->realname);
+        $temp = glob($this->dirpath . '/' . $temp['filename'] . '.*.' . $temp['extension']);
+        foreach ($temp as $val) {
+            if (is_file($val)) {
+                unlink($val);
+            }
+        }
     }
     
     
