@@ -239,6 +239,31 @@ abstract class CustomField extends \SOME\SOME
     }
     
     
+    public function fromRich($x = null)
+    {
+        if ($x === null) {
+            $x = $this->getValue();
+        }
+        switch ($this->datatype) {
+            case 'datetime': case 'datetime-local':
+                $x = str_replace('T', ' ', $x);
+                $x = date('Y-m-d H:i:s', strtotime($x));
+                break;
+            case 'number':
+                return str_replace(',', '.', (float)$x);
+                break;
+            case 'checkbox': case 'radio': case 'select':
+                if ($this->multiple || ($this->datatype != 'checkbox')) {
+                    $x = $this->getFromCaption($x);
+                } else {
+                    $x = (bool)$x;
+                }
+                break;
+        }
+        return $x;
+    }
+    
+    
     public function countValues()
     {
         if (!$this->Owner || !static::data_table) {
@@ -488,6 +513,7 @@ abstract class CustomField extends \SOME\SOME
         return $data;
     }
     
+
     protected function getCaption($key = '', $DATA = array())
     {
         if (!$DATA) {
@@ -503,6 +529,24 @@ abstract class CustomField extends \SOME\SOME
         }
         return null;
     }
+
+
+    protected function getFromCaption($val = '', $DATA = array())
+    {
+        if (!$DATA) {
+            $DATA =& $this->stdSource;
+        }
+        foreach ($DATA as $k => $row) {
+            if (mb_strtolower(trim($row['name'])) == mb_strtolower(trim($val))) {
+                return $k;
+            }
+            if (isset($row['children']) && ($v = $this->getFromCaption($val, $row['children']))) {
+                return $v;
+            }
+        }
+        return null;
+    }
+
     
     protected function _stdSource()
     {
