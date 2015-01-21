@@ -42,7 +42,7 @@ function showMenu(array $SUBMENU, $type = null)
                       .     (isset($row['counter']) && $row['counter'] ? ' (<b><a href="' . htmlspecialchars($row['href']) . '">' . (int)$row['counter'] . '</a></b>)' : '')
                       .     $children;
             } else {
-                $text .= '  <a>' 
+                $text .= '  <a ' . $attrs . '>' 
                       .       (isset($row['icon']) ? '<i class="icon-' . htmlspecialchars($row['icon']) . '"></i> ' : '') . $row['name']
                       .  '  </a>'
                       .     (isset($row['counter']) && $row['counter'] ? ' (<b>' . (int)$row['counter'] . '</b>)' : '')
