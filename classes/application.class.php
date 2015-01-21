@@ -810,10 +810,10 @@ final class Application extends \SOME\Singleton implements IContext
         } else {
             switch ($classname) {
                 case 'PHPExcel':
-                    require_once $this->includeDir . '/class.phpmailer.php';
+                    require_once $this->includeDir . '/phpexcel/Classes/PHPExcel.php';
                     break;
                 case 'PHPMailer':
-                    require_once $this->includeDir . '/phpexcel/Classes/PHPExcel.php';
+                    require_once $this->includeDir . '/class.phpmailer.php';
                     break;
                 case 'phpQuery':
                     require_once $this->includeDir . '/phpQuery-onefile.php';

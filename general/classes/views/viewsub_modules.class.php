@@ -180,18 +180,18 @@ class ViewSub_Modules extends \RAAS\Abstract_Sub_View
                 'icon' => 'refresh', 
                 'onclick' => 'return confirm(\'' . $this->_($Item instanceof Package ? 'PACKAGE_REPAIR_CONFIRMATION' : 'MODULE_REPAIR_CONFIRMATION') . '\')'
             );
-            $arr[] = array(
-                'name' => $this->_('FORMAT'), 
-                'href' => $this->url . '&action=format&mid=' . $Item->mid . ($edit || $levels ? '' : '&back=1'), 
-                'icon' => 'warning-sign', 
-                'onclick' => 'return confirm(\'' . $this->_($Item instanceof Package ? 'PACKAGE_FORMAT_CONFIRMATION' : 'MODULE_FORMAT_CONFIRMATION') . '\')'
-            );
-            $arr[] = array(
-                'name' => $this->_('DELETE'), 
-                'href' => $this->url . '&action=delete&mid=' . $Item->mid . ($edit || $levels ? '' : '&back=1'), 
-                'icon' => 'remove', 
-                'onclick' => 'return confirm(\'' . $this->_($Item instanceof Package ? 'PACKAGE_DELETE_CONFIRMATION' : 'MODULE_DELETE_CONFIRMATION') . '\')'
-            );
+            // $arr[] = array(
+            //     'name' => $this->_('FORMAT'), 
+            //     'href' => $this->url . '&action=format&mid=' . $Item->mid . ($edit || $levels ? '' : '&back=1'), 
+            //     'icon' => 'warning-sign', 
+            //     'onclick' => 'return confirm(\'' . $this->_($Item instanceof Package ? 'PACKAGE_FORMAT_CONFIRMATION' : 'MODULE_FORMAT_CONFIRMATION') . '\')'
+            // );
+            // $arr[] = array(
+            //     'name' => $this->_('DELETE'), 
+            //     'href' => $this->url . '&action=delete&mid=' . $Item->mid . ($edit || $levels ? '' : '&back=1'), 
+            //     'icon' => 'remove', 
+            //     'onclick' => 'return confirm(\'' . $this->_($Item instanceof Package ? 'PACKAGE_DELETE_CONFIRMATION' : 'MODULE_DELETE_CONFIRMATION') . '\')'
+            // );
         } else {
             $arr[] = array(
                 'name' => $this->_('REPAIR'), 

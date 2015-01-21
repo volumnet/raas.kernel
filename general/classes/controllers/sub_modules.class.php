@@ -50,14 +50,14 @@ class Sub_Modules extends \RAAS\Abstract_Sub_Controller
                 $Context = $this->getContext(false);
                 StdSub::registrySet($Context, $this->url, true, isset($Context), 'installDate', null);
                 break;
-            case 'format':
-                $Context = $this->getContext();
-                StdSub::uninstall($Context, $this->url, true, isset($Context), false);
-                break;
-            case 'delete': 
-                $Context = $this->getContext();
-                StdSub::uninstall($Context, $this->url, true, isset($Context), true);
-                break;
+            // case 'format':
+            //     $Context = $this->getContext();
+            //     StdSub::uninstall($Context, $this->url, true, isset($Context), false);
+            //     break;
+            // case 'delete': 
+            //     $Context = $this->getContext();
+            //     StdSub::uninstall($Context, $this->url, true, isset($Context), true);
+            //     break;
             case 'move_up_level':
                 $Item = new Level((int)$this->id);
                 $Context = ($Item->id && ($Item->Context instanceof IRightsContext)) ? $Item->Context : $this->getContext();
