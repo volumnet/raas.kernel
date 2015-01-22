@@ -807,11 +807,10 @@ final class Application extends \SOME\Singleton implements IContext
                     }
                 }
             }
+        } elseif (stristr($classname, 'PHPExcel')) {
+            require_once $this->includeDir . '/phpexcel/Classes/PHPExcel.php';
         } else {
             switch ($classname) {
-                case 'PHPExcel':
-                    require_once $this->includeDir . '/phpexcel/Classes/PHPExcel.php';
-                    break;
                 case 'PHPMailer':
                     require_once $this->includeDir . '/class.phpmailer.php';
                     break;
