@@ -35,7 +35,7 @@ class Sub_Modules extends \RAAS\Abstract_Sub_Controller
     {
         $this->view->submenu = $this->view->getModulesMenu();
         switch ($this->action) {
-            case 'edit': case 'update': case 'edit_level':
+            case 'edit': /*case 'update':*/ case 'edit_level':
                 $this->{$this->action}();
                 break;
             case 'levels': 

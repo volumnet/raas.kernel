@@ -245,7 +245,7 @@ class ViewSub_Modules extends \RAAS\Abstract_Sub_View
             'href' => $this->url . '&action=edit',
             'active' => ($this->action == 'edit') && (!isset($this->nav['mid']) || ($this->nav['mid']) == ''),
         );
-        $submenu[] = array('name' => $this->_('SYSTEM_UPDATE'), 'href' => $this->url . '&action=update');
+        // $submenu[] = array('name' => $this->_('SYSTEM_UPDATE'), 'href' => $this->url . '&action=update');
         return $submenu;
     }
 }
