@@ -43,7 +43,7 @@ abstract class CustomField extends \SOME\SOME
                         $f->$key = (int)$this->$key;
                     }
                 }
-                foreach (array('min_val', 'max_val') as $key) {
+                foreach (array('min_val', 'max_val', 'step') as $key) {
                     if ((float)$this->$key) {
                         $f->{str_replace('_val', '', $key)} = (float)$this->$key;
                     }
@@ -53,6 +53,9 @@ abstract class CustomField extends \SOME\SOME
                 $f->children = $this->_getFieldChildren((array)$this->_stdSource());
                 $f->export = 'is_null';
                 $f->import = function ($Field) use ($t) { return $t->getValues(); };
+                if (!in_array($t->datatype, array('image', 'file'))) {
+                    $f->default = $t->defval;
+                }
                 if (in_array($t->datatype, array('image', 'file')) && $t->getValue()->id) {
                     //$f->required = false;
                 }
