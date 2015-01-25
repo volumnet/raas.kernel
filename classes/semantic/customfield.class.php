@@ -241,9 +241,6 @@ abstract class CustomField extends \SOME\SOME
     
     public function fromRich($x = null)
     {
-        if ($x === null) {
-            $x = $this->getValue();
-        }
         switch ($this->datatype) {
             case 'datetime': case 'datetime-local':
                 $x = str_replace('T', ' ', $x);
