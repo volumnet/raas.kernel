@@ -5,6 +5,7 @@ class Attachment extends \SOME\SOME
     const tnsize = 300;
     
     protected static $tablename = 'attachments';
+    protected static $objectCascadeDelete = true;
     protected static $cognizableVars = array('parent');
     
     public function __get($var)
