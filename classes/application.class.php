@@ -607,33 +607,8 @@ final class Application extends \SOME\Singleton implements IContext
             }
             $this->registrySet('installDate', date('Y-m-d H:i:s'));
 
-            $Set = Attachment::getSet();
-            foreach ($Set as $row) {
-                if (!is_file($row->file)) {
-                    if (is_file($old_file = $this->filesDir . '/' . $row->realname)) {
-                        rename($old_file, $row->file);
-                    } else {
-                        Attachment::delete($row);
-                    }
-                }
-                if ($row->image) {
-                    if ($row->tn && !is_file($row->tn)) {
-                        if (is_file($old_file = $this->filesDir . '/' . pathinfo($row->realname, PATHINFO_FILENAME) . '_tn.jpg')) {
-                            rename($old_file, $row->tn);
-                        } else {
-                            $row->createThumbnail();
-                        }
-                    }
-                    if ($row->small && !is_file($row->small)) {
-                        if (is_file($old_file = $this->filesDir . '/' . pathinfo($row->realname, PATHINFO_FILENAME) . '_small.' . $row->ext)) {
-                            rename($old_file, $row->small);
-                        } else {
-                            $row->createThumbnail();
-                        }
-                    }
-                    $row->createThumbnail();
-                }
-            }
+            Attachment::clearLostAttachments();
+            Attachment::clearLostFiles();
         }
     }
     

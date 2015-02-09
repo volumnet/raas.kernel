@@ -122,17 +122,17 @@ class Attachment extends \SOME\SOME
     
     protected function deleteFile()
     {
+        $temp = pathinfo($this->realname);
+        $temp = glob($this->dirpath . '/' . $temp['filename'] . '.*.' . $temp['extension']);
         if (is_file($this->dirpath . '/' . $this->realname)) {
             unlink($this->dirpath . '/' . $this->realname);
         }
         if (is_file($this->dirpath . '/' . pathinfo($this->realname, PATHINFO_FILENAME) . '_tn.jpg')) {
             unlink($this->dirpath . '/' . pathinfo($this->realname, PATHINFO_FILENAME) . '_tn.jpg');
         }
-        if (is_file($this->dirpath . '/' . pathinfo($this->realname, PATHINFO_FILENAME) . '_small.jpg')) {
-            unlink($this->dirpath . '/' . pathinfo($this->realname, PATHINFO_FILENAME) . '_small.jpg');
+        if (is_file($this->dirpath . '/' . pathinfo($this->realname, PATHINFO_FILENAME) . '_small.' . pathinfo($this->realname, PATHINFO_EXTENSION))) {
+            unlink($this->dirpath . '/' . pathinfo($this->realname, PATHINFO_FILENAME) . '_small.' . pathinfo($this->realname, PATHINFO_EXTENSION));
         }
-        $temp = pathinfo($this->realname);
-        $temp = glob($this->dirpath . '/' . $temp['filename'] . '.*.' . $temp['extension']);
         foreach ($temp as $val) {
             if (is_file($val)) {
                 unlink($val);
@@ -186,6 +186,71 @@ class Attachment extends \SOME\SOME
             \SOME\Thumbnail::make($this->file, $this->small, $this->tnsize ? $this->tnsize : self::tnsize, -1, \SOME\Thumbnail::THUMBNAIL_FRAME, true);
             if ($this->small) {
                 chmod($this->small, 0777);
+            }
+        }
+    }
+
+
+    public static function clearLostAttachments()
+    {
+        $Set = static::getSet();
+        foreach ($Set as $row) {
+            if (!is_file($row->file)) {
+                if (is_file($old_file = Application::i()->filesDir . '/' . $row->realname)) {
+                    rename($old_file, $row->file);
+                } else {
+                    static::delete($row);
+                }
+            }
+            if ($row->image) {
+                if ($row->tn && !is_file($row->tn)) {
+                    if (is_file($old_file = Application::i()->filesDir . '/' . pathinfo($row->realname, PATHINFO_FILENAME) . '_tn.jpg')) {
+                        rename($old_file, $row->tn);
+                    } else {
+                        $row->createThumbnail();
+                    }
+                }
+                if ($row->small && !is_file($row->small)) {
+                    if (is_file($old_file = Application::i()->filesDir . '/' . pathinfo($row->realname, PATHINFO_FILENAME) . '_small.' . $row->ext)) {
+                        rename($old_file, $row->small);
+                    } else {
+                        $row->createThumbnail();
+                    }
+                }
+                // 2015-02-09, AVS: закомментировал
+                // $row->createThumbnail();
+            }
+        }
+    }
+
+
+    public static function clearLostFiles($dirname = null)
+    {
+        if (!$dirname) {
+            $dirname = Application::i()->filesDir;
+        }
+        $Set = static::getSet();
+        $temp = array();
+        foreach ($Set as $row) {
+            if (is_file($row->file)) {
+                $temp[] = preg_replace('/\\.\\w+$/umi', '', realpath($row->file));
+            }
+        }
+        $Set = $temp;
+        $temp = glob($dirname . '/*');
+        $temp = array_filter($temp, 'is_file');
+        $temp = array_map('realpath', $temp);
+        $toDelete = array();
+        foreach ($temp as $val) {
+            $file = preg_replace('/\\.\\w+$/umi', '', realpath($val));
+            $file = preg_replace('/_(small|tn)$/umi', '', $file);
+            if (!in_array($file, $Set)) {
+                $toDelete[] = $val;
+            }
+        }
+        foreach ($toDelete as $val) {
+            if (is_file($val)) {
+                unlink($val);
             }
         }
     }
