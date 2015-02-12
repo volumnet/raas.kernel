@@ -229,7 +229,7 @@ class Sub_Modules extends \RAAS\Abstract_Sub_Controller
             'Item' => $Item,
             'caption' => $Item->id ? htmlspecialchars($Item->name) : $this->view->_('CREATE_LEVEL'),
             'parentUrl' => \SOME\HTTP::queryString('action=levels&id='),
-            'import' => function($Form) use ($IN) { return array_merge($Form->importDefault(), $IN['DATA']); },
+            'import' => function($Form) use ($IN) { return array_merge($Form->importDefault(), (array)$IN['DATA']); },
             'commit' => function($Form) use ($Context) { 
                 $Form->exportDefault(); 
                 $Form->Item->Context = $Context; 

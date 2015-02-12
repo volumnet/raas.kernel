@@ -57,7 +57,7 @@ class ViewSub_Modules extends \RAAS\Abstract_Sub_View
                             if ($row->locked) {
                                 return htmlspecialchars($row->name);
                             } else {
-                                return '<a href="' . $this->url . $view->getContextURL($IN['Context']) . '&action=edit_level&id=' . (int)$row->id . '">' 
+                                return '<a href="' . $view->url . $view->getContextURL($IN['Context']) . '&action=edit_level&id=' . (int)$row->id . '">' 
                                      .    htmlspecialchars($row->name) 
                                      . '</a>';
                             }
