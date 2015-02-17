@@ -1,7 +1,19 @@
 <?php
 $_RAASForm_Option = function(\RAAS\Option $Option, $level = 0) use ($_RAASForm_Options, $_RAASForm_Attrs) {
     $attrs = array();
-    if (in_array($Option->value, (array)$Option->Form->DATA[$Option->Field->name]) && !$Option->disabled) {
+    $selected = false;
+    if (!$Option->disabled) {
+        if ($Option->Field->multiple) {
+            if ($Option->Field->{'data-raas-multiselect'}) {
+                $selected = in_array($Option->value, (array)$Option->Form->DATA[$Option->Field->name]);
+            } else {
+                $selected = ($Option->value == $Option->Field->value);
+            }
+        } else {
+            $selected = ($Option->value == $Option->Form->DATA[$Option->Field->name]);
+        }
+    }
+    if ($selected) {
         $attrs['selected'] = 'selected';
     }
     ?>
