@@ -175,9 +175,9 @@ abstract class Access
     
     final private function _rights()
     {
-        if (($this->Owner instanceof User) && $this->Owner->rights) {
-            $this->rights = $this->Owner->rights['rights'];
-            $this->mask = $this->Owner->rights['mask'];
+        if (($this->Owner instanceof User) && isset($this->Owner->rights[$this->Context->mid]) && $this->Owner->rights[$this->Context->mid]) {
+            $this->rights = $this->Owner->rights[$this->Context->mid]['rights'];
+            $this->mask = $this->Owner->rights[$this->Context->mid]['mask'];
         } else {
             // Собственные права
             $this->rights = $this->selfRights;
@@ -240,7 +240,11 @@ abstract class Access
             }
             
             if (($this->Owner instanceof User) && $this->Owner->id) {
-                $this->Owner->cache_rights = json_encode(array('rights' => $this->rights, 'mask' => $this->mask));
+                $cache_rights = @json_decode($this->Owner->cache_rights, true);
+                $cache_rights = (array)$cache_rights;
+                $cache_rights[$this->Context->mid] = array('rights' => $this->rights, 'mask' => $this->mask);
+                $cache_rights = json_encode($cache_rights);
+                $this->Owner->cache_rights = $cache_rights;
                 $this->Owner->commit();
             }
         }
