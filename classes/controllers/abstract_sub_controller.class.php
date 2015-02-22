@@ -69,8 +69,13 @@ abstract class Abstract_Sub_Controller extends \SOME\Singleton
                 return $this->_view;
                 break;
             
+            case 'mid': case 'alias':
+                $classname = \SOME\Namespaces::getClass(\get_called_class());
+                $classname = str_ireplace('Sub_', '', $classname);
+                return strtolower($classname);
+                break;
             case 'url':
-                return $this->parent->url . '&sub=' . $this->sub;
+                return $this->parent->url . '&sub=' . $this->mid;
                 break;
             default:
                 return $this->parent->$var;
