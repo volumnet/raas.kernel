@@ -463,7 +463,8 @@ abstract class CustomField extends \SOME\SOME
             $SQL_result = static::$SQL->get((string)$text);
         }
         if ($SQL_result) {
-            $rawData = array_values(array_filter($SQL_result, create_function('$x', '$v = "' . addslashes($pid) . '"; return ($x["pid"] == $v) || (!$x["pid"] && !$v);')));
+            // $rawData = array_values(array_filter($SQL_result, create_function('$x', '$v = "' . addslashes($pid) . '"; return ($x["pid"] == $v) || (!$x["pid"] && !$v);')));
+            $rawData = array_values(array_filter($SQL_result, function($x) use ($pid) { return ($x['pid'] == $pid) || (!$x['pid'] && !$pid); }));
             foreach ($rawData as $row) {
                 $val = trim(isset($row['name']) && trim($row['name']) ? $row['name'] : array_shift(array_values($row)));
                 $key = trim(isset($row['val']) && trim($row['val']) ? $row['val'] : $val);
