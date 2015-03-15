@@ -72,42 +72,15 @@ class ViewSub_Users extends \RAAS\Abstract_Sub_View
     public function showlist(array $IN = array())
     {
         $view = $this;
-        $IN['UsersTable'] = new Table(array(
-            'columns' => array(
-                'login' => array(
-                    'caption' => $this->_('LOGIN'), 
-                    'sortable' => Column::SORTABLE_REVERSABLE, 
-                    'callback' => function($row) use ($view) { return '<a href="' . $view->url . '&action=edit_user&id=' . (int)$row->id . '">' . htmlspecialchars($row->login) . '</a>'; }
-                ),
-                'last_name' => array('caption' => $this->_('FULL_NAME'), 'sortable' => Column::SORTABLE_REVERSABLE, 'callback' => function($row) { return $row->full_name; }),
-                ' ' => array('callback' => function($row) use ($view, $IN) { return rowContextMenu($view->getUserContextMenu($row, $IN['Group'])); })
-            ),
-            'caption' => $this->_('USERS'),
-            'callback' => function (Row $Row) use ($view) { if ($Row->source->root) { $Row->class = 'info'; $Row->title = $view->_('ADMINISTRATOR'); } },
-            'Set' => $IN['CONTENT']['Set'],
-            'Pages' => $IN['CONTENT']['Pages'],
-            'sort' => $IN['CONTENT']['sort'] ? $IN['CONTENT']['sort'] : 'login',
-            'order' => ($IN['CONTENT']['order'] == 'desc') ? Column::SORT_DESC : Column::SORT_ASC,
+        $IN['UsersTable'] = new UsersTable(array(
+            'Group' => $IN['Group'], 
+            'Set' => $IN['CONTENT']['Set'], 
+            'Pages' => $IN['CONTENT']['Pages'], 
+            'sort' => $IN['CONTENT']['sort'], 
+            'order' => $IN['CONTENT']['order']
         ));
 
-        $IN['GroupsTable'] = new Table(array(
-            'columns' => array(
-                'name' => array(
-                    'callback' => function ($row) use ($view) { 
-                        return '<div class="media">
-                                  <div class="media-body">
-                                    <h4 class="media-heading"><a href="' . $view->url . '&id=' . (int)$row->id . '">' . htmlspecialchars($row->name) . '</a></h4>
-                                    ' . htmlspecialchars(\SOME\Text::cuttext($row->description)) . '
-                                  </div>
-                                </div>'; 
-                    }
-                ),
-                ' ' => array('callback' => function($row) use ($view, $IN) { return rowContextMenu($view->getGroupContextMenu($row)); })
-            ),
-            'caption' => $this->_('GROUPS'),
-            'Set' => $IN['CONTENT']['GSet'],
-            'header' => false,
-        ));
+        $IN['GroupsTable'] = new GroupsTable(array('Set' => $IN['CONTENT']['GSet']));
 
         $this->assignVars($IN);
         $this->getGroupsPath($IN['Group']);

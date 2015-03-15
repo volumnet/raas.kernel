@@ -77,121 +77,7 @@ class Sub_Users extends \RAAS\Abstract_Sub_Controller
     private function edit_user()
     {
         $Item = new User((int)$this->id);
-        $t = $this;
-        $Form = new Form(array(
-            'caption' => $Item->id ? htmlspecialchars($Item->full_name ? $Item->full_name : $Item->login) : $this->view->_('ADD_USER'), 'Item' => $Item
-        ));
-        /*** Вкладка редактирования пользователя ***/
-        $FormTab = new FormTab(array('name' => 'edit', 'caption' => $this->view->_('EDIT_USER')));
-        // Логин
-        $Field = new Field(array('name' => 'login', 'caption' => $this->view->_('LOGIN'), 'required' => 'required'));
-        if ($Item->id == $this->model->user->id) {
-            $Field->readonly = 'readonly';
-            $Field->export = 'is_null';
-        } else {
-            $Field->required = 'required';
-            $Field->check = function($Field) use ($t) {
-                $localError = $Field->getErrors();
-                if (!$localError) {
-                    if ($t->model->checkLoginExists($_POST[$Field->name], $Field->Form->Item->id)) {
-                        $localError[] = array('name' => 'INVALID', 'value' => $Field->name, 'description' => $t->view->_('ERR_LOGIN_EXISTS'));
-                    }
-                }
-                return $localError;
-           };
-        }
-        $FormTab->children[] = $Field;
-        // Пароль
-        $Field = new Field(array(
-            'type' => 'password', 
-            'name' => 'password', 
-            'caption' => $this->view->_('PASSWORD'),
-            'confirm' => true, 
-            'export' => function($Field) use ($t) { 
-                if ($_POST[$Field->name]) {
-                    $Field->Form->Item->password_md5 = $t->application->md5It(trim($_POST[$Field->name])); 
-                }
-            }
-        ));
-        if (!$Item->id) {
-            $Field->required = 'required';
-        }
-        $FormTab->children[] = $Field;
-        // E-mail
-        $FormTab->children[] = new Field(array('type' => 'email', 'name' => 'email', 'caption' => $this->view->_('EMAIL')));
-        // ФИО
-        $FormTab->children[] = new Field(array('name' => 'last_name', 'caption' => $this->view->_('LAST_NAME')));
-        $FormTab->children[] = new Field(array('name' => 'first_name', 'caption' => $this->view->_('FIRST_NAME')));
-        $FormTab->children[] = new Field(array('name' => 'second_name', 'caption' => $this->view->_('SECOND_NAME')));
-        // Глобальный админ
-        if ($Item->id != $this->model->user->id) {
-            $FormTab->children[] = new Field(array('type' => 'checkbox', 'name' => 'root', 'caption' => $this->view->_('GLOBAL_ADMIN')));
-        }
-        // Язык
-        $Field = new Field(array(
-            'type' => 'select',
-            'name' => 'lang', 
-            'caption' => $this->view->_('LANGUAGE'),
-            'default' => $this->view->language,
-            'import' => function($Field) use ($t) { return $Field->Form->Item->preferences[$Field->name]; },
-            'export' => function($Field) use ($t) { 
-                $preferences = $Field->Form->Item->preferences;
-                if (isset($_POST[$Field->name])) {
-                    $preferences['lang'] = $_POST[$Field->name];
-                }
-                $Field->Form->Item->preferences = $preferences;
-            }
-        ));
-        foreach ($this->view->availableLanguages as $key => $val) {
-            $Field->children[] = new Option(array('value' => $key, 'caption' => $val));
-        }
-        $FormTab->children[] = $Field;
-        $Form->children[] = $FormTab;
-        
-        if ($t->model->user->root) {
-            // Группы
-            $Form->children[] = new FormTab(array(
-                'name' => 'user_groups', 
-                'caption' => $this->view->_('GROUPS'), 
-                'template' => 'admin_users_edit_user',
-                'children' => array(
-                    new Field(array(
-                        'type' => 'checkbox', 
-                        'name' => 'groups',
-                        'multiple' => 'multiple', 
-                        'import' => function($Field) use ($t) { return $Field->Form->Item->associations; }, 
-                        'export' => function($Field) use ($t) { $Field->Form->Item->_SET_groups = $_POST[$Field->name]; }
-                    )
-                ))
-            ));
-            if ($t->model->user->id != $Form->Item->id) {
-                // Права доступа
-                $Form->children[] = new FormTab(array(
-                    'name' => 'rights',
-                    'caption' => $this->view->_('RIGHTS'), 
-                    'template' => 'rights', 
-                    'children' => array(array(
-                        'type' => 'select', 
-                        'name' => 'rights', 
-                        'multiple' => 'multiple',
-                        'export' => function($Field) use ($t) { $Field->Form->Item->_SET_rights = $_POST[$Field->name]; },
-                        'import' => function($Field) use ($t) {
-                            $DATA = array();
-                            $Item = $Field->Form->Item;
-                            foreach ($t->application->packages as $row) {
-                                $level = $Item->access($row)->level;
-                                $DATA[$row->mid] = (int)($level instanceof Level ? $level->id : $level);
-                                foreach ($row->modules as $row2) {
-                                    $level = $Item->access($row2)->level;
-                                    $DATA[$row2->mid] = (int)($level instanceof Level ? $level->id : $level);
-                                }
-                            }
-                            return $DATA;
-                        }
-                    ))
-                ));
-            }
-        }
+        $Form = new EditUserForm(array('Item' => $Item));
         $this->view->edit_user($Form->process());
     }
     
@@ -202,46 +88,7 @@ class Sub_Users extends \RAAS\Abstract_Sub_Controller
         if (!$Item->id) {
             $Item->pid = isset($_GET['pid']) ? (int)$_GET['pid'] : 0;
         }
-        $t = $this;
-        $Form = new Form(array(
-            'Item' => $Item,
-            'caption' => $Item->id ? htmlspecialchars($Item->name) : $this->view->_('ADD_GROUP'),
-            'parentUrl' => urldecode(\SOME\HTTP::queryString('id=%s&action=')) . '#groups',
-            'children' => array(
-                new FormTab(array(
-                    'name' => 'edit', 
-                    'caption' => $this->view->_('EDIT_GROUP'), 
-                    'children' => array(
-                        array('name' => 'name', 'caption' => $this->view->_('NAME'), 'required' => 'required'),
-                        array('type' => 'textarea', 'name' => 'description', 'caption' => $this->view->_('DESCRIPTION')),
-                    )
-                )),
-                new FormTab(array(
-                    'name' => 'rights',
-                    'caption' => $this->view->_('RIGHTS'), 
-                    'template' => 'rights', 
-                    'children' => array(array(
-                        'type' => 'select', 
-                        'name' => 'rights', 
-                        'multiple' => 'multiple',
-                        'export' => function($Field) use ($t) { $Field->Form->Item->_SET_rights = $_POST[$Field->name]; },
-                        'import' => function($Field) use ($t) {
-                            $DATA = array();
-                            $Item = $Field->Form->Item;
-                            foreach ($t->application->packages as $row) {
-                                $level = $Item->access($row)->level;
-                                $DATA[$row->mid] = (int)($level instanceof Level ? $level->id : $level);
-                                foreach ($row->modules as $row2) {
-                                    $level = $Item->access($row2)->level;
-                                    $DATA[$row2->mid] = (int)($level instanceof Level ? $level->id : $level);
-                                }
-                            }
-                            return $DATA;
-                        }
-                    ))
-                ))
-            )
-        ));
+        $Form = new EditGroupForm(array('Item' => $Item));
         $this->view->edit_group($Form->process());
     }
 
@@ -257,14 +104,7 @@ class Sub_Users extends \RAAS\Abstract_Sub_Controller
         }
         $t = $this;
         $IN = (array)$Context->controller->rights($Item, $Context);
-        $Form = new Form(array(
-            'caption' => $this->application->view->_('EDIT_RIGHTS') . ': ' . htmlspecialchars($IN['Item']->full_name ? $IN['Item']->full_name : $IN['Item']->login),
-            'import' => function($Form) use ($IN) { return $IN['DATA']; },
-            'commit' => function($Form) use ($IN, $Context, $Item) { $Item->access($Context)->setRights($IN['rights']); },
-            'children' => array(
-                array('name' => 'rights', 'template' => str_replace('.', '/', $Context->mid) . '/rights.inc.tmp.php', 'import' => 'is_null', 'export' => 'is_null')
-            )
-        ));
+        $Form = new EditRightsForm(array_merge(array('Item' => $Item, 'Context' => $Context), $IN));
         $this->view->user_rights(array_merge((array)$Form->process(), array('Context' => $Context, 'Item' => $Item)));
     }
     
@@ -280,14 +120,7 @@ class Sub_Users extends \RAAS\Abstract_Sub_Controller
         }
         $t = $this;
         $IN = (array)$Context->controller->rights($Item, $Context);
-        $Form = new Form(array(
-            'caption' => $this->application->view->_('EDIT_RIGHTS') . ': ' . htmlspecialchars($IN['Item']->name),
-            'import' => function($Form) use ($IN) { return $IN['DATA']; },
-            'commit' => function($Form) use ($IN, $Context, $Item) { $Item->access($Context)->setRights($IN['rights']); },
-            'children' => array(
-                array('name' => 'rights', 'template' => str_replace('.', '/', $Context->mid) . '/rights.inc.tmp.php', 'import' => 'is_null', 'export' => 'is_null')
-            )
-        ));
+        $Form = new EditRightsForm(array_merge(array('Item' => $Item, 'Context' => $Context), $IN));
         $this->view->group_rights(array_merge((array)$Form->process(), array('Context' => $Context, 'Item' => $Item)));
     }
     
