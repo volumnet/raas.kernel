@@ -110,3 +110,67 @@ input[disabled], select[disabled], textarea[disabled], input[readonly], select[r
     cursor: default;
     background-color: inherit;
 }
+
+.raas-autotext-container {
+    position: relative;
+}
+
+.raas-autotext-container .close {
+    float: none;
+}
+
+.raas-autotext {
+    display block; 
+    position: absolute;
+    box-sizing: content-box;
+    border: 1px solid #eee;
+    position absolute;
+    border-radius: 5px;
+    top: 25px;
+    left: 0;
+    max-height: 200px;
+    z-index: 999;
+    overflow: hidden;
+    overflow-y: scroll;
+    background: white;
+    margin: 0;
+    padding: 0;
+}
+
+.raas-autotext li {
+    display: block;
+    clear: both;
+    margin: 0;
+    padding: 0;
+    border-bottom: 1px solid #eee;
+}
+
+.raas-autotext li:last-child {
+    border-bottom: none;
+}
+
+.raas-autotext li a {
+    display: block;
+    padding: 10px;
+    font-size: 12px;
+    color: black;
+    text-decoration: none;
+}
+
+.raas-autotext li img {
+    display: block;
+    float: left;
+    margin: 0 10px 10px 0;
+    max-height: 32px;
+    max-width: 32px;
+}
+
+.raas-autotext__description {
+    display: block;
+    font-size: 10px;
+    color: silver;
+}
+
+.raas-autotext li a:hover {
+    background: #eee;
+}
