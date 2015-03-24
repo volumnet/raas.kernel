@@ -188,17 +188,20 @@ abstract class Module extends \SOME\Singleton implements IRightsContext
     public function install()
     {
         if (!$this->registryGet('installDate')) {
-            if ($u = $this->updater) {
+            $u = $this->updater;
+            if ($u) {
                 $u->preInstall();
-                $SQL_query = (is_file($this->installFile) ? file_get_contents($this->installFile) : "");
-                if ($SQL_query) {
-                    $this->SQL->query($this->prepareSQL($SQL_query));
-                }
+            }
+            $SQL_query = (is_file($this->installFile) ? file_get_contents($this->installFile) : "");
+            if ($SQL_query) {
+                $this->SQL->query($this->prepareSQL($SQL_query));
+            }
+            if ($u) {
                 $u->postInstall();
-                $this->SQL->add($this->dbprefix . "registry", array('m' => $this->mid, 'name' => 'installDate', 'value' => date('Y-m-d H:i:s'), 'locked' => 1));
-                if ($this->application->debug) {
-                    $this->registrySet('isActive', 1);
-                }
+            }
+            $this->SQL->add($this->dbprefix . "registry", array('m' => $this->mid, 'name' => 'installDate', 'value' => date('Y-m-d H:i:s'), 'locked' => 1));
+            if ($this->application->debug) {
+                $this->registrySet('isActive', 1);
             }
         }
     }
