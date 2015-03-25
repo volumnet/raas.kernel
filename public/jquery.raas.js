@@ -134,7 +134,7 @@ jQuery(function($) {
                     }
                     $autotext.show();
                 } else {
-                    methods.hideList();
+                    $autotext.hide();
                 }
             },
             textOnChange: function() {
