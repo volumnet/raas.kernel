@@ -113,7 +113,7 @@ jQuery(function($) {
                 var Set = data.Set;
                 var i;
                 $autotext.empty();
-                if (Set.length > 0) {
+                if (Set && (Set.length > 0)) {
                     for (i = 0; i < Set.length; i++) {
                         var text = '<li>';
                         text    += '  <a href="#" data-id="' + Set[i].id + '"';
