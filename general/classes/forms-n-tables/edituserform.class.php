@@ -62,7 +62,7 @@ class EditUserForm extends \RAAS\Form
             'confirm' => true, 
             'export' => function($Field) use ($t) { 
                 if ($_POST[$Field->name]) {
-                    $Field->Form->Item->password_md5 = $t->application->md5It(trim($_POST[$Field->name])); 
+                    $Field->Form->Item->password_md5 = Application::i()->md5It(trim($_POST[$Field->name])); 
                 }
             }
         ));
