@@ -160,7 +160,8 @@ jQuery(function($) {
             init: function(options) { 
                 $autotext.params = params = $.extend(defaultParams, options);
                 $thisObj.on('keyup', methods.textOnChange);
-                $('body').on('click', $autotext.hide);
+                // 2015-05-04, AVS: заменил $autotext.hide на function() { $autotext.hide() }, ибо глючит
+                $('body').on('click', function() { $autotext.hide() });
                 $autotext.on('click', 'a', methods.onClick);
             },
         };
