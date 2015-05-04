@@ -4,6 +4,7 @@ use \RAAS\Application;
 use \RAAS\FormTab;
 use \RAAS\Field;
 use \RAAS\Option;
+use \RAAS\Group;
 
 class EditUserForm extends \RAAS\Form
 {
@@ -103,19 +104,28 @@ class EditUserForm extends \RAAS\Form
         
         if (Application::i()->user->root) {
             // Группы
+            $g = new Group();
             $defaultParams['children']['groups'] = new FormTab(array(
                 'name' => 'user_groups', 
                 'caption' => $this->view->_('GROUPS'), 
-                'template' => 'admin_users_edit_user',
                 'children' => array(
-                    new Field(array(
+                    array(
                         'type' => 'checkbox', 
                         'name' => 'groups',
+                        'children' => array('Set' => $g->children),
                         'multiple' => 'multiple', 
-                        'import' => function($Field) use ($t) { return $Field->Form->Item->associations; }, 
-                        'export' => function($Field) use ($t) { $Field->Form->Item->_SET_groups = $_POST[$Field->name]; }
+                        'import' => function($Field) use ($t) { 
+                            return array_keys($Field->Form->Item->associations); 
+                        }, 
+                        'export' => function($Field) use ($t) { 
+                            $arr = array();
+                            foreach ((array)$_POST[$Field->name] as $key => $val) {
+                                $arr[$val] = 1;
+                            }
+                            $Field->Form->Item->_SET_groups = $arr;
+                        }
                     )
-                ))
+                )
             ));
             if (Application::i()->user->id != $Form->Item->id) {
                 // Права доступа
