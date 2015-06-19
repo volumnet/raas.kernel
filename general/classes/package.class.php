@@ -161,7 +161,7 @@ class Package extends \RAAS\Package
             $chunks = array();
             for ($j = 0, $k = 0, $size = 0; $j < count($SQL_result); $j++) {
                 $size += strlen(json_encode($SQL_result[$j]));
-                if ($size >= self::dangerQuerySize) {
+                if (($size >= self::dangerQuerySize) || ($j == count($SQL_result) - 1)) {
                     $SQL_query .= $this->SQL->export($tablename, array_slice($SQL_result, $k, $j + 1 - $k), false) . ";\n";
                     $chunks[] = array($k, $j - $k + 1);
                     $k = $j + 1;
