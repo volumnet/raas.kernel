@@ -9,7 +9,7 @@ use \RAAS\Application as Application;
 
 class Package extends \RAAS\Package
 {
-    const rowsChunk = 1000;
+    const dangerQuerySize = 100000;
     
     protected static $instance;
     
@@ -157,8 +157,16 @@ class Package extends \RAAS\Package
             $SQL_query = "SELECT * FROM " . $tablename;
             $SQL_result = $this->SQL->get($SQL_query);
             $SQL_query = "";
-            for ($j = 0; $j < count($SQL_result); $j += self::rowsChunk) {
-                $SQL_query .= $this->SQL->export($tablename, array_slice($SQL_result, $j, self::rowsChunk), false) . ";\n";
+            
+            $chunks = array();
+            for ($j = 0, $k = 0, $size = 0; $j < count($SQL_result); $j++) {
+                $size += strlen(json_encode($SQL_result[$j]));
+                if ($size >= self::dangerQuerySize) {
+                    $SQL_query .= $this->SQL->export($tablename, array_slice($SQL_result, $k, $j + 1 - $k), false) . ";\n";
+                    $chunks[] = array($k, $j - $k + 1);
+                    $k = $j + 1;
+                    $size = 0;
+                }
             }
             if (trim($SQL_query)) {
                 echo "\n\n" .
