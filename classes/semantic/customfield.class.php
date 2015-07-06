@@ -53,7 +53,8 @@ abstract class CustomField extends \SOME\SOME
                 $f->children = $this->_getFieldChildren((array)$this->_stdSource());
                 $f->export = 'is_null';
                 $f->import = function ($Field) use ($t) { return $t->getValues(); };
-                if (!in_array($t->datatype, array('image', 'file'))) {
+                // 2015-07-06, AVS: добавил && (!$t->multiple || $t->required), чтобы автоматом не подставлял первое попавшееся во множественном
+                if (!in_array($t->datatype, array('image', 'file')) && (!$t->multiple || $t->required)) {
                     $f->default = $t->defval;
                 }
                 if (in_array($t->datatype, array('image', 'file')) && $t->getValue()->id) {
