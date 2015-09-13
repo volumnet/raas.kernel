@@ -149,7 +149,7 @@ abstract class CustomField extends \SOME\SOME
         }
         $SQL_query = "SELECT COUNT(*) FROM " . static::_tablename() . " WHERE urn = ? AND classname = ? AND pid = ? AND id != ?";
         while (
-            in_array($this->urn, array('name', 'description')) || (int)static::$SQL->getvalue(array($SQL_query, $this->urn, $this->classname, $this->pid, (int)$this->id))
+            in_array($this->urn, array('name', 'description')) || (int)static::$SQL->getvalue(array($SQL_query, $this->urn, $this->classname, (int)$this->pid, (int)$this->id))
         ) {
             $this->urn = '_' . $this->urn . '_';
         }

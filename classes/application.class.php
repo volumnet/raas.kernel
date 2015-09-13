@@ -682,6 +682,26 @@ final class Application extends \SOME\Singleton implements IContext
             }
         }
     }
+
+
+    /**
+     * Предлагает замену для повторяющегося URN
+     * 
+     * Для URN без числового суффикса предлагает суффикс "_1". Для URN с суффиксом увеличивает в суффиксе число на 1
+     * @param string $urn Старый URN
+     * @param bool $forceNewSuffix Принудительно добавлять суффикс "_1" (даже если суффикс уже есть, добавляет еще один)
+     * @return string Новый URN
+     */
+    public function getNewURN($urn, $forceNewSuffix = false)
+    {
+        if (preg_match('/_(\\d+)$/', $urn, $regs) && !$forceNewSuffix) {
+            $suffix = (int)$regs[1];
+            $newURN = preg_replace('/_' . $suffix . '$/', '_' . ($suffix + 1), $urn);
+        } else {
+            $newURN = $urn . '_1';
+        }
+        return $newURN;
+    }
     
     
     /**

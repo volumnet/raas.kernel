@@ -1,5 +1,6 @@
 <?php
 namespace RAAS;
+
 class Attachment extends \SOME\SOME
 {
     const tnsize = 300;
@@ -102,10 +103,7 @@ class Attachment extends \SOME\SOME
                 $this->uploadImage();
                 $this->createThumbnail();
             } else {
-                $this->realname = \SOME\Text::beautify(pathinfo($this->filename, PATHINFO_FILENAME)) . '.' . \SOME\Text::beautify(pathinfo($this->filename, PATHINFO_EXTENSION));
-                while(is_file($this->file)) {
-                    $this->realname = '_' . $this->realname;
-                }
+                $this->realname = $this->getUniqueFilename();
                 $this->uploadFile();
             }
             parent::commit();
@@ -160,10 +158,7 @@ class Attachment extends \SOME\SOME
             return false;
         }
         $this->mime = image_type_to_mime_type($type[2]);
-        $this->realname = \SOME\Text::beautify(pathinfo($this->filename, PATHINFO_FILENAME)) . '.' . $types[$type[2]];
-        while(is_file($this->file)) {
-            $this->realname = '_' . $this->realname;
-        }
+        $this->realname = $this->getUniqueFilename();
         if (($this->maxWidth && ($this->maxWidth < $type[0])) || ($this->maxHeight && ($this->maxHeight < $type[1]))) {
             \SOME\Thumbnail::make($this->upload, $this->file, $this->maxWidth ? $this->maxWidth : INF, $this->maxHeight ? $this->maxHeight : -1);
             if (!$this->copy) {
@@ -263,5 +258,16 @@ class Attachment extends \SOME\SOME
             return new $classname((int)$this->pid);
         }
         return null;
+    }
+
+
+    protected function getUniqueFilename()
+    {
+        $filename = \SOME\Text::beautify(pathinfo($this->filename, PATHINFO_FILENAME));
+        $ext = \SOME\Text::beautify(pathinfo($this->filename, PATHINFO_EXTENSION));
+        for ($i = 0; is_file($this->dirpath . '/' . $filename . '.' . $ext); $i++) {
+            $filename = Application::i()->getNewURN($filename, !$i);
+        }
+        return $filename . '.' . $ext;
     }
 }

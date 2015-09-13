@@ -73,13 +73,20 @@ function rowContextMenu(array $SUBMENU = null)
     }
     return '';
 }
+$metaTitle = $TITLE . ' — RAAS';
+if (\RAAS\Application::i()->activePackage) {
+    $metaTitle .= '.' . \RAAS\Application::i()->activePackage->view->_('__NAME');
+}
+if (\RAAS\Application::i()->activeModule) {
+    $metaTitle .= '.' . \RAAS\Application::i()->activeModule->view->_('__NAME');
+}
 ?>
 <!DOCTYPE html>
 <html>
   <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
     <meta name="generator" content="RAAS4" />
-    <title>RAAS Framework 4</title>
+    <title><?php echo $metaTitle?></title>
     <link type="text/css" rel="stylesheet" href="<?php echo $VIEW->themeURL . ($VIEW->templateType ? '/' . $VIEW->templateType : '')?>/style.css" />
     
     <link type="text/css" href="<?php echo $VIEW->publicURL?>/jquery-ui/css/redmond/jquery-ui-1.8.23.custom.css" rel="stylesheet" />
