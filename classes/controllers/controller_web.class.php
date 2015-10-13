@@ -290,5 +290,7 @@ class Controller_Web extends Abstract_Controller
         setcookie('password_md5', '', time() - 1, '/');
         unset($_SESSION['login']);
         unset($_SESSION['password_md5']);
+        setcookie(session_name(), '', time() - 1, '/');
+        session_destroy();
     }
 }
