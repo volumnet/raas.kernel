@@ -610,6 +610,8 @@ abstract class CustomField extends \SOME\SOME
         list($step, $where, $priorityN) = func_get_args();
         $where = (array)$where;
         $where[] = "classname = '" . static::$SQL->real_escape_string($this->classname) . "'";
+        $where = array_map(function($x) { return "(" . $x . ")"; }, $where);
+        $where = implode(" AND ", $where);
         parent::reorder($step, $where, $priorityN);
     }
 
