@@ -189,7 +189,7 @@ class Controller_Web extends Abstract_Controller
      */         
     protected function logout()
     {
-        $this->cleanSessionAuth();
+        $this->cleanSessionAuth(true);
         new Redirector('?');
     }
     
@@ -284,11 +284,15 @@ class Controller_Web extends Abstract_Controller
     /**
      * Очистка параметров авторизации из сессии и cookies
      */         
-    public function cleanSessionAuth()
+    public function cleanSessionAuth($clearSession = false)
     {
         setcookie('login', '', time() - 1, '/');
         setcookie('password_md5', '', time() - 1, '/');
         unset($_SESSION['login']);
         unset($_SESSION['password_md5']);
+        if ($clearSession) {
+            setcookie(session_name(), '', time() - 1, '/');
+            session_destroy();
+        }
     }
 }

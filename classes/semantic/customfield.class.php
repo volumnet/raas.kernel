@@ -53,7 +53,8 @@ abstract class CustomField extends \SOME\SOME
                 $f->children = $this->_getFieldChildren((array)$this->_stdSource());
                 $f->export = 'is_null';
                 $f->import = function ($Field) use ($t) { return $t->getValues(); };
-                if (!in_array($t->datatype, array('image', 'file'))) {
+                // 2015-07-06, AVS: добавил && (!$t->multiple || $t->required), чтобы автоматом не подставлял первое попавшееся во множественном
+                if (!in_array($t->datatype, array('image', 'file')) && (!$t->multiple || $t->required)) {
                     $f->default = $t->defval;
                 }
                 if (in_array($t->datatype, array('image', 'file')) && $t->getValue()->id) {
@@ -148,7 +149,7 @@ abstract class CustomField extends \SOME\SOME
         }
         $SQL_query = "SELECT COUNT(*) FROM " . static::_tablename() . " WHERE urn = ? AND classname = ? AND pid = ? AND id != ?";
         while (
-            in_array($this->urn, array('name', 'description')) || (int)static::$SQL->getvalue(array($SQL_query, $this->urn, $this->classname, $this->pid, (int)$this->id))
+            in_array($this->urn, array('name', 'description')) || (int)static::$SQL->getvalue(array($SQL_query, $this->urn, $this->classname, (int)$this->pid, (int)$this->id))
         ) {
             $this->urn = '_' . $this->urn . '_';
         }
@@ -588,6 +589,30 @@ abstract class CustomField extends \SOME\SOME
             $temp[] = $Option;
         }
         return $temp;
+    }
+    
+    
+    public static function getSet()
+    {
+        $args = func_get_args();
+        if (!isset($args[0]['where'])) {
+            $args[0]['where'] = array();
+        } else {
+            $args[0]['where'] = (array)$args[0]['where'];
+        }
+        $args[0]['where'][] = "classname = '" . static::$SQL->real_escape_string(static::$references['parent']['classname']) . "'";
+        return call_user_func_array('parent::getSet', $args);
+    }
+
+
+    public function reorder()
+    {
+        list($step, $where, $priorityN) = func_get_args();
+        $where = (array)$where;
+        $where[] = "classname = '" . static::$SQL->real_escape_string($this->classname) . "'";
+        $where = array_map(function($x) { return "(" . $x . ")"; }, $where);
+        $where = implode(" AND ", $where);
+        parent::reorder($step, $where, $priorityN);
     }
 
 

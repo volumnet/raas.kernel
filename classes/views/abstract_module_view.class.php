@@ -62,7 +62,7 @@ abstract class Abstract_Module_View extends \SOME\Singleton implements IAbstract
                 break;
 
             case 'url':
-                return '?p=' . $this->packageName . '&m=' . $this->moduleName;
+                return '?p=' . $this->package->alias . '&m=' . $this->module->alias;
                 break;
             default:
                 return $this->parent->$var;

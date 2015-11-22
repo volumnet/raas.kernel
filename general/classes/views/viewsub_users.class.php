@@ -204,11 +204,7 @@ class ViewSub_Users extends \RAAS\Abstract_Sub_View
     {
         $submenu = array();
         foreach ($node->children as $row) {
-            $temp = array('name' => htmlspecialchars($row->name), 'href' => $this->url . '&id=' . (int)$row->id);
-            if ($row->id == $current->id || in_array($current->id, $row->all_children_ids)) {
-                $temp['submenu'] = $this->getGroupsMenu($row, $current);
-            }
-            $submenu[] = $temp;
+            $submenu[] = array('name' => htmlspecialchars($row->name), 'href' => $this->url . '&id=' . (int)$row->id, 'submenu' => $this->getGroupsMenu($row, $current));
         }
         return $submenu;
     }

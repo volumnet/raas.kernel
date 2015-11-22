@@ -45,27 +45,20 @@ $_RAASForm_Form_Plain = function(\RAAS\FieldCollection $fields) use (&$_RAASForm
     <div class="form-horizontal">
       <?php 
       foreach ($fields as $row) { 
-          switch (get_class($row)) {
-              case 'RAAS\FieldSet':
-                  include \RAAS\Application::i()->view->context->tmp('/fieldset.inc.php');
-                  break;
-              case 'RAAS\Field':
-                  include \RAAS\Application::i()->view->context->tmp('/field.inc.php');
-                  break;
+          if ($row instanceof \RAAS\FieldSet) {
+              include \RAAS\Application::i()->view->context->tmp('/fieldset.inc.php');
+          } elseif ($row instanceof \RAAS\Field) {
+              include \RAAS\Application::i()->view->context->tmp('/field.inc.php');
           }
           if ($row->template) {
               include \RAAS\Application::i()->view->context->tmp($row->template);
           }
-          switch (get_class($row)) {
-              case 'RAAS\FieldSet':
-                  $_RAASForm_FieldSet($row);
-                  break;
-              case 'RAAS\Field':
-                  $_RAASForm_Field($row);
-                  break;
-              default:
-                  $_RAASForm_Form_Plain($row->children);
-                  break;
+          if ($row instanceof \RAAS\FieldSet) {
+              $_RAASForm_FieldSet($row);
+          } elseif ($row instanceof \RAAS\Field) {
+              $_RAASForm_Field($row);
+          } else {
+              $_RAASForm_Form_Plain($row->children);
           }
       } 
       ?>
