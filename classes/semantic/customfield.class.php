@@ -135,6 +135,7 @@ abstract class CustomField extends \SOME\SOME
                 break;
         }
     }
+
     
     public function commit()
     {

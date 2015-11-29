@@ -18,6 +18,9 @@ abstract class Dictionary extends \SOME\SOME
     
     public function commit()
     {
+        if (!$this->id || !$this->priority) {
+            $this->priority = static::$SQL->getvalue("SELECT MAX(priority) FROM " . static::_tablename()) + 1;
+        }
         parent::commit();
         if ($this->pid && !$this->urn) {
             $this->urn = $this->id;
