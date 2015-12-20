@@ -31,7 +31,7 @@ class StdSub extends Abstract_Sub_Controller
 
     /**
      * Перемещение объекта вверх по списку
-     * @param \SOME\SOME $Item объект для перемещения
+     * @param mixed $data Данные об объектах (обработка с помощью метода getItems - см. описание там)
      * @param string url URL для перехода после выполнения действия
      * @param bool $conditionalBack если установлен в TRUE, функция будет проверять наличие переменной $_GET['back'] и при обнаружении ее 
      *                              автоматически заменять параметр $url на 'history:back'
@@ -39,11 +39,11 @@ class StdSub extends Abstract_Sub_Controller
      *                              либо (если callable) возвращать TRUE от объекта $Item
      * @param mixed $where Дополнительное условие для поиска, например, общность родительских элементов
      */         
-    public static function move_up(\SOME\SOME $Item, $url = 'history::back', $conditionalBack = true, $filter = true, $where = null)
+    public static function move_up($data, $url = 'history::back', $conditionalBack = true, $filter = true, $where = null)
     {
-        if ($Item->id && (is_callable($filter) ? $filter($Item) : (bool)$filter)) {
+        $items = self::getItems($data, $filter);
+        foreach ($items as $Item) {
             $Item->reorder((isset($_GET['step']) && (int)$_GET['step']) ? -1 * abs((int)$_GET['step']) : -1, $where);
-            $Item->commit();
         }
         new Redirector(($conditionalBack && isset($_GET['back'])) ? 'history:back' : $url);
     }
@@ -51,7 +51,7 @@ class StdSub extends Abstract_Sub_Controller
 
     /**
      * Перемещение объекта вниз по списку
-     * @param \SOME\SOME $Item объект для перемещения
+     * @param mixed $data Данные об объектах (обработка с помощью метода getItems - см. описание там)
      * @param string url URL для перехода после выполнения действия
      * @param bool $conditionalBack если установлен в TRUE, функция будет проверять наличие переменной $_GET['back'] и при обнаружении ее 
      *                              автоматически заменять параметр $url на 'history:back'
@@ -59,11 +59,11 @@ class StdSub extends Abstract_Sub_Controller
      *                              либо (если callable) возвращать TRUE от объекта $Item
      * @param mixed $where Дополнительное условие для поиска, например, общность родительских элементов
      */         
-    public static function move_down(\SOME\SOME $Item, $url = 'history::back', $conditionalBack = true, $filter = true, $where = null)
+    public static function move_down($data, $url = 'history::back', $conditionalBack = true, $filter = true, $where = null)
     {
-        if ($Item->id && (is_callable($filter) ? $filter($Item) : (bool)$filter)) {
+        $items = self::getItems($data, $filter);
+        foreach ($items as $Item) {
             $Item->reorder((isset($_GET['step']) && (int)$_GET['step']) ? abs((int)$_GET['step']) : 1, $where);
-            $Item->commit();
         }
         new Redirector(($conditionalBack && isset($_GET['back'])) ? 'history:back' : $url);
     }
@@ -71,16 +71,17 @@ class StdSub extends Abstract_Sub_Controller
 
     /**
      * Смена видимости объекта
-     * @param \SOME\SOME $Item объект для смены видимости
+     * @param mixed $data Данные об объектах (обработка с помощью метода getItems - см. описание там)
      * @param string url URL для перехода после выполнения действия
      * @param bool $conditionalBack если установлен в TRUE, функция будет проверять наличие переменной $_GET['back'] и при обнаружении ее 
      *                              автоматически заменять параметр $url на 'history:back'
      * @param callable|bool $filter дополнительное условие - для выполнения фактического действия должен быть TRUE, 
      *                              либо (если callable) возвращать TRUE от объекта $Item
      */         
-    public static function chvis(\SOME\SOME $Item, $url = 'history::back', $conditionalBack = true, $filter = true)
+    public static function chvis($data, $url = 'history::back', $conditionalBack = true, $filter = true)
     {
-        if ($Item->id && (is_callable($filter) ? $filter($Item) : (bool)$filter)) {
+        $items = self::getItems($data, $filter);
+        foreach ($items as $Item) {
             $Item->vis = (int)!$Item->vis;
             $Item->commit();
         }
@@ -89,17 +90,58 @@ class StdSub extends Abstract_Sub_Controller
 
 
     /**
-     * Удаление объекта
-     * @param \SOME\SOME $Item объект для удаления
+     * Установка видимости объекта
+     * @param mixed $data Данные об объектах (обработка с помощью метода getItems - см. описание там)
      * @param string url URL для перехода после выполнения действия
      * @param bool $conditionalBack если установлен в TRUE, функция будет проверять наличие переменной $_GET['back'] и при обнаружении ее 
      *                              автоматически заменять параметр $url на 'history:back'
      * @param callable|bool $filter дополнительное условие - для выполнения фактического действия должен быть TRUE, 
      *                              либо (если callable) возвращать TRUE от объекта $Item
      */         
-    public static function delete(\SOME\SOME $Item, $url = 'history::back', $conditionalBack = true, $filter = true)
+    public static function vis($data, $url = 'history::back', $conditionalBack = true, $filter = true)
     {
-        if ($Item->id && (is_callable($filter) ? $filter($Item) : (bool)$filter)) {
+        $items = self::getItems($data, $filter);
+        foreach ($items as $Item) {
+            $Item->vis = 1;
+            $Item->commit();
+        }
+        new Redirector(($conditionalBack && isset($_GET['back'])) ? 'history:back' : $url);
+    }
+
+
+    /**
+     * Снятие видимости объекта
+     * @param mixed $data Данные об объектах (обработка с помощью метода getItems - см. описание там)
+     * @param string url URL для перехода после выполнения действия
+     * @param bool $conditionalBack если установлен в TRUE, функция будет проверять наличие переменной $_GET['back'] и при обнаружении ее 
+     *                              автоматически заменять параметр $url на 'history:back'
+     * @param callable|bool $filter дополнительное условие - для выполнения фактического действия должен быть TRUE, 
+     *                              либо (если callable) возвращать TRUE от объекта $Item
+     */         
+    public static function invis($data, $url = 'history::back', $conditionalBack = true, $filter = true)
+    {
+        $items = self::getItems($data, $filter);
+        foreach ($items as $Item) {
+            $Item->vis = 0;
+            $Item->commit();
+        }
+        new Redirector(($conditionalBack && isset($_GET['back'])) ? 'history:back' : $url);
+    }
+
+
+    /**
+     * Удаление объекта
+     * @param mixed $data Данные об объектах (обработка с помощью метода getItems - см. описание там)
+     * @param string url URL для перехода после выполнения действия
+     * @param bool $conditionalBack если установлен в TRUE, функция будет проверять наличие переменной $_GET['back'] и при обнаружении ее 
+     *                              автоматически заменять параметр $url на 'history:back'
+     * @param callable|bool $filter дополнительное условие - для выполнения фактического действия должен быть TRUE, 
+     *                              либо (если callable) возвращать TRUE от объекта $Item
+     */         
+    public static function delete($data, $url = 'history::back', $conditionalBack = true, $filter = true)
+    {
+        $items = self::getItems($data, $filter);
+        foreach ($items as $Item) {
             $classname = get_class($Item);
             $classname::delete($Item);
         }
@@ -109,7 +151,7 @@ class StdSub extends Abstract_Sub_Controller
 
     /**
      * Перемещение объекта к другому родителю
-     * @param \SOME\SOME $Item объект для перемещения (в sprintf подставляется в любом случае $Item->pid)
+     * @param mixed $data Данные об объектах (обработка с помощью метода getItems - см. описание там)
      * @param \SOME\SOME $Parent новый родительский объект (должен быть того же типа)
      * @param string url URL для перехода после выполнения действия
      * @param bool $conditionalBack если установлен в TRUE, функция будет проверять наличие переменной $_GET['back'] и при обнаружении ее 
@@ -117,15 +159,17 @@ class StdSub extends Abstract_Sub_Controller
      * @param callable|bool $filter дополнительное условие - для выполнения фактического действия должен быть TRUE, 
      *                              либо (если callable) возвращать TRUE от объекта $Item
      */         
-    public static function move(\SOME\SOME $Item, \SOME\SOME $Parent, $url = 'history::back', $conditionalBack = true, $filter = true)
+    public static function move($data, \SOME\SOME $Parent, $url = 'history::back', $conditionalBack = true, $filter = true)
     {
-        $ok = true;
-        if (get_class($Item) == get_class($Parent)) {
-            $ok &= ($Parent->id != $Item->id) && ($Parent->id != $Item->pid) && !in_array($Parent->id, $Item->all_children_ids);
-        }
-        if ($Item->id && $ok && (is_callable($filter) ? $filter($Item) : (bool)$filter)) {
-            $Item->pid = (int)$Parent->id;
-            $Item->commit();
+        $items = self::getItems($data, $filter);
+        foreach ($items as $Item) {
+            if (
+                (get_class($Item) != get_class($Parent)) || 
+                !in_array($Parent->id, array_merge(array((int)$Item->id, (int)$Item->pid), (array)$Item->all_children_ids))
+            ) {
+                $Item->pid = (int)$Parent->id;
+                $Item->commit();
+            }
         }
         new Redirector(($conditionalBack && isset($_GET['back'])) ? 'history:back' : sprintf($url, (int)$Item->pid));
     }
@@ -133,7 +177,7 @@ class StdSub extends Abstract_Sub_Controller
 
     /**
      * Произвольное именованное действие с объектом
-     * @param object $Item объект для действия
+     * @param mixed $data Данные об объектах (обработка с помощью метода getItems - см. описание там)
      * @param string url URL для перехода после выполнения действия
      * @param bool $conditionalBack если установлен в TRUE, функция будет проверять наличие переменной $_GET['back'] и при обнаружении ее 
      *                              автоматически заменять параметр $url на 'history:back'
@@ -142,18 +186,53 @@ class StdSub extends Abstract_Sub_Controller
      */         
     public static function __callStatic($f, $args)
     {
-        if (isset($args[0]) && is_object($args[0])) {
-            $Item = $args[0];
+        if (isset($args[0])) {
+            $data = $args[0];
         } else {
             return false;
         }
         $url = isset($args[1]) ? (string)$args[1] : 'history:back';
         $conditionalBack = isset($args[2]) ? (bool)$args[2] : true;
-        $filter = isset($args[3]) ? (bool)$args[3] : true;
+        $filter = isset($args[3]) ? $args[3] : true;
         $arguments = (count($args) > 4) ? array_slice($args, 4) : array();
-        if (($Item->id || !($Item instanceof \SOME\SOME)) && (is_callable($filter) ? $filter($Item) : (bool)$filter)) {
+        
+        $items = self::getItems($data, $filter);
+        foreach ($items as $Item) {
             call_user_func_array(array($Item, $f), $arguments);
         }
         new Redirector(($conditionalBack && isset($_GET['back'])) ? 'history:back' : $url);
+    }
+
+
+    /**
+     * Получение объектов из входных данных
+     * @param array[\SOME\SOME]|\SOME\SOME|object $data Входные данные
+     * @param callable|bool $filter дополнительное условие - для выполнения фактического действия должен быть TRUE, 
+     *                              либо (если callable) возвращать TRUE от объекта $Item
+     * @return array[\SOME\SOME|object] массив объектов для обработки
+     */
+    public function getItems($data, $filter = true)
+    {
+        if (!$filter) {
+            return array();
+        }
+        if (($data instanceof \SOME\SOME) || !is_array($data)) {
+            $data = array($data);
+        }
+
+        $temp = array();
+        foreach ($data as $row) {
+            if ($row instanceof \SOME\SOME) {
+                if ($row->id) {
+                    $temp[] = $row;
+                }
+            } elseif (is_object($row)) {
+                $temp[] = $row;
+            }
+        }
+        if (is_callable($filter)) {
+            $temp = array_filter($temp, $filter);
+        }
+        return $temp;
     }
 }
