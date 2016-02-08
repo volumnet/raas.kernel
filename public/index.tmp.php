@@ -61,12 +61,12 @@ function showMenu(array $SUBMENU, $type = null)
         return $text;        
     }
 }
-function rowContextMenu(array $SUBMENU = null)
+function rowContextMenu(array $SUBMENU = null, $title = '', $class = 'pull-right', $btnClass = '')
 {
     if ($SUBMENU) {
         if ($text = showMenu($SUBMENU)) {
-            return '<div class="btn-group pull-right">
-                      <a href="#" class="btn dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></a> 
+            return '<div class="btn-group ' . htmlspecialchars($class) . '">
+                      <a href="#" class="btn dropdown-toggle ' . $btnClass . '" data-toggle="dropdown">' . htmlspecialchars($title) . ' <span class="caret"></span></a> 
                       <ul class="dropdown-menu">' . $text . '</ul>
                     </div>';
         }
