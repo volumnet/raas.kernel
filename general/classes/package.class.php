@@ -1,18 +1,19 @@
 <?php
 namespace RAAS\General;
-use \RAAS\User as User;
-use \RAAS\Group as Group;
-use \RAAS\Level as Level;
-use \RAAS\IRightsContext as IRightsContext;
-use \RAAS\IContext as IContext;
-use \RAAS\Application as Application;
+
+use RAAS\User as User;
+use RAAS\Group as Group;
+use RAAS\Level as Level;
+use RAAS\IRightsContext as IRightsContext;
+use RAAS\IContext as IContext;
+use RAAS\Application as Application;
 
 class Package extends \RAAS\Package
 {
     const dangerQuerySize = 100000;
-    
+
     protected static $instance;
-    
+
     public function __get($var)
     {
         switch ($var) {
@@ -22,7 +23,9 @@ class Package extends \RAAS\Package
             case 'systemDir':
                 return $this->baseDir;
                 break;
-            case 'alias': case 'Mid': case 'mid':
+            case 'alias':
+            case 'Mid':
+            case 'mid':
                 return '/';
                 break;
             case 'version':
@@ -36,15 +39,15 @@ class Package extends \RAAS\Package
                 break;
         }
     }
-    
-    public function initModules() 
-    { 
-        return; 
+
+    public function initModules()
+    {
+        return;
     }
-    
+
     public function admin_users_showlist(Group $Group, array $IN)
     {
-        $Pages = new \SOME\Pages((isset($IN['page']) ? $IN['page'] : 1), $this->registryGet('rowsPerPage'));
+        $Pages = new \SOME\Pages((isset($IN['page']) ? $IN['page'] : 1), Application::i()->registryGet('rowsPerPage'));
         $from = $where = array();
         if (isset($IN['search_string'])) {
             $where[] = array("(login LIKE :search_string OR CONCAT(last_name, ' ', first_name, ' ', second_name) LIKE :search_string)", array(':search_string' => "%" . $this->SQL->escape_like($IN['search_string']) . "%"));
@@ -54,7 +57,8 @@ class Package extends \RAAS\Package
             $where[] = "tUGA.gid = " . (int)$Group->id;
         }
         switch (isset($IN['sort']) ? $IN['sort'] : null) {
-            case 'email': case 'last_name':
+            case 'email':
+            case 'last_name':
                 $sort = "User." . $_GET['sort'];
                 break;
             default:
@@ -67,7 +71,7 @@ class Package extends \RAAS\Package
             $order = 'ASC';
         }
         $Set = User::getSet(array('from' => $from, 'where' => $where, 'orderBy' => $sort . " " . $order), $Pages);
-        
+
         $GSet = $Group->getChildSet('children');
         return array('Set' => $Set, 'Pages' => $Pages, 'GSet' => $GSet);
     }
@@ -103,7 +107,7 @@ class Package extends \RAAS\Package
         $DATA = array();
         if (!$sxe = new \SimpleXMLElement($text)) {
             return array('failedToConnect' => true);
-        }        
+        }
         foreach ($sxe->module as $module) {
             if (!(string)$module['error']) {
                 $Context = null;
@@ -122,7 +126,7 @@ class Package extends \RAAS\Package
         }
         return array('modules' => $DATA);
     }
-    
+
     public function downloadUpdate(IContext $Context)
     {
         $url = $this->application->updateURL . '?action=download&lang=' . $this->application->view->language . '&m=' . ($Context instanceof Application ? '/' : $Context->mid);
@@ -133,7 +137,7 @@ class Package extends \RAAS\Package
         @file_put_contents($file, $text);
         return $file;
     }
-    
+
     public function backupSQL()
     {
         header('Content-Type: text/plain;encoding=UTF-8');
@@ -141,10 +145,10 @@ class Package extends \RAAS\Package
 
         $SQL_query = "SHOW TABLES";
         $tables = $this->SQL->getcol($SQL_query);
-        for ($i = 0; $i < count($tables); $i++) { 
+        for ($i = 0; $i < count($tables); $i++) {
             $tablename = $tables[$i];
             if ($i) {
-                echo "\n\n" . 
+                echo "\n\n" .
                      "-- *************************************************************\n";
             }
             echo "-- \n" .
@@ -157,7 +161,7 @@ class Package extends \RAAS\Package
             $SQL_query = "SELECT * FROM " . $tablename;
             $SQL_result = $this->SQL->get($SQL_query);
             $SQL_query = "";
-            
+
             $chunks = array();
             for ($j = 0, $k = 0, $size = 0; $j < count($SQL_result); $j++) {
                 $size += strlen(json_encode($SQL_result[$j]));
@@ -177,7 +181,7 @@ class Package extends \RAAS\Package
             }
         }
     }
-    
+
     public function backupFiles()
     {
         $tmpname = tempnam(sys_get_temp_dir(), '');

@@ -1,4 +1,4 @@
-<?php 
+<?php
 $pages_list = array();
 if ($Pages->pages > 1) {
     $trace = 2;
@@ -7,7 +7,7 @@ if ($Pages->pages > 1) {
     }
     $pattern_active = '<li class="active"><span>{text}</span></li>';
     $pattern = '<li><a href="' . \SOME\HTTP::queryString($pagesVar . '={link}') . ($pagesHash ? '#' . $pagesHash : '') . '">{text}</a></li>';
-    
+
     if ($Pages->page > 1) {
         $pages_list[] = strtr($pattern, array(urlencode('{link}') => $Pages->page - 1, '{text}' => '«'));
     }
@@ -41,11 +41,11 @@ if ($Pages->pages > 1) {
     if ($Pages->page < $Pages->pages) {
         $pages_list[] = strtr($pattern, array(urlencode('{link}') => $Pages->page + 1, '{text}' => '»'));
     }
-    
+
     $pages_list = implode(' ', $pages_list);
 }
 ?>
-<nav class="pagination pagination-right">
+<nav class="pagination pagination-right clearfix">
   <div class="pull-left"><b><?php echo PAGES_SHOWN?>: </b> <?php echo $Pages->from . ' — ' . $Pages->to . ' ' . PAGES_OF . ' ' . $Pages->count; ?></div>
   <div><?php echo $pages_list ? '<ul>' . $pages_list . '</ul>' : ''?></div>
 </nav>

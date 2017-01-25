@@ -29,6 +29,12 @@ $_RAASForm_Attrs = function(\RAAS\FormElement $FormElement, $additional = array(
     if ($FormElement->type == 'password') {
         unset($arr['confirm']);
     }
+    if (!$arr['disabled']) {
+        unset($arr['disabled']);
+    }
+    if (!$arr['readonly']) {
+        unset($arr['readonly']);
+    }
     if ($arr['required']) {
         $arr['data-required'] = 'required';
     }
@@ -43,8 +49,8 @@ $_RAASForm_Attrs = function(\RAAS\FormElement $FormElement, $additional = array(
 $_RAASForm_Form_Plain = function(\RAAS\FieldCollection $fields) use (&$_RAASForm_Form_Plain, &$_RAASForm_Attrs) {
     ?>
     <div class="form-horizontal">
-      <?php 
-      foreach ($fields as $row) { 
+      <?php
+      foreach ($fields as $row) {
           if ($row instanceof \RAAS\FieldSet) {
               include \RAAS\Application::i()->view->context->tmp('/fieldset.inc.php');
           } elseif ($row instanceof \RAAS\Field) {
@@ -60,7 +66,7 @@ $_RAASForm_Form_Plain = function(\RAAS\FieldCollection $fields) use (&$_RAASForm
           } else {
               $_RAASForm_Form_Plain($row->children);
           }
-      } 
+      }
       ?>
     </div>
     <?php
@@ -77,9 +83,9 @@ $_RAASForm_Form_Tabbed = function(\RAAS\FieldCollection $fields) use (&$_RAASFor
         <?php $i++; } ?>
       </ul>
       <div class="tab-content">
-        <?php 
-        $i = 0; 
-        foreach ($fields as $row) { 
+        <?php
+        $i = 0;
+        foreach ($fields as $row) {
             ?>
             <div<?php echo $_RAASForm_Attrs($row, array('class' => 'tab-pane' . (!$i ? ' active' : ''), 'id' => $row->name))?>>
               <?php

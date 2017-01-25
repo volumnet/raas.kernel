@@ -5,20 +5,20 @@
  * @version 4.1
  * @author Alex V. Surnin <info@volumnet.ru>
  * @copyright 2011, Volume Networks
- */       
+ */
 namespace RAAS;
 
 /**
  * Класс мастера перенаправлений
  * @package RAAS
- */       
+ */
 class Redirector
 {
     /**
      * Конструктор класса
      * @param string $url Адрес для перенаправления, либо 'history:back' для возврата назад по HTTP_REFERER, либо null для ручного управления
      *        либо пустая строка для обновления страницы
-     */              
+     */
     public function __construct($url = '')
     {
         if ($url !== null) {
@@ -32,7 +32,7 @@ class Redirector
             }
         }
     }
-    
+
      /**
      * Перенаправляет обратно
      * @param string $defaut_location если не удалось получить HTTP_REFERER
@@ -56,12 +56,10 @@ class Redirector
      */
     private function setLocation($url)
     {
-        if ($url[0] == '/')
-        {
-            $url = 'http://' . $_SERVER["SERVER_NAME"] . $url;
+        if ($url[0] == '/') {
+            $url = 'http' . ($_SERVER['HTTPS'] == 'on' ? 's' : '') . '://' . $_SERVER["SERVER_NAME"] . $url;
         }
         header('Location: ' . $url);
         exit;
     }
-
 }
