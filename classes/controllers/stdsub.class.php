@@ -26,7 +26,9 @@ class StdSub extends Abstract_Sub_Controller
     /**
      * Конструктор класса
      */
-    protected function init() {}
+    protected function init()
+    {
+    }
 
 
     /**
@@ -163,8 +165,7 @@ class StdSub extends Abstract_Sub_Controller
     {
         $items = self::getItems($data, $filter);
         foreach ($items as $Item) {
-            if (
-                (get_class($Item) != get_class($Parent)) ||
+            if ((get_class($Item) != get_class($Parent)) ||
                 !in_array($Parent->id, array_merge(array((int)$Item->id, (int)$Item->pid), (array)$Item->all_children_ids))
             ) {
                 $Item->pid = (int)$Parent->id;

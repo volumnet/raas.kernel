@@ -5,7 +5,7 @@
  * @version 4.2
  * @author Alex V. Surnin <info@volumnet.ru>
  * @copyright 2013, Volume Networks
- */       
+ */
 namespace RAAS;
 
 /**
@@ -13,7 +13,7 @@ namespace RAAS;
  * @package RAAS
  * @property mixed $default значение по умолчанию
  * @property-read bool $isFilled заполнено ли поле
- * @property-read bool|array $validate проверка на правильность заполнения поля - true в случае успешной проверки, 
+ * @property-read bool|array $validate проверка на правильность заполнения поля - true в случае успешной проверки,
  *                           в случае неуспешной - для multiple - массив числовых индексов ошибочных полей (с нуля), для остальных - false
  * @property-read bool $matchConfirm совпадают ли пароли с подтверждениями (для не паролей - всегда true)
  * @property-read bool $required поле обязательно для заполнения
@@ -29,7 +29,7 @@ namespace RAAS;
  * @property string $errorEmptyString Идентификатор строки перевода "Необходимо заполнить поле %s"
  * @property string $errorInvalidString Идентификатор строки перевода "Поле %s заполнено неправильно"
  * @property string $errorDoesntMatch Идентификатор строки перевода "Пароль и его подтверждение не совпадают"
- */       
+ */
 class Field extends OptionContainer
 {
     /**
@@ -209,7 +209,7 @@ class Field extends OptionContainer
         } else {
             $v = $this->validate;
             if ($v !== true) {
-                if (in_array($this->type, array('file', 'image'))) {  
+                if (in_array($this->type, array('file', 'image'))) {
                     $e = array('name' => 'INVALID', 'value' => $this->name, 'description' => sprintf($this->view->_($this->__get('errorInvalidFileString')), $this->caption));
                 } else {
                     $e = array('name' => 'INVALID', 'value' => $this->name, 'description' => sprintf($this->view->_($this->__get('errorInvalidString')), $this->caption));
@@ -326,7 +326,7 @@ class Field extends OptionContainer
      * @param string $nameN имя свойства, где хранится наименование объекта
      * @param int|null $levelN уровень обработки дочерних элементов, null - не ограничено
      * @param string|null $childrenN свойство, где хранятся дочерние элементы, null - определить автоматически
-     * @param callable|null $additionalF - Функция, которой передается на вход объект, на выходе дополнительные атрибуты для элемента в виде 
+     * @param callable|null $additionalF - Функция, которой передается на вход объект, на выходе дополнительные атрибуты для элемента в виде
      *                                     'имя атрибута' => 'значение атрибута'. NULL - не обрабатывать дополнительные значения
      * @param bool $useOptionGroups - Если установлен в TRUE, каждая опция, содержащая дочерние, будет представлена как OptGroup, если FALSE - то как Option
      * @param callable|null $filter - Функция для фильтрации элементов - принимает в качестве единственного аргумента SOME-объект для фильтрации,
@@ -356,7 +356,7 @@ class Field extends OptionContainer
                         $children = $this->parseSet($children, $nameN, $level === null ? $level : $level - 1, $childrenN, $additionalF, $useOptionGroups, $filter);
                     }
                 }
-                
+
                 $idN = $classname::_idN();
                 if ($useOptionGroups && $children) {
                     $optionClassName = 'RAAS\OptGroup';
@@ -436,27 +436,27 @@ class Field extends OptionContainer
             case 'file': case 'image':
                 break;
             case 'date':
-                $x = $this->Form->Item->{$this->name}; 
+                $x = $this->Form->Item->{$this->name};
                 if (strtotime($x) > 0) {
                     return date('Y-m-d', strtotime($x));
                 }
                 break;
             case 'time':
-                $x = $this->Form->Item->{$this->name}; 
+                $x = $this->Form->Item->{$this->name};
                 if (strtotime($x) > 0) {
                     return date('H:i', strtotime($x));
                 }
                 return '';
                 break;
             case 'datetime': case 'datetime-local':
-                $x = $this->Form->Item->{$this->name}; 
+                $x = $this->Form->Item->{$this->name};
                 if (strtotime($x) > 0) {
                     return date('Y-m-d H:i', strtotime($x));
                 }
                 return '';
                 break;
             case 'number':
-                $x = (float)$this->Form->Item->{$this->name}; 
+                $x = (float)$this->Form->Item->{$this->name};
                 $x = str_replace(',', '.', $x);
                 return $x;
                 break;
@@ -465,7 +465,7 @@ class Field extends OptionContainer
                 break;
         }
     }
-    
+
     /**
      * Функция, выполняемая после коммита полей
      */
@@ -500,8 +500,8 @@ class Field extends OptionContainer
                 foreach ($_FILES[$this->name]['tmp_name'] as $key => $val) {
                     if (is_uploaded_file($_FILES[$this->name]['tmp_name'][$key])) {
                         $arr[] = array(
-                            'name' => $_FILES[$this->name]['name'][$key], 
-                            'tmp_name' => $_FILES[$this->name]['tmp_name'][$key], 
+                            'name' => $_FILES[$this->name]['name'][$key],
+                            'tmp_name' => $_FILES[$this->name]['tmp_name'][$key],
                             'type' => $_FILES[$this->name]['type'][$key]
                         );
                     }
