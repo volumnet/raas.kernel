@@ -1,20 +1,25 @@
 <?php
 namespace RAAS;
 
-class Attachment extends \SOME\SOME
+use SOME\SOME;
+use SOME\Thumbnail;
+use SOME\Namespaces;
+use SOME\Text;
+
+class Attachment extends SOME
 {
     const tnsize = 300;
-    
+
     protected static $tablename = 'attachments';
     protected static $objectCascadeDelete = true;
     protected static $cognizableVars = array('parent');
-    
+
     public function __get($var)
     {
         switch ($var) {
             case 'model':
                 if ($this->classname) {
-                    $NS = \SOME\Namespaces::getNSArray($this->classname);
+                    $NS = Namespaces::getNSArray($this->classname);
                     switch (count($NS)) {
                         case 3:
                             $classname = implode('\\', $NS) . '\\Module';
@@ -25,7 +30,6 @@ class Attachment extends \SOME\SOME
                         default:
                             $classname = '\\RAAS\\Application';
                             break;
-
                     }
                     if (class_exists($classname)) {
                         return $classname::i();
@@ -79,12 +83,12 @@ class Attachment extends \SOME\SOME
                 break;
         }
     }
-    
+
     public function __set($var, $val)
     {
         switch ($var) {
             case 'parent':
-                if ($val instanceof \SOME\SOME) {
+                if ($val instanceof SOME) {
                     $this->classname = get_class($val);
                     $this->pid = $val->_id;
                 }
@@ -94,7 +98,7 @@ class Attachment extends \SOME\SOME
                 break;
         }
     }
-    
+
     public function commit()
     {
         if ($this->upload && is_file($this->upload)) {
@@ -109,15 +113,15 @@ class Attachment extends \SOME\SOME
             parent::commit();
         }
     }
-    
-    
+
+
     public static function delete(self $Item)
     {
         $Item->deleteFile();
         parent::delete($Item);
     }
-    
-    
+
+
     protected function deleteFile()
     {
         $temp = pathinfo($this->realname);
@@ -137,8 +141,8 @@ class Attachment extends \SOME\SOME
             }
         }
     }
-    
-    
+
+
     protected function uploadFile()
     {
         if ($this->copy) {
@@ -148,8 +152,8 @@ class Attachment extends \SOME\SOME
         }
         chmod($this->file, 0777);
     }
-    
-    
+
+
     protected function uploadImage()
     {
         $type = @getimagesize($this->upload);
@@ -160,7 +164,7 @@ class Attachment extends \SOME\SOME
         $this->mime = image_type_to_mime_type($type[2]);
         $this->realname = $this->getUniqueFilename();
         if (($this->maxWidth && ($this->maxWidth < $type[0])) || ($this->maxHeight && ($this->maxHeight < $type[1]))) {
-            \SOME\Thumbnail::make($this->upload, $this->file, $this->maxWidth ? $this->maxWidth : INF, $this->maxHeight ? $this->maxHeight : -1);
+            Thumbnail::make($this->upload, $this->file, $this->maxWidth ? $this->maxWidth : INF, $this->maxHeight ? $this->maxHeight : -1);
             if (!$this->copy) {
                 unlink($this->upload);
             }
@@ -169,16 +173,16 @@ class Attachment extends \SOME\SOME
             $this->uploadFile();
         }
     }
-    
-    
+
+
     public function createThumbnail()
     {
         if (is_file($this->file) && $this->image) {
-            \SOME\Thumbnail::make($this->file, $this->tn, $this->tnsize ? $this->tnsize : self::tnsize, -1, \SOME\Thumbnail::THUMBNAIL_CROP, true);
+            Thumbnail::make($this->file, $this->tn, $this->tnsize ? $this->tnsize : self::tnsize, -1, Thumbnail::THUMBNAIL_CROP, true);
             if ($this->tn) {
                 chmod($this->tn, 0777);
             }
-            \SOME\Thumbnail::make($this->file, $this->small, $this->tnsize ? $this->tnsize : self::tnsize, -1, \SOME\Thumbnail::THUMBNAIL_FRAME, true);
+            Thumbnail::make($this->file, $this->small, $this->tnsize ? $this->tnsize : self::tnsize, -1, Thumbnail::THUMBNAIL_FRAME, true);
             if ($this->small) {
                 chmod($this->small, 0777);
             }
@@ -249,8 +253,8 @@ class Attachment extends \SOME\SOME
             }
         }
     }
-    
-    
+
+
     protected function _parent()
     {
         $classname = $this->classname;
@@ -263,11 +267,54 @@ class Attachment extends \SOME\SOME
 
     protected function getUniqueFilename()
     {
-        $filename = \SOME\Text::beautify(pathinfo($this->filename, PATHINFO_FILENAME));
-        $ext = \SOME\Text::beautify(pathinfo($this->filename, PATHINFO_EXTENSION));
+        $filename = Text::beautify(pathinfo($this->filename, PATHINFO_FILENAME));
+        $ext = Text::beautify(pathinfo($this->filename, PATHINFO_EXTENSION));
         for ($i = 0; is_file($this->dirpath . '/' . $filename . '.' . $ext); $i++) {
             $filename = Application::i()->getNewURN($filename, !$i);
         }
         return $filename . '.' . $ext;
+    }
+
+
+    public static function createFromFile($filename, SOME $parentField = null, $maxSize = 1920, $tnSize = 300, $mime = 'application/octet-stream')
+    {
+        $att = new static();
+        $basename = basename($filename);
+        $basenameWOExt = pathinfo($filename, PATHINFO_FILENAME);
+        $oldExt = pathinfo($filename, PATHINFO_EXTENSION);
+        if (!is_file($filename)) {
+            $text = file_get_contents($filename);
+            $att->upload = tempnam(sys_get_temp_dir(), 'raas');
+            file_put_contents($att->upload, $text);
+        } else {
+            $att->copy = true;
+            $att->upload = $filename;
+        }
+        $att->filename = $basename;
+
+        $type = getimagesize($att->upload);
+        if ($type) {
+            $newExt = image_type_to_extension($type[2], false);
+            $newExt = strtolower($newExt);
+            if (in_array($newExt, array('jpeg', 'pjpeg'))) {
+                $newExt = 'jpg';
+            }
+            $att->filename = $basenameWOExt . '.' . $newExt;
+            $att->mime = image_type_to_mime_type($type[2]);
+            $att->image = 1;
+            $att->maxWidth = $att->maxHeight = $maxSize;
+            $att->tnsize = $tnSize;
+        } else {
+            if ($newMime = @mime_content_type($filepath)) {
+                $att->mime = $newMime;
+            } else {
+                $att->mime = $mime;
+            }
+        }
+        if ($parentField) {
+            $att->parent = $parentField;
+        }
+        $att->commit();
+        return $att;
     }
 }
