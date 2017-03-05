@@ -50,6 +50,7 @@ abstract class CustomField extends \SOME\SOME
                 }
                 $f->name = $this->urn;
                 $f->caption = $this->name;
+                $f->pattern = $this->pattern;
                 $f->children = $this->_getFieldChildren((array)$this->_stdSource());
                 $f->export = 'is_null';
                 $f->import = function ($Field) use ($t) {

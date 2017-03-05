@@ -99,7 +99,8 @@ class Field extends OptionContainer
         switch ($var) {
             case 'isFilled':
                 switch ($this->type) {
-                    case 'file': case 'image':
+                    case 'file':
+                    case 'image':
                         $val = isset($_FILES[$this->name]['tmp_name']) ? $_FILES[$this->name]['tmp_name'] : null;
                         break;
                     default:
@@ -108,7 +109,9 @@ class Field extends OptionContainer
                 }
                 if ($this->multiple) {
                     $row = $this;
-                    return (bool)array_filter(array_map(function($x) use ($row) { return $row->_isFilled($x); }, (array)$val), 'intval');
+                    return (bool)array_filter(array_map(function ($x) use ($row) {
+                        return $row->_isFilled($x);
+                    }, (array)$val), 'intval');
                 } else {
                     return $this->_isFilled($val);
                 }
@@ -125,7 +128,8 @@ class Field extends OptionContainer
                 break;
             case 'validate':
                 switch ($this->type) {
-                    case 'file': case 'image':
+                    case 'file':
+                    case 'image':
                         $val = isset($_FILES[$this->name]['tmp_name']) ? $_FILES[$this->name]['tmp_name'] : null;
                         break;
                     default:
@@ -134,16 +138,23 @@ class Field extends OptionContainer
                 }
                 if ($this->multiple) {
                     $row = $this;
-                    $v = array_filter(array_map(function($x) use ($row) { return !$row->_validate($x); }, (array)$val), 'intval');
+                    $v = array_filter(array_map(function ($x) use ($row) {
+                        return !$row->_validate($x);
+                    }, (array)$val), 'intval');
                     return $v ? array_keys($v) : true;
                 } else {
                     return $this->_validate($val);
                 }
                 break;
-            case 'multiple': case 'required':
+            case 'multiple':
+            case 'required':
                 return (isset($this->attrs[$var]) && $this->attrs[$var]);
                 break;
-            case 'errorEmptyString': case 'errorInvalidString': case 'errorEmptyFileString': case 'errorInvalidFileString': case 'errorDoesntMatch':
+            case 'errorEmptyString':
+            case 'errorInvalidString':
+            case 'errorEmptyFileString':
+            case 'errorInvalidFileString':
+            case 'errorDoesntMatch':
                 return (string)($this->$var ? $this->$var : $this->Parent->__get($var));
                 break;
             default:
@@ -154,7 +165,7 @@ class Field extends OptionContainer
 
     public function __set($var, $val)
     {
-        switch ($var){
+        switch ($var) {
             case 'children':
                 if (is_array($val) && isset($val['Set']) && is_array($val['Set'])) {
                     $Set = $val['Set'];
@@ -169,12 +180,19 @@ class Field extends OptionContainer
                     parent::__set($var, $val);
                 }
                 break;
-            case 'check': case 'export': case 'import': case 'oncommit':
+            case 'check':
+            case 'export':
+            case 'import':
+            case 'oncommit':
                 if (is_callable($val)) {
                     $this->$var = $val;
                 }
                 break;
-            case 'errorEmptyString': case 'errorInvalidString': case 'errorEmptyFileString': case 'errorInvalidFileString': case 'errorDoesntMatch':
+            case 'errorEmptyString':
+            case 'errorInvalidString':
+            case 'errorEmptyFileString':
+            case 'errorInvalidFileString':
+            case 'errorDoesntMatch':
                 $this->$var = (string)$val;
                 break;
             case 'default':
@@ -238,7 +256,8 @@ class Field extends OptionContainer
             case 'date':
                 return ($val != '0000-00-00');
                 break;
-            case 'datetime': case 'datetime-local':
+            case 'datetime':
+            case 'datetime-local':
                 return !preg_match('/^0000-00-00( |T)00:00(:00(\\.00)?)?$/i', $val);
                 break;
             case 'month':
@@ -247,7 +266,8 @@ class Field extends OptionContainer
             case 'week':
                 return ($val != '0000-W00');
                 break;
-            case 'image': case 'file':
+            case 'image':
+            case 'file':
                 return is_uploaded_file($val);
                 break;
             case 'number':
@@ -270,6 +290,11 @@ class Field extends OptionContainer
         if (trim($val) === '') {
             return true;
         }
+        if ($this->pattern) {
+            if (!preg_match('/' . $this->pattern . '/umi', $val)) {
+                return false;
+            }
+        }
         switch ($this->type) {
             case 'color':
                 return (bool)preg_match('/^(#[0-9A-F]{3})|(#[0-9A-F]{6})|#[0-9A-F]{8}$/i', $val);
@@ -277,13 +302,15 @@ class Field extends OptionContainer
             case 'date':
                 return (bool)preg_match('/^\\d{4}-\\d{2}-\\d{2}$/i', $val);
                 break;
-            case 'datetime': case 'datetime-local':
+            case 'datetime':
+            case 'datetime-local':
                 return (bool)preg_match('/^\\d{4}-\\d{2}-\\d{2}( |T)\\d{2}:\\d{2}(:\\d{2}(\\.\\d{2})?)?$/i', $val);
                 break;
             case 'email':
                 return (bool)filter_var($val, FILTER_VALIDATE_EMAIL);
                 break;
-            case 'number': case 'range':
+            case 'number':
+            case 'range':
                 $val = str_replace(',', '.', (float)$val);
                 if (!is_numeric($val)) {
                     return false;
@@ -344,7 +371,9 @@ class Field extends OptionContainer
                 if (($level === null) || ($level > 0)) {
                     if (!$childrenN) {
                         $tmp_ch = (array)$classname::_children($key);
-                        if ($tmp_ch = array_filter($tmp_ch, function($x) use ($classname) { return $x['classname'] == $classname; })) {
+                        if ($tmp_ch = array_filter($tmp_ch, function ($x) use ($classname) {
+                            return $x['classname'] == $classname;
+                        })) {
                             list($childrenN) = each($tmp_ch);
                         }
                     }
@@ -386,34 +415,48 @@ class Field extends OptionContainer
     {
         switch ($this->type) {
             case 'date':
-                $f = function($x) { return strtotime($x) > 0 ? date('Y-m-d', strtotime($x)) : '0000-00-00'; };
+                $f = function ($x) {
+                    return strtotime($x) > 0 ? date('Y-m-d', strtotime($x)) : '0000-00-00';
+                };
                 break;
-            case 'datetime': case 'datetime-local':
-                $f = function($x) { return strtotime(str_replace('T', ' ', $x)) > 0 ? date('Y-m-d H:i:s', strtotime(str_replace('T', ' ', $x))) : '0000-00-00 00:00:00'; };
+            case 'datetime':
+            case 'datetime-local':
+                $f = function ($x) {
+                    return strtotime(str_replace('T', ' ', $x)) > 0 ? date('Y-m-d H:i:s', strtotime(str_replace('T', ' ', $x))) : '0000-00-00 00:00:00';
+                };
                 break;
             case 'year':
                 $f = 'intval';
                 break;
-            case 'number': case 'range':
-                $f = function($x) { return floatval(str_replace(',', '.', $x)); };
+            case 'number':
+            case 'range':
+                $f = function ($x) {
+                    return floatval(str_replace(',', '.', $x));
+                };
                 break;
             case 'time':
-                $f = function($x) { return strtotime($x) > 0 ? date('H:i:s', strtotime($x)) : '00:00:00'; };
+                $f = function ($x) {
+                    return strtotime($x) > 0 ? date('H:i:s', strtotime($x)) : '00:00:00';
+                };
                 break;
             case 'month':
-                $f = function($x) { return strtotime($x . '-01') > 0 ? date('Y-m-d', strtotime($x . '-01')) : '0000-00-00'; };
+                $f = function ($x) {
+                    return strtotime($x . '-01') > 0 ? date('Y-m-d', strtotime($x . '-01')) : '0000-00-00';
+                };
                 break;
             case 'checkbox':
                 $f = $this->multiple ? 'trim' : 'intval';
                 break;
-            case 'image': case 'file':
+            case 'image':
+            case 'file':
                 break;
             default:
                 $f = 'trim';
                 break;
         }
         switch ($this->type) {
-            case 'file': case 'image':
+            case 'file':
+            case 'image':
                 break;
             default:
                 $Item = $this->Form->Item;
@@ -433,7 +476,8 @@ class Field extends OptionContainer
     public function importDefault()
     {
         switch ($this->type) {
-            case 'file': case 'image':
+            case 'file':
+            case 'image':
                 break;
             case 'date':
                 $x = $this->Form->Item->{$this->name};
@@ -448,7 +492,8 @@ class Field extends OptionContainer
                 }
                 return '';
                 break;
-            case 'datetime': case 'datetime-local':
+            case 'datetime':
+            case 'datetime-local':
                 $x = $this->Form->Item->{$this->name};
                 if (strtotime($x) > 0) {
                     return date('Y-m-d H:i', strtotime($x));
@@ -474,7 +519,7 @@ class Field extends OptionContainer
         if (in_array($this->type, array('image', 'file'))) {
             $Item = $this->Form->Item;
             $Field = $this;
-            $f = function($x) use ($Item, $Field) {
+            $f = function ($x) use ($Item, $Field) {
                 if (is_uploaded_file($x['tmp_name'])) {
                     $var = isset($Field->meta['attachmentVar']) ? $Field->meta['attachmentVar'] : 'attachments';
                     if (!$Field->multiple && $Item->$var) {
