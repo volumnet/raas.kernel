@@ -33,7 +33,7 @@ abstract class CustomField extends \SOME\SOME
                 $t = $this;
                 $f = new \RAAS\Field();
                 $f->type = $this->datatype;
-                foreach (array('placeholder') as $key) {
+                foreach (array('placeholder', 'pattern') as $key) {
                     if ((string)$this->$key !== '') {
                         $f->$key = (string)$this->$key;
                     }
@@ -50,7 +50,6 @@ abstract class CustomField extends \SOME\SOME
                 }
                 $f->name = $this->urn;
                 $f->caption = $this->name;
-                $f->pattern = $this->pattern;
                 $f->children = $this->_getFieldChildren((array)$this->_stdSource());
                 $f->export = 'is_null';
                 $f->import = function ($Field) use ($t) {
