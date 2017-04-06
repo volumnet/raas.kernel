@@ -527,7 +527,7 @@ abstract class CustomField extends \SOME\SOME
         if ($result) {
             foreach ((array)$result as $key => $arr) {
                 $key = trim($key);
-                if (is_array($val)) {
+                if (is_array($arr)) {
                     $data[$key] = array();
                     if (isset($arr['name'])) {
                         $data[$key]['name'] = $arr['name'];
