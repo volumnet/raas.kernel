@@ -124,20 +124,22 @@ class Attachment extends SOME
 
     protected function deleteFile()
     {
-        $temp = pathinfo($this->realname);
-        $temp = glob($this->dirpath . '/' . $temp['filename'] . '.*.' . $temp['extension']);
         if (is_file($this->dirpath . '/' . $this->realname)) {
             unlink($this->dirpath . '/' . $this->realname);
         }
-        if (is_file($this->dirpath . '/' . pathinfo($this->realname, PATHINFO_FILENAME) . '_tn.jpg')) {
-            unlink($this->dirpath . '/' . pathinfo($this->realname, PATHINFO_FILENAME) . '_tn.jpg');
-        }
-        if (is_file($this->dirpath . '/' . pathinfo($this->realname, PATHINFO_FILENAME) . '_small.' . pathinfo($this->realname, PATHINFO_EXTENSION))) {
-            unlink($this->dirpath . '/' . pathinfo($this->realname, PATHINFO_FILENAME) . '_small.' . pathinfo($this->realname, PATHINFO_EXTENSION));
-        }
-        foreach ($temp as $val) {
-            if (is_file($val)) {
-                unlink($val);
+        if ($this->image) {
+            if (is_file($this->dirpath . '/' . pathinfo($this->realname, PATHINFO_FILENAME) . '_tn.jpg')) {
+                unlink($this->dirpath . '/' . pathinfo($this->realname, PATHINFO_FILENAME) . '_tn.jpg');
+            }
+            if (is_file($this->dirpath . '/' . pathinfo($this->realname, PATHINFO_FILENAME) . '_small.' . pathinfo($this->realname, PATHINFO_EXTENSION))) {
+                unlink($this->dirpath . '/' . pathinfo($this->realname, PATHINFO_FILENAME) . '_small.' . pathinfo($this->realname, PATHINFO_EXTENSION));
+            }
+            $temp = pathinfo($this->realname);
+            $temp = glob($this->dirpath . '/' . $temp['filename'] . '.*.' . $temp['extension']);
+            foreach ($temp as $val) {
+                if (is_file($val)) {
+                    unlink($val);
+                }
             }
         }
     }
@@ -162,6 +164,7 @@ class Attachment extends SOME
             return false;
         }
         $this->mime = image_type_to_mime_type($type[2]);
+        $this->filename = pathinfo($this->filename, PATHINFO_FILENAME) . '.' . $types[$type[2]];
         $this->realname = $this->getUniqueFilename();
         if (($this->maxWidth && ($this->maxWidth < $type[0])) || ($this->maxHeight && ($this->maxHeight < $type[1]))) {
             Thumbnail::make($this->upload, $this->file, $this->maxWidth ? $this->maxWidth : INF, $this->maxHeight ? $this->maxHeight : -1);
@@ -265,11 +268,11 @@ class Attachment extends SOME
     }
 
 
-    protected function getUniqueFilename()
+    protected function getUniqueFilename($ignoreExtension = true)
     {
         $filename = Text::beautify(pathinfo($this->filename, PATHINFO_FILENAME));
         $ext = Text::beautify(pathinfo($this->filename, PATHINFO_EXTENSION));
-        for ($i = 0; is_file($this->dirpath . '/' . $filename . '.' . $ext); $i++) {
+        for ($i = 0; glob($this->dirpath . '/' . $filename . '.' . ($ignoreExtension ? '*' : $ext)); $i++) {
             $filename = Application::i()->getNewURN($filename, !$i);
         }
         return $filename . '.' . $ext;
