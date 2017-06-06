@@ -5,7 +5,7 @@
  * @version 4.2
  * @author Alex V. Surnin <info@volumnet.ru>
  * @copyright 2013, Volume Networks
- */       
+ */
 namespace RAAS;
 
 /**
@@ -22,7 +22,7 @@ namespace RAAS;
  * @property callable $commit Функция сохранения
  * @property callable $redirect Функция переадресации
  * @property callable $cancel Функция отмены
- */       
+ */
 class Form extends FieldContainer
 {
     /**
@@ -143,7 +143,7 @@ class Form extends FieldContainer
      * @var string
      */
     protected $resetCaption = '';
-    
+
     /**
      * Использовать меню действий
      * @var bool
@@ -167,12 +167,16 @@ class Form extends FieldContainer
             case 'Form':
                 return $this;
                 break;
-            case 'selfUrl': case 'parentUrl': case 'newUrl':
+            case 'selfUrl':
+            case 'parentUrl':
+            case 'newUrl':
                 $classname = get_class($this->Item);
                 $idN = $classname::_idN();
                 $refs = $classname::_references();
                 if (count($refs) > 1) {
-                    $refs = array_filter($refs, function($x) use ($classname) { return $x['classname'] == $classname; });
+                    $refs = array_filter($refs, function ($x) use ($classname) {
+                        return $x['classname'] == $classname;
+                    });
                 }
                 $refs = array_values($refs);
                 $pidN = $refs ? $refs[0]['FK'] : '';
@@ -193,7 +197,7 @@ class Form extends FieldContainer
 
     public function __set($var, $val)
     {
-        switch ($var){
+        switch ($var) {
             case 'Item':
                 if ($val instanceof \SOME\SOME) {
                     $this->Item = $val;
@@ -201,12 +205,18 @@ class Form extends FieldContainer
                     $this->$var = new $val(isset($_GET['id']) && (int)$_GET['id'] ? (int)$_GET['id'] : null);
                 }
                 break;
-            case 'commit': case 'redirect': case 'cancel':
+            case 'commit':
+            case 'redirect':
+            case 'cancel':
                 if (is_callable($val)) {
                     $this->$var = $val;
                 }
                 break;
-            case 'selfUrl': case 'parentUrl': case 'newUrl': case 'submitCaption': case 'resetCaption':
+            case 'selfUrl':
+            case 'parentUrl':
+            case 'newUrl':
+            case 'submitCaption':
+            case 'resetCaption':
                 $this->$var = (string)$val;
                 break;
             case 'actionMenu':
@@ -217,12 +227,12 @@ class Form extends FieldContainer
                 break;
         }
     }
-    
+
     /**
      * Конструктор класса
      * @param array([[имя параметра] => mixed]) $params массив дополнительных свойств, доступных для установки
      */
-    public function __construct(array $params = array()) 
+    public function __construct(array $params = array())
     {
         if (!isset($params['action'])) {
             $params['action'] = '';
@@ -273,7 +283,7 @@ class Form extends FieldContainer
                         $this->Item->commit();
                     }
                     $this->success = true;
-                
+
                     if ($f = $this->oncommit) {
                         call_user_func($f, $this);
                     } else {
@@ -304,7 +314,7 @@ class Form extends FieldContainer
         $OUT['DATA'] = $this->DATA;
         return $OUT;
     }
-    
+
     /**
      * Стандартная переадресация
      */
@@ -324,7 +334,7 @@ class Form extends FieldContainer
                     break;
             }
         } elseif (isset($_POST['@cancel']) || (Application::i()->controller instanceof Controller_Web)) {
-            new Redirector();
+            new Redirector($this->__get('selfUrl'));
         }
     }
 }
