@@ -170,22 +170,27 @@ class Form extends FieldContainer
             case 'selfUrl':
             case 'parentUrl':
             case 'newUrl':
-                $classname = get_class($this->Item);
-                $idN = $classname::_idN();
-                $refs = $classname::_references();
-                if (count($refs) > 1) {
-                    $refs = array_filter($refs, function ($x) use ($classname) {
-                        return $x['classname'] == $classname;
-                    });
-                }
-                $refs = array_values($refs);
-                $pidN = $refs ? $refs[0]['FK'] : '';
-                if ($this->$var) {
-                    return sprintf($this->$var, ($var == 'selfUrl') ? $this->Item->__id() : $this->Item->$pidN);
+                if ($this->Item) {
+                    $classname = get_class($this->Item);
+                    $idN = $classname::_idN();
+                    $refs = $classname::_references();
+                    if (count($refs) > 1) {
+                        $refs = array_filter($refs, function ($x) use ($classname) {
+                            return $x['classname'] == $classname;
+                        });
+                    }
+                    $refs = array_values($refs);
+                    $pidN = $refs ? $refs[0]['FK'] : '';
+                    if ($this->$var) {
+                        return sprintf($this->$var, ($var == 'selfUrl') ? $this->Item->__id() : $this->Item->$pidN);
+                    } else {
+                        $selfUrl = sprintf(urldecode(\SOME\HTTP::queryString($idN . '=%s' . ($pidN ? '&' . $pidN . '=' : ''))), $this->Item->__id());
+                        $parentUrl = sprintf(urldecode(\SOME\HTTP::queryString($idN . '=' . ($pidN ? '%s' : '') . '&action=')), $this->Item->$pidN);
+                        $newUrl = sprintf(urldecode(\SOME\HTTP::queryString($idN . '=' . ($pidN ? '&' . $pidN . '=%s' : '') . '&action=' . (isset($_GET['action']) ? $_GET['action'] : 'edit'))), $this->Item->$pidN);
+                        return $$var;
+                    }
                 } else {
-                    $selfUrl = sprintf(urldecode(\SOME\HTTP::queryString($idN . '=%s' . ($pidN ? '&' . $pidN . '=' : ''))), $this->Item->__id());
-                    $parentUrl = sprintf(urldecode(\SOME\HTTP::queryString($idN . '=' . ($pidN ? '%s' : '') . '&action=')), $this->Item->$pidN);
-                    $newUrl = sprintf(urldecode(\SOME\HTTP::queryString($idN . '=' . ($pidN ? '&' . $pidN . '=%s' : '') . '&action=' . (isset($_GET['action']) ? $_GET['action'] : 'edit'))), $this->Item->$pidN);
+                    $selfUrl = $parentUrl = $newUrl = \SOME\HTTP::queryString() . '&action=' . (isset($_GET['action']) ? $_GET['action'] : 'edit');
                     return $$var;
                 }
                 break;
