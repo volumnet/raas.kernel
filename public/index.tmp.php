@@ -36,13 +36,13 @@ function showMenu(array $SUBMENU, $type = null)
                 $level--;
             }
             if ($row['href']) {
-                $text .= '  <a ' . $attrs . ' href="' . htmlspecialchars($row['href']) . '">' 
+                $text .= '  <a ' . $attrs . ' href="' . htmlspecialchars($row['href']) . '">'
                       .       (isset($row['icon']) ? '<i class="icon-' . htmlspecialchars($row['icon']) . '"></i> ' : '') . $row['name']
-                      .  '  </a>' 
+                      .  '  </a>'
                       .     (isset($row['counter']) && $row['counter'] ? ' (<b><a href="' . htmlspecialchars($row['href']) . '">' . (int)$row['counter'] . '</a></b>)' : '')
                       .     $children;
             } else {
-                $text .= '  <a ' . $attrs . '>' 
+                $text .= '  <a ' . $attrs . '>'
                       .       (isset($row['icon']) ? '<i class="icon-' . htmlspecialchars($row['icon']) . '"></i> ' : '') . $row['name']
                       .  '  </a>'
                       .     (isset($row['counter']) && $row['counter'] ? ' (<b>' . (int)$row['counter'] . '</b>)' : '')
@@ -58,7 +58,7 @@ function showMenu(array $SUBMENU, $type = null)
         if ($text && $level) {
             $text = '<ul>' . $text . '</ul>';
         }
-        return $text;        
+        return $text;
     }
 }
 function rowContextMenu(array $SUBMENU = null, $title = '', $class = 'pull-right', $btnClass = '')
@@ -66,7 +66,7 @@ function rowContextMenu(array $SUBMENU = null, $title = '', $class = 'pull-right
     if ($SUBMENU) {
         if ($text = showMenu($SUBMENU)) {
             return '<div class="btn-group ' . htmlspecialchars($class) . '">
-                      <a href="#" class="btn dropdown-toggle ' . $btnClass . '" data-toggle="dropdown">' . htmlspecialchars($title) . ' <span class="caret"></span></a> 
+                      <a href="#" class="btn dropdown-toggle ' . $btnClass . '" data-toggle="dropdown">' . htmlspecialchars($title) . ' <span class="caret"></span></a>
                       <ul class="dropdown-menu">' . $text . '</ul>
                     </div>';
         }
@@ -88,7 +88,7 @@ if (\RAAS\Application::i()->activeModule) {
     <meta name="generator" content="RAAS4" />
     <title><?php echo $metaTitle?></title>
     <link type="text/css" rel="stylesheet" href="<?php echo $VIEW->themeURL . ($VIEW->templateType ? '/' . $VIEW->templateType : '')?>/style.css" />
-    
+
     <link type="text/css" href="<?php echo $VIEW->publicURL?>/jquery-ui/css/redmond/jquery-ui-1.8.23.custom.css" rel="stylesheet" />
     <link type="text/css" href="<?php echo $VIEW->publicURL?>/timepicker/jquery-ui-timepicker-addon.css" rel="stylesheet" />
     <link type="text/css" href="<?php echo $VIEW->publicURL?>/colorpicker/css/colorpicker.css" rel="stylesheet" />
@@ -153,8 +153,14 @@ if (\RAAS\Application::i()->activeModule) {
                     RAAS.<?php echo htmlspecialchars($APPLICATION->activePackage->view->_('__NAME'))?><b class="caret"></b>
                   </a>
                   <ul class="dropdown-menu pull-right">
-                    <?php foreach ($APPLICATION->packages as $key => $pack) { ?>
-                        <?php if (($pack->registryGet('isActive') || !$key || ($key == '/')) && ($pack != $APPLICATION->activePackage)) { ?>
+                    <?php foreach ($APPLICATION->packages as $key => $pack) {
+                        if ($access = $pack->access()) {
+                            if (($pack->alias != '/') && !$access->A('p=' . $key)) {
+                                continue;
+                            }
+                        }
+                        if (($pack->registryGet('isActive') || !$key || ($key == '/')) && ($pack != $APPLICATION->activePackage)) {
+                            ?>
                             <li><a href="?p=<?php echo $key?>"><?php echo htmlspecialchars($pack->view->_('__NAME'))?></a></li>
                         <?php } ?>
                     <?php } ?>
@@ -230,8 +236,8 @@ if (\RAAS\Application::i()->activeModule) {
                 </ul>
               </div>
           <?php } ?>
-          
-          <?php 
+
+          <?php
           if ($TEMPLATE) {
               include $VIEW->tmp($TEMPLATE);
           }

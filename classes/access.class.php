@@ -1,15 +1,18 @@
 <?php
 namespace RAAS;
+
 abstract class Access
 {
     private $Owner;
     private $mask = 0;
     private $rights = null;
-    
+
     public function __get($var)
     {
         switch ($var) {
-            case 'Owner': case 'rights': case 'mask':
+            case 'Owner':
+            case 'rights':
+            case 'mask':
                 return $this->$var;
                 break;
             case 'oidN':
@@ -47,7 +50,8 @@ abstract class Access
             case 'application':
                 return Application::i();
                 break;
-            case 'dbprefix': case 'SQL':
+            case 'dbprefix':
+            case 'SQL':
                 return $this->application->$var;
                 break;
             case 'level':
@@ -88,15 +92,15 @@ abstract class Access
                 break;
         }
     }
-    
-    
+
+
     final public function __construct(IOwner $Owner)
     {
         $this->Owner = $Owner;
         $this->_rights();
     }
-    
-    
+
+
     final public function setLevel($Level = null)
     {
         if (!($Level instanceof Level) || (get_class($this->Context) == get_class($Level->Context))) {
@@ -110,8 +114,8 @@ abstract class Access
             $this->flush();
         }
     }
-    
-    
+
+
     final public function setRights($rights = null)
     {
         $this->deleteRights($this->Context);
@@ -119,16 +123,16 @@ abstract class Access
         $this->SQL->add($this->rightsTableN, $arr);
         $this->flush();
     }
-    
-    
+
+
     final public function deleteRights()
     {
         $SQL_query = "DELETE FROM " . $this->rightsTableN . " WHERE " . $this->oidN . " = ? AND m = ?";
         $this->SQL->query(array($SQL_query, (int)$this->Owner->id, $this->Context->mid));
         $this->flush();
     }
-    
-    
+
+
     final public static function flushRights(User $User = null)
     {
         $SQL_query = "UPDATE " . User::_tablename() . " SET cache_rights = '' WHERE 1";
@@ -137,29 +141,31 @@ abstract class Access
         }
         Application::i()->SQL->query($SQL_query);
     }
-    
+
+
     public function canDo($sub = null, $action = null, $id = null)
     {
         return (($this->Owner instanceof User) && $this->Owner->root) || ($this->mask == 1);
     }
-    
-    
+
+
     final public function A($href)
     {
+        $href = ltrim($href, '?');
         @parse_str($href, $arr);
         $sub = isset($arr['sub']) ? $arr['sub'] : null;
         $action = isset($arr['action']) ? $arr['action'] : null;
         $id = isset($arr['id']) ? $arr['id'] : null;
         return $this->canDo($sub, $action, $id);
     }
-    
-    
+
+
     protected static function inherit($child, $parent)
     {
         return array_merge((array)$parent, (array)$child);
     }
-    
-    
+
+
     protected static function merge($a, $b)
     {
         $temp = array();
@@ -171,8 +177,8 @@ abstract class Access
         }
         return $temp;
     }
-    
-    
+
+
     final private function _rights()
     {
         if (($this->Owner instanceof User) && isset($this->Owner->rights[$this->Context->mid]) && $this->Owner->rights[$this->Context->mid]) {
@@ -183,18 +189,18 @@ abstract class Access
             $this->rights = $this->selfRights;
             $this->mask = 0;
             $level = $this->level;
-            
+
             // Маскированные права
             if ($level instanceof Level) {
-                $this->rights = static::inherit($this->rights, $level->rights); 
+                $this->rights = static::inherit($this->rights, $level->rights);
             } else {
                 if ($level === Level::GRANT_ALL) {
                     $this->mask = 1;
                 } elseif ($level === Level::REVOKE_ALL) {
                     $this->mask = -1;
-                } 
+                }
             }
-            
+
             // Наследуемые права
             if (!$this->mask) {
                 if ($this->Owner instanceof User) {
@@ -207,7 +213,7 @@ abstract class Access
                             $groupMask = $parentAccess->mask;
                         }
                     }
-                    
+
                     $this->rights = static::inherit($this->rights, $groupRights);
                     $this->mask = $groupMask;
                 } elseif (($this->Owner instanceof Group) && $this->Owner->parent && $this->Owner->parent->id) {
@@ -216,7 +222,7 @@ abstract class Access
                     $this->mask = $parentAccess->mask;
                 }
             }
-            
+
             // Наследуем уровень по умолчанию
             if (!$this->mask) {
                 $level = new Level((int)$this->Context->registryGet('defaultLevel'));
@@ -224,21 +230,21 @@ abstract class Access
                     $level = (int)$this->Context->registryGet('defaultLevel');
                 }
                 if ($level instanceof Level) {
-                    $this->rights = static::inherit($this->rights, $level->rights); 
+                    $this->rights = static::inherit($this->rights, $level->rights);
                 } else {
                     if ($level === Level::GRANT_ALL) {
                         $this->mask = 1;
                     } elseif ($level === Level::REVOKE_ALL) {
                         $this->mask = -1;
-                    } 
+                    }
                 }
             }
-            
+
             // Если не определена маска, запрещаем по умолчанию
             if (!$this->mask) {
                 $this->mask = -1;
             }
-            
+
             if (($this->Owner instanceof User) && $this->Owner->id) {
                 $cache_rights = @json_decode($this->Owner->cache_rights, true);
                 $cache_rights = (array)$cache_rights;
@@ -249,8 +255,8 @@ abstract class Access
             }
         }
     }
-    
-    
+
+
     final private function flush()
     {
         if ($this->Owner instanceof User) {

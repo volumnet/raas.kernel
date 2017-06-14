@@ -5,7 +5,7 @@
  * @version 4.1
  * @author Alex V. Surnin <info@volumnet.ru>
  * @copyright 2012, Volume Networks
- */       
+ */
 namespace RAAS;
 
 /**
@@ -19,129 +19,129 @@ namespace RAAS;
  * @property-read string templateType текущая группа шаблонов
  * @property-read string publicURL URL общей папки
  * @property-read \RAAS\IContext_View_Web $context представление текущего пакета/модуля
- */       
+ */
 class View_Web extends Abstract_View implements IContext_View_Web
 {
     /**
      * Признак определения мобильных браузеров по регулярным выражениям в USER-AGENT
-     */         
+     */
     const rxMobile = '/Mobile/i';
-    
+
     /**
      * Пользовательские данные
-     * @var array     
-     */         
+     * @var array
+     */
     protected $data;
-    
+
     /**
      * Справочные данные
-     * @var \ArrayObject     
-     */         
+     * @var \ArrayObject
+     */
     protected $content;
-    
+
     /**
      * Локальные (пользовательские) ошибки
-     * @var \ArrayObject     
-     */         
+     * @var \ArrayObject
+     */
     protected $localError;
-    
+
     /**
      * Основной шаблон содержимого
-     * @var string     
-     */         
+     * @var string
+     */
     protected $template = '';
-    
+
     /**
      * Заголовок страницы
-     * @var string     
-     */         
+     * @var string
+     */
     protected $title;
-    
+
     /**
      * Верхнее меню, пункты в виде array('name' => 'текст ссылки', ['href' => 'ссылка', ...прочие аттрибуты тега <a...></a>...])
-     * @var \ArrayObject     
-     */         
+     * @var \ArrayObject
+     */
     protected $menu;
-    
+
     /**
      * Левое меню, пункты в виде array('name' => 'текст ссылки', ['href' => 'ссылка', ...прочие аттрибуты тега <a...></a>...])
-     * @var \ArrayObject     
-     */         
+     * @var \ArrayObject
+     */
     protected $submenu;
-    
+
     /**
      * Контекстное меню страницы в виде array('name' => 'текст ссылки', ['href' => 'ссылка', ...прочие аттрибуты тега <a...></a>...])
-     * @var \ArrayObject     
-     */         
+     * @var \ArrayObject
+     */
     protected $contextmenu;
-    
+
     /**
      * Строка навигации, пункты в виде array('name' => 'текст ссылки', ['href' => 'ссылка', ...прочие аттрибуты тега <a...></a>...])
-     * @var \ArrayObject     
-     */         
+     * @var \ArrayObject
+     */
     protected $path;
-    
+
     /**
      * Набор подключаемых CSS-файлов
      * @var \ArrayObject
      */
     protected $css;
-    
+
     /**
      * Набор подключаемых JS-файлов после документа
      * @var \ArrayObject
      */
     protected $js;
-    
+
     /**
      * Набор подключаемых JS-файлов в шапке
      * @var \ArrayObject
      */
     protected $head_js;
-    
+
     /**
      * Начался рендеринг шаблонов
-     * @var bool     
-     */         
+     * @var bool
+     */
     protected $renderStarted = false;
-    
+
     /**
      * Текущая группа шаблонов
-     * @var string     
-     */         
+     * @var string
+     */
     private $templateType = '';
-    
+
     /**
      * Текущая тема оформления
-     * @var string     
-     */         
+     * @var string
+     */
     private $theme;
-    
+
     /**
      * Имена контейнеров-массивов
-     * @var array     
-     */         
+     * @var array
+     */
     private static $arrayContainers = array('data', 'content', 'localError', 'css', 'js', 'head_js');
-    
+
     /**
      * Имена контейнеров-строк
      * @var array
      */
     private static $stringContainers = array('template', 'title');
-    
+
     /**
      * Экземпляр класса
      * @var \RAAS\View_Web
-     */         
+     */
     protected static $instance;
-    
+
     public function __get($var)
     {
         switch ($var) {
             case 'themeDir':
                 return $this->theme ? ($this->application->baseDir . '/themes/' . $this->theme) : $this->application->publicDir;
                 break;
-            
+
             case 'modulesURL':
                 return 'modules';
                 break;
@@ -151,7 +151,7 @@ class View_Web extends Abstract_View implements IContext_View_Web
             case 'publicURL':
                 return 'system/public';
                 break;
-            
+
             case 'templateType': case 'data': case 'content': case 'localError': case 'menu': case 'submenu': case 'contextmenu': case 'path': case 'theme':
             case 'renderStarted':
                 return $this->$var;
@@ -176,7 +176,7 @@ class View_Web extends Abstract_View implements IContext_View_Web
                 break;
         }
     }
-    
+
     public function __set($var, $val)
     {
         if (in_array($var, self::$arrayContainers) || in_array($var, self::$stringContainers) || in_array($var, array('menu', 'submenu', 'contextmenu', 'path'))) {
@@ -193,11 +193,11 @@ class View_Web extends Abstract_View implements IContext_View_Web
             }
         }
     }
-    
-    
+
+
     /**
      * Конструктор класса
-     */         
+     */
     protected function init()
     {
         foreach (self::$arrayContainers as $key) {
@@ -209,36 +209,36 @@ class View_Web extends Abstract_View implements IContext_View_Web
         $this->path = new \ArrayObject();
         parent::init();
     }
-    
-    
+
+
     /**
      * Страница проверки совместимости
      * @param array $IN входные данные
-     */         
+     */
     public function checkCompatibility(array $IN)
     {
         $IN['localError'] = parent::checkCompatibility($IN);
         $this->assignVars($IN);
         $this->title = $this->_('CHECK_COMPATIBILITY');
     }
-    
-    
+
+
     /**
      * Страница конфигурации базы данных
      * @param array $IN входные данные
-     */         
+     */
     public function configureDB(array $IN)
     {
         $this->assignVars($IN);
         $this->title = $IN['Form']->caption;
         $this->template = $IN['Form']->template;
     }
-    
-    
+
+
     /**
      * Страница проверки совместимости движка SOME
      * @param array $IN входные данные
-     */         
+     */
     public function checkSOME(array $IN)
     {
         $this->title = $this->_('CHECK_COMPATIBILITY');
@@ -246,20 +246,20 @@ class View_Web extends Abstract_View implements IContext_View_Web
             $this->localError[] = $this->_('SOME_CORRUPTED');
         }
     }
-    
-    
+
+
     /**
      * Страница входа в систему
      * @param array $IN входные данные
-     */         
+     */
     public function login(array $IN)
     {
         $this->assignVars($IN);
         $this->title = $IN['Form']->caption;
         $this->template = $IN['Form']->template;
     }
-    
-    
+
+
     public function assignVars(array $IN = array())
     {
         if (isset($IN['localError'])) {
@@ -276,35 +276,35 @@ class View_Web extends Abstract_View implements IContext_View_Web
         unset($IN['localError'], $IN['DATA'], $IN['CONTENT']);
         $this->content = array_merge((array)$this->content, (array)$IN);
     }
-    
-    
+
+
     /**
      * При необходимости обрабатывает данные XSLT-преобразованием
-     */         
+     */
     public function processXSLT($content)
     {
         if ($this->theme && ($this->theme != '/') && is_file($this->themeDir . '/theme.xsl')) {
-            
+
         }
         return $content;
     }
-    
-    
+
+
     /**
      * Выводит данные конечному пользователю
-     */         
+     */
     public function render()
     {
         $this->combineViews();
         $this->renderStarted = true;
         extract($this->prepareVars(), EXTR_SKIP);
-        
+
         if ($this->application->debug && ($this->application->exceptions || $this->application->sqlExceptions)) {
             foreach (array_merge((array)$this->application->exceptions, (array)$this->application->sqlExceptions) as $e) {
                 array_unshift($localError, $this->debugShowException($e));
             }
         }
-        
+
         header ('Cache-Control: no-cache, must-revalidate');
         header ('Pragma: no-cache');
         header('Content-Type: text/html; charset=UTF-8');
@@ -317,18 +317,18 @@ class View_Web extends Abstract_View implements IContext_View_Web
         ob_end_clean();
         echo $this->processXSLT($content);
     }
-    
+
     /**
      * Системное отображение исключения
-     * @param \Exception $e исключение     
-     */         
+     * @param \Exception $e исключение
+     */
     public function debugShowException(\Exception $e)
     {
         $text .= $e->getMessage() . $e->getTraceAsString();
         return $text;
     }
-    
-    
+
+
     public function tmp($file)
     {
         $temp = explode('/', ltrim($file, '/'));
@@ -348,16 +348,16 @@ class View_Web extends Abstract_View implements IContext_View_Web
         if (!strstr($f, '.')) {
             $f .= '.tmp.php';
         }
-        
+
         if ($this->templateType && is_file($dir . '/' . $this->templateType . '/' . $f)) {
             return $dir . '/' . $this->templateType . '/' . $f;
         } elseif (is_file($dir . '/' . $f)) {
             return $dir . '/' . $f;
         }
     }
-    
-    
-    public function getMenu(array $SUBMENU = array()) 
+
+
+    public function getMenu(array $SUBMENU = array())
     {
         $menu = array();
         foreach ($SUBMENU as $i => $item) {
@@ -394,11 +394,11 @@ class View_Web extends Abstract_View implements IContext_View_Web
         }
         return $menu;
     }
-    
+
     /**
      * Готовит основные переменные для экспорта перед выводом данных, также "раскатывает" переводы
-     * @return array массив переменных для последующего экспорта и использования в шаблонах     
-     */         
+     * @return array массив переменных для последующего экспорта и использования в шаблонах
+     */
     protected function prepareVars()
     {
         $temp = array();
@@ -418,10 +418,10 @@ class View_Web extends Abstract_View implements IContext_View_Web
         $temp = array_merge($temp, (array)$this->content);
         return $temp;
     }
-    
+
     /**
      * Комбинирует переменные из представлений ядра, пакетов и модулей
-     */         
+     */
     protected function combineViews()
     {
         parent::combineViews();
