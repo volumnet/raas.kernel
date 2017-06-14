@@ -218,10 +218,10 @@ if (\RAAS\Application::i()->activeModule) {
           <?php if ($PATH) { ?>
               <nav class="backtrace"><ul class="breadcrumb"><?php echo showMenu($PATH, 'breadcrumb')?></ul></nav>
           <?php } ?>
-          <?php if ($CONTEXTMENU) { ?>
+          <?php if ($CONTEXTMENU && ($managementMenu = showMenu($CONTEXTMENU))) { ?>
               <div class="btn-group pull-right">
                 <a href="#" class="btn btn-info btn-large dropdown-toggle" data-toggle="dropdown"><?php echo MANAGEMENT?> <span class="caret"></span></a>
-                <ul class="dropdown-menu"><?php echo showMenu($CONTEXTMENU)?></ul>
+                <ul class="dropdown-menu"><?php echo $managementMenu?></ul>
               </div>
           <?php } ?>
           <h1><?php echo $TITLE?></h1>
