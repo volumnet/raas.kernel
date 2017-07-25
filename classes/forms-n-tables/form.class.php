@@ -8,6 +8,8 @@
  */
 namespace RAAS;
 
+use SOME\SOME;
+
 /**
  * Класс формы
  * @package RAAS
@@ -170,23 +172,28 @@ class Form extends FieldContainer
             case 'selfUrl':
             case 'parentUrl':
             case 'newUrl':
-                $classname = get_class($this->Item);
-                $idN = $classname::_idN();
-                $refs = $classname::_references();
-                if (count($refs) > 1) {
-                    $refs = array_filter($refs, function ($x) use ($classname) {
-                        return $x['classname'] == $classname;
-                    });
-                }
-                $refs = array_values($refs);
-                $pidN = $refs ? $refs[0]['FK'] : '';
-                if ($this->$var) {
-                    return sprintf($this->$var, ($var == 'selfUrl') ? $this->Item->__id() : $this->Item->$pidN);
-                } else {
-                    $selfUrl = sprintf(urldecode(\SOME\HTTP::queryString($idN . '=%s' . ($pidN ? '&' . $pidN . '=' : ''))), $this->Item->__id());
-                    $parentUrl = sprintf(urldecode(\SOME\HTTP::queryString($idN . '=' . ($pidN ? '%s' : '') . '&action=')), $this->Item->$pidN);
-                    $newUrl = sprintf(urldecode(\SOME\HTTP::queryString($idN . '=' . ($pidN ? '&' . $pidN . '=%s' : '') . '&action=' . (isset($_GET['action']) ? $_GET['action'] : 'edit'))), $this->Item->$pidN);
-                    return $$var;
+                // 2017-07-25, AVS: если Item не задан, выдернуть его id не получится
+                if ($this->Item && ($this->Item instanceof SOME)) {
+                    $classname = get_class($this->Item);
+                    $idN = $classname::_idN();
+                    $refs = $classname::_references();
+                    if (count($refs) > 1) {
+                        $refs = array_filter($refs, function ($x) use ($classname) {
+                            return $x['classname'] == $classname;
+                        });
+                    }
+                    $refs = array_values($refs);
+                    $pidN = $refs ? $refs[0]['FK'] : '';
+                    if ($this->$var) {
+                        return sprintf($this->$var, ($var == 'selfUrl') ? $this->Item->__id() : $this->Item->$pidN);
+                    } else {
+                        $selfUrl = sprintf(urldecode(\SOME\HTTP::queryString($idN . '=%s' . ($pidN ? '&' . $pidN . '=' : ''))), $this->Item->__id());
+                        $parentUrl = sprintf(urldecode(\SOME\HTTP::queryString($idN . '=' . ($pidN ? '%s' : '') . '&action=')), $this->Item->$pidN);
+                        $newUrl = sprintf(urldecode(\SOME\HTTP::queryString($idN . '=' . ($pidN ? '&' . $pidN . '=%s' : '') . '&action=' . (isset($_GET['action']) ? $_GET['action'] : 'edit'))), $this->Item->$pidN);
+                        return $$var;
+                    }
+                } elseif ($this->$var) {
+                    return $this->$var;
                 }
                 break;
             default:
