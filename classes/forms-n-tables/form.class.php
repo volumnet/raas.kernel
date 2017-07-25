@@ -172,8 +172,7 @@ class Form extends FieldContainer
             case 'selfUrl':
             case 'parentUrl':
             case 'newUrl':
-                // 2017-07-25, AVS: если Item не задан, выдернуть его id не получится
-                if ($this->Item && ($this->Item instanceof SOME)) {
+                if ($this->Item) {
                     $classname = get_class($this->Item);
                     $idN = $classname::_idN();
                     $refs = $classname::_references();
@@ -192,8 +191,9 @@ class Form extends FieldContainer
                         $newUrl = sprintf(urldecode(\SOME\HTTP::queryString($idN . '=' . ($pidN ? '&' . $pidN . '=%s' : '') . '&action=' . (isset($_GET['action']) ? $_GET['action'] : 'edit'))), $this->Item->$pidN);
                         return $$var;
                     }
-                } elseif ($this->$var) {
-                    return $this->$var;
+                } else {
+                    $selfUrl = $parentUrl = $newUrl = \SOME\HTTP::queryString() . '&action=' . (isset($_GET['action']) ? $_GET['action'] : 'edit');
+                    return $$var;
                 }
                 break;
             default:
