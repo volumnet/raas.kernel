@@ -1,6 +1,6 @@
 <?php
 $_RAASForm_Options = function(\RAAS\OptionCollection $options, $level = 0) use (&$_RAASForm_Options, &$_RAASForm_Attrs) {
-    foreach ($options as $row) { 
+    foreach ($options as $row) {
         switch (get_class($row)) {
             case 'RAAS\OptGroup':
                 include \RAAS\Application::i()->view->context->tmp('/optgroup.inc.php');
@@ -23,7 +23,7 @@ $_RAASForm_Options = function(\RAAS\OptionCollection $options, $level = 0) use (
                 $_RAASForm_Options($row->children, $level + 1);
                 break;
         }
-    } 
+    }
 };
 
 $_RAASForm_Checkbox = function (\RAAS\OptionCollection $options, $level = 0) use (&$_RAASForm_Checkbox, &$_RAASForm_Attrs) {
@@ -32,7 +32,7 @@ $_RAASForm_Checkbox = function (\RAAS\OptionCollection $options, $level = 0) use
     $attrs = array();
     $text = '';
     $plain = !$level && !array_filter($options, function($x) { return (bool)(array)$x->children; }) && count($options) < 16;
-    foreach ($options as $row) { 
+    foreach ($options as $row) {
         $attrs = $row->attrs;
         foreach (array('type', 'name', 'multiple') as $key) {
             $attrs[$key] = $Field->$key;
@@ -58,8 +58,8 @@ $_RAASForm_Checkbox = function (\RAAS\OptionCollection $options, $level = 0) use
 
 $_RAASForm_Control = function(\RAAS\Field $Field, $confirm = true) use (&$_RAASForm_Attrs, &$_RAASForm_Options, &$_RAASForm_Checkbox) {
     $attrs = array();
-    switch ($Field->type) { 
-        case 'image': case 'file': 
+    switch ($Field->type) {
+        case 'image': case 'file':
             $attVar = isset($Field->meta['attachmentVar']) ? $Field->meta['attachmentVar'] : 'attachments';
             $delAttPath = isset($Field->meta['deleteAttachmentPath']) ? $Field->meta['deleteAttachmentPath'] : (\SOME\HTTP::queryString('action=delete_attachment&id=') . '&id=%s');
             $Set = $Field->Form->Item->$attVar;
@@ -79,7 +79,7 @@ $_RAASForm_Control = function(\RAAS\Field $Field, $confirm = true) use (&$_RAASF
                             <a class="close" href="<?php echo sprintf($delAttPath, (int)$row->id)?>" onclick="return confirm('<?php echo $Field->type == 'image' ? DELETE_IMAGE_TEXT : DELETE_FILE_TEXT?>')">&times;</a>
                           <?php } ?>
                           <a href="<?php echo htmlspecialchars($row->fileURL)?>" target="_blank">
-                            <?php if ($Field->type == 'image') { ?> 
+                            <?php if ($Field->type == 'image') { ?>
                                 <img src="<?php echo htmlspecialchars($row->tnURL)?>" alt="<?php echo htmlspecialchars(basename($row->filename))?>" title="<?php echo htmlspecialchars(basename($row->filename))?>" />
                             <?php } else { ?>
                                 <?php echo htmlspecialchars(basename($row->filename))?>
@@ -97,7 +97,7 @@ $_RAASForm_Control = function(\RAAS\Field $Field, $confirm = true) use (&$_RAASF
             if ($Field->type == 'image') {
                 $attrs['accept'] = 'image/jpeg,image/png,image/gif';
             }
-            if ($Field->multiple) { 
+            if ($Field->multiple) {
                 ?>
                 <div data-role="raas-repo-block">
                   <div data-role="raas-repo-container"><div data-role="raas-repo-element"><input<?php echo $_RAASForm_Attrs($Field, $attrs)?> /></div></div>
@@ -133,7 +133,7 @@ $_RAASForm_Control = function(\RAAS\Field $Field, $confirm = true) use (&$_RAASF
                 }
                 $Field->children[0] = new \RAAS\Option(array('caption' => $Field->placeholder, 'value' => ''));
             }
-            if ($Field->multiple && !$Field->{'data-raas-multiselect'}) { 
+            if ($Field->multiple && !$Field->{'data-raas-multiselect'}) {
                 $attrs = array_merge($attrs, array('multiple' => false));
                 ?>
                 <div data-role="raas-repo-block">
@@ -142,12 +142,12 @@ $_RAASForm_Control = function(\RAAS\Field $Field, $confirm = true) use (&$_RAASF
                         <div data-role="raas-repo-element">
                           <select<?php echo $_RAASForm_Attrs($Field, $attrs)?>><?php echo $_RAASForm_Options($Field->children)?></select>
                         </div>
-                    <?php } ?>   
+                    <?php } ?>
                   </div>
                   <div data-role="raas-repo"><select<?php echo $_RAASForm_Attrs($Field, array_merge($attrs, array('disabled' => 'disabled')))?>><?php echo $_RAASForm_Options($Field->children)?></select></div>
                 </div>
-                <?php 
-            } else { 
+                <?php
+            } else {
                 ?>
                 <select<?php echo $_RAASForm_Attrs($Field, $attrs)?>><?php echo $_RAASForm_Options($Field->children)?></select>
                 <?php
@@ -161,7 +161,7 @@ $_RAASForm_Control = function(\RAAS\Field $Field, $confirm = true) use (&$_RAASF
             } elseif ($Field->type == 'codearea') {
                 $attrs['class'] = 'code codearea fullscreen';
             }
-            if ($Field->multiple) { 
+            if ($Field->multiple) {
                 ?>
                 <div data-role="raas-repo-block">
                   <div data-role="raas-repo-container">
@@ -185,12 +185,12 @@ $_RAASForm_Control = function(\RAAS\Field $Field, $confirm = true) use (&$_RAASF
             <input<?php echo $_RAASForm_Attrs($Field, $attrs)?> />
             <?php
             break;
-        default: 
+        default:
             $attrs = array();
             if (!$Field->type) {
                 $attrs['type'] = 'text';
             }
-            if ($Field->multiple) { 
+            if ($Field->multiple) {
                 ?>
                 <div data-role="raas-repo-block">
                   <div data-role="raas-repo-container">
@@ -200,8 +200,8 @@ $_RAASForm_Control = function(\RAAS\Field $Field, $confirm = true) use (&$_RAASF
                   </div>
                   <div data-role="raas-repo"><input<?php echo $_RAASForm_Attrs($Field, array_merge($attrs, array('disabled' => 'disabled')))?> /></div>
                 </div>
-                <?php 
-            } else { 
+                <?php
+            } else {
                 ?>
                 <input<?php echo $_RAASForm_Attrs($Field, array_merge($attrs, array('value' => $Field->Form->DATA[$Field->name])))?> />
                 <?php
@@ -216,7 +216,7 @@ $_RAASForm_Field = function(\RAAS\Field $Field) use (&$_RAASForm_Control, &$_RAA
         ?>
         <div class="control-group<?php echo $err ? ' error' : ''?>">
           <?php if ($Field->caption) { ?>
-              <label class="control-label" for="<?php echo htmlspecialchars($Field->name)?>"><?php echo htmlspecialchars($Field->caption)?>:</label> 
+              <label class="control-label" for="<?php echo htmlspecialchars($Field->name)?>"><?php echo htmlspecialchars($Field->caption)?>:</label>
               <div class="controls clearfix">&nbsp;</div>
           <?php } ?>
           <div class="clearfix"><?php echo $_RAASForm_Control($Field)?></div>
@@ -226,11 +226,11 @@ $_RAASForm_Field = function(\RAAS\Field $Field) use (&$_RAASForm_Control, &$_RAA
         $err2 = (bool)array_filter((array)$Field->Form->localError, function($x) use ($Field) { return $x['value'] == $Field->name . '@confirm'; });
         ?>
         <div class="control-group<?php echo $err ? ' error' : ''?>">
-          <label class="control-label" for="<?php echo htmlspecialchars($Field->name)?>"><?php echo htmlspecialchars($Field->caption)?>:</label> 
+          <label class="control-label" for="<?php echo htmlspecialchars($Field->name)?>"><?php echo htmlspecialchars($Field->caption)?>:</label>
           <div class="controls"><?php echo $_RAASForm_Control($Field, false)?></div>
         </div>
         <div class="control-group<?php echo $err2 ? ' error' : ''?>">
-          <label class="control-label" for="<?php echo htmlspecialchars($Field->name)?>@confirm"><?php echo PASSWORD_CONFIRM?>:</label> 
+          <label class="control-label" for="<?php echo htmlspecialchars($Field->name)?>@confirm"><?php echo PASSWORD_CONFIRM?>:</label>
           <div class="controls"><?php echo $_RAASForm_Control($Field, true)?></div>
         </div>
         <?php
@@ -247,7 +247,7 @@ $_RAASForm_Field = function(\RAAS\Field $Field) use (&$_RAASForm_Control, &$_RAA
         <div class="control-group<?php echo $err ? ' error' : ''?>">
           <label class="control-label" for="<?php echo htmlspecialchars($Field->name)?>">
             <?php echo htmlspecialchars($Field->caption ? $Field->caption . ':' : '')?>
-          </label> 
+          </label>
           <div class="controls"><?php echo $_RAASForm_Control($Field, false)?></div>
         </div>
         <?php
