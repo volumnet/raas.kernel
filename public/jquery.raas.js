@@ -228,12 +228,16 @@ jQuery(function($) {
                 return false;
             },
             init : function(options) { 
-                params = $.extend(defaultParams, params);
-                var sel = '';
-                for (var i = 0; i < params.shownLevel; i++) {
-                    sel += 'ul ';
+                params = $.extend(defaultParams, options);
+                if (params.shownLevel) {
+                    var sel = '';
+                    for (var i = 0; i < params.shownLevel; i++) {
+                        sel += 'ul ';
+                    }
+                    $thisObj = $(sel, this);
+                } else {
+                    $thisObj = $(this);
                 }
-                $thisObj = $(sel, this);
                 methods.hideUL($thisObj);
                 methods.addPluses($thisObj);
                 methods.unfold($('li.active', $thisObj), false);

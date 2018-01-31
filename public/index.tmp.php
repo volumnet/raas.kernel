@@ -94,6 +94,7 @@ if (\RAAS\Application::i()->activeModule) {
     <link type="text/css" href="<?php echo $VIEW->publicURL?>/colorpicker/css/colorpicker.css" rel="stylesheet" />
     <link type="text/css" href="<?php echo $VIEW->publicURL?>/bootstrap-multiselect.css" rel="stylesheet" />
     <link type="text/css" href="<?php echo $VIEW->publicURL?>/codemirror/lib/codemirror.css" rel="stylesheet" />
+    <link type="text/css" href="<?php echo $VIEW->publicURL?>/fonts/font-awesome.min.css" rel="stylesheet" />
     <?php foreach ($VIEW->css as $css) { ?>
         <link type="text/css" rel="stylesheet" href="<?php echo $css?>" />
     <?php } ?>

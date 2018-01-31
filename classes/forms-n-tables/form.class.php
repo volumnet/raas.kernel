@@ -8,6 +8,8 @@
  */
 namespace RAAS;
 
+use SOME\SOME;
+
 /**
  * Класс формы
  * @package RAAS
