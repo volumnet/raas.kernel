@@ -50,7 +50,7 @@ abstract class CustomField extends \SOME\SOME
                 }
                 $f->name = $this->urn;
                 $f->caption = $this->name;
-                $f->children = $this->_getFieldChildren((array)$this->_stdSource());
+                $f->children = $this->_getFieldChildren((array)$this->_stdSource(), $f);
                 $f->export = 'is_null';
                 $f->import = function ($Field) use ($t) {
                     return $t->getValues();
@@ -621,17 +621,18 @@ abstract class CustomField extends \SOME\SOME
         }
     }
 
-    protected function _getFieldChildren(array $stdSource = array())
+    protected function _getFieldChildren(array $stdSource = array(), \RAAS\Field $parentField)
     {
-        $temp = array();
+        $options = new OptionCollection();
+        $options->Parent = $parentField;
         foreach ((array)$stdSource as $key => $val) {
             $Option = new Option(array('value' => $key, 'caption' => $val['name']));
             if (isset($val['children'])) {
-                $Option->children = $this->_getFieldChildren($val['children']);
+                $Option->children = $this->_getFieldChildren($val['children'], $parentField);
             }
-            $temp[] = $Option;
+            $options[] = $Option;
         }
-        return $temp;
+        return $options;
     }
 
 

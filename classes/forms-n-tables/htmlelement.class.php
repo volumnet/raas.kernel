@@ -5,7 +5,7 @@
  * @version 4.2
  * @author Alex V. Surnin <info@volumnet.ru>
  * @copyright 2013, Volume Networks
- */       
+ */
 namespace RAAS;
 
 /**
@@ -18,7 +18,7 @@ namespace RAAS;
  * @property-read \ArrayObject $meta Массив дополнительных данных об объекте в произвольной форме
  * @property-write \ArrayObject|array $meta Массив дополнительных данных об объекте в произвольной форме
  * @property string $template Шаблон для отображения элемента в формате шаблонов RAAS
- */       
+ */
 abstract class HTMLElement
 {
     /**
@@ -32,7 +32,7 @@ abstract class HTMLElement
      * @var string
      */
     protected $caption = '';
-    
+
     /**
      * Массив дополнительных HTML-атрибутов опции для вывода
      * @var \RAAS\StringCollection
@@ -101,7 +101,7 @@ abstract class HTMLElement
 
     }
 
-    
+
     /**
      * Конструктор класса
      * @param array([[имя параметра] => mixed]) $params массив дополнительных свойств, доступных для установки

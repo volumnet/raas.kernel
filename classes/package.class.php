@@ -5,7 +5,7 @@
  * @version 4.1
  * @author Alex V. Surnin <info@volumnet.ru>
  * @copyright 2011, Volume Networks
- */       
+ */
 namespace RAAS;
 
 /**
@@ -17,33 +17,33 @@ namespace RAAS;
  * @property-read array(\RAAS\Module) $modules массив загруженных модулей
  * @property \RAAS\Module $activeModule активный модуль
  * @property \RAAS\Updater $updater мастер обновлений
- */       
+ */
 abstract class Package extends \SOME\Singleton implements IRightsContext
 {
     /**
      * Контроллер пакета
-     * @var \RAAS\Abstract_Package_Controller     
-     */         
+     * @var \RAAS\Abstract_Package_Controller
+     */
     protected $controller = array();
-    
+
     /**
      * Массив загруженных модулей пакета
      * @var array
      */
     protected $modules = array();
-    
+
     /**
      * Массив наименований требуемых расширений
      * @var array
-     */              
+     */
     protected static $requiredExtensions = array();
-    
+
     /**
      * Экземпляр класса
-     * @var \RAAS\Package     
-     */         
+     * @var \RAAS\Package
+     */
     protected static $instance;
-    
+
     public function __get($var)
     {
         switch ($var) {
@@ -68,7 +68,7 @@ abstract class Package extends \SOME\Singleton implements IRightsContext
                     return $u;
                 }
                 break;
-            
+
             // Файлы и директории
             case 'baseDir':
                 return $this->application->modulesDir . '/' . $this->alias;
@@ -117,7 +117,7 @@ abstract class Package extends \SOME\Singleton implements IRightsContext
             case 'uninstallFile':
                 return $this->resourcesDir . '/uninstall.' . (string)$this->application->dbtype . '.sql';
                 break;
-            
+
             // Модель
             case 'Mid':
                 $NS = \SOME\Namespaces::getNSArray(\get_called_class());
@@ -168,8 +168,8 @@ abstract class Package extends \SOME\Singleton implements IRightsContext
                 break;
         }
     }
-    
-    
+
+
     public function __set($var, $val)
     {
         switch ($var) {
@@ -181,7 +181,7 @@ abstract class Package extends \SOME\Singleton implements IRightsContext
         }
     }
 
-    
+
     public function init()
     {
         spl_autoload_register(array($this, 'autoload'));
@@ -197,8 +197,8 @@ abstract class Package extends \SOME\Singleton implements IRightsContext
             //throw new Exception($this->application->view->_('INVALID_CONTROLLER_FOR_PACKAGE'));
         }
     }
-    
-    
+
+
     public function run()
     {
         if ($this->controller) {
@@ -282,8 +282,8 @@ abstract class Package extends \SOME\Singleton implements IRightsContext
             }
         }
     }
-    
-    
+
+
     public function access(IOwner $Owner = null)
     {
         if ($Owner === null) {
@@ -333,10 +333,10 @@ abstract class Package extends \SOME\Singleton implements IRightsContext
                     } elseif (preg_match('/^View_Chunk?$/i', $classname, $regs)) {
                         $callback = ' namespace %s;
                                       class View_Chunk extends \\RAAS\\Package_View_Chunk {
-                                          protected static $instance; 
-                                          public function __call($name, $args) { 
+                                          protected static $instance;
+                                          public function __call($name, $args) {
                                               $this->assignVars(isset($args[0]) ? $args[0] : array());
-                                              $this->template = $name; 
+                                              $this->template = $name;
                                           }
                                       }';
                         eval(sprintf($callback, implode('\\', $NS)));
