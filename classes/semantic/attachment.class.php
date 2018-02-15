@@ -287,6 +287,9 @@ class Attachment extends SOME
         $oldExt = pathinfo($filename, PATHINFO_EXTENSION);
         if (!is_file($filename)) {
             $text = file_get_contents($filename);
+            if (!$text) {
+                return false;
+            }
             $att->upload = tempnam(sys_get_temp_dir(), 'raas');
             file_put_contents($att->upload, $text);
         } else {
