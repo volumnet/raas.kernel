@@ -5,7 +5,7 @@
  * @version 4.1
  * @author Alex V. Surnin <info@volumnet.ru>
  * @copyright 2011, Volume Networks
- */       
+ */
 namespace RAAS;
 
 /**
@@ -23,12 +23,12 @@ namespace RAAS;
  * @property-read string $classesFile путь к файлу кэша классов
  * @property-read array(string) $availableDatabases массив названий доступных СУБД в виде 'alias' => 'Название СУБД'
  * @property-read bool $debug режим отладки
- * @property-read array(\RAAS\Exception) $exceptions массив исключений 
+ * @property-read array(\RAAS\Exception) $exceptions массив исключений
  * @property-read array(\Exception) $sqlExceptions массив исключений по SQL-запросам
  * @property \RAAS\User $user активный пользователь системы
  * @property-read \SOME\DB $SQL подключение к базе данных
  * @property-read string $DSN строка подключения к базе данных
- * @property-read string $updateURL адрес сервера обновлений 
+ * @property-read string $updateURL адрес сервера обновлений
  * @property-read string $userAgent поле User-Agent для обмена данными с сервером обновлений
  * @property-read resource $networkContext контекст соединения с сервером обновлений
  */
@@ -36,55 +36,55 @@ final class Application extends \SOME\Singleton implements IContext
 {
     /**
      * Наименование версии
-     */         
+     */
     const versionName = 'RAAS v4.1 Remote Automated Assistant';
-    
+
     /**
      * Контроллер, используемый по умолчанию
-     */         
+     */
     const defaultController = 'web';
-    
+
     /**
      * Сервер баз данных, используемый по умолчанию
-     */         
+     */
     const defaultDBHost = 'localhost';
-    
+
     /**
      * Пользователь баз данных, используемый по умолчанию
-     */         
+     */
     const defaultDBUser = 'root';
-    
+
     /**
      * "Соль" для шифрования MD5-алгоритмом
-     */         
+     */
     const generalSalt = 'KJLO(HD*hkojnds890fyhkOHnLO(U)*(#)&hjldfc890LKN(*YHN,vDIO89sILHKNLNVLDS*Y(DJXCVN';
-    
+
     /**
-     * Время ожидания ответа от сервера обновлений 
+     * Время ожидания ответа от сервера обновлений
      */
     const networkTimeout = 10;
-    
+
     /**
      * Версия файла
      */
     const version = '2013-12-01 18:36:50';
-    
+
     /**
-     * UNIX-timestamp времени начала выполнения скрипта     
+     * UNIX-timestamp времени начала выполнения скрипта
      * @var double
-     */         
+     */
     private $startMicrotime = 0;
-    
+
     /**
      * Режим отладки
      * @var bool
-     */         
+     */
     private $debug = false;
-    
+
     /**
-     * Контроллер ядра     
+     * Контроллер ядра
      * @var Abstract_Controller
-     */         
+     */
     private $controller;
 
     /**
@@ -134,31 +134,31 @@ final class Application extends \SOME\Singleton implements IContext
      * @var \RAAS\Package
      */
     private $activePackage;
-    
+
     /**
      * Массив наименований требуемых расширений
      * @var array
-     */              
+     */
     private static $requiredExtensions = array('session', 'iconv', 'pcre', 'date', 'standard', 'zlib', 'SimpleXML', 'xml', 'gd', 'PDO', 'mbstring');
-    
+
     /**
      * Массив наименований переменных, которые будут использоваться в файле конфигурации
      * @var array
-     */         
+     */
     private static $configVars = array('dbtype', 'dbhost', 'dbname', 'dbuser', 'dbpass', 'dbprefix', 'loginType');
-    
+
     /**
-     * Массив вида $key => $val, где $key - идентификатор базы данных в DSN, $val - наименование СУБД     
+     * Массив вида $key => $val, где $key - идентификатор базы данных в DSN, $val - наименование СУБД
      * @var array
-     */         
+     */
     private static $availableDatabases = array('mysql' => 'MySQL');
-    
+
     /**
      * Экземпляр приложения
      * @var Application
-     */         
+     */
     protected static $instance;
-    
+
     public function __get($var)
     {
         switch ($var) {
@@ -169,19 +169,19 @@ final class Application extends \SOME\Singleton implements IContext
             case 'view':
                 return $this->controller->view;
                 break;
-            case 'packages': case 'activePackage': 
+            case 'packages': case 'activePackage':
                 return $this->$var;
                 break;
             case 'activeModule':
                 if ($this->activePackage) {
                     return $this->activePackage->activeModule;
                 }
-                return null; 
+                return null;
                 break;
             case 'context':
                 return $this->activeModule ? $this->activeModule : ($this->activePackage ? $this->activePackage : $this);
                 break;
-            
+
             // Файлы и директории
             case 'baseDir':
                 return realpath(__DIR__ . '/../..');
@@ -242,14 +242,14 @@ final class Application extends \SOME\Singleton implements IContext
             case 'classesFile':
                 return $this->resourcesDir . '/classes.dat';
                 break;
-            
+
             // Модель
             case 'Mid': case 'mid':
                 return '';
                 break;
             case 'availableDatabases':
                 return eval('return ' . \get_called_class() . '::$' . $var . ';');
-                break; 
+                break;
             case 'debug': case 'exceptions': case 'sqlExceptions': case 'SQL': case 'user':
                 return $this->$var;
                 break;
@@ -333,13 +333,13 @@ final class Application extends \SOME\Singleton implements IContext
                 break;
         }
     }
-    
-    
+
+
     /**
      * Метод запуска приложения
      * @param string $controller наименование контроллера
      * @param bool $debugMode режим отладки
-     */                    
+     */
     public function run($controller = self::defaultController, $debugMode = false)
     {
         ob_start();
@@ -356,11 +356,11 @@ final class Application extends \SOME\Singleton implements IContext
         session_start();
         $_SESSION['RAAS_STARTED'] = microtime(true);
         $this->getConfig();
-        
+
         if (!class_exists($classname = ('RAAS\\Controller_' . ucfirst($controller)))) {
             $classname = 'RAAS\\Controller_' . ucfirst(self::defaultController);
         }
-        
+
         $this->controller = $classname::i();
         $this->controller->run();
     }
@@ -401,8 +401,8 @@ final class Application extends \SOME\Singleton implements IContext
         }
         return $e;
     }
-    
-    
+
+
     /**
      * Обработчик исключений при работе с базой данных
      * @param \Exception $e исключение
@@ -611,8 +611,8 @@ final class Application extends \SOME\Singleton implements IContext
             Attachment::clearLostFiles();
         }
     }
-    
-    
+
+
     public function prepareSQL($SQL_query)
     {
         $SQL_query = str_replace('{$DBPREFIX$}', $this->dbprefix, $SQL_query);
@@ -646,13 +646,13 @@ final class Application extends \SOME\Singleton implements IContext
     {
         return md5($string . md5($string . Application::generalSalt) . Application::generalSalt);
     }
-    
-    
+
+
     /**
      * Получение контекста по строке mid
      * @param string $mid Строка вида "/", "Пакет" или "Пакет.Модуль"
-     * @param bool $treatSlashAsApplication при установке в true по строке "/" возвращает приложение, в противном случае корневой пакет     
-     * @return IContext контекст          
+     * @param bool $treatSlashAsApplication при установке в true по строке "/" возвращает приложение, в противном случае корневой пакет
+     * @return IContext контекст
      */
     public function getContext($mid = '', $treatSlashAsApplication = false)
     {
@@ -686,7 +686,7 @@ final class Application extends \SOME\Singleton implements IContext
 
     /**
      * Предлагает замену для повторяющегося URN
-     * 
+     *
      * Для URN без числового суффикса предлагает суффикс "_1". Для URN с суффиксом увеличивает в суффиксе число на 1
      * @param string $urn Старый URN
      * @param bool $forceNewSuffix Принудительно добавлять суффикс "_1" (даже если суффикс уже есть, добавляет еще один)
@@ -702,8 +702,8 @@ final class Application extends \SOME\Singleton implements IContext
         }
         return $newURN;
     }
-    
-    
+
+
     /**
      * Отправка почты
      * @param array|string $to_arr Получатель или список получателей
@@ -714,8 +714,8 @@ final class Application extends \SOME\Singleton implements IContext
      * @param string|null $from Отправитель (по умолчанию - полное имя текущего пользователя)
      * @param string|null $from_email Обратный e-mail адрес (по умолчанию - e-mail текущего пользователя)
      * @param bool $is_html Отправлять сообщение в формате HTML
-     * @param array $attach Массив вложений вида array(array('tmp_name' => путь к реальному файлу, 'name' => имя файла, 'type' => MIME-тип файла), ...)     
-     */         
+     * @param array $attach Массив вложений вида array(array('tmp_name' => путь к реальному файлу, 'name' => имя файла, 'type' => MIME-тип файла), ...)
+     */
     public function sendmail($to_arr, $subject, $message, $from = null, $from_email = null, $is_html = true, $attach = array())
     {
         $to_arr = (array)$to_arr;
@@ -724,7 +724,7 @@ final class Application extends \SOME\Singleton implements IContext
         }
         if (!$from_email) {
             $from_email = $this->user->email;
-        }                    
+        }
         if (is_array($subject)) {
             $subject[1] = array_merge($_SERVER, (array)$subject[1]);
             foreach ((array)$subject[1] as $key => $val) {
@@ -739,7 +739,7 @@ final class Application extends \SOME\Singleton implements IContext
             }
             $message = $message[0];
         }
-        
+
         $mail = new \PHPMailer();
         $mail->IsMail();
         $mail->From = $from_email;
@@ -753,20 +753,20 @@ final class Application extends \SOME\Singleton implements IContext
             if (is_array($file['name'])) {
                 foreach($file['name'] as $key => $val) {
                     $mail->AddAttachment($file['tmp_name'][$key], $file['name'][$key], 'base64', $file['type'][$key]);
-                } 
+                }
             } else {
                 $mail->AddAttachment($file['tmp_name'], $file['name'], 'base64', $file['type']);
-            } 
+            }
         }
-        $mail->SingleTo = true; 
-    
+        $mail->SingleTo = true;
+
         foreach ((array)$to_arr as $to) {
             $mail->AddAddress($to, $to);
             $mail->AddReplyTo($from_email);
         }
         $mail->Send();
         return true;
-    } 
+    }
 
 
 
