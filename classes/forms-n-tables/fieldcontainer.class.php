@@ -5,7 +5,7 @@
  * @version 4.2
  * @author Alex V. Surnin <info@volumnet.ru>
  * @copyright 2013, Volume Networks
- */       
+ */
 namespace RAAS;
 
 /**
@@ -20,10 +20,10 @@ namespace RAAS;
  * @property string $errorEmptyFileString Идентификатор строки перевода "Необходимо загрузить файл %s"
  * @property string $errorInvalidFileString Идентификатор строки перевода "Файл %s недопустимого формата"
  * @property string $errorDoesntMatch Идентификатор строки перевода "Пароль и его подтверждение не совпадают"
- */       
+ */
 class FieldContainer extends FormElement
 {
-	/**
+    /**
      * Тип поля $children
      */
     const childrenType = 'RAAS\FieldCollection';
@@ -84,25 +84,36 @@ class FieldContainer extends FormElement
 
     public function __set($var, $val)
     {
-        switch ($var){
-            case 'check': case 'export': case 'import': case 'oncommit':
+        switch ($var) {
+            case 'check':
+            case 'export':
+            case 'import':
+            case 'oncommit':
                 if (is_callable($val)) {
                     $this->$var = $val;
                 }
                 break;
-            case 'errorEmptyString': case 'errorInvalidString': case 'errorEmptyFileString': case 'errorInvalidFileString': case 'errorHasntUploadedString':
-                $this->$var = (string)$val;
+            case 'errorEmptyString':
+            case 'errorInvalidString':
+            case 'errorEmptyFileString':
+            case 'errorInvalidFileString':
+            case 'errorHasntUploadedString':
+                            $this->$var = (string)$val;
                 break;
             default:
                 parent::__set($var, $val);
                 break;
         }
     }
-    
+
     public function __get($var)
     {
         switch ($var) {
-            case 'errorEmptyString': case 'errorInvalidString': case 'errorEmptyFileString': case 'errorInvalidFileString': case 'errorDoesntMatch':
+            case 'errorEmptyString':
+            case 'errorInvalidString':
+            case 'errorEmptyFileString':
+            case 'errorInvalidFileString':
+            case 'errorDoesntMatch':
                 return (string)($this->$var ? $this->$var : $this->Parent->__get($var));
                 break;
             default:
@@ -186,7 +197,7 @@ class FieldContainer extends FormElement
         }
         return $DATA;
     }
-    
+
     /**
      * Функция, выполняемая после коммита полей
      */
