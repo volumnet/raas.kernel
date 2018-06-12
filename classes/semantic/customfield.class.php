@@ -625,6 +625,10 @@ abstract class CustomField extends \SOME\SOME
     {
         $options = new OptionCollection();
         $options->Parent = $parentField;
+        if (!$parentField->required) {
+            $option = new Option(array('value' => '', 'caption' => ($parentField->placeholder ?: '--')));
+            $options[] = $option;
+        }
         foreach ((array)$stdSource as $key => $val) {
             $Option = new Option(array('value' => $key, 'caption' => $val['name']));
             if (isset($val['children'])) {
