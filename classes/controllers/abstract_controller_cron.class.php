@@ -76,11 +76,25 @@ abstract class Abstract_Controller_Cron extends Abstract_Controller
 
 
     protected function configureDB()
-    {}
+    {
+    }
 
 
     protected function fork()
-    {}
+    {
+        $this->action = isset($GLOBALS['argv'][1]) ? $GLOBALS['argv'][1] : '';
+        $f = array($this, $this->action);
+        if (is_callable($f)) {
+            $args = array_slice($GLOBALS['argv'], 2);
+            call_user_func_array($f, $args);
+        } elseif (class_exists($this->action)) {
+            $commandClassname = $this->action;
+            $command = new $commandClassname($this);
+            if ($command instanceof Command) {
+                call_user_func_array(array($command, 'process'), array_slice($GLOBALS['argv'], 2));
+            }
+        }
+    }
 
 
     /**
