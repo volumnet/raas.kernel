@@ -87,7 +87,7 @@ abstract class Abstract_Controller_Cron extends Abstract_Controller
      * Выдача лога в stdOut
      * @param string $text Текст для вывода
      */
-    protected function doLog($text)
+    public function doLog($text)
     {
         if ($this->encoding) {
             $text = iconv('UTF-8', $this->encoding . '//IGNORE', $text);
