@@ -15,6 +15,25 @@ use SOME\Singleton;
  */
 class Timer extends Singleton
 {
+    /**
+     * Экземпляр фильтра
+     * @var self
+     */
+    protected static $instance;
+
+    /**
+     * Таймеры
+     * @var array<string[] ID# таймера => array(
+     *          'time' => float Общее время,
+     *          'intervals' => array<
+     *              array(
+     *                  'startTime' => float UNIX-timestamp (с миллисекундами) начала интервала,
+     *                  'endTime' => float UNIX-timestamp (с миллисекундами) окончания интервала,
+     *                  'time' => float Время интервала (с миллисекундами),
+     *              )
+     *          > Статистика по интервалам
+     *      )>
+     */
     protected $timers = array();
 
     /**
