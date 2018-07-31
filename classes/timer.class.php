@@ -4,7 +4,7 @@
  * @package RAAS
  * @version 4.3
  * @author Alex V. Surnin <info@volumnet.ru>
- * @copyright 2011, Volume Networks
+ * @copyright 2018, Volume Networks
  */
 namespace RAAS;
 
