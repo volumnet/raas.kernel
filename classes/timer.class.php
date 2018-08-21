@@ -12,137 +12,127 @@ use SOME\Singleton;
 
 /**
  * Класс таймера
+ * @property-read float $time Общее время таймера
+ * @property-read TimerInterval|null $active Активный интервал, если таймер запущен, но не остановлен,
+ *                                           null если таймер остановлен
  */
-class Timer extends Singleton
+class Timer
 {
     /**
-     * Экземпляр фильтра
-     * @var self
+     * Интервалы
+     * @var array<TimerInterval>
      */
-    protected static $instance;
+    protected $intervals = array();
 
     /**
      * Таймеры
-     * @var array<string[] ID# таймера => array(
-     *          'time' => float Общее время,
-     *          'intervals' => array<
-     *              array(
-     *                  'startTime' => float UNIX-timestamp (с миллисекундами) начала интервала,
-     *                  'endTime' => float UNIX-timestamp (с миллисекундами) окончания интервала,
-     *                  'time' => float Время интервала (с миллисекундами),
-     *              )
-     *          > Статистика по интервалам
-     *      )>
+     * @var array<string[] ID# таймера => Timer>
      */
-    protected $timers = array();
+    protected static $timers = array();
+
+    public function __get($var)
+    {
+        switch ($var) {
+            case 'intervals':
+                return $this->$var;
+                break;
+            case 'time':
+                $times = array_map(function ($x) {
+                    return $x->time;
+                }, $this->intervals);
+                $time = array_sum($times);
+                return $time;
+                break;
+            case 'active':
+                $actives = array_filter($this->intervals, function ($x) {
+                    return $x->active;
+                });
+                if ($actives) {
+                    return array_shift($actives);
+                }
+                break;
+        }
+    }
 
     /**
      * Запустить таймер
      * @param string|null $id Идентификатор таймера (null, если автоматически)
      * @return string Идентификатор таймера
      */
-    public function start($id = null)
+    public function start()
     {
-        if (!$id) {
-            $id = uniqid('');
+        if (!$this->active) {
+            $this->intervals[] = new TimerInterval();
         }
-        if (!isset($this->timers[$id])) {
-            $this->reset($id);
-        }
-        $timer = $this->timers[$id]['intervals'];
-        if ($timer) {
-            $lastInterval = $timer[count($timer) - 1];
-            if (!isset($lastInterval['endTime']) || !$lastInterval['endTime']) {
-                return;
-            }
-        }
-        $this->timers[$id]['intervals'][] = array('startTime' => microtime(true));
     }
 
 
     /**
      * Остановить таймер
      * @param string $id Идентификатор таймера
-     * @return float Время последнего круга таймера
      */
-    public function stop($id)
+    public function stop()
     {
-        if (isset($this->timers[$id])) {
-            $timer =& $this->timers[$id]['intervals'];
-            if ($timer) {
-                $lastInterval =& $timer[count($timer) - 1];
-                if (!isset($lastInterval['endTime']) || !$lastInterval['endTime']) {
-                    $lastInterval['endTime'] = microtime(true);
-                    $lastInterval['time'] = $lastInterval['endTime'] - $lastInterval['startTime'];
-                    $this->timers[$id]['time'] += $lastInterval['time'];
-                    return $lastInterval['time'];
-                }
-            }
+        if ($interval = $this->active) {
+            $interval->stop();
         }
-        return 0;
     }
 
 
     /**
      * Сбросить таймер
-     * @param string $id Идентификатор таймера
      */
-    public function reset($id)
+    public function reset()
     {
-        $this->timers[$id] = array('intervals' => array(), 'time' => 0);
+        $this->intervals = array();
     }
 
 
     /**
-     * Возвращает статистику по таймеру
-     * @param string $id Идентификатор интервала (null, если для всех)
-     * @return array(
-     *             'time' => float Общее время,
-     *             'intervals' => array<
-     *                 array(
-     *                     'startTime' => float UNIX-timestamp (с миллисекундами) начала интервала,
-     *                     'endTime' => float UNIX-timestamp (с миллисекундами) окончания интервала,
-     *                     'time' => float Время интервала (с миллисекундами),
-     *                 )
-     *             > Статистика по интервалам
-     *         )|
-     *         array<string[] ID# таймера => array(
-     *             'time' => float Общее время,
-     *             'intervals' => array<
-     *                 array(
-     *                     'startTime' => float UNIX-timestamp (с миллисекундами) начала интервала,
-     *                     'endTime' => float UNIX-timestamp (с миллисекундами) окончания интервала,
-     *                     'time' => float Время интервала (с миллисекундами),
-     *                 )
-     *             > Статистика по интервалам
-     *         )>|null
+     * Добавить таймер
+     * @param string $id ID# таймера
+     * @param bool $start Сразу стартовать
+     * @return Timer Добавленный таймер
      */
-    public function stat($id = null)
+    public static function add($id, $start = true)
     {
-        if (!$id) {
-            return $this->timers;
-        }
-        if (isset($this->timers[$id])) {
-            return $this->timers[$id];
+        static::$timers[$id] = new Timer();
+        if ($start) {
+            static::$timers[$id]->start();
         }
     }
 
 
     /**
-     * Получает общее время по таймеру
-     * @param string $id Идентификатор интервала (null, если для всех)
-     * @return float|array<string[] ID# таймера => float>|null
+     * Удалить таймер
+     * @param string $id ID# таймера
      */
-    public function time($id = null)
+    public static function remove($id)
     {
-        if (!$id) {
-            $timers = array_map(function ($x) {
-                return $x['time'];
-            }, $this->timers);
-            return $timers;
-        }
-        if (isset($this->timers[$id])) {
-            return $this->timers[$id]['time'];
-        }
+        unset(static::$timers[$id]);
+    }
+
+
+    /**
+     * Получить таймер
+     * @param string $id ID# таймера
+     * @return Timer
+     */
+    public static function get($id)
+    {
+        return static::$timers[$id];
+    }
+
+
+    /**
+     * Получить статистику по таймерам
+     * @return array<string[] ID# таймера => float Время таймера>
+     */
+    public static function stat()
+    {
+        $stat = array_map(function ($x) {
+            return $x->time;
+        }, static::$timers);
+        return $stat;
     }
 }
