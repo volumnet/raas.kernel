@@ -21,7 +21,12 @@ jQuery(function($) {
             //$(this).closest('.accordion').find('.collapse.in').collapse('hide');
             $(this).closest('.accordion').find('a.accordion-toggle[href="' + hash + '"]').closest('.accordion-group').find('.collapse').collapse('show');
         }
-    })
+    });
+
+    $('a[data-toggle="tab"]').on('shown', function () {
+        var url = $(this).attr('href');
+        window.history.pushState({}, document.title, url);
+    });
     
     $.datepicker.setDefaults({ dateFormat: 'yy-mm-dd' });
     $.timepicker.setDefaults({ timeFormat: 'hh:mm', separator: (Modernizr.inputtypes.datetime ? 'T' : ' ') });
