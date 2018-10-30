@@ -1,5 +1,5 @@
 jQuery(function($) {
-    function formatPrice(price)
+    window.formatPrice = function(price)
     {
         var pSign = (price < 0) ? '-' : '';
         price = Math.abs(price);
