@@ -383,7 +383,10 @@ jQuery(function($) {
 
         RAASInitInputs: function() {
             var thisObj = this;
-            var clearDate = $('<a href="#" class="jsClearDate"><i class="icon-remove-circle"></i></a>', thisObj).click(function() { $(this).prev('input').val(''); return false; });
+            var clearDate = $('<a href="#" class="jsClearDate"><i class="icon-remove-circle"></i></a>', thisObj).click(function(e) { 
+                $(this).prev('input').val('').trigger('change'); 
+                e.preventDefault();
+            });
             var codeSettings = {
                 'php': { lineNumbers: true, mode: "application/x-httpd-php", indentUnit: 2, indentWithTabs: false, enterMode: "keep", tabMode: "shift", tabSize: 2 },
                 'html': { lineNumbers: true, mode: "text/html", indentUnit: 2, indentWithTabs: false, enterMode: "keep", tabMode: "shift", tabSize: 2 }
