@@ -384,7 +384,7 @@ jQuery(function($) {
         RAASInitInputs: function() {
             var thisObj = this;
             var clearDate = $('<a href="#" class="jsClearDate"><i class="icon-remove-circle"></i></a>', thisObj).click(function(e) { 
-                $(this).prev('input:not(:disabled)').val('').trigger('change'); 
+                $(this).prev('input:not(:disabled):not(:readonly)').val('').trigger('change'); 
                 e.preventDefault();
             });
             var codeSettings = {
