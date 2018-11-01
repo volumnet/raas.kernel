@@ -1,4 +1,28 @@
 jQuery(function($) {
+    window.formatPrice = function(price)
+    {
+        var pSign = (price < 0) ? '-' : '';
+        price = Math.abs(price);
+        var pR = Math.round((parseFloat(price) - parseInt(price)) * 100);
+        var pS = parseInt(price).toString();
+        var pT = '';
+        var i;
+
+        for (i = 0; i < pS.length; i++) {
+            var j = pS.length - i - 1;
+            pT = ((i % 3 == 2) && (j > 0) ? ' ' : '') + pS.substr(j, 1) + pT;
+        }
+        if (pR > 0) {
+            pR = pR.toString();
+            if (pR.length < 2) {
+                pR = '0' + pR;
+            }
+            pT += ',' + pR;
+        }
+        pT = pSign + pT;
+        return pT;
+    }
+
     $.fn.RAAS_tree = function(method)
     {
         var $thisObj;
@@ -383,7 +407,10 @@ jQuery(function($) {
 
         RAASInitInputs: function() {
             var thisObj = this;
-            var clearDate = $('<a href="#" class="jsClearDate"><i class="icon-remove-circle"></i></a>', thisObj).click(function() { $(this).prev('input').val(''); return false; });
+            var clearDate = $('<a href="#" class="jsClearDate"><i class="icon-remove-circle"></i></a>', thisObj).click(function(e) { 
+                $(this).prev('input:not(:disabled)').val('').trigger('change'); 
+                e.preventDefault();
+            });
             var codeSettings = {
                 'php': { lineNumbers: true, mode: "application/x-httpd-php", indentUnit: 2, indentWithTabs: false, enterMode: "keep", tabMode: "shift", tabSize: 2 },
                 'html': { lineNumbers: true, mode: "text/html", indentUnit: 2, indentWithTabs: false, enterMode: "keep", tabMode: "shift", tabSize: 2 }
