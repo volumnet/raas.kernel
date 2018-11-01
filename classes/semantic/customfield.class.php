@@ -648,7 +648,9 @@ abstract class CustomField extends \SOME\SOME
         } else {
             $args[0]['where'] = (array)$args[0]['where'];
         }
-        $args[0]['where'][] = "classname = '" . static::$SQL->real_escape_string(static::$references['parent']['classname']) . "'";
+        if ($classname = static::$references['parent']['classname']) {
+            $args[0]['where'][] = "classname = '" . static::$SQL->real_escape_string($classname) . "'";
+        }
         return call_user_func_array('parent::getSet', $args);
     }
 
