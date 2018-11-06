@@ -5,24 +5,24 @@
  * @version 4.1
  * @author Alex V. Surnin <info@volumnet.ru>
  * @copyright 2012, Volume Networks
- */       
+ */
 namespace RAAS;
 
 /**
  * Класс AJAX-контроллера модуля RAAS
  * @package RAAS
- */       
+ */
 final class Controller_Ajax extends Controller_Web
 {
     /**
      * Экземпляр класса
      * @var \RAAS\Controller_AJAX
-     */         
+     */
     protected static $instance;
-    
+
     /**
      * Инициализатор класса
-     */         
+     */
     protected function init()
     {
         if (isset($_GET['v'])) {
