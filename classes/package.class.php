@@ -318,7 +318,10 @@ abstract class Package extends \SOME\Singleton implements IRightsContext
             } else {
                 $rdi = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->classesDir));
                 foreach ($rdi as $f) {
-                    if (($f->getFileName() == strtolower($classname) . '.class.php') || ($f->getFileName() == strtolower($classname) . '.interface.php')) {
+                    if (($f->getFileName() == strtolower($classname) . '.class.php') ||
+                        ($f->getFileName() == strtolower($classname) . '.interface.php') ||
+                        ($f->getFileName() == strtolower($classname) . '.trait.php')
+                    ) {
                         require_once $f->getPathName();
                         break;
                     }
