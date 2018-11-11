@@ -169,7 +169,8 @@ final class Application extends \SOME\Singleton implements IContext
             case 'view':
                 return $this->controller->view;
                 break;
-            case 'packages': case 'activePackage':
+            case 'packages':
+            case 'activePackage':
                 return $this->$var;
                 break;
             case 'activeModule':
@@ -244,19 +245,25 @@ final class Application extends \SOME\Singleton implements IContext
                 break;
 
             // Модель
-            case 'Mid': case 'mid':
+            case 'Mid':
+            case 'mid':
                 return '';
                 break;
             case 'availableDatabases':
                 return eval('return ' . \get_called_class() . '::$' . $var . ';');
                 break;
-            case 'debug': case 'exceptions': case 'sqlExceptions': case 'SQL': case 'user':
+            case 'debug':
+            case 'exceptions':
+            case 'sqlExceptions':
+            case 'SQL':
+            case 'user':
                 return $this->$var;
                 break;
             case 'DSN':
                 if (isset($this->config['dbtype'])) {
                     switch ($this->config['dbtype']) {
-                        case 'mysql': case 'mssql':
+                        case 'mysql':
+                        case 'mssql':
                             return $this->config['dbtype'] . ':host=' . $this->config['dbhost'] . ';dbname=' . $this->config['dbname'];
                             break;
                         case 'pgsql':
@@ -326,6 +333,7 @@ final class Application extends \SOME\Singleton implements IContext
                 } elseif ($val instanceof Package) {
                     $this->activePackage = $val;
                 }
+                break;
             case 'user':
                 if ($val instanceof User) {
                     $this->user = $val;
@@ -347,7 +355,7 @@ final class Application extends \SOME\Singleton implements IContext
         $this->debug = $debugMode;
 
         mb_internal_encoding('UTF-8');
-        require_once ($this->someFile);
+        require_once $this->someFile;
         spl_autoload_register('\\SOME\\SOME::autoload');
         spl_autoload_register(array($this, 'autoload'));
         //error_reporting(E_ALL);
@@ -435,7 +443,6 @@ final class Application extends \SOME\Singleton implements IContext
      */
     public function queryHandler($query = '', $bind = array(), $time = 0)
     {
-
     }
 
 
@@ -447,7 +454,12 @@ final class Application extends \SOME\Singleton implements IContext
     {
         try {
             $this->SQL = new \SOME\DB(
-                $this->DSN, $this->config['dbuser'], $this->config['dbpass'], 'utf8', array($this, 'sqlErrorHandler'), array($this, 'queryHandler')
+                $this->DSN,
+                $this->config['dbuser'],
+                $this->config['dbpass'],
+                'utf8',
+                array($this, 'sqlErrorHandler'),
+                array($this, 'queryHandler')
             );
             return (!$this->sqlExceptions);
         } catch (\Exception $e) {
@@ -627,7 +639,9 @@ final class Application extends \SOME\Singleton implements IContext
     {
         $this->packages['/'] = General\Package::i();
         $m = $this;
-        $callback = function($x) use ($m) { return $x[0] != '.' && is_dir($m->modulesDir . '/' . $x); };
+        $callback = function ($x) use ($m) {
+            return $x[0] != '.' && is_dir($m->modulesDir . '/' . $x);
+        };
         $packages = \SOME\File::scandir($this->modulesDir, $callback);
         foreach ((array)$packages as $package) {
             if (class_exists($classname = 'RAAS\\' . ucfirst($package) . '\\Package')) {
@@ -676,7 +690,7 @@ final class Application extends \SOME\Singleton implements IContext
     private function getConfig()
     {
         if (is_file($this->configFile)) {
-            @include_once ($this->configFile);
+            @include_once $this->configFile;
             foreach (self::$configVars as $var) {
                 $this->config[$var] = $$var;
             }
@@ -751,7 +765,7 @@ final class Application extends \SOME\Singleton implements IContext
         $mail->AltBody = "";
         foreach ($attach as $file) {
             if (is_array($file['name'])) {
-                foreach($file['name'] as $key => $val) {
+                foreach ($file['name'] as $key => $val) {
                     $mail->AddAttachment($file['tmp_name'][$key], $file['name'][$key], 'base64', $file['type'][$key]);
                 }
             } else {
@@ -783,12 +797,12 @@ final class Application extends \SOME\Singleton implements IContext
                 $p = $NS[1];
                 if ($p == 'General') {
                     if (is_file($this->systemDir . '/general/classes/package.class.php')) {
-                        require_once ($this->systemDir . '/general/classes/package.class.php');
+                        require_once $this->systemDir . '/general/classes/package.class.php';
                         General\Package::i();
                     }
                 } else {
                     if (is_file($this->modulesDir . '/' . strtolower($p) . '/common/classes/package.class.php')) {
-                        require_once ($this->modulesDir . '/' . strtolower($p) . '/common/classes/package.class.php');
+                        require_once $this->modulesDir . '/' . strtolower($p) . '/common/classes/package.class.php';
                         $classname = 'RAAS\\' . $p . '\\Package';
                         $classname::i();
                     }
@@ -805,11 +819,10 @@ final class Application extends \SOME\Singleton implements IContext
                     }
                 }
             }
+        } elseif (stristr($classname, 'PHPExcel')) {
+            require_once $this->includeDir . '/phpexcel/Classes/PHPExcel.php';
         } else {
             switch ($classname) {
-                case 'PHPExcel':
-                    require_once $this->includeDir . '/phpexcel/Classes/PHPExcel.php';
-                    break;
                 case 'PHPMailer':
                     require_once $this->includeDir . '/class.phpmailer.php';
                     break;
