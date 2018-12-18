@@ -1,9 +1,10 @@
 <?php
 namespace RAAS\General;
-use \RAAS\Application;
-use \RAAS\User;
 
-class EditUserRightsForm extends \RAAS\Form
+use RAAS\Application;
+use RAAS\User;
+
+class EditRightsForm extends \RAAS\Form
 {
     protected $_view;
 
@@ -35,7 +36,7 @@ class EditUserRightsForm extends \RAAS\Form
         }
 
         $defaultParams = array(
-            'caption' => $this->application->view->_('EDIT_RIGHTS') . ': ' . htmlspecialchars($name),
+            'caption' => Application::i()->view->_('EDIT_RIGHTS') . ': ' . htmlspecialchars($name),
             'import' => function($Form) use ($params) { return $params['DATA']; },
             'commit' => function($Form) use ($params, $Context, $Item) { $Item->access($Context)->setRights($params['rights']); },
             'children' => array(
