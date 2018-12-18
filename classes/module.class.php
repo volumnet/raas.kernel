@@ -5,7 +5,7 @@
  * @version 4.1
  * @author Alex V. Surnin <info@volumnet.ru>
  * @copyright 2011, Volume Networks
- */       
+ */
 namespace RAAS;
 
 /**
@@ -15,27 +15,27 @@ namespace RAAS;
  * @property-read \RAAS\Abstract_Module_Controller $controller контроллер модуля
  * @property-read \RAAS\Abstract_Module_View $view представление модуля
  * @property \RAAS\Updater $updater мастер обновлений
- */       
+ */
 abstract class Module extends \SOME\Singleton implements IRightsContext
 {
     /**
      * Контроллер модуля
-     * @var \RAAS\Abstract_Module_Controller     
-     */         
+     * @var \RAAS\Abstract_Module_Controller
+     */
     protected $controller;
-    
+
     /**
      * Массив наименований требуемых расширений
      * @var array
-     */              
+     */
     protected static $requiredExtensions = array();
-    
+
     /**
      * Экземпляр класса
-     * @var \RAAS\Module     
-     */         
+     * @var \RAAS\Module
+     */
     protected static $instance;
-    
+
     public function __get($var)
     {
         switch ($var) {
@@ -61,7 +61,7 @@ abstract class Module extends \SOME\Singleton implements IRightsContext
                     return $u;
                 }
                 break;
-            
+
             // Файлы и директории
             case 'baseDir': case 'systemDir':
                 return $this->package->baseDir . '/' . $this->alias;
@@ -97,7 +97,7 @@ abstract class Module extends \SOME\Singleton implements IRightsContext
             case 'uninstallFile':
                 return $this->resourcesDir . '/uninstall.' . (string)$this->application->dbtype . '.sql';
                 break;
-            
+
             // Модель
             case 'Mid':
                 $NS = \SOME\Namespaces::getNSArray(\get_called_class());
@@ -148,8 +148,8 @@ abstract class Module extends \SOME\Singleton implements IRightsContext
                 break;
         }
     }
-    
-    
+
+
     public function init()
     {
         spl_autoload_register(array($this, 'autoload'));
@@ -164,8 +164,8 @@ abstract class Module extends \SOME\Singleton implements IRightsContext
             //throw new Exception($this->application->view->_('INVALID_CONTROLLER_FOR_MODULE'));
         }
     }
-    
-    
+
+
     public function run()
     {
         if ($this->controller) {
@@ -222,8 +222,8 @@ abstract class Module extends \SOME\Singleton implements IRightsContext
             $this->registrySet('isActive', null);
         }
     }
-    
-    
+
+
     public function prepareSQL($SQL_query)
     {
         $SQL_query = str_replace('{$DBPREFIX$}', $this->dbprefix, $SQL_query);
@@ -259,7 +259,10 @@ abstract class Module extends \SOME\Singleton implements IRightsContext
         if ($myNS == $NS) {
             $rdi = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->classesDir));
             foreach ($rdi as $f) {
-                if (($f->getFileName() == strtolower($classname) . '.class.php') || ($f->getFileName() == strtolower($classname) . '.interface.php')) {
+                if (($f->getFileName() == strtolower($classname) . '.class.php') ||
+                    ($f->getFileName() == strtolower($classname) . '.interface.php') ||
+                    ($f->getFileName() == strtolower($classname) . '.trait.php')
+                ) {
                     require_once $f->getPathName();
                     break;
                 }
@@ -274,10 +277,10 @@ abstract class Module extends \SOME\Singleton implements IRightsContext
                 } elseif (preg_match('/^View_Chunk?$/i', $classname, $regs)) {
                     $callback = ' namespace %s;
                                   class View_Chunk extends \\RAAS\\Module_View_Chunk {
-                                      protected static $instance; 
-                                      public function __call($name, $args) { 
+                                      protected static $instance;
+                                      public function __call($name, $args) {
                                           $this->assignVars(isset($args[0]) ? $args[0] : array());
-                                          $this->template = $name; 
+                                          $this->template = $name;
                                       }
                                   }';
                     eval(sprintf($callback, implode('\\', $NS)));

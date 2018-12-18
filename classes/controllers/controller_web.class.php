@@ -5,40 +5,40 @@
  * @version 4.1
  * @author Alex V. Surnin <info@volumnet.ru>
  * @copyright 2012, Volume Networks
- */       
+ */
 namespace RAAS;
 
 /**
  * Класс web-контроллера модуля RAAS
  * @package RAAS
- */       
+ */
 class Controller_Web extends Abstract_Controller
 {
     /**
      * Экземпляр класса
-     * @var \RAAS\Controller_Web     
-     */         
+     * @var \RAAS\Controller_Web
+     */
     protected static $instance;
-    
+
     /**
      * Инициализатор класса
-     */         
+     */
     protected function init()
     {
         if (get_class($this) == __CLASS__) {
             $this->view = View_Web::i();
-            
+
             if (isset($_COOKIE['p'])) {
                 $this->packageName = strtolower($_COOKIE['p']);
             }
         }
         parent::init();
     }
-    
-    
+
+
     /**
      * Логика приложения, если пользователь первый в системе
-     */         
+     */
     public function isFirst()
     {
         if (parent::isFirst()) {
@@ -46,12 +46,12 @@ class Controller_Web extends Abstract_Controller
             new Redirector();
         }
     }
-    
-    
+
+
     /**
      * Функция проверки подключения к базе данных
-     * @return bool true, если подключение прошло успешно, false в противном случае     
-     */         
+     * @return bool true, если подключение прошло успешно, false в противном случае
+     */
     protected function checkDB()
     {
         $localError = array();
@@ -62,11 +62,11 @@ class Controller_Web extends Abstract_Controller
         }
         return false;
     }
-    
-    
+
+
     /**
      * Функция настройки подключения к базе данных
-     */         
+     */
     protected function configureDB()
     {
         $CONTENT = array();
@@ -79,16 +79,16 @@ class Controller_Web extends Abstract_Controller
         $t = $this;
         $Form = new Form(array(
             'caption' => $this->view->_('CONFIGURE_DB'),
-            'commit' => function() use ($t) { 
-                $t->model->configureDB($_POST); 
+            'commit' => function () use ($t) {
+                $t->model->configureDB($_POST);
                 new Redirector();
             },
             'children' => array(
                 array('type' => 'hidden', 'name' => 'dbtype', 'default' => 'mysql'),
                 array(
-                    'name' => 'dbhost', 
-                    'required' => 'required', 
-                    'caption' => $this->view->_('DBHOST'), 
+                    'name' => 'dbhost',
+                    'required' => 'required',
+                    'caption' => $this->view->_('DBHOST'),
                     'default' => ($this->model->dbhost ? $this->model->dbhost : '127.0.0.1')
                 ),
                 array('name' => 'dbuser', 'required' => 'required', 'caption' => $this->view->_('DBUSER'), 'default' => 'root'),
@@ -96,23 +96,23 @@ class Controller_Web extends Abstract_Controller
                 array('name' => 'dbname', 'required' => 'required', 'caption' => $this->view->_('DBNAME'), 'default' => $_SERVER['HTTP_HOST']),
                 array('name' => 'dbprefix', 'caption' => $this->view->_('DBPREFIX'), 'default' => $this->model->dbprefix),
                 array(
-                    'type' => 'select', 
-                    'name' => 'loginType', 
-                    'caption' => $this->view->_('SELECT_LOGIN_TYPE'), 
-                    'required' => 'required', 
-                    'children' => $CONTENT['loginTypes'], 
+                    'type' => 'select',
+                    'name' => 'loginType',
+                    'caption' => $this->view->_('SELECT_LOGIN_TYPE'),
+                    'required' => 'required',
+                    'children' => $CONTENT['loginTypes'],
                     'default' => $this->model->loginType
                 )
             )
         ));
         $this->view->configureDB($Form->process());
     }
-    
-    
+
+
     /**
      * Авторизация пользователя
-     * @return bool true, если пользователь успешно авторизован, false в противном случае     
-     */         
+     * @return bool true, если пользователь успешно авторизован, false в противном случае
+     */
     protected function auth()
     {
         parent::auth();
@@ -139,11 +139,11 @@ class Controller_Web extends Abstract_Controller
         }
         return false;
     }
-    
-    
+
+
     /**
      * Логика входа в систему с использованием комбинации логина/пароля
-     */         
+     */
     protected function login()
     {
         $t = $this;
@@ -153,7 +153,7 @@ class Controller_Web extends Abstract_Controller
             'submitCaption' => $this->view->_('LOG_IN'),
             'template' => '/log_in',
             'actionMenu' => false,
-            'check' => function($Form) use ($t) {
+            'check' => function ($Form) use ($t) {
                 if ($localError = $Form->getErrors()) {
                     $t->cleanSessionAuth();
                     return $localError;
@@ -166,15 +166,24 @@ class Controller_Web extends Abstract_Controller
                     }
                 }
             },
-            'commit' => function() use ($t) { $t->authSession(trim($_POST['login']), $t->model->md5It(trim($_POST['password'])), (bool)$_POST['save_password']); },
-            'import' => function() { return ($_SERVER['REQUEST_METHOD'] == 'POST') ? $_POST : array(); },
+            'commit' => function () use ($t) {
+                $t->authSession(
+                    trim($_POST['login']),
+                    $t->model->md5It(trim($_POST['password'])),
+                    (bool)$_POST['save_password']
+                );
+                new Redirector();
+            },
+            'import' => function () {
+                return ($_SERVER['REQUEST_METHOD'] == 'POST') ? $_POST : array();
+            },
             'children' => array(
-                array('name' => 'login', 'maxlength' => 16, 'required' => 'required', 'caption' => $this->view->_('LOGIN_NAME')), 
+                array('name' => 'login', 'maxlength' => 16, 'required' => 'required', 'caption' => $this->view->_('LOGIN_NAME')),
                 array(
-                    'type' => 'password', 
-                    'name' => 'password', 
-                    'maxlength' => 16, 
-                    'required' => 'required', 
+                    'type' => 'password',
+                    'name' => 'password',
+                    'maxlength' => 16,
+                    'required' => 'required',
                     'caption' => $this->view->_('PASSWORD')
                 ),
                 array('type' => 'checkbox', 'name' => 'save_password', 'caption' => $this->view->_('REMEMBER_PASSWORD'), 'export' => 'intval')
@@ -182,20 +191,20 @@ class Controller_Web extends Abstract_Controller
         ));
         $this->view->login($Form->process());
     }
-    
-    
+
+
     /**
      * Логика выхода из системы
-     */         
+     */
     protected function logout()
     {
         $this->cleanSessionAuth(true);
         new Redirector('?');
     }
-    
+
     /**
      * Применение персональных настроек пользователя
-     */         
+     */
     protected function applyPersonalSettings()
     {
         if (isset($this->model->user->preferences['theme']) && ($this->model->user->preferences['theme'] != '/')) {
@@ -204,12 +213,12 @@ class Controller_Web extends Abstract_Controller
             $this->view->theme = '';
         }
         parent::applyPersonalSettings();
-    } 
-    
-    
+    }
+
+
     /**
      * Ветвление логики по модулям
-     */         
+     */
     protected function fork()
     {
         setcookie('p', $this->packageName, time() + $this->model->registryGet('cookieLifetime') * 86400, '/');
@@ -233,7 +242,7 @@ class Controller_Web extends Abstract_Controller
                 }
             }
         }
-        
+
         $Context = $this->model->activeModule ? $this->model->activeModule : $this->model->activePackage;
         if (!$this->model->user->access($Context)->canDo($this->sub, $this->action, $this->id)) {
             $this->id = null;
@@ -241,8 +250,8 @@ class Controller_Web extends Abstract_Controller
             if (!$this->model->user->access($Context)->canDo($this->sub)) {
                 $this->sub = null;
             }
-        } 
-        
+        }
+
         if ($this->model->activePackage) {
             $this->model->activePackage->view->header();
             foreach ((array)$this->model->activePackage->modules as $module) {
@@ -250,7 +259,7 @@ class Controller_Web extends Abstract_Controller
                     $module->view->header();
                 }
             }
-            
+
             if ($this->mode == 'set_language') {
                 $this->set_language();
             } elseif ($this->mode == 'set_theme') {
@@ -260,14 +269,14 @@ class Controller_Web extends Abstract_Controller
             }
         }
     }
-    
-    
+
+
     /**
      * Запись параметров авторизации в сессию и/или cookies
      * @param string $login имя пользователя (логин)
      * @param string $password_md5 MD5-хэш пароля
-     * @param bool $save_password true, если требуется записать параметры авторизации в cookies               
-     */         
+     * @param bool $save_password true, если требуется записать параметры авторизации в cookies
+     */
     public function authSession($login, $password_md5, $save_password = false)
     {
         if ($this->model->loginType != 'http') {
@@ -279,11 +288,11 @@ class Controller_Web extends Abstract_Controller
             }
         }
     }
-    
-    
+
+
     /**
      * Очистка параметров авторизации из сессии и cookies
-     */         
+     */
     public function cleanSessionAuth($clearSession = false)
     {
         setcookie('login', '', time() - 1, '/');
