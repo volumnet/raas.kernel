@@ -62,7 +62,7 @@ class TimerInterval
     /**
      * Остановить таймер
      */
-    public function stop($id)
+    public function stop()
     {
         if (!$this->endTime) {
             $this->endTime = microtime(true);

@@ -56,8 +56,6 @@ class Timer
 
     /**
      * Запустить таймер
-     * @param string|null $id Идентификатор таймера (null, если автоматически)
-     * @return string Идентификатор таймера
      */
     public function start()
     {
@@ -69,7 +67,6 @@ class Timer
 
     /**
      * Остановить таймер
-     * @param string $id Идентификатор таймера
      */
     public function stop()
     {
@@ -100,6 +97,7 @@ class Timer
         if ($start) {
             static::$timers[$id]->start();
         }
+        return static::$timers[$id];
     }
 
 
