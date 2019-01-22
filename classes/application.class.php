@@ -60,6 +60,11 @@ final class Application extends \SOME\Singleton implements IContext
     const generalSalt = 'KJLO(HD*hkojnds890fyhkOHnLO(U)*(#)&hjldfc890LKN(*YHN,vDIO89sILHKNLNVLDS*Y(DJXCVN';
 
     /**
+     * Соль для дополнительного шифрования входа по COOKIES
+     */
+    const COOKIES_SALT = 'skldfjsoij)(*UKLMNsd90rtueropmgdfjgIJLLKDFMNGDIORTR(4fop+JK';
+
+    /**
      * Время ожидания ответа от сервера обновлений
      */
     const networkTimeout = 10;

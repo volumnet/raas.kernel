@@ -123,9 +123,19 @@ class Controller_Web extends Abstract_Controller
             $this->httpAuth();
         } else {
             if (!(isset($_SESSION['login']) && isset($_SESSION['password_md5']) && $this->model->user->auth($_SESSION['login'], $_SESSION['password_md5']))) {
-                if (isset($_COOKIE['login']) && isset($_COOKIE['password_md5']) && $this->model->user->auth($_COOKIE['login'], $_COOKIE['password_md5'])) {
-                    $this->authSession(trim($_COOKIE['login']), $_COOKIE['password_md5'], true);
-                } else {
+                $cookieAuth = false;
+                if (isset($_COOKIE['login']) && isset($_COOKIE['password_md5'])) {
+                    $cookieLogin = $_COOKIE['login'];
+                    $cookiePassword = substr($_COOKIE['password_md5'], 0, 32);
+                    $cookieCheck = substr($_COOKIE['password_md5'], 32);
+                    if ($cookieCheck == Application::i()->md5It($cookiePassword . Application::COOKIES_SALT . '1')) {
+                        if ($this->model->user->auth($cookieLogin, $cookiePassword)) {
+                            $cookieAuth = true;
+                            $this->authSession($cookieLogin, $cookiePassword, true);
+                        }
+                    }
+                }
+                if (!$cookieAuth) {
                     $this->cleanSessionAuth();
                 }
             } elseif (isset($_POST['save_password']) && (int)$_POST['save_password']) {
@@ -274,17 +284,22 @@ class Controller_Web extends Abstract_Controller
     /**
      * Запись параметров авторизации в сессию и/или cookies
      * @param string $login имя пользователя (логин)
-     * @param string $password_md5 MD5-хэш пароля
-     * @param bool $save_password true, если требуется записать параметры авторизации в cookies
+     * @param string $passwordMD5 MD5-хэш пароля
+     * @param bool $savePassword true, если требуется записать параметры авторизации в cookies
      */
-    public function authSession($login, $password_md5, $save_password = false)
+    public function authSession($login, $passwordMD5, $savePassword = false)
     {
         if ($this->model->loginType != 'http') {
             $_SESSION['login'] = trim($login);
-            $_SESSION['password_md5'] = $password_md5;
-            if ($save_password) {
+            $_SESSION['password_md5'] = $passwordMD5;
+            if ($savePassword) {
                 setcookie('login', $login, time() + $this->model->registryGet('cookieLifetime') * 86400, '/');
-                setcookie('password_md5', $password_md5, time() + $this->model->registryGet('cookieLifetime') * 86400, '/');
+                setcookie(
+                    'password_md5',
+                    $passwordMD5 . Application::i()->md5It($passwordMD5 . Application::COOKIES_SALT),
+                    time() + $this->model->registryGet('cookieLifetime') * 86400,
+                    '/'
+                );
             }
         }
     }
