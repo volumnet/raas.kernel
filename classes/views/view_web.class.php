@@ -308,7 +308,8 @@ class View_Web extends Abstract_View implements IContext_View_Web
         header ('Cache-Control: no-cache, must-revalidate');
         header ('Pragma: no-cache');
         header('Content-Type: text/html; charset=UTF-8');
-        header('X-XSS-Protection: 0');
+        header('X-XSS-Protection: 1');
+        header('Content-Security-Policy: default-src \'self\' \'unsafe-inline\' \'unsafe-eval\';');
         if (!Application::i()->debug) {
             ob_clean();
         }
