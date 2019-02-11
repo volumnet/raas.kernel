@@ -115,7 +115,7 @@ class Attachment extends SOME
     }
 
 
-    public static function delete(self &$Item)
+    public static function delete(self $Item)
     {
         $Item->deleteFile();
         parent::delete($Item);
