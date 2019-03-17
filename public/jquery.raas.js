@@ -411,10 +411,6 @@ jQuery(function($) {
                 $(this).prev('input:not(:disabled)').val('').trigger('change'); 
                 e.preventDefault();
             });
-            var codeSettings = {
-                'php': { lineNumbers: true, mode: "application/x-httpd-php", indentUnit: 2, indentWithTabs: false, enterMode: "keep", tabMode: "shift", tabSize: 2 },
-                'html': { lineNumbers: true, mode: "text/html", indentUnit: 2, indentWithTabs: false, enterMode: "keep", tabMode: "shift", tabSize: 2 }
-            };
             
             $('input[type="date"], input[type="time"], input[type="month"], input[type="datetime-local"], input[type="datetime"]', thisObj).not('[disabled]').each(function() {
                 var html = this.outerHTML;
@@ -498,7 +494,19 @@ jQuery(function($) {
                 maxHeight: 200
             });
             $('textarea.codearea', thisObj).not('[disabled]').each(function() { 
-                CodeMirror.fromTextArea(this, codeSettings[$(this).attr('data-language') ? $(this).attr('data-language') : 'php']);
+                var codeMirrorData = { 
+                    lineNumbers: true, 
+                    mode: "application/x-httpd-php", 
+                    indentUnit: 2, 
+                    indentWithTabs: false, 
+                    enterMode: "keep", 
+                    tabMode: "shift", 
+                    tabSize: 2 
+                }
+                if ($(this).attr('data-mime')) {
+                    codeMirrorData['mode'] = $(this).attr('data-mime');
+                }
+                CodeMirror.fromTextArea(this, codeMirrorData);
             });
             $('textarea.htmlarea', thisObj).not('[disabled]').each(function() { 
                 $(this).ckeditor();

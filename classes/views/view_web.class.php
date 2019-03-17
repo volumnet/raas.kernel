@@ -305,11 +305,22 @@ class View_Web extends Abstract_View implements IContext_View_Web
             }
         }
 
-        header ('Cache-Control: no-cache, must-revalidate');
-        header ('Pragma: no-cache');
+        header('Cache-Control: no-cache, must-revalidate');
+        header('Pragma: no-cache');
         header('Content-Type: text/html; charset=UTF-8');
         header('X-XSS-Protection: 1');
-        header('Content-Security-Policy: default-src \'self\' \'unsafe-inline\' \'unsafe-eval\' data: https://*.googleapis.com https://*.yandex.ru https://*.gstatic.com http://*.webspellchecker.net;');
+        $csp = 'Content-Security-Policy:'
+             . ' default-src'
+             . ' \'self\''
+             . ' \'unsafe-inline\''
+             . ' \'unsafe-eval\''
+             . ' data:'
+             . ' https://*.googleapis.com'
+             . ' http://*.googleapis.com'
+             . ' https://*.yandex.ru'
+             . ' https://*.gstatic.com'
+             . ' http://*.webspellchecker.net;';
+        header($csp);
         if (!Application::i()->debug) {
             ob_clean();
         }
