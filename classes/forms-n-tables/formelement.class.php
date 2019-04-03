@@ -5,7 +5,7 @@
  * @version 4.2
  * @author Alex V. Surnin <info@volumnet.ru>
  * @copyright 2013, Volume Networks
- */       
+ */
 namespace RAAS;
 
 /**
@@ -15,7 +15,7 @@ namespace RAAS;
  * @property-write {static::childrenType} $children Массив дочерних элементов
  * @property-read Form $Form Рабочая форма
  * @property FormElement $Parent Родительский элемент
- */       
+ */
 abstract class FormElement extends HTMLElement
 {
     /**
@@ -82,7 +82,7 @@ abstract class FormElement extends HTMLElement
 
     }
 
-    
+
     /**
      * Конструктор класса
      * @param array([[имя параметра] => mixed]) $params массив дополнительных свойств, доступных для установки
