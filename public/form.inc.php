@@ -2,7 +2,7 @@
 $_RAASForm_Attrs = function(\RAAS\FormElement $FormElement, $additional = array()) {
     $arr = (array)$FormElement->attrs;
     foreach ((array)$additional as $key => $val) {
-        if ($val === false) {
+        if (($val === false) || (in_array($key, array('checked', 'selected')) && !$val)) {
             unset($arr[$key]);
         } else {
             if (in_array($key, array('class', 'data-role'))) {
