@@ -39,6 +39,8 @@ $_RAASForm_Checkbox = function (\RAAS\OptionCollection $options, $level = 0) use
         }
         if (in_array($row->value, (array)$Field->Form->DATA[$Field->name])) {
             $attrs['checked'] = 'checked';
+        } else {
+            $attrs['checked'] = false;
         }
         if ($plain) {
             $text .= '<label class="' . $Field->type . ' inline"><input' . $_RAASForm_Attrs($Field, $attrs) . ' /> ' . htmlspecialchars($row->caption) . '</label>';
