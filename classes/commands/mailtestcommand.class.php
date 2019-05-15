@@ -18,7 +18,6 @@ class MailTestCommand extends Command
     {
         $subject = 'Test';
         $message = '<p>This is a test message. Please do not reply.</p>';
-        $from =
         Application::i()->sendmail(
             [$email],
             $subject,
