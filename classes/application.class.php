@@ -745,9 +745,18 @@ final class Application extends \SOME\Singleton implements IContext
      * @param string|null $from_email Обратный e-mail адрес (по умолчанию - e-mail текущего пользователя)
      * @param bool $is_html Отправлять сообщение в формате HTML
      * @param array $attach Массив вложений вида array(array('tmp_name' => путь к реальному файлу, 'name' => имя файла, 'type' => MIME-тип файла), ...)
+     * @param array $embedded Массив встраиваемых файлов вида array(array('tmp_name' => путь к реальному файлу, 'name' => имя файла, 'type' => MIME-тип файла), ...)
      */
-    public function sendmail($to_arr, $subject, $message, $from = null, $from_email = null, $is_html = true, $attach = array())
-    {
+    public function sendmail(
+        $to_arr,
+        $subject,
+        $message,
+        $from = null,
+        $from_email = null,
+        $is_html = true,
+        $attach = array(),
+        $embedded = array()
+    ) {
         $to_arr = (array)$to_arr;
         if (!$from) {
             $from = $this->user->name;
@@ -786,6 +795,19 @@ final class Application extends \SOME\Singleton implements IContext
                 }
             } else {
                 $mail->AddAttachment($file['tmp_name'], $file['name'], 'base64', $file['type']);
+            }
+        }
+        // if ($embedded) {
+        //     print_r($embedded);
+        //     exit;
+        // }
+        foreach ($embedded as $file) {
+            if (is_array($file['name'])) {
+                foreach ($file['name'] as $key => $val) {
+                    $mail->AddEmbeddedImage($file['tmp_name'][$key], $file['name'][$key], $file['name'][$key], 'base64', $file['type'][$key]);
+                }
+            } else {
+                $mail->AddEmbeddedImage($file['tmp_name'], $file['name'], $file['name'], 'base64', $file['type']);
             }
         }
         $mail->SingleTo = true;
