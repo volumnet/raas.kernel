@@ -365,6 +365,8 @@ class View_Web extends Abstract_View implements IContext_View_Web
             return $dir . '/' . $this->templateType . '/' . $f;
         } elseif (is_file($dir . '/' . $f)) {
             return $dir . '/' . $f;
+        } elseif (is_file($file)) {
+            return $file;
         }
     }
 
