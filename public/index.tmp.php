@@ -93,7 +93,7 @@ if (Application::i()->activeModule) {
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
     <meta name="generator" content="RAAS4" />
     <title><?php echo $metaTitle?></title>
-    <link type="text/css" rel="stylesheet" href="<?php echo $VIEW->themeURL . ($VIEW->templateType ? '/' . $VIEW->templateType : '')?>/style.css" />
+    <link type="text/css" rel="stylesheet" href="<?php echo $VIEW->themeURL . ($VIEW->templateType ? '/' . $VIEW->templateType : '')?>/style.css?v=<?php echo date('Y-m-d', filemtime(__DIR__ . '/style.css'))?>" />
 
     <link type="text/css" href="<?php echo $VIEW->publicURL?>/jquery-ui/css/redmond/jquery-ui-1.8.23.custom.css" rel="stylesheet" />
     <link type="text/css" href="<?php echo $VIEW->publicURL?>/timepicker/jquery-ui-timepicker-addon.css" rel="stylesheet" />
