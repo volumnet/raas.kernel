@@ -1,0 +1,46 @@
+.body
+  gradient-vertical(#08f, #8cf)
+  &__main-container-outer
+    display -webkit-flex
+    display -moz-flex
+    display -ms-flex
+    display -o-flex
+    display flex
+    justify-content center
+  &__main-container
+    position relative
+    padding 64px 20px 80px 40px
+    min-height 640px;
+    overflow hidden
+    background-color white;
+    border-radius $border-radius-base;
+    box-shadow 5px 5px 15px rgba(black, .5);
+    background white
+    min-width $container-lg-desktop
+    margin 0 auto
+    display -webkit-flex
+    display -moz-flex
+    display -ms-flex
+    display -o-flex
+    display flex
+  &__menu-left
+    flex-shrink 0
+    float none
+    margin-left 0
+  &__content
+    flex-grow 1
+    min-width 870px
+    width auto
+    float none
+  &__copyright
+    margin 0 
+    border-top 1px solid silver
+    text-align center 
+    font-size 9px 
+    padding-top 10px 
+    position absolute 
+    bottom 10px 
+    width 100% 
+    left 0 
+    min-height 50px
+    overflow hidden

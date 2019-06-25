@@ -1,4 +1,10 @@
 <?php
+/**
+ * Основной шаблон RAAS
+ */
+
+use RAAS\Application;
+
 function showMenu(array $SUBMENU, $type = null)
 {
     static $level = 0;
@@ -10,12 +16,12 @@ function showMenu(array $SUBMENU, $type = null)
             $href = $row['href'];
             $href = parse_url($href, PHP_URL_QUERY);
             parse_str($href, $href);
-            if (isset($_GET['p'], $_GET['m']) && isset(\RAAS\Application::i()->packages[$_GET['p']]->modules[$_GET['m']])) {
-                $ctx = \RAAS\Application::i()->packages[$_GET['p']]->modules[$_GET['m']];
-            } elseif (isset($_GET['p']) && isset(\RAAS\Application::i()->packages[$_GET['p']])) {
-                $ctx = \RAAS\Application::i()->activePackage;
+            if (isset($_GET['p'], $_GET['m']) && isset(Application::i()->packages[$_GET['p']]->modules[$_GET['m']])) {
+                $ctx = Application::i()->packages[$_GET['p']]->modules[$_GET['m']];
+            } elseif (isset($_GET['p']) && isset(Application::i()->packages[$_GET['p']])) {
+                $ctx = Application::i()->activePackage;
             } else {
-                $ctx = \RAAS\Application::i()->context;
+                $ctx = Application::i()->context;
             }
             if ($access = $ctx->access()) {
                 if (!$access->A($row['href'])) {
@@ -74,11 +80,11 @@ function rowContextMenu(array $SUBMENU = null, $title = '', $class = 'pull-right
     return '';
 }
 $metaTitle = $TITLE . ' — RAAS';
-if (\RAAS\Application::i()->activePackage) {
-    $metaTitle .= '.' . \RAAS\Application::i()->activePackage->view->_('__NAME');
+if (Application::i()->activePackage) {
+    $metaTitle .= '.' . Application::i()->activePackage->view->_('__NAME');
 }
-if (\RAAS\Application::i()->activeModule) {
-    $metaTitle .= '.' . \RAAS\Application::i()->activeModule->view->_('__NAME');
+if (Application::i()->activeModule) {
+    $metaTitle .= '.' . Application::i()->activeModule->view->_('__NAME');
 }
 ?>
 <!DOCTYPE html>
@@ -98,16 +104,6 @@ if (\RAAS\Application::i()->activeModule) {
     <?php foreach ($VIEW->css as $css) { ?>
         <link type="text/css" rel="stylesheet" href="<?php echo $css?>" />
     <?php } ?>
-    <!--[if lt IE 9]>
-    <script type="text/javascript">
-    document.createElement('header');
-    document.createElement('nav');
-    document.createElement('section');
-    document.createElement('article');
-    document.createElement('aside');
-    document.createElement('footer');
-    </script>
-    <![endif]-->
     <script src="<?php echo $VIEW->publicURL?>/jquery.js" type="text/javascript"></script>
     <script src="<?php echo $VIEW->publicURL?>/jquery.scrollTo.js" type="text/javascript"></script>
     <script src="<?php echo $VIEW->publicURL?>/jquery.form.js" type="text/javascript"></script>
@@ -143,32 +139,34 @@ if (\RAAS\Application::i()->activeModule) {
         <script src="<?php echo $js?>" type="text/javascript"></script>
     <?php } ?>
   </head>
-  <body>
+  <body class="body">
     <?php if ($APPLICATION->activePackage) { ?>
-        <header class="navbar navbar-inverse navbar-fixed-top">
+        <header class="body__head navbar navbar-inverse navbar-fixed-top">
           <div class="navbar-inner">
             <div class="container">
-              <ul class="nav">
-                <li class="dropdown">
-                  <a class="dropdown-toggle brand" href="?" data-toggle="dropdown">
-                    RAAS.<?php echo htmlspecialchars($APPLICATION->activePackage->view->_('__NAME'))?><b class="caret"></b>
-                  </a>
-                  <ul class="dropdown-menu pull-right">
-                    <?php foreach ($APPLICATION->packages as $key => $pack) {
-                        if ($access = $pack->access()) {
-                            if (($pack->alias != '/') && !$access->A('p=' . $key)) {
-                                continue;
-                            }
-                        }
-                        if (($pack->registryGet('isActive') || !$key || ($key == '/')) && ($pack != $APPLICATION->activePackage)) {
-                            ?>
-                            <li><a href="?p=<?php echo $key?>"><?php echo htmlspecialchars($pack->view->_('__NAME'))?></a></li>
-                        <?php } ?>
-                    <?php } ?>
-                  </ul>
-                </li>
-                <?php echo showMenu($MENU)?>
-              </ul>
+              <nav class="menu-top">
+                <ul class="nav">
+                  <li class="dropdown">
+                    <a class="dropdown-toggle brand menu-top__current-package" href="?" data-toggle="dropdown">
+                      RAAS.<?php echo htmlspecialchars($APPLICATION->activePackage->view->_('__NAME'))?><b class="caret"></b>
+                    </a>
+                    <ul class="dropdown-menu pull-right">
+                      <?php foreach ($APPLICATION->packages as $key => $pack) {
+                          if ($access = $pack->access()) {
+                              if (($pack->alias != '/') && !$access->A('p=' . $key)) {
+                                  continue;
+                              }
+                          }
+                          if (($pack->registryGet('isActive') || !$key || ($key == '/')) && ($pack != $APPLICATION->activePackage)) {
+                              ?>
+                              <li><a href="?p=<?php echo $key?>"><?php echo htmlspecialchars($pack->view->_('__NAME'))?></a></li>
+                          <?php } ?>
+                      <?php } ?>
+                    </ul>
+                  </li>
+                  <?php echo showMenu($MENU)?>
+                </ul>
+              </nav>
               <?php if ($USER && $USER->id) { ?>
                   <ul class="nav pull-right">
                     <li class="dropdown">
@@ -210,12 +208,16 @@ if (\RAAS\Application::i()->activeModule) {
           </div>
         </header>
     <?php } ?>
-    <div class="container">
-      <section class="row">
+    <div class="body__main-container-outer">
+      <div class="body__main-container">
         <?php if ($SUBMENU) { ?>
-            <nav class="span3 menuLeft"><ul><?php echo showMenu($SUBMENU)?></ul></nav>
+            <div class="span3 body__menu-left">
+              <nav class="menuLeft menu-left">
+                <ul><?php echo showMenu($SUBMENU)?></ul>
+              </nav>
+            </div>
         <?php } ?>
-        <article class="span<?php echo $SUBMENU ? 9 : 12?>">
+        <article class="body__content span<?php echo $SUBMENU ? 9 : 12?>">
           <?php if ($PATH) { ?>
               <nav class="backtrace"><ul class="breadcrumb"><?php echo showMenu($PATH, 'breadcrumb')?></ul></nav>
           <?php } ?>
@@ -225,7 +227,7 @@ if (\RAAS\Application::i()->activeModule) {
                 <ul class="dropdown-menu"><?php echo $managementMenu?></ul>
               </div>
           <?php } ?>
-          <h1><?php echo $TITLE?></h1>
+          <h1 class="h1"><?php echo $TITLE?></h1>
           <?php if ($localError) { ?>
               <div class="alert alert-error alert-block">
                 <button type="button" class="close" data-dismiss="alert">&times;</button>
@@ -244,17 +246,16 @@ if (\RAAS\Application::i()->activeModule) {
           }
           ?>
         </article>
-        <div class="clearfix"></div>
-      </section>
-      <footer class="copyright">
-        <?php if ($VIEW->context->versionName) { ?>
-            <?php echo $VIEW->context->versionName?><br />
-        <?php } ?>
-        <?php echo \RAAS\Application::versionName?>: <?php echo CORPORATE_RESOURCE_MANAGEMENT?><br />
-        <?php echo COPYRIGHT?> &#0169; <a href="http://www.volumnet.ru/">Volume Networks</a>, <?php echo date('Y')?>. <?php echo ALL_RIGHTS_RESERVED?>.<br />
-        <?php echo ICONS_BY?> <a href="http://glyphicons.com/" target="_blank">Glyphicons</a>
+        <footer class="body__copyright">
+          <?php if ($VIEW->context->versionName) { ?>
+              <?php echo $VIEW->context->versionName?><br />
+          <?php } ?>
+          <?php echo Application::versionName?>: <?php echo CORPORATE_RESOURCE_MANAGEMENT?><br />
+          <?php echo COPYRIGHT?> &copy; <a href="http://www.volumnet.ru/">Volume Networks</a>, <?php echo date('Y')?>. <?php echo ALL_RIGHTS_RESERVED?>.<br />
+          <?php echo ICONS_BY?> <a href="http://glyphicons.com/" target="_blank">Glyphicons</a>
 
-      </footer>
+        </footer>
+      </div>
     </div>
     <script src="<?php echo $VIEW->themeURL . ($VIEW->templateType ? '/' . $VIEW->templateType : '')?>/index.js" type="text/javascript"></script>
     <?php foreach ($VIEW->js as $js) { ?>
