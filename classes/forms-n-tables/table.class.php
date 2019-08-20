@@ -5,7 +5,7 @@
  * @version 4.2
  * @author Alex V. Surnin <info@volumnet.ru>
  * @copyright 2013, Volume Networks
- */       
+ */
 namespace RAAS;
 
 /**
@@ -24,7 +24,7 @@ namespace RAAS;
  * @property bool $emptyHeader Отображать заголовок при отсутствии строк
  * @property ColumnCollection $columns Массив колонок
  * @property-read array(Rows[]) $rows Строки таблицы
- */       
+ */
 class Table extends TableElement
 {
     /**
@@ -136,7 +136,7 @@ class Table extends TableElement
             case 'sort':
                 if (isset($this->columns[(string)$val]) && $this->columns[(string)$val]->sortable) {
                     $this->$var = (string)$val;
-                } 
+                }
                 break;
             case 'order':
                 if (in_array((int)$val, array(Column::SORT_ASC, Column::SORT_DESC))) {
@@ -177,7 +177,7 @@ class Table extends TableElement
                 break;
         }
     }
-    
+
     /**
      * Конструктор класса
      * @param array([[имя параметра] => mixed]) $params массив дополнительных свойств, доступных для установки
