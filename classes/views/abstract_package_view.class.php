@@ -5,7 +5,7 @@
  * @version 4.1
  * @author Alex V. Surnin <info@volumnet.ru>
  * @copyright 2011, Volume Networks
- */       
+ */
 namespace RAAS;
 
 /**
@@ -13,21 +13,21 @@ namespace RAAS;
  * @package RAAS
  * @property-read \RAAS\Package $model ссылка на экземпляр пакета
  * @property-read \RAAS\Abstract_View $parent ссылка на экземпляр активного представления ядра
- */       
+ */
 abstract class Abstract_Package_View extends \SOME\Singleton implements IAbstract_Context_View
 {
     /**
      * Массив переводов
-     * @var array     
-     */         
+     * @var array
+     */
     protected $translations;
-    
+
     /**
      * Экземпляр класса
-     * @var \RAAS\Abstract_Package_View     
-     */         
+     * @var \RAAS\Abstract_Package_View
+     */
     protected static $instance;
-    
+
     public function __get($var)
     {
         switch ($var) {
@@ -42,16 +42,16 @@ abstract class Abstract_Package_View extends \SOME\Singleton implements IAbstrac
             case 'parent':
                 return $this->application->view;
                 break;
-            
+
             // Файлы и папки
             case 'languagesDir':
                 return $this->package->systemDir . '/languages';
                 break;
-            
+
             case 'versionName':
                 return ($this->_('__VERSION') && ($this->_('__VERSION') != '__VERSION')) ? $this->_('__VERSION') : '';
                 break;
-            
+
             case 'url':
                 return '?p=' . $this->packageName;
                 break;
@@ -60,7 +60,7 @@ abstract class Abstract_Package_View extends \SOME\Singleton implements IAbstrac
                 break;
         }
     }
-    
+
     public function __set($var, $val)
     {
         switch ($var) {
@@ -69,28 +69,28 @@ abstract class Abstract_Package_View extends \SOME\Singleton implements IAbstrac
                 break;
         }
     }
-    
+
     /**
      * Конструктор класса
-     */         
+     */
     protected function init()
     {
         if (is_file($this->languagesDir . '/' . $this->language . '.ini')) {
             $this->translations = parse_ini_file($this->languagesDir . '/' . $this->language . '.ini');
         }
     }
-    
-    
+
+
     public function _($var)
     {
         if (isset($this->translations[$var])) {
             return $this->translations[$var];
-        } else {
+        } elseif ($this->parent) {
             return $this->parent->_($var);
         }
     }
-    
-    
+
+
     public function exportLang()
     {
         foreach ((array)$this->translations as $key => $val) {
@@ -100,8 +100,8 @@ abstract class Abstract_Package_View extends \SOME\Singleton implements IAbstrac
             }
         }
     }
-    
-    
+
+
     public function assignVars(array $IN = array())
     {
         return $this->parent->assignVars($IN);
