@@ -8,39 +8,45 @@
  */
 namespace RAAS;
 
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use SOME\File;
+use SOME\Namespaces;
+use SOME\Singleton;
+
 /**
  * Класс абстрактного пакета RAAS
  * @package RAAS
- * @property-read \RAAS\Application $parent объект приложения
- * @property-read \RAAS\Abstract_Package_Controller $controller контроллер пакета
- * @property-read \RAAS\Abstract_Package_View $view представление пакета
- * @property-read array(\RAAS\Module) $modules массив загруженных модулей
- * @property \RAAS\Module $activeModule активный модуль
- * @property \RAAS\Updater $updater мастер обновлений
+ * @property-read Application $parent объект приложения
+ * @property-read Abstract_Package_Controller $controller контроллер пакета
+ * @property-read Abstract_Package_View $view представление пакета
+ * @property-read [Module] $modules массив загруженных модулей
+ * @property Module $activeModule активный модуль
+ * @property Updater $updater мастер обновлений
  */
-abstract class Package extends \SOME\Singleton implements IRightsContext
+abstract class Package extends Singleton implements IRightsContext
 {
     /**
      * Контроллер пакета
-     * @var \RAAS\Abstract_Package_Controller
+     * @var Abstract_Package_Controller
      */
-    protected $controller = array();
+    protected $controller = [];
 
     /**
      * Массив загруженных модулей пакета
      * @var array
      */
-    protected $modules = array();
+    protected $modules = [];
 
     /**
      * Массив наименований требуемых расширений
      * @var array
      */
-    protected static $requiredExtensions = array();
+    protected static $requiredExtensions = [];
 
     /**
      * Экземпляр класса
-     * @var \RAAS\Package
+     * @var Package
      */
     protected static $instance;
 
@@ -48,7 +54,8 @@ abstract class Package extends \SOME\Singleton implements IRightsContext
     {
         switch ($var) {
             // MVC
-            case 'application': case 'parent':
+            case 'application':
+            case 'parent':
                 return Application::i();
                 break;
             case 'controller':
@@ -57,12 +64,13 @@ abstract class Package extends \SOME\Singleton implements IRightsContext
             case 'view':
                 return $this->controller->view;
                 break;
-            case 'modules': case 'activeModule':
+            case 'modules':
+            case 'activeModule':
                 return isset($this->$var) ? $this->$var : null;
                 break;
             case 'updater':
-                $NS = \SOME\Namespaces::getNS($this);
-                $classname = $NS . '\\Updater';
+                $ns = Namespaces::getNS($this);
+                $classname = $ns . '\\Updater';
                 if (class_exists($classname)) {
                     $u = new $classname($this);
                     return $u;
@@ -112,47 +120,68 @@ abstract class Package extends \SOME\Singleton implements IRightsContext
                 return $this->systemDir . '/resources';
                 break;
             case 'installFile':
-                return $this->resourcesDir . '/install.' . (string)$this->application->dbtype . '.sql';
+                return $this->resourcesDir . '/install.' .
+                       (string)$this->application->dbtype . '.sql';
                 break;
             case 'uninstallFile':
-                return $this->resourcesDir . '/uninstall.' . (string)$this->application->dbtype . '.sql';
+                return $this->resourcesDir . '/uninstall.' .
+                       (string)$this->application->dbtype . '.sql';
                 break;
 
             // Модель
             case 'Mid':
-                $NS = \SOME\Namespaces::getNSArray(\get_called_class());
-                return $NS[1];
+                $ns = Namespaces::getNSArray(static::class);
+                return $ns[1];
                 break;
             case 'mid':
                 return strtolower($this->Mid);
                 break;
             case 'alias':
-                $NS = \SOME\Namespaces::getNSArray(\get_called_class());
-                return strtolower($NS[1]);
+                $ns = Namespaces::getNSArray(static::class);
+                return strtolower($ns[1]);
                 break;
             case 'phpVersionCompatible':
-                return (version_compare(static::requiredPHPVersion, phpversion()) <= 0);
+                $versionCompare = version_compare(
+                    static::requiredPHPVersion,
+                    phpversion()
+                );
+                return ($versionCompare <= 0);
                 break;
             case 'missedExt':
-                $ext_loaded = array_values(array_map('trim', get_loaded_extensions()));
-                return array_values(array_diff(static::$requiredExtensions, $ext_loaded));
+                $extLoaded = array_map('trim', get_loaded_extensions());
+                $extLoaded = array_values($extLoaded);
+                $extDiff = array_diff(static::$requiredExtensions, $extLoaded);
+                return array_values($extDiff);
                 break;
             case 'isCompatible':
                 return $this->phpVersionCompatible && !$this->missedExt;
                 break;
             case 'version':
-                return defined('static::version') ? static::version : date('Y-m-d', filemtime($this->classesDir . '/package.class.php'));
+                if (defined('static::version')) {
+                    $date = static::version;
+                } else {
+                    $t = filemtime($this->classesDir . '/package.class.php');
+                    $date = date('Y-m-d', $t);
+                }
+                return $date;
                 break;
             case 'versionTime':
-                return defined('static::version') ? strtotime($this->version) : filemtime($this->classesDir . '/package.class.php');
+                if (defined('static::version')) {
+                    $t = strtotime(static::version);
+                } else {
+                    $t = filemtime($this->classesDir . '/package.class.php');
+                }
+                return $t;
                 break;
             case 'levels':
-                return Level::getSet(array('where' => array(array("m = ?", $this->mid))));
+                return Level::getSet(['where' => [["m = ?", $this->mid]]]);
                 break;
             case 'defaultLevel':
                 $l = $this->registryGet('defaultLevel');
                 $L = new Level((int)$l);
-                if (($L instanceof Level) && (get_class($L->Context) == get_class($this))) {
+                if (($L instanceof Level) &&
+                    (get_class($L->Context) == get_class($this))
+                ) {
                     return $L;
                 } else {
                     return (int)$l;
@@ -184,8 +213,9 @@ abstract class Package extends \SOME\Singleton implements IRightsContext
 
     public function init()
     {
-        spl_autoload_register(array($this, 'autoload'));
-        $classname = \SOME\Namespaces::getNS(\get_called_class()) . '\\' . \SOME\Namespaces::getClass($this->application->controller);
+        spl_autoload_register([$this, 'autoload']);
+        $classname = Namespaces::getNS(static::class) . '\\'
+                   . Namespaces::getClass($this->application->controller);
         if (class_exists($classname)) {
             $this->controller = $classname::i();
             if ($this->SQL) {
@@ -226,14 +256,21 @@ abstract class Package extends \SOME\Singleton implements IRightsContext
             if ($u) {
                 $u->preInstall();
             }
-            $SQL_query = (is_file($this->installFile) ? file_get_contents($this->installFile) : "");
-            if ($SQL_query) {
-                $this->SQL->query($this->prepareSQL($SQL_query));
+            if (is_file($this->installFile)) {
+                $sqlQuery = file_get_contents($this->installFile);
+                if ($sqlQuery) {
+                    $this->SQL->query($this->prepareSQL($sqlQuery));
+                }
             }
             if ($u) {
                 $u->postInstall();
             }
-            $this->SQL->add($this->dbprefix . "registry", array('m' => $this->mid, 'name' => 'installDate', 'value' => date('Y-m-d H:i:s'), 'locked' => 1));
+            $this->SQL->add($this->dbprefix . "registry", [
+                'm' => $this->mid,
+                'name' => 'installDate',
+                'value' => date('Y-m-d H:i:s'),
+                'locked' => 1,
+            ]);
             if ($this->application->debug) {
                 $this->registrySet('isActive', 1);
             }
@@ -247,24 +284,29 @@ abstract class Package extends \SOME\Singleton implements IRightsContext
             foreach ($this->modules as $module) {
                 $module->uninstall($deleteFiles);
             }
-            $SQL_query = "DELETE FROM " . $this->dbprefix . "registry WHERE m = ? \r\n";
-            $this->SQL->query(array($SQL_query, $this->mid));
-            if ($SQL_query = (is_file($this->uninstallFile) ? (file_get_contents($this->uninstallFile) . "\r\n") : "")) {
-                $this->SQL->query($this->prepareSQL($SQL_query));
+            $sqlQuery = "DELETE FROM " . $this->dbprefix . "registry
+                          WHERE m = ? \r\n";
+            $this->SQL->query([$sqlQuery, $this->mid]);
+
+            if (is_file($this->uninstallFile)) {
+                $sqlQuery = file_get_contents($this->uninstallFile);
+                if ($sqlQuery) {
+                    $this->SQL->query($this->prepareSQL($sqlQuery));
+                }
             }
             if ($deleteFiles) {
-                \SOME\File::unlink($this->baseDir);
+                File::unlink($this->baseDir);
             }
             $this->registrySet('installDate', null);
             $this->registrySet('isActive', null);
         }
     }
 
-    public function prepareSQL($SQL_query)
+    public function prepareSQL($sqlQuery)
     {
-        $SQL_query = str_replace('{$DBPREFIX$}', $this->dbprefix, $SQL_query);
-        $SQL_query = str_replace('{$PACKAGENAME$}', $this->alias, $SQL_query);
-        return $SQL_query;
+        $sqlQuery = str_replace('{$DBPREFIX$}', $this->dbprefix, $sqlQuery);
+        $sqlQuery = str_replace('{$PACKAGENAME$}', $this->alias, $sqlQuery);
+        return $sqlQuery;
     }
 
 
@@ -274,10 +316,23 @@ abstract class Package extends \SOME\Singleton implements IRightsContext
     public function initModules()
     {
         $p = $this;
-        $callback = function($x) use ($p) { return $x[0] != '.' && ($x != 'common') && is_dir($p->baseDir . '/' . $x); };
-        $modules = \SOME\File::scandir($this->baseDir, $callback);
+        $callback = function ($x) use ($p) {
+            if ($x[0] == '.') {
+                return false;
+            }
+            if ($x == 'common') {
+                return true;
+            }
+            if (!is_dir($p->baseDir . '/' . $x)) {
+                return false;
+            }
+            return true;
+        };
+        $modules = File::scandir($this->baseDir, $callback);
         foreach ($modules as $module) {
-            if (class_exists($classname = \SOME\Namespaces::getNS(\get_called_class()) . '\\' . ucfirst($module) . '\\Module')) {
+            $classname = Namespaces::getNS(static::class) . '\\'
+                       . ucfirst($module) . '\\Module';
+            if (class_exists($classname)) {
                 $this->modules[$module] = $classname::i();
             }
         }
@@ -289,8 +344,8 @@ abstract class Package extends \SOME\Singleton implements IRightsContext
         if ($Owner === null) {
             $Owner = $this->application->user;
         }
-        $NS = \SOME\Namespaces::getNSArray(\get_called_class());
-        $classname = implode('\\', $NS) . '\\Access';
+        $ns = Namespaces::getNSArray(static::class);
+        $classname = implode('\\', $ns) . '\\Access';
         if (class_exists($classname)) {
             return new $classname($Owner);
         }
@@ -304,51 +359,88 @@ abstract class Package extends \SOME\Singleton implements IRightsContext
      */
     public function autoload($class)
     {
-        $myNS = \SOME\Namespaces::getNSArray(\get_called_class());
-        $NS = \SOME\Namespaces::getNSArray($class);
-        $classname = \SOME\Namespaces::getClass($class);
-        if (array_slice($NS, 0, count($myNS)) == $myNS) {
-            if (isset($NS[2])) {
-                $m = $NS[2];
-                if (is_file($this->baseDir . '/' . strtolower($m) . '/classes/module.class.php')) {
-                    require_once ($this->baseDir . '/' . strtolower($m) . '/classes/module.class.php');
-                    $classname = implode('\\', $NS) . '\\Module';
+        $myNS = Namespaces::getNSArray(static::class);
+        $ns = Namespaces::getNSArray($class);
+        $classname = Namespaces::getClass($class);
+        if (array_slice($ns, 0, count($myNS)) == $myNS) {
+            if (isset($ns[2])) {
+                $m = $ns[2];
+                $filename = $this->baseDir . '/' . strtolower($m)
+                          . '/classes/module.class.php';
+                if (is_file($filename)) {
+                    require_once $filename;
+                    $classname = implode('\\', $ns) . '\\Module';
                     $classname::i();
                 }
             } else {
-                $rdi = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->classesDir));
-                foreach ($rdi as $f) {
-                    if (($f->getFileName() == strtolower($classname) . '.class.php') ||
-                        ($f->getFileName() == strtolower($classname) . '.interface.php') ||
-                        ($f->getFileName() == strtolower($classname) . '.trait.php')
-                    ) {
+                $rdi = new RecursiveDirectoryIterator($this->classesDir);
+                $rii = new RecursiveIteratorIterator($rdi);
+                $possibleFilenames = [
+                    strtolower($classname) . '.class.php',
+                    strtolower($classname) . '.interface.php',
+                    strtolower($classname) . '.trait.php',
+                ];
+                foreach ($rii as $f) {
+                    $currentFileName = $f->getFileName();
+                    if (in_array($currentFileName, $possibleFilenames)) {
                         require_once $f->getPathName();
                         break;
                     }
                 }
-                if (!class_exists($class, false) && !interface_exists($class, false)) {
+                if (!class_exists($class, false) &&
+                    !interface_exists($class, false)
+                ) {
                     if ($classname == 'Access') {
-                        $callback = 'namespace %s; class %s extends \\RAAS\\Access {}';
-                        eval(sprintf($callback, implode('\\', $NS), $classname));
+                        $callback = 'namespace %s; '
+                                  . 'class %s extends \\RAAS\\Access {}';
+                        $callback = sprintf(
+                            $callback,
+                            implode('\\', $ns),
+                            $classname
+                        );
+                        eval($callback);
                     } elseif (preg_match('/^Controller_(.*?)?$/i', $classname)) {
-                        $callback = 'namespace %s; class %s extends \%s\Abstract_Controller { protected static $instance; public function __call($name, $args){} }';
-                        eval(sprintf($callback, implode('\\', $NS), $classname, implode('\\', $NS)));
+                        $callback = 'namespace %s; '
+                                  . 'class %s extends \%s\Abstract_Controller { '
+                                  . '    protected static $instance; '
+                                  . '    public function __call($name, $args) '
+                                  . '    {'
+                                  . '    } '
+                                  . '}';
+                        $callback = sprintf(
+                            $callback,
+                            implode('\\', $ns),
+                            $classname,
+                            implode('\\', $ns)
+                        );
+                        eval($callback);
                     } elseif (preg_match('/^View_Chunk?$/i', $classname, $regs)) {
-                        $callback = ' namespace %s;
-                                      class View_Chunk extends \\RAAS\\Package_View_Chunk {
-                                          protected static $instance;
-                                          public function __call($name, $args) {
-                                              $this->assignVars(isset($args[0]) ? $args[0] : array());
-                                              $this->template = $name;
-                                          }
-                                      }';
-                        eval(sprintf($callback, implode('\\', $NS)));
+                        $callback = 'namespace %s; '
+                                  . 'class View_Chunk extends \\RAAS\\Package_View_Chunk { '
+                                  . '    protected static $instance; '
+                                  . '    public function __call($name, $args) '
+                                  . '    { '
+                                  . '        $this->assignVars(isset($args[0]) ? $args[0] : []); '
+                                  . '        $this->template = $name; '
+                                  . '    } '
+                                  . '}';
+                        $callback = sprintf($callback, implode('\\', $ns));
+                        eval($callback);
                     } elseif (preg_match('/^View_(.*?)?$/i', $classname, $regs)) {
-                        $callback = ' namespace %s;
-                                      class %s extends \RAAS\Package_View_%s {
-                                          protected static $instance; public function __call($name, $args) { $this->assignVars(isset($args[0]) ? $args[0] : array()); }
-                                      }';
-                        eval(sprintf($callback, implode('\\', $NS), $classname, $regs[1]));
+                        $callback = 'namespace %s; '
+                                  . 'class %s extends \RAAS\Package_View_%s { '
+                                  . '    protected static $instance; '
+                                  . '    public function __call($name, $args) { '
+                                  . '        $this->assignVars(isset($args[0]) ? $args[0] : []); '
+                                  . '    } '
+                                  . '}';
+                        $callback = sprintf(
+                            $callback,
+                            implode('\\', $ns),
+                            $classname,
+                            $regs[1]
+                        );
+                        eval($callback);
                     }
                 }
             }
