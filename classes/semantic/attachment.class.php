@@ -47,6 +47,9 @@ class Attachment extends SOME
                 return pathinfo($this->realname, PATHINFO_EXTENSION);
                 break;
             case 'fileURL':
+                if (!$this->realname) {
+                    return false;
+                }
                 return $this->dirURL . '/' . $this->realname;
                 break;
             case 'tnURL':
@@ -62,6 +65,9 @@ class Attachment extends SOME
                 return $this->dirURL . '/' . pathinfo($this->realname, PATHINFO_FILENAME) . '_small.' . $this->ext;
                 break;
             case 'file':
+                if (!$this->realname) {
+                    return false;
+                }
                 return $this->dirpath . '/' . $this->realname;
                 break;
             case 'tn':
