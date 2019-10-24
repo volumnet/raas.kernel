@@ -172,15 +172,19 @@ class FieldContainer extends FormElement
             foreach ($this->children as $row) {
                 if ($row instanceof Field) {
                     if ($f = $row->import) {
-                        $DATA[$row->name] = call_user_func($f, $row);
+                        // 2019-10-24, AVS: поддержка полей с числовыми наименованиями
+                        $DATA[trim($row->name)] = call_user_func($f, $row);
                     } else {
-                        $DATA[$row->name] = $row->importDefault();
+                        // 2019-10-24, AVS: поддержка полей с числовыми наименованиями
+                        $DATA[trim($row->name)] = $row->importDefault();
                     }
                 } else {
                     if ($f = $row->import) {
-                        $DATA = array_merge($DATA, (array)call_user_func($f, $row));
+                        // 2019-10-24, AVS: поддержка полей с числовыми наименованиями
+                        $DATA += (array)call_user_func($f, $row);
                     } else {
-                        $DATA = array_merge($DATA, (array)$row->importDefault());
+                        // 2019-10-24, AVS: поддержка полей с числовыми наименованиями
+                        $DATA += (array)$row->importDefault();
                     }
                 }
             }
