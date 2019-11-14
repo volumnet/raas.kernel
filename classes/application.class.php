@@ -902,6 +902,11 @@ final class Application extends Singleton implements IContext
         if (!$realFromEmail && $this->user->email) {
             $realFromEmail = $this->user->email;
         }
+        // 2019-Добавляем точку в локальный адрес, чтобы был совместим
+        // с валидатором нового PHPMailer'а
+        if ($realFromEmail && !stristr($realFromEmail, '.')) {
+            $realFromEmail .= '.local';
+        }
 
         if (!$from) {
             $from = $this->user->name;
