@@ -8,6 +8,8 @@
  */
 namespace RAAS;
 
+use PHPMailer\PHPMailer;
+
 /**
  * Класс приложения RAAS
  * @package RAAS
@@ -18,7 +20,6 @@ namespace RAAS;
  * @property \RAAS\Module $activeModule активный модуль
  * @property \RAAS\IContext $context активный модуль или пакет
  * @property-read string $modulesDir директория с пакетами и модулями
- * @property-read string $someFile путь к файлу SOME
  * @property-read string $configFile путь к файлу системных настроек
  * @property-read string $classesFile путь к файлу кэша классов
  * @property-read array(string) $availableDatabases массив названий доступных СУБД в виде 'alias' => 'Название СУБД'
@@ -233,9 +234,6 @@ final class Application extends \SOME\Singleton implements IContext
             case 'resourcesDir':
                 return $this->systemDir . '/resources';
                 break;
-            case 'someFile':
-                return $this->includeDir . '/some/some.class.php';
-                break;
             case 'configFile':
                 return $this->baseDir . '/config.php';
                 break;
@@ -360,8 +358,6 @@ final class Application extends \SOME\Singleton implements IContext
         $this->debug = $debugMode;
 
         mb_internal_encoding('UTF-8');
-        require_once $this->someFile;
-        spl_autoload_register('\\SOME\\SOME::autoload');
         spl_autoload_register(array($this, 'autoload'));
         //error_reporting(E_ALL);
         set_error_handler(array($this, 'errorHandler'), error_reporting());

@@ -1,0 +1,19 @@
+{
+    "name": "volumnet/raas.kernel",
+    "description": "RAAS Framework",
+    "version": "4.2.0",
+    "require": {
+        "php": ">=5.6",
+        "volumnet/some4": "4.*",
+        "phpmailer/phpmailer": "~6.1"
+    },
+    "authors": [
+        {
+            "name": "Alex V. Surnin",
+            "email": "info@volumnet.ru"
+        }
+    ],
+    "autoload": {
+        "classmap": ["classes/"] 
+    }
+}
