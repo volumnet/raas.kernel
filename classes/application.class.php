@@ -9,7 +9,7 @@
 namespace RAAS;
 
 use Mustache_Autoloader;
-use PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\PHPMailer;
 use RecursiveIteratorIterator;
 use RecursiveDirectoryIterator;
 use SOME\DB;
@@ -1009,9 +1009,7 @@ final class Application extends Singleton implements IContext
                     if (is_file(
                         $this->systemDir . '/general/classes/package.class.php'
                     )) {
-                        require_once $this->systemDir .
-                                     '/general/classes/package.class.php';
-                        General\Package::i();
+                        // General\Package::i();
                     }
                 } else {
                     if (is_file(
@@ -1024,34 +1022,10 @@ final class Application extends Singleton implements IContext
                         $classname::i();
                     }
                 }
-            } else {
-                $rdi = new RecursiveIteratorIterator(
-                    new RecursiveDirectoryIterator(__DIR__)
-                );
-                foreach ($rdi as $f) {
-                    $fn = $f->getFileName();
-                    if (($fn == strtolower($classname) . '.class.php') ||
-                        ($fn == strtolower($classname) . '.interface.php') ||
-                        ($fn == strtolower($classname) . '.trait.php')
-                    ) {
-                        require_once $f->getPathName();
-                        break;
-                    }
-                }
             }
-        } elseif (stristr($classname, 'PHPExcel')) {
-            require_once $this->includeDir . '/phpexcel/Classes/PHPExcel.php';
         } else {
             switch ($classname) {
-                case 'PHPMailer':
-                    require_once $this->includeDir . '/class.phpmailer.php';
-                    break;
-                case 'phpQuery':
-                    require_once $this->includeDir . '/phpQuery-onefile.php';
-                    break;
                 case 'Mustache_Engine':
-                    require_once $this->includeDir .
-                                 '/mustache/src/Mustache/Autoloader.php';
                     Mustache_Autoloader::register();
                     break;
             }
