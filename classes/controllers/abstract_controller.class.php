@@ -483,6 +483,7 @@ abstract class Abstract_Controller extends Singleton implements IAbstract_Contex
                 'type' => 'email',
                 'name' => 'email_from',
                 'caption' => $this->view->_('SENDING_EMAIL'),
+                'placeholder' => 'info@' . $_SERVER['HTTP_HOST'],
             ],
         ];
     }
