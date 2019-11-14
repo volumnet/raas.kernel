@@ -14,6 +14,6 @@
         }
     ],
     "autoload": {
-        "classmap": ["classes/", "general/classes/"] 
+        "classmap": ["classes/", "general/classes/", "include/"] 
     }
 }
