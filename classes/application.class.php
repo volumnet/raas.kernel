@@ -8,31 +8,46 @@
  */
 namespace RAAS;
 
+use Mustache_Autoloader;
+use PHPMailer;
+use RecursiveIteratorIterator;
+use RecursiveDirectoryIterator;
+use SOME\DB;
+use SOME\File;
+use SOME\Namespaces;
+use SOME\Singleton;
+use SOME\SOME;
+
 /**
  * Класс приложения RAAS
  * @package RAAS
- * @property-read \RAAS\Abstract_Controller $controller контроллер приложения
- * @property-read \RAAS\Abstract_View $view представление приложения
- * @property-read array(\RAAS\Package) $packages массив загруженных пакетов
- * @property \RAAS\Package $activePackage активный пакет
- * @property \RAAS\Module $activeModule активный модуль
- * @property \RAAS\IContext $context активный модуль или пакет
+ * @property-read Abstract_Controller $controller контроллер приложения
+ * @property-read Abstract_View $view представление приложения
+ * @property-read array<Package> $packages массив загруженных пакетов
+ * @property Package $activePackage активный пакет
+ * @property Module $activeModule активный модуль
+ * @property IContext $context активный модуль или пакет
  * @property-read string $modulesDir директория с пакетами и модулями
  * @property-read string $someFile путь к файлу SOME
  * @property-read string $configFile путь к файлу системных настроек
  * @property-read string $classesFile путь к файлу кэша классов
- * @property-read array(string) $availableDatabases массив названий доступных СУБД в виде 'alias' => 'Название СУБД'
+ * @property-read array<string> $availableDatabases массив названий доступных
+ *                                                  СУБД в виде
+ *                                                  'alias' => 'Название СУБД'
  * @property-read bool $debug режим отладки
- * @property-read array(\RAAS\Exception) $exceptions массив исключений
- * @property-read array(\Exception) $sqlExceptions массив исключений по SQL-запросам
- * @property \RAAS\User $user активный пользователь системы
- * @property-read \SOME\DB $SQL подключение к базе данных
+ * @property-read array<Exception> $exceptions массив исключений
+ * @property-read array<\Exception> $sqlExceptions массив исключений
+ *                                                 по SQL-запросам
+ * @property User $user активный пользователь системы
+ * @property-read DB $SQL подключение к базе данных
  * @property-read string $DSN строка подключения к базе данных
  * @property-read string $updateURL адрес сервера обновлений
- * @property-read string $userAgent поле User-Agent для обмена данными с сервером обновлений
- * @property-read resource $networkContext контекст соединения с сервером обновлений
+ * @property-read string $userAgent поле User-Agent для обмена данными
+ *                                  с сервером обновлений
+ * @property-read resource $networkContext контекст соединения
+ *                                         с сервером обновлений
  */
-final class Application extends \SOME\Singleton implements IContext
+final class Application extends Singleton implements IContext
 {
     /**
      * Наименование версии
@@ -96,23 +111,23 @@ final class Application extends \SOME\Singleton implements IContext
      * Массив статических настроек, взятых из файла конфигурации
      * @var array
      */
-    private $config = array();
+    private $config = [];
 
     /**
      * Массив системных исключений
      * @var array
      */
-    private $exceptions = array();
+    private $exceptions = [];
 
     /**
      * Массив исключений при работе с базой данных
      * @var array
      */
-    private $sqlExceptions = array();
+    private $sqlExceptions = [];
 
     /**
      * Экземпляр подключения к базе данных
-     * @var \SOME\DB
+     * @var DB
      */
     private $SQL;
 
@@ -120,11 +135,11 @@ final class Application extends \SOME\Singleton implements IContext
      * Массив кэша параметров реестра
      * @var array
      */
-    private $registry = array();
+    private $registry = [];
 
     /**
      * Текущий пользователь системы
-     * @var \RAAS\User
+     * @var User
      */
     private $user;
 
@@ -132,11 +147,11 @@ final class Application extends \SOME\Singleton implements IContext
      * Массив загруженных пакетов
      * @var array
      */
-    private $packages = array();
+    private $packages = [];
 
     /**
      * текущий (рабочий) пакет
-     * @var \RAAS\Package
+     * @var Package
      */
     private $activePackage;
 
@@ -144,19 +159,40 @@ final class Application extends \SOME\Singleton implements IContext
      * Массив наименований требуемых расширений
      * @var array
      */
-    private static $requiredExtensions = array('session', 'iconv', 'pcre', 'date', 'standard', 'zlib', 'SimpleXML', 'xml', 'gd', 'PDO', 'mbstring');
+    private static $requiredExtensions = [
+        'session',
+        'iconv',
+        'pcre',
+        'date',
+        'standard',
+        'zlib',
+        'SimpleXML',
+        'xml',
+        'gd',
+        'PDO',
+        'mbstring'
+    ];
 
     /**
-     * Массив наименований переменных, которые будут использоваться в файле конфигурации
+     * Массив наименований переменных, которые будут использоваться
+     * в файле конфигурации
      * @var array
      */
-    private static $configVars = array('dbtype', 'dbhost', 'dbname', 'dbuser', 'dbpass', 'dbprefix', 'loginType');
+    private static $configVars = [
+        'dbtype',
+        'dbhost',
+        'dbname',
+        'dbuser',
+        'dbpass',
+        'dbprefix',
+        'loginType'
+    ];
 
     /**
-     * Массив вида $key => $val, где $key - идентификатор базы данных в DSN, $val - наименование СУБД
-     * @var array
+     * Доступные базы данных
+     * @var array<string[] идентификатор базы данных в DSN => string наименование СУБД>
      */
-    private static $availableDatabases = array('mysql' => 'MySQL');
+    private static $availableDatabases = ['mysql' => 'MySQL'];
 
     /**
      * Экземпляр приложения
@@ -185,7 +221,13 @@ final class Application extends \SOME\Singleton implements IContext
                 return null;
                 break;
             case 'context':
-                return $this->activeModule ? $this->activeModule : ($this->activePackage ? $this->activePackage : $this);
+                if ($this->activeModule) {
+                    return $this->activeModule;
+                } elseif ($this->activePackage) {
+                    return $this->activePackage;
+                } else {
+                    return $this;
+                }
                 break;
 
             // Файлы и директории
@@ -240,10 +282,19 @@ final class Application extends \SOME\Singleton implements IContext
                 return $this->baseDir . '/config.php';
                 break;
             case 'installFile':
-                return (isset($this->config['dbtype']) ? ($this->resourcesDir . '/install.' . (string)$this->config['dbtype'] . '.sql') : null);
+                if (isset($this->config['dbtype'])) {
+                    $dbtype = (string)$this->config['dbtype'];
+                    return $this->resourcesDir . '/install.' . $dbtype . '.sql';
+                }
+                return null;
                 break;
             case 'uninstallFile':
-                return (isset($this->config['dbtype']) ? ($this->resourcesDir . '/uninstall.' . (string)$this->config['dbtype'] . '.sql') : null);
+                if (isset($this->config['dbtype'])) {
+                    $dbtype = (string)$this->config['dbtype'];
+                    return $this->resourcesDir .
+                           '/uninstall.' . $dbtype . '.sql';
+                }
+                return null;
                 break;
             case 'classesFile':
                 return $this->resourcesDir . '/classes.dat';
@@ -255,7 +306,7 @@ final class Application extends \SOME\Singleton implements IContext
                 return '';
                 break;
             case 'availableDatabases':
-                return eval('return ' . \get_called_class() . '::$' . $var . ';');
+                return static::$availableDatabases;
                 break;
             case 'debug':
             case 'exceptions':
@@ -269,11 +320,15 @@ final class Application extends \SOME\Singleton implements IContext
                     switch ($this->config['dbtype']) {
                         case 'mysql':
                         case 'mssql':
-                            return $this->config['dbtype'] . ':host=' . $this->config['dbhost'] . ';dbname=' . $this->config['dbname'];
+                            return $this->config['dbtype'] .
+                                   ':host=' . $this->config['dbhost'] .
+                                   ';dbname=' . $this->config['dbname'];
                             break;
                         case 'pgsql':
-                            return 'pgsql:host=' . $this->config['dbhost'] . ' dbname=' . $this->config['dbname']
-                                      . ' user=' . $this->config['dbuser'] . ' password=' . $this->config['dbpass'];
+                            return 'pgsql:host=' . $this->config['dbhost'] .
+                                    ' dbname=' . $this->config['dbname'] .
+                                    ' user=' . $this->config['dbuser'] .
+                                    ' password=' . $this->config['dbpass'];
                             break;
                         default:
                             return false;
@@ -283,20 +338,32 @@ final class Application extends \SOME\Singleton implements IContext
                 return false;
                 break;
             case 'phpVersionCompatible':
-                return (version_compare(self::requiredPHPVersion, phpversion()) <= 0);
+                $verCmp = version_compare(
+                    self::requiredPHPVersion,
+                    phpversion()
+                );
+                return ($verCmp <= 0);
                 break;
             case 'missedExt':
-                $ext_loaded = array_values(array_map('trim', get_loaded_extensions()));
-                return array_values(array_diff(self::$requiredExtensions, $ext_loaded));
+                $extLoaded = array_map('trim', get_loaded_extensions());
+                $extLoaded = array_values($extLoaded);
+                $diff = array_diff(self::$requiredExtensions, $extLoaded);
+                return array_values($diff);
                 break;
             case 'isCompatible':
                 return $this->phpVersionCompatible && !$this->missedExt;
                 break;
             case 'version':
-                return defined('static::version') ? static::version : date('Y-m-d', filemtime(__FILE__));
+                if (defined('static::version')) {
+                    return static::version;
+                }
+                return date('Y-m-d', filemtime(__FILE__));
                 break;
             case 'versionTime':
-                return defined('static::version') ? strtotime($this->version) : filemtime(__FILE__);
+                if (defined('static::version')) {
+                    return strtotime($this->version);
+                }
+                return filemtime(__FILE__);
                 break;
             case 'updateURL':
                 return 'http://raas.volumnet.ru/update/';
@@ -305,10 +372,16 @@ final class Application extends \SOME\Singleton implements IContext
                 return self::versionName . ' ' . $this->version;
                 break;
             case 'networkContext':
-                return stream_context_create(array('http' => array('timeout' => self::networkTimeout, 'user_agent' => $this->userAgent)));
+                return stream_context_create(['http' => [
+                    'timeout' => self::networkTimeout,
+                    'user_agent' => $this->userAgent
+                ]]);
                 break;
             default:
-                if (in_array($var, self::$configVars) && !in_array($var, array('dbpass')) && isset($this->config[$var])) {
+                if (in_array($var, self::$configVars) &&
+                    !in_array($var, ['dbpass']) &&
+                    isset($this->config[$var])
+                ) {
                     return (string)$this->config[$var];
                 }
                 return null;
@@ -353,8 +426,10 @@ final class Application extends \SOME\Singleton implements IContext
      * @param string $controller наименование контроллера
      * @param bool $debugMode режим отладки
      */
-    public function run($controller = self::defaultController, $debugMode = false)
-    {
+    public function run(
+        $controller = self::defaultController,
+        $debugMode = false
+    ) {
         ob_start();
         $this->startMicrotime = microtime(true);
         $this->debug = $debugMode;
@@ -362,15 +437,16 @@ final class Application extends \SOME\Singleton implements IContext
         mb_internal_encoding('UTF-8');
         require_once $this->someFile;
         spl_autoload_register('\\SOME\\SOME::autoload');
-        spl_autoload_register(array($this, 'autoload'));
+        spl_autoload_register([$this, 'autoload']);
         //error_reporting(E_ALL);
-        set_error_handler(array($this, 'errorHandler'), error_reporting());
-        set_exception_handler(array($this, 'errorHandler'));
+        set_error_handler([$this, 'errorHandler'], error_reporting());
+        set_exception_handler([$this, 'errorHandler']);
         session_start();
         $_SESSION['RAAS_STARTED'] = microtime(true);
         $this->getConfig();
 
-        if (!class_exists($classname = ('RAAS\\Controller_' . ucfirst($controller)))) {
+        $classname = ('RAAS\\Controller_' . ucfirst($controller));
+        if (!class_exists($classname)) {
             $classname = 'RAAS\\Controller_' . ucfirst(self::defaultController);
         }
 
@@ -381,12 +457,15 @@ final class Application extends \SOME\Singleton implements IContext
 
      /**
      * Обработчик ошибок
-     * @param Exception|int либо исключение (если передается исключение), либо внутренний номер ошибки (если передается ошибка)
+     * @param Exception|int либо исключение (если передается исключение),
+     *                      либо внутренний номер ошибки
+     *                      (если передается ошибка)
      * @param string текстовое описание ошибки (если передается ошибка)
      * @param string путь к файлу, где была ошибка (если передается ошибка)
      * @param int строка в файле, где была ошибка (если передается ошибка)
-     * @param array контекст ошибки (переменные окружения, если передается ошибка)
-     * @return \RAAS\Exception возвращает ошибку в виде исключения
+     * @param array контекст ошибки (переменные окружения,
+     *              если передается ошибка)
+     * @return Exception возвращает ошибку в виде исключения
      */
     public function errorHandler()
     {
@@ -408,9 +487,12 @@ final class Application extends \SOME\Singleton implements IContext
             $this->exceptions[] = $e;
         }
         if ($this->debug) {
-            //if (!$this->view->renderStarted) {
-                echo '<pre class="error">' . $e->getMessage() . ' in ' . $e->getFile() . ' on line ' . $e->getLine() . ' ' . $e->getTraceAsString() . '</pre>';
-            //}
+            echo '<pre class="error">' .
+                    $e->getMessage() .
+                    ' in ' . $e->getFile() .
+                    ' on line ' . $e->getLine() . ' ' .
+                    $e->getTraceAsString() .
+                 '</pre>';
         }
         return $e;
     }
@@ -422,10 +504,8 @@ final class Application extends \SOME\Singleton implements IContext
      */
     public function sqlErrorHandler(\Exception $e)
     {
-        //$this->sqlExceptions[] = $e;
-        //$this->errorHandler($e);
         if ($this->SQL && $this->SQL->connection) {
-            $arr = array(
+            $arr = [
                 'debug_code' => '',
                 'error_type' => '',
                 'error_message' => '',
@@ -434,7 +514,7 @@ final class Application extends \SOME\Singleton implements IContext
                 'referer' => '',
                 'request_method' => '',
                 'debug_backtrace' => ''
-            );
+            ];
         }
         throw $e;
     }
@@ -442,29 +522,32 @@ final class Application extends \SOME\Singleton implements IContext
 
     /**
      * Обработчик запросов
-     * @param string $query текст запроса (возможно, с заменителями для подстановок)
-     * @param array $bind массив подстановок (ассоциированный или индексированный)
+     * @param string $query текст запроса
+     *                      (возможно, с заменителями для подстановок)
+     * @param array $bind массив подстановок
+     *                    (ассоциированный или индексированный)
      * @param float $time время выполнения запроса
      */
-    public function queryHandler($query = '', $bind = array(), $time = 0)
+    public function queryHandler($query = '', $bind = [], $time = 0)
     {
     }
 
 
     /**
      * Инициализация базы данных
-     * @return bool true, если подключение прошло успешно, false в противном случае
+     * @return bool true, если подключение прошло успешно,
+     *              false в противном случае
      */
     public function initDB()
     {
         try {
-            $this->SQL = new \SOME\DB(
+            $this->SQL = new DB(
                 $this->DSN,
                 $this->config['dbuser'],
                 $this->config['dbpass'],
                 'utf8',
-                array($this, 'sqlErrorHandler'),
-                array($this, 'queryHandler')
+                [$this, 'sqlErrorHandler'],
+                [$this, 'queryHandler']
             );
             return (!$this->sqlExceptions);
         } catch (\Exception $e) {
@@ -481,7 +564,7 @@ final class Application extends \SOME\Singleton implements IContext
     {
         $text = '<' . "?php\r\n";
         foreach (self::$configVars as $var) {
-             $text .= '$' . $var . ' = \'' . \addslashes($DATA[$var]) . "';\r\n";
+             $text .= '$' . $var . ' = \'' . addslashes($DATA[$var]) . "';\r\n";
         }
         file_put_contents($this->configFile, $text);
         chmod($this->configFile, 0777);
@@ -490,19 +573,17 @@ final class Application extends \SOME\Singleton implements IContext
 
     /**
      * Инициализация движка SOME
-     * @return bool true, если инициализация прошла успешно, false в противном случае
+     * @return bool true, если инициализация прошла успешно,
+     *              false в противном случае
      */
     public function initSOME()
     {
-        $classes = array();
-        if (is_file(__DIR__ . '/../classes.dat')) {
-            $classes = @json_decode(@file_get_contents(__DIR__ . '/../classes.dat'), true);
-        }
-        if (!is_array($classes)) {
-            $classes = array();
-        }
-        $ok = \SOME\SOME::init($this->SQL, $this->config['dbprefix'], (array)$classes);
-        //file_put_contents(__DIR__ . '/../classes.dat', json_encode(\SOME\SOME::_classes()));
+        $classes = [];
+        $ok = SOME::init(
+            $this->SQL,
+            $this->config['dbprefix'],
+            (array)$classes
+        );
         return $ok;
     }
 
@@ -519,36 +600,45 @@ final class Application extends \SOME\Singleton implements IContext
             $Sender = $this;
         }
         $m = $Sender->mid;
-        $NS = \SOME\Namespaces::getNS($Sender);
-        $NSArray = \SOME\Namespaces::getNSArray($Sender);
+        $NS = Namespaces::getNS($Sender);
+        $NSArray = Namespaces::getNSArray($Sender);
 
         if (($NS == __NAMESPACE__) || $m == '/') {
             if (!isset($this->registry[''][$var])) {
-                $SQL_query = "SELECT * FROM " . $this->dbprefix . "registry WHERE m = ''";
+                $sqlQuery = "SELECT *
+                               FROM " . $this->dbprefix . "registry
+                              WHERE m = ''";
                 try {
-                    $SQL_result = $this->SQL->get($SQL_query);
+                    $sqlResult = $this->SQL->get($sqlQuery);
                 } catch (\Exception $e) {
-                    $SQL_result = null;
+                    $sqlResult = null;
                 }
-                foreach ((array)$SQL_result as $row) {
+                foreach ((array)$sqlResult as $row) {
                     $this->registry[''][$row['name']] = $row['value'];
                 }
             }
-            return isset($this->registry[''][$var]) ? $this->registry[''][$var] : null;
+            if (isset($this->registry[''][$var])) {
+                return $this->registry[''][$var];
+            }
         } elseif ($NSArray[0] == 'RAAS') {
             if (!isset($this->registry[$m][$var])) {
-                $SQL_query = "SELECT * FROM " . $this->dbprefix . "registry WHERE m = ?";
+                $sqlQuery = "SELECT *
+                               FROM " . $this->dbprefix . "registry
+                              WHERE m = ?";
                 try {
-                    $SQL_result = $this->SQL->get(array($SQL_query, $m));
+                    $sqlResult = $this->SQL->get([$sqlQuery, $m]);
                 } catch (\Exception $e) {
-                    $SQL_result = null;
+                    $sqlResult = null;
                 }
-                foreach ((array)$SQL_result as $row) {
+                foreach ((array)$sqlResult as $row) {
                     $this->registry[$m][$row['name']] = $row['value'];
                 }
             }
-            return isset($this->registry[$m][$var]) ? $this->registry[$m][$var] : null;
+            if (isset($this->registry[$m][$var])) {
+                return $this->registry[$m][$var];
+            }
         }
+        return null;
     }
 
 
@@ -557,7 +647,8 @@ final class Application extends \SOME\Singleton implements IContext
      * @param string $var наименование записи
      * @param string $val значение записи
      * @param object|null $Sender отправитель запроса
-     * @return bool true, если вызов произведен успешно и значение записано, false в противном случае
+     * @return bool true, если вызов произведен успешно и значение записано,
+     *              false в противном случае
      */
     public function registrySet($var, $val, $Sender = null)
     {
@@ -565,15 +656,17 @@ final class Application extends \SOME\Singleton implements IContext
             $Sender = $this;
         }
         $m = $Sender->mid;
-        $c = \SOME\Namespaces::getClass($Sender);
-        $NS = \SOME\Namespaces::getNS($Sender);
-        $NSArray = \SOME\Namespaces::getNSArray($Sender);
+        $c = Namespaces::getClass($Sender);
+        $NS = Namespaces::getNS($Sender);
+        $NSArray = Namespaces::getNSArray($Sender);
 
-        $arr = array('name' => $var, 'value' => $val);
+        $arr = ['name' => $var, 'value' => $val];
         if (get_class($Sender) == __CLASS__) {
             if ($val === null) {
-                $SQL_query = "DELETE FROM " . $this->dbprefix . "registry WHERE m = '' AND name = ?";
-                $this->SQL->query(array($SQL_query, $var));
+                $sqlQuery = "DELETE FROM " . $this->dbprefix . "registry
+                              WHERE m = ''
+                                AND name = ?";
+                $this->SQL->query([$sqlQuery, $var]);
                 unset($this->registry[''][$var]);
             } else {
                 $this->SQL->add($this->dbprefix . "registry", $arr, $arr);
@@ -581,12 +674,20 @@ final class Application extends \SOME\Singleton implements IContext
             }
             return true;
         } elseif (($NS == __NAMESPACE__) || $m == '/') {
-            $SQL_query = "SELECT * FROM " . $this->dbprefix . "registry WHERE m = '' AND name = ?";
-            $SQL_result = $this->SQL->getline(array($SQL_query, $var));
-            if (!$SQL_result || !isset($SQL_result['locked']) || !$SQL_result['locked']) {
+            $sqlQuery = "SELECT *
+                           FROM " . $this->dbprefix . "registry
+                          WHERE m = ''
+                            AND name = ?";
+            $sqlResult = $this->SQL->getline([$sqlQuery, $var]);
+            if (!$sqlResult ||
+                !isset($sqlResult['locked']) ||
+                !$sqlResult['locked']
+            ) {
                 if ($val === null) {
-                    $SQL_query = "DELETE FROM " . $this->dbprefix . "registry WHERE m = '' AND name = ?";
-                    $this->SQL->query(array($SQL_query, $var));
+                    $sqlQuery = "DELETE FROM " . $this->dbprefix . "registry
+                                  WHERE m = ''
+                                    AND name = ?";
+                    $this->SQL->query([$sqlQuery, $var]);
                     unset($this->registry[''][$var]);
                 } else {
                     $this->SQL->add($this->dbprefix . "registry", $arr, $arr);
@@ -595,12 +696,19 @@ final class Application extends \SOME\Singleton implements IContext
                 return true;
             }
         } elseif ($NSArray[0] == 'RAAS') {
-            $SQL_query = "SELECT value FROM " . $this->dbprefix . "registry WHERE m = ? AND name = ?";
-            $SQL_result = $this->SQL->getline(array($SQL_query, (string)$m, $var));
-            if (!$SQL_result || !isset($SQL_result['locked']) || !$SQL_result['locked']) {
+            $sqlQuery = "SELECT value
+                           FROM " . $this->dbprefix . "registry
+                          WHERE m = ?
+                            AND name = ?";
+            $sqlResult = $this->SQL->getline([$sqlQuery, (string)$m, $var]);
+            if (!$sqlResult ||
+                !isset($sqlResult['locked']) ||
+                !$sqlResult['locked']) {
                 if ($val === null) {
-                    $SQL_query = "DELETE FROM " . $this->dbprefix . "registry WHERE m = ? AND name = ?";
-                    $this->SQL->query(array($SQL_query, (string)$m, $var));
+                    $sqlQuery = "DELETE FROM " . $this->dbprefix . "registry
+                                  WHERE m = ?
+                                    AND name = ?";
+                    $this->SQL->query([$sqlQuery, (string)$m, $var]);
                     unset($this->registry[''][$var]);
                 } else {
                     $arr2 = $arr;
@@ -618,9 +726,12 @@ final class Application extends \SOME\Singleton implements IContext
     public function install()
     {
         if (!$this->registryGet('installDate')) {
-            $SQL_query = (is_file($this->installFile) ? file_get_contents($this->installFile) : "");
-            if ($SQL_query) {
-                $this->SQL->query($this->prepareSQL($SQL_query));
+            $sqlQuery = "";
+            if (is_file($this->installFile)) {
+                $sqlQuery = file_get_contents($this->installFile);
+            }
+            if ($sqlQuery) {
+                $this->SQL->query($this->prepareSQL($sqlQuery));
             }
             $this->registrySet('installDate', date('Y-m-d H:i:s'));
 
@@ -630,10 +741,10 @@ final class Application extends \SOME\Singleton implements IContext
     }
 
 
-    public function prepareSQL($SQL_query)
+    public function prepareSQL($sqlQuery)
     {
-        $SQL_query = str_replace('{$DBPREFIX$}', $this->dbprefix, $SQL_query);
-        return $SQL_query;
+        $sqlQuery = str_replace('{$DBPREFIX$}', $this->dbprefix, $sqlQuery);
+        return $sqlQuery;
     }
 
 
@@ -647,9 +758,10 @@ final class Application extends \SOME\Singleton implements IContext
         $callback = function ($x) use ($m) {
             return $x[0] != '.' && is_dir($m->modulesDir . '/' . $x);
         };
-        $packages = \SOME\File::scandir($this->modulesDir, $callback);
+        $packages = File::scandir($this->modulesDir, $callback);
         foreach ((array)$packages as $package) {
-            if (class_exists($classname = 'RAAS\\' . ucfirst($package) . '\\Package')) {
+            $classname = 'RAAS\\' . ucfirst($package) . '\\Package';
+            if (class_exists($classname)) {
                 $this->packages[$package] = $classname::i();
             }
         }
@@ -663,14 +775,20 @@ final class Application extends \SOME\Singleton implements IContext
      */
     public function md5It($string)
     {
-        return md5($string . md5($string . Application::generalSalt) . Application::generalSalt);
+        return md5(
+            $string .
+            md5($string . Application::generalSalt) .
+            Application::generalSalt
+        );
     }
 
 
     /**
      * Получение контекста по строке mid
      * @param string $mid Строка вида "/", "Пакет" или "Пакет.Модуль"
-     * @param bool $treatSlashAsApplication при установке в true по строке "/" возвращает приложение, в противном случае корневой пакет
+     * @param bool $treatSlashAsApplication при установке в true
+     *                                      по строке "/" возвращает приложение,
+     *                                      в противном случае корневой пакет
      * @return IContext контекст
      */
     public function getContext($mid = '', $treatSlashAsApplication = false)
@@ -682,10 +800,15 @@ final class Application extends \SOME\Singleton implements IContext
             return $treatSlashAsApplication ? $this : $this->packages['/'];
         } elseif (strstr($mid, '.')) {
             list($p, $m) = explode('.', $mid);
-            return isset($this->packages[$p]->modules[$m]) ? $this->packages[$p]->modules[$m] : null;
+            if (isset($this->packages[$p]->modules[$m])) {
+                return $this->packages[$p]->modules[$m];
+            }
         } else {
-            return isset($this->packages[$mid]) ? $this->packages[$mid] : null;
+            if (isset($this->packages[$mid])) {
+                return $this->packages[$mid];
+            }
         }
+        return null;
     }
 
 
@@ -710,7 +833,8 @@ final class Application extends \SOME\Singleton implements IContext
      * Для URN с суффиксом увеличивает в суффиксе число на 1
      * @param string $urn Старый URN
      * @param bool $forceNewSuffix Принудительно добавлять суффикс "_1"
-     *                             (даже если суффикс уже есть, добавляет еще один)
+     *                             (даже если суффикс уже есть,
+     *                             добавляет еще один)
      * @param string $separator разделитель суффикса
      * @return string Новый URN
      */
@@ -736,65 +860,107 @@ final class Application extends \SOME\Singleton implements IContext
 
     /**
      * Отправка почты
-     * @param array|string $to_arr Получатель или список получателей
-     * @param array|string $subject Текст заголовка письма либо массив array(string Шаблон, array Подстановки) -
-     *        Шаблон: текст с переменными вида {%VAR%}; Подстановки - массив соответственно вида array('var' => 'значение переменной', ...)
-     * @param array|string $message Текст письма либо массив array(string Шаблон, array Подстановки) -
-     *        Шаблон: текст с переменными вида {%VAR%}; Подстановки - массив соответственно вида array('var' => 'значение переменной', ...)
-     * @param string|null $from Отправитель (по умолчанию - полное имя текущего пользователя)
-     * @param string|null $from_email Обратный e-mail адрес (по умолчанию - e-mail текущего пользователя)
-     * @param bool $is_html Отправлять сообщение в формате HTML
-     * @param array $attach Массив вложений вида array(array('tmp_name' => путь к реальному файлу, 'name' => имя файла, 'type' => MIME-тип файла), ...)
-     * @param array $embedded Массив встраиваемых файлов вида array(array('tmp_name' => путь к реальному файлу, 'name' => имя файла, 'type' => MIME-тип файла), ...)
+     * @param array|string $toArr Получатель или список получателей
+     * @param [
+     *            string Шаблон,
+     *            array<string[] переменная => string Значение> Подстановки
+     *        ]|string $subject Текст заголовка письма либо массив шаблона
+     *                          с подстановками
+     * @param [
+     *            string Шаблон,
+     *            array<string[] переменная => string Значение> Подстановки
+     *        ]|string $message Текст письма либо массив шаблона
+     *                          с подстановками
+     * @param string|null $from Отправитель (по умолчанию - полное имя
+     *                          текущего пользователя)
+     * @param string|null $fromEmail Обратный e-mail адрес (по умолчанию -
+     *                                e-mail текущего пользователя)
+     * @param bool $isHTML Отправлять сообщение в формате HTML
+     * @param array<[
+     *            'tmp_name' => string Путь к реальному файлу,
+     *            'name' => string Имя файла,
+     *            'type' => string MIME-тип файла
+     *        ]> $attach Массив вложений
+     * @param array<[
+     *            'tmp_name' => путь к реальному файлу,
+     *            'name' => имя файла,
+     *            'type' => MIME-тип файла
+     *        ]> $embedded Массив встраиваемых файлов
      */
     public function sendmail(
-        $to_arr,
+        $toArr,
         $subject,
         $message,
         $from = null,
-        $from_email = null,
-        $is_html = true,
-        $attach = array(),
-        $embedded = array()
+        $fromEmail = null,
+        $isHTML = true,
+        $attach = [],
+        $embedded = []
     ) {
-        $to_arr = (array)$to_arr;
+        $toArr = (array)$toArr;
+        $realFromEmail = trim($this->registryGet('email_from'));
+        if (!$realFromEmail && $SERVER['HTTP_HOST']) {
+            $realFromEmail = 'info@' . $SERVER['HTTP_HOST'];
+        }
+        if (!$realFromEmail && $fromEmail) {
+            $realFromEmail = $fromEmail;
+        }
+        if (!$realFromEmail && $this->user->email) {
+            $realFromEmail = $this->user->email;
+        }
+
         if (!$from) {
             $from = $this->user->name;
-        }
-        if (!$from_email) {
-            $from_email = $this->user->email;
         }
         if (is_array($subject)) {
             $subject[1] = array_merge($_SERVER, (array)$subject[1]);
             foreach ((array)$subject[1] as $key => $val) {
-                $subject[0] = str_replace('{%' . strtoupper($key) . '%}', $val, $subject[0]);
+                $subject[0] = str_replace(
+                    '{%' . strtoupper($key) . '%}',
+                    $val,
+                    $subject[0]
+                );
             }
             $subject = $subject[0];
         }
         if (is_array($message)) {
             $message[1] = array_merge($_SERVER, (array)$message[1]);
             foreach ((array)$message[1] as $key => $val) {
-                $message[0] = str_replace('{%' . strtoupper($key) . '%}', $val, $message[0]);
+                $message[0] = str_replace(
+                    '{%' . strtoupper($key) . '%}',
+                    $val,
+                    $message[0]
+                );
             }
             $message = $message[0];
         }
 
-        $mail = new \PHPMailer();
+        $mail = new PHPMailer();
         $mail->IsMail();
-        $mail->From = $from_email;
+        $mail->From = $realFromEmail;
         $mail->CharSet = "utf-8";
         $mail->FromName = $from;
-        $mail->IsHTML($is_html);
+        $mail->IsHTML($isHTML);
         $mail->Subject = $subject;
         $mail->Body = $message;
         $mail->AltBody = "";
         foreach ($attach as $file) {
             if (is_array($file['name'])) {
                 foreach ($file['name'] as $key => $val) {
-                    $mail->AddAttachment($file['tmp_name'][$key], $file['name'][$key], 'base64', $file['type'][$key]);
+                    $mail->AddAttachment(
+                        $file['tmp_name'][$key],
+                        $file['name'][$key],
+                        'base64',
+                        $file['type'][$key]
+                    );
                 }
             } else {
-                $mail->AddAttachment($file['tmp_name'], $file['name'], 'base64', $file['type']);
+                $mail->AddAttachment(
+                    $file['tmp_name'],
+                    $file['name'],
+                    'base64',
+                    $file['type']
+                );
             }
         }
         // if ($embedded) {
@@ -804,18 +970,30 @@ final class Application extends \SOME\Singleton implements IContext
         foreach ($embedded as $file) {
             if (is_array($file['name'])) {
                 foreach ($file['name'] as $key => $val) {
-                    $mail->AddEmbeddedImage($file['tmp_name'][$key], $file['name'][$key], $file['name'][$key], 'base64', $file['type'][$key]);
+                    $mail->AddEmbeddedImage(
+                        $file['tmp_name'][$key],
+                        $file['name'][$key],
+                        $file['name'][$key],
+                        'base64',
+                        $file['type'][$key]
+                    );
                 }
             } else {
-                $mail->AddEmbeddedImage($file['tmp_name'], $file['name'], $file['name'], 'base64', $file['type']);
+                $mail->AddEmbeddedImage(
+                    $file['tmp_name'],
+                    $file['name'],
+                    $file['name'],
+                    'base64',
+                    $file['type']
+                );
             }
         }
         $mail->SingleTo = true;
 
-        foreach ((array)$to_arr as $to) {
+        foreach ((array)$toArr as $to) {
             $mail->AddAddress($to, $to);
-            $mail->AddReplyTo($from_email);
         }
+        $mail->AddReplyTo($realFromEmail);
         $mail->Send();
         return true;
     }
@@ -828,29 +1006,39 @@ final class Application extends \SOME\Singleton implements IContext
      */
     public function autoload($class)
     {
-        $NS = \SOME\Namespaces::getNSArray($class);
-        $classname = \SOME\Namespaces::getClass($class);
+        $NS = Namespaces::getNSArray($class);
+        $classname = Namespaces::getClass($class);
         if (is_array($NS) && $NS && $NS[0] == 'RAAS') {
             if (isset($NS[1])) {
                 $p = $NS[1];
                 if ($p == 'General') {
-                    if (is_file($this->systemDir . '/general/classes/package.class.php')) {
-                        require_once $this->systemDir . '/general/classes/package.class.php';
+                    if (is_file(
+                        $this->systemDir . '/general/classes/package.class.php'
+                    )) {
+                        require_once $this->systemDir .
+                                     '/general/classes/package.class.php';
                         General\Package::i();
                     }
                 } else {
-                    if (is_file($this->modulesDir . '/' . strtolower($p) . '/common/classes/package.class.php')) {
-                        require_once $this->modulesDir . '/' . strtolower($p) . '/common/classes/package.class.php';
+                    if (is_file(
+                        $this->modulesDir . '/' . strtolower($p) .
+                        '/common/classes/package.class.php'
+                    )) {
+                        require_once $this->modulesDir . '/' . strtolower($p) .
+                                     '/common/classes/package.class.php';
                         $classname = 'RAAS\\' . $p . '\\Package';
                         $classname::i();
                     }
                 }
             } else {
-                $rdi = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator(__DIR__));
+                $rdi = new RecursiveIteratorIterator(
+                    new RecursiveDirectoryIterator(__DIR__)
+                );
                 foreach ($rdi as $f) {
-                    if (($f->getFileName() == strtolower($classname) . '.class.php') ||
-                        ($f->getFileName() == strtolower($classname) . '.interface.php') ||
-                        ($f->getFileName() == strtolower($classname) . '.trait.php')
+                    $fn = $f->getFileName();
+                    if (($fn == strtolower($classname) . '.class.php') ||
+                        ($fn == strtolower($classname) . '.interface.php') ||
+                        ($fn == strtolower($classname) . '.trait.php')
                     ) {
                         require_once $f->getPathName();
                         break;
@@ -868,8 +1056,9 @@ final class Application extends \SOME\Singleton implements IContext
                     require_once $this->includeDir . '/phpQuery-onefile.php';
                     break;
                 case 'Mustache_Engine':
-                    require_once $this->includeDir . '/mustache/src/Mustache/Autoloader.php';
-                    \Mustache_Autoloader::register();
+                    require_once $this->includeDir .
+                                 '/mustache/src/Mustache/Autoloader.php';
+                    Mustache_Autoloader::register();
                     break;
             }
         }
