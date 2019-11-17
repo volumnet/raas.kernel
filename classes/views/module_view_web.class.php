@@ -30,7 +30,10 @@ class Module_View_Web extends Abstract_Module_View implements IRightsContext_Vie
     {
         switch ($var) {
             case 'publicURL':
-                return $this->parent->modulesURL . '/' . $this->model->parent->alias . '/' . $this->model->alias . '/public';
+                return mb_substr(
+                    $this->model->publicDir,
+                    mb_strlen(Application::i()->baseDir)
+                );
                 break;
             case 'stdView':
                 if (!$this->_stdView) {

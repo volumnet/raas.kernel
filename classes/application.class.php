@@ -163,7 +163,7 @@ final class Application extends Singleton implements IContext
 
             // Файлы и директории
             case 'baseDir':
-                return $_SERVER['DOCUMENT_ROOT'];
+                return realpath($_SERVER['DOCUMENT_ROOT']);
                 break;
             case 'baseFilesDir':
                 $dir = $this->baseDir . '/files';
@@ -173,7 +173,7 @@ final class Application extends Singleton implements IContext
                 return $dir;
                 break;
             case 'filesDir':
-                $dir = $this->baseFilesDir . '/common';
+                $dir = realpath($this->baseFilesDir . '/common');
                 if (!is_dir($dir)) {
                     @mkdir($dir, 0777, true);
                 }
@@ -614,7 +614,7 @@ final class Application extends Singleton implements IContext
         }
 
         // Старый вариант - для совместимости
-        $packages = File::scandir($this->baseDir . '/modules', function ($x) {
+        $packages = @File::scandir($this->baseDir . '/modules', function ($x) {
             return $x[0] != '.' && is_dir($this->baseDir . '/modules/' . $x);
         });
         foreach ((array)$packages as $package) {

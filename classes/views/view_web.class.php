@@ -149,7 +149,10 @@ class View_Web extends Abstract_View implements IContext_View_Web
                 return ($this->theme && ($this->theme != '/')) ? ('themes/' . $this->theme) : $this->publicURL;
                 break;
             case 'publicURL':
-                return 'system/public';
+                return mb_substr(
+                    Application::i()->publicDir,
+                    mb_strlen(Application::i()->baseDir)
+                );
                 break;
 
             case 'templateType': case 'data': case 'content': case 'localError': case 'menu': case 'submenu': case 'contextmenu': case 'path': case 'theme':

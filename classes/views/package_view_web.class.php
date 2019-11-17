@@ -5,19 +5,19 @@
  * @version 4.1
  * @author Alex V. Surnin <info@volumnet.ru>
  * @copyright 2011, Volume Networks
- */       
+ */
 namespace RAAS;
 
 /**
  * Класс web-представления абстрактного пакета RAAS
  * @package RAAS
- */       
+ */
 class Package_View_Web extends Abstract_Package_View implements IRightsContext_View_Web
 {
     /**
      * Экземпляр класса
-     * @var \RAAS\Package_View_Web     
-     */         
+     * @var \RAAS\Package_View_Web
+     */
     protected static $instance;
 
     /**
@@ -25,12 +25,15 @@ class Package_View_Web extends Abstract_Package_View implements IRightsContext_V
      * @var \RAAS\View_StdSub
      */
     protected $_stdView;
-    
+
     public function __get($var)
     {
         switch ($var) {
             case 'publicURL':
-                return $this->parent->modulesURL . '/' . $this->model->alias . '/common/public';
+                return mb_substr(
+                    $this->model->publicDir,
+                    mb_strlen(Application::i()->baseDir)
+                );
                 break;
             case 'stdView':
                 if (!$this->_stdView) {
@@ -43,7 +46,7 @@ class Package_View_Web extends Abstract_Package_View implements IRightsContext_V
                 break;
         }
     }
-    
+
     public function __set($var, $val)
     {
         if ($var == 'template' && !strstr($val, '/')) {
@@ -51,7 +54,7 @@ class Package_View_Web extends Abstract_Package_View implements IRightsContext_V
         }
         parent::__set($var, $val);
     }
-    
+
     public function tmp($file)
     {
         if (!strstr($file, '/')) {
@@ -59,7 +62,7 @@ class Package_View_Web extends Abstract_Package_View implements IRightsContext_V
         }
         return $this->parent->tmp($file);
     }
-    
+
     public function header()
     {
     }
