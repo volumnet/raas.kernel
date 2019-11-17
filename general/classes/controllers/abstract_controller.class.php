@@ -16,26 +16,24 @@ use \RAAS\FormTab as FormTab;
 abstract class Abstract_Controller extends \RAAS\Abstract_Package_Controller
 {
     protected static $instance;
-    
+
     protected function execute()
     {
         if (($this->mode == 'admin') && $this->model->user->adminRights) {
             $this->admin();
         } elseif ($this->mode == 'manual') {
-            
+
         } elseif ($this->mode == 'set_package') {
-            
+
         } elseif ($this->mode == 'set_language') {
-            
-        } elseif ($this->mode == 'set_theme') {
-            
+
         } elseif ($this->action == 'edit') {
             $this->edit();
-        } elseif (!in_array($this->mode, array('set_package', 'set_language', 'set_theme'))) {
+        } elseif (!in_array($this->mode, array('set_package', 'set_language'))) {
             $this->main();
         }
     }
-    
+
     private function admin()
     {
         if (($this->sub == 'users') && $this->model->user->canAdminUsers) {
@@ -48,7 +46,7 @@ abstract class Abstract_Controller extends \RAAS\Abstract_Package_Controller
             $this->main();
         }
     }
-    
+
     public function getContext($safe = true)
     {
         $Context = null;
@@ -59,7 +57,7 @@ abstract class Abstract_Controller extends \RAAS\Abstract_Package_Controller
         }
         return $Context;
     }
-    
+
     private function edit()
     {
         $t = $this;
@@ -68,18 +66,18 @@ abstract class Abstract_Controller extends \RAAS\Abstract_Package_Controller
             $CONTENT['languages'][] = array('value' => $key, 'caption' => $val);
         }
         $Form = new Form(array(
-            'caption' => htmlspecialchars($this->model->user->full_name ? $this->model->user->full_name : $this->model->user->login), 
+            'caption' => htmlspecialchars($this->model->user->full_name ? $this->model->user->full_name : $this->model->user->login),
             'Item' => $this->model->user,
             'children' => array(
                 array('name' => 'login', 'caption' => $this->view->_('LOGIN'), 'readonly' => 'readonly', 'export' => 'is_null'),
                 array(
-                    'type' => 'password', 
-                    'name' => 'password', 
+                    'type' => 'password',
+                    'name' => 'password',
                     'caption' => $this->view->_('PASSWORD'),
-                    'confirm' => true, 
-                    'export' => function($Field) use ($t) { 
+                    'confirm' => true,
+                    'export' => function($Field) use ($t) {
                         if ($_POST[$Field->name]) {
-                            $Field->Form->Item->password_md5 = $t->application->md5It(trim($_POST[$Field->name])); 
+                            $Field->Form->Item->password_md5 = $t->application->md5It(trim($_POST[$Field->name]));
                         }
                     }
                 ),
@@ -89,12 +87,12 @@ abstract class Abstract_Controller extends \RAAS\Abstract_Package_Controller
                 array('name' => 'second_name', 'caption' => $this->view->_('SECOND_NAME')),
                 array(
                     'type' => 'select',
-                    'name' => 'lang', 
+                    'name' => 'lang',
                     'caption' => $this->view->_('LANGUAGE'),
                     'children' => $CONTENT['languages'],
                     'default' => $this->view->language,
                     'import' => function($Field) use ($t) { return $Field->Form->Item->preferences[$Field->name]; },
-                    'export' => function($Field) use ($t) { 
+                    'export' => function($Field) use ($t) {
                         $preferences = $Field->Form->Item->preferences;
                         if (isset($_POST[$Field->name])) {
                             $preferences['lang'] = $_POST[$Field->name];
@@ -111,15 +109,15 @@ abstract class Abstract_Controller extends \RAAS\Abstract_Package_Controller
     {
         $OUT = array();
         $OUT['CONTENT']['H'] = date('H');
-        
+
         $OUT['CONTENT']['ip'] = $_SERVER['REMOTE_ADDR'];
-        $OUT['CONTENT']['NAME'] = Application::versionName;
+        $OUT['CONTENT']['NAME'] = Application::i()->versionName;
         if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
             $OUT['CONTENT']['proxy'] = $_SERVER['HTTP_X_FORWARDED_FOR'];
         }
         $this->view->main($OUT);
     }
-    
+
     public function getContextURL(IRightsContext $Context)
     {
         if (($Context instanceof \RAAS\Package) ||  ($Context instanceof \RAAS\Module)) {

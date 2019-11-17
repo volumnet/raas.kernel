@@ -38,7 +38,7 @@ class User extends \SOME\SOME implements IOwner
             unset($this->_SET_rights);
         }
     }
-    
+
     /**
      * Присоединение к множеству групп
      * @param array $groups Группы в виде массива [ID группы] => [0 - не присоединять, 1 - как пользователь, 2 - как администратор]
@@ -59,14 +59,14 @@ class User extends \SOME\SOME implements IOwner
             self::$SQL->add(User::_dbprefix() . "users_groups_assoc", $temp);
         }
     }
-    
+
     public function sign(array $data)
     {
         ksort($data);
         $str = Model::i()->md5It(http_build_query($data) . $this->login . $this->password_md5);
         return $str;
     }
-    
+
     public function ipFilter($ip)
     {
         if ($ips = $this->ip_filter) {
@@ -84,7 +84,7 @@ class User extends \SOME\SOME implements IOwner
         }
         return true;
     }
-    
+
     public function auth($login, $password_md5)
     {
         $SQL_query = "SELECT * FROM " . self::_tablename() . " WHERE login = ? AND password_md5 = ? ";
@@ -96,7 +96,7 @@ class User extends \SOME\SOME implements IOwner
         }
         return (bool)$User->id;
     }
-    
+
     public function authBySignature(array $data, $sign)
     {
         ksort($data);
@@ -107,7 +107,7 @@ class User extends \SOME\SOME implements IOwner
             $this->__construct($User);
         }
     }
-    
+
     public function associate(Group $Group)
     {
         if ($this->id && $Group->id) {
@@ -117,7 +117,7 @@ class User extends \SOME\SOME implements IOwner
             $this->commit();
         }
     }
-    
+
     public function deassociate(Group $Group)
     {
         if ($this->id && $Group->id) {
@@ -126,21 +126,21 @@ class User extends \SOME\SOME implements IOwner
             $this->commit();
         }
     }
-    
+
     public function access(IRightsContext $Context)
     {
         $NS = \SOME\Namespaces::getNSArray(\get_class($Context));
         $classname = implode('\\', $NS) . '\\Access';
         return new $classname($this);
     }
-    
+
     protected function _isFirst()
     {
         $SQL_query = "SELECT COUNT(*) FROM " . self::_tablename() . " WHERE root";
         $SQL_result = self::$SQL->getvalue($SQL_query);
         return !$SQL_result;
     }
-    
+
     protected function _full_name()
     {
         $arr = array();
@@ -155,17 +155,17 @@ class User extends \SOME\SOME implements IOwner
         }
         return implode(' ', $arr);
     }
-    
+
     protected function _canAdminUsers()
     {
         return (bool)$this->root;
     }
-    
+
     protected function _adminRights()
     {
         return (bool)$this->root;
     }
-    
+
     protected function _associations()
     {
         $SQL_query = "SELECT * FROM " . self::$dbprefix . "users_groups_assoc WHERE uid = " . (int)$this->id;
@@ -176,7 +176,7 @@ class User extends \SOME\SOME implements IOwner
         }
         return $temp;
     }
-    
+
     protected function _manageableGroups_ids()
     {
         if ($this->root) {
@@ -186,12 +186,12 @@ class User extends \SOME\SOME implements IOwner
         }
         return self::$SQL->getcol($SQL_query);
     }
-    
+
     protected function _rights()
     {
         return @json_decode($this->cache_rights, true);
     }
-    
+
     protected function _preferences()
     {
         return (array)@json_decode($this->prefs, true);

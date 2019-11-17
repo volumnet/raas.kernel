@@ -8,7 +8,7 @@
  */
 namespace RAAS;
 
-use Mustache_Autoloader;
+use ReflectionClass;
 use PHPMailer\PHPMailer\PHPMailer;
 use RecursiveIteratorIterator;
 use RecursiveDirectoryIterator;
@@ -21,15 +21,11 @@ use SOME\SOME;
 /**
  * Класс приложения RAAS
  * @package RAAS
- * @property-read Abstract_Controller $controller контроллер приложения
- * @property-read Abstract_View $view представление приложения
  * @property-read array<Package> $packages массив загруженных пакетов
  * @property Package $activePackage активный пакет
  * @property Module $activeModule активный модуль
  * @property IContext $context активный модуль или пакет
- * @property-read string $modulesDir директория с пакетами и модулями
  * @property-read string $configFile путь к файлу системных настроек
- * @property-read string $classesFile путь к файлу кэша классов
  * @property-read array<string> $availableDatabases массив названий доступных
  *                                                  СУБД в виде
  *                                                  'alias' => 'Название СУБД'
@@ -40,33 +36,10 @@ use SOME\SOME;
  * @property User $user активный пользователь системы
  * @property-read DB $SQL подключение к базе данных
  * @property-read string $DSN строка подключения к базе данных
- * @property-read string $updateURL адрес сервера обновлений
- * @property-read string $userAgent поле User-Agent для обмена данными
- *                                  с сервером обновлений
- * @property-read resource $networkContext контекст соединения
- *                                         с сервером обновлений
  */
 final class Application extends Singleton implements IContext
 {
-    /**
-     * Наименование версии
-     */
-    const versionName = 'RAAS v4.1 Remote Automated Assistant';
-
-    /**
-     * Контроллер, используемый по умолчанию
-     */
-    const defaultController = 'web';
-
-    /**
-     * Сервер баз данных, используемый по умолчанию
-     */
-    const defaultDBHost = 'localhost';
-
-    /**
-     * Пользователь баз данных, используемый по умолчанию
-     */
-    const defaultDBUser = 'root';
+    use ContextTrait;
 
     /**
      * "Соль" для шифрования MD5-алгоритмом
@@ -77,16 +50,6 @@ final class Application extends Singleton implements IContext
      * Соль для дополнительного шифрования входа по COOKIES
      */
     const COOKIES_SALT = 'skldfjsoij)(*UKLMNsd90rtueropmgdfjgIJLLKDFMNGDIORTR(4fop+JK';
-
-    /**
-     * Время ожидания ответа от сервера обновлений
-     */
-    const networkTimeout = 10;
-
-    /**
-     * Версия файла
-     */
-    const version = '2013-12-01 18:36:50';
 
     /**
      * UNIX-timestamp времени начала выполнения скрипта
@@ -155,24 +118,6 @@ final class Application extends Singleton implements IContext
     private $activePackage;
 
     /**
-     * Массив наименований требуемых расширений
-     * @var array
-     */
-    private static $requiredExtensions = [
-        'session',
-        'iconv',
-        'pcre',
-        'date',
-        'standard',
-        'zlib',
-        'SimpleXML',
-        'xml',
-        'gd',
-        'PDO',
-        'mbstring'
-    ];
-
-    /**
      * Массив наименований переменных, которые будут использоваться
      * в файле конфигурации
      * @var array
@@ -206,13 +151,6 @@ final class Application extends Singleton implements IContext
             case 'controller':
                 return $this->controller;
                 break;
-            case 'view':
-                return $this->controller->view;
-                break;
-            case 'packages':
-            case 'activePackage':
-                return $this->$var;
-                break;
             case 'activeModule':
                 if ($this->activePackage) {
                     return $this->activePackage->activeModule;
@@ -220,33 +158,12 @@ final class Application extends Singleton implements IContext
                 return null;
                 break;
             case 'context':
-                if ($this->activeModule) {
-                    return $this->activeModule;
-                } elseif ($this->activePackage) {
-                    return $this->activePackage;
-                } else {
-                    return $this;
-                }
+                return $this->activeModule ?: $this->activePackage ?: $this;
                 break;
 
             // Файлы и директории
             case 'baseDir':
-                return realpath(__DIR__ . '/../..');
-                break;
-            case 'systemDir':
-                return realpath(__DIR__ . '/..');
-                break;
-            case 'modulesDir':
-                return $this->baseDir . '/modules';
-                break;
-            case 'classesDir':
-                return $this->systemDir . '/classes';
-                break;
-            case 'languagesDir':
-                return $this->systemDir . '/languages';
-                break;
-            case 'publicDir':
-                return $this->systemDir . '/public';
+                return $_SERVER['DOCUMENT_ROOT'];
                 break;
             case 'baseFilesDir':
                 $dir = $this->baseDir . '/files';
@@ -268,48 +185,13 @@ final class Application extends Singleton implements IContext
             case 'filesURL':
                 return $this->baseFilesURL . '/common';
                 break;
-            case 'includeDir':
-                return $this->systemDir . '/include';
-                break;
-            case 'resourcesDir':
-                return $this->systemDir . '/resources';
-                break;
             case 'configFile':
                 return $this->baseDir . '/config.php';
                 break;
-            case 'installFile':
-                if (isset($this->config['dbtype'])) {
-                    $dbtype = (string)$this->config['dbtype'];
-                    return $this->resourcesDir . '/install.' . $dbtype . '.sql';
-                }
-                return null;
-                break;
-            case 'uninstallFile':
-                if (isset($this->config['dbtype'])) {
-                    $dbtype = (string)$this->config['dbtype'];
-                    return $this->resourcesDir .
-                           '/uninstall.' . $dbtype . '.sql';
-                }
-                return null;
-                break;
-            case 'classesFile':
-                return $this->resourcesDir . '/classes.dat';
-                break;
 
             // Модель
-            case 'Mid':
-            case 'mid':
-                return '';
-                break;
             case 'availableDatabases':
                 return static::$availableDatabases;
-                break;
-            case 'debug':
-            case 'exceptions':
-            case 'sqlExceptions':
-            case 'SQL':
-            case 'user':
-                return $this->$var;
                 break;
             case 'DSN':
                 if (isset($this->config['dbtype'])) {
@@ -333,45 +215,30 @@ final class Application extends Singleton implements IContext
                 }
                 return false;
                 break;
+            case 'composer':
             case 'phpVersionCompatible':
-                $verCmp = version_compare(
-                    self::requiredPHPVersion,
-                    phpversion()
-                );
-                return ($verCmp <= 0);
-                break;
             case 'missedExt':
-                $extLoaded = array_map('trim', get_loaded_extensions());
-                $extLoaded = array_values($extLoaded);
-                $diff = array_diff(self::$requiredExtensions, $extLoaded);
-                return array_values($diff);
-                break;
             case 'isCompatible':
-                return $this->phpVersionCompatible && !$this->missedExt;
-                break;
             case 'version':
-                if (defined('static::version')) {
-                    return static::version;
-                }
-                return date('Y-m-d', filemtime(__FILE__));
+            case 'versionName':
+            case 'systemDir':
+            case 'classesDir':
+            case 'languagesDir':
+            case 'publicDir':
+            case 'resourcesDir':
+            case 'installFile':
+            case 'mid':
+            case 'view':
+                return $this->getCommonContextVar($var);
                 break;
-            case 'versionTime':
-                if (defined('static::version')) {
-                    return strtotime($this->version);
-                }
-                return filemtime(__FILE__);
-                break;
-            case 'updateURL':
-                return 'http://raas.volumnet.ru/update/';
-                break;
-            case 'userAgent':
-                return self::versionName . ' ' . $this->version;
-                break;
-            case 'networkContext':
-                return stream_context_create(['http' => [
-                    'timeout' => self::networkTimeout,
-                    'user_agent' => $this->userAgent
-                ]]);
+            case 'packages':
+            case 'activePackage':
+            case 'debug':
+            case 'exceptions':
+            case 'sqlExceptions':
+            case 'SQL':
+            case 'user':
+                return $this->$var;
                 break;
             default:
                 if (in_array($var, self::$configVars) &&
@@ -422,26 +289,22 @@ final class Application extends Singleton implements IContext
      * @param string $controller наименование контроллера
      * @param bool $debugMode режим отладки
      */
-    public function run(
-        $controller = self::defaultController,
-        $debugMode = false
-    ) {
+    public function run($controller = 'web', $debugMode = false)
+    {
         ob_start();
         $this->startMicrotime = microtime(true);
         $this->debug = $debugMode;
 
         mb_internal_encoding('UTF-8');
-        spl_autoload_register([$this, 'autoload']);
-        //error_reporting(E_ALL);
         set_error_handler([$this, 'errorHandler'], error_reporting());
-        set_exception_handler([$this, 'errorHandler']);
+        // set_exception_handler([$this, 'errorHandler']);
         session_start();
         $_SESSION['RAAS_STARTED'] = microtime(true);
         $this->getConfig();
 
         $classname = ('RAAS\\Controller_' . ucfirst($controller));
         if (!class_exists($classname)) {
-            $classname = 'RAAS\\Controller_' . ucfirst(self::defaultController);
+            $classname = 'RAAS\\Controller_' . ucfirst('web');
         }
 
         $this->controller = $classname::i();
@@ -470,9 +333,6 @@ final class Application extends Singleton implements IContext
             $args = func_get_args();
             $errno = (isset($args[0]) ? $args[0] : null);
             $errstr = (isset($args[1]) ? $args[1] : null);
-            $errfile = (isset($args[2]) ? $args[2] : null);
-            $errline = (isset($args[3]) ? $args[3] : null);
-            $errcontext = (isset($args[4]) ? $args[4] : null);
             $e = new Exception($errstr, $errno);
         } else {
             $e = func_get_arg(0);
@@ -498,18 +358,6 @@ final class Application extends Singleton implements IContext
      */
     public function sqlErrorHandler(\Exception $e)
     {
-        if ($this->SQL && $this->SQL->connection) {
-            $arr = [
-                'debug_code' => '',
-                'error_type' => '',
-                'error_message' => '',
-                'sql_query' => '',
-                'url' => '',
-                'referer' => '',
-                'request_method' => '',
-                'debug_backtrace' => ''
-            ];
-        }
         throw $e;
     }
 
@@ -572,64 +420,44 @@ final class Application extends Singleton implements IContext
      */
     public function initSOME()
     {
-        $classes = [];
-        $ok = SOME::init(
-            $this->SQL,
-            $this->config['dbprefix'],
-            (array)$classes
-        );
-        return $ok;
+        return SOME::init($this->SQL, $this->config['dbprefix']);
     }
 
 
     /**
      * Получение значения записи в реестре относительно вызывающего класса
      * @param string $var наименование записи
-     * @param object|null $Sender отправитель запроса
+     * @param object|null $sender отправитель запроса
      * @return string значение записи
      */
-    public function registryGet($var, $Sender = null)
+    public function registryGet($var, $sender = null)
     {
-        if (!$Sender || !is_object($Sender)) {
-            $Sender = $this;
+        if (!$sender || !is_object($sender)) {
+            $sender = $this;
         }
-        $m = $Sender->mid;
-        $NS = Namespaces::getNS($Sender);
-        $NSArray = Namespaces::getNSArray($Sender);
-
-        if (($NS == __NAMESPACE__) || $m == '/') {
-            if (!isset($this->registry[''][$var])) {
-                $sqlQuery = "SELECT *
-                               FROM " . $this->dbprefix . "registry
-                              WHERE m = ''";
+        $ns = Namespaces::getNS($sender);
+        $sqlQuery = "SELECT *
+                       FROM " . $this->dbprefix . "registry
+                      WHERE m = ?";
+        $key = null;
+        if (($ns == 'RAAS') || $sender->mid == '/') {
+            $key = '';
+        } elseif (preg_match('/^RAAS\\\\/umi', $ns)) {
+            $key = $sender->mid;
+        }
+        if ($key !== null) {
+            if (!isset($this->registry[$key][$var])) {
                 try {
-                    $sqlResult = $this->SQL->get($sqlQuery);
+                    $sqlResult = $this->SQL->get([$sqlQuery, $key]);
                 } catch (\Exception $e) {
                     $sqlResult = null;
                 }
                 foreach ((array)$sqlResult as $row) {
-                    $this->registry[''][$row['name']] = $row['value'];
+                    $this->registry[$key][$row['name']] = $row['value'];
                 }
             }
-            if (isset($this->registry[''][$var])) {
-                return $this->registry[''][$var];
-            }
-        } elseif ($NSArray[0] == 'RAAS') {
-            if (!isset($this->registry[$m][$var])) {
-                $sqlQuery = "SELECT *
-                               FROM " . $this->dbprefix . "registry
-                              WHERE m = ?";
-                try {
-                    $sqlResult = $this->SQL->get([$sqlQuery, $m]);
-                } catch (\Exception $e) {
-                    $sqlResult = null;
-                }
-                foreach ((array)$sqlResult as $row) {
-                    $this->registry[$m][$row['name']] = $row['value'];
-                }
-            }
-            if (isset($this->registry[$m][$var])) {
-                return $this->registry[$m][$var];
+            if (isset($this->registry[$key][$var])) {
+                return $this->registry[$key][$var];
             }
         }
         return null;
@@ -640,78 +468,56 @@ final class Application extends Singleton implements IContext
      * Запись значения в реестр относительно вызывающего класса
      * @param string $var наименование записи
      * @param string $val значение записи
-     * @param object|null $Sender отправитель запроса
+     * @param object|null $sender отправитель запроса
      * @return bool true, если вызов произведен успешно и значение записано,
      *              false в противном случае
      */
-    public function registrySet($var, $val, $Sender = null)
+    public function registrySet($var, $val, $sender = null)
     {
-        if (!$Sender || !is_object($Sender)) {
-            $Sender = $this;
+        if (!$sender || !is_object($sender)) {
+            $sender = $this;
         }
-        $m = $Sender->mid;
-        $c = Namespaces::getClass($Sender);
-        $NS = Namespaces::getNS($Sender);
-        $NSArray = Namespaces::getNSArray($Sender);
+        $m = $sender->mid;
+        $ns = Namespaces::getNS($sender);
 
+        $sqlQuery = "SELECT *
+                       FROM " . $this->dbprefix . "registry
+                      WHERE m = ?
+                        AND name = ?";
+        $deleteQuery = "DELETE FROM " . $this->dbprefix . "registry
+                         WHERE m = ?
+                           AND name = ?";
         $arr = ['name' => $var, 'value' => $val];
-        if (get_class($Sender) == __CLASS__) {
-            if ($val === null) {
-                $sqlQuery = "DELETE FROM " . $this->dbprefix . "registry
-                              WHERE m = ''
-                                AND name = ?";
-                $this->SQL->query([$sqlQuery, $var]);
-                unset($this->registry[''][$var]);
-            } else {
-                $this->SQL->add($this->dbprefix . "registry", $arr, $arr);
-                $this->registry[''][$var] = $val;
-            }
-            return true;
-        } elseif (($NS == __NAMESPACE__) || $m == '/') {
-            $sqlQuery = "SELECT *
-                           FROM " . $this->dbprefix . "registry
-                          WHERE m = ''
-                            AND name = ?";
-            $sqlResult = $this->SQL->getline([$sqlQuery, $var]);
+        $key = null;
+        if (get_class($sender) == __CLASS__) {
+            $key = '';
+        } elseif (($ns == __NAMESPACE__) || $m == '/') {
+            $sqlResult = $this->SQL->getline([$sqlQuery, '', $var]);
             if (!$sqlResult ||
                 !isset($sqlResult['locked']) ||
                 !$sqlResult['locked']
             ) {
-                if ($val === null) {
-                    $sqlQuery = "DELETE FROM " . $this->dbprefix . "registry
-                                  WHERE m = ''
-                                    AND name = ?";
-                    $this->SQL->query([$sqlQuery, $var]);
-                    unset($this->registry[''][$var]);
-                } else {
-                    $this->SQL->add($this->dbprefix . "registry", $arr, $arr);
-                    $this->registry[''][$var] = $val;
-                }
-                return true;
+                $key = '';
             }
-        } elseif ($NSArray[0] == 'RAAS') {
-            $sqlQuery = "SELECT value
-                           FROM " . $this->dbprefix . "registry
-                          WHERE m = ?
-                            AND name = ?";
+        } elseif (preg_match('/^RAAS\\\\/umi', $ns)) {
             $sqlResult = $this->SQL->getline([$sqlQuery, (string)$m, $var]);
             if (!$sqlResult ||
                 !isset($sqlResult['locked']) ||
-                !$sqlResult['locked']) {
-                if ($val === null) {
-                    $sqlQuery = "DELETE FROM " . $this->dbprefix . "registry
-                                  WHERE m = ?
-                                    AND name = ?";
-                    $this->SQL->query([$sqlQuery, (string)$m, $var]);
-                    unset($this->registry[''][$var]);
-                } else {
-                    $arr2 = $arr;
-                    $arr['m'] = $m;
-                    $this->SQL->add($this->dbprefix . "registry", $arr, $arr2);
-                    $this->registry[$m][$var] = $val;
-                }
-                return true;
+                !$sqlResult['locked']
+            ) {
+                $key = $m;
             }
+        }
+        if ($key !== null) {
+            if ($val === null) {
+                $this->SQL->query([$deleteQuery, $key, $var]);
+                unset($this->registry[$key][$var]);
+            } else {
+                $arr['m'] = $key;
+                $this->SQL->add($this->dbprefix . "registry", $arr, $arr);
+                $this->registry[$key][$var] = $val;
+            }
+            return true;
         }
         return false;
     }
@@ -720,12 +526,12 @@ final class Application extends Singleton implements IContext
     public function install()
     {
         if (!$this->registryGet('installDate')) {
-            $sqlQuery = "";
             if (is_file($this->installFile)) {
                 $sqlQuery = file_get_contents($this->installFile);
-            }
-            if ($sqlQuery) {
-                $this->SQL->query($this->prepareSQL($sqlQuery));
+                if ($sqlQuery) {
+                    $sqlQuery = $this->prepareSQL($sqlQuery);
+                    $this->SQL->query($sqlQuery);
+                }
             }
             $this->registrySet('installDate', date('Y-m-d H:i:s'));
 
@@ -737,7 +543,9 @@ final class Application extends Singleton implements IContext
 
     public function prepareSQL($sqlQuery)
     {
-        $sqlQuery = str_replace('{$DBPREFIX$}', $this->dbprefix, $sqlQuery);
+        $sqlQuery = strtr($sqlQuery, [
+            '{$DBPREFIX$}' => $this->dbprefix,
+        ]);
         return $sqlQuery;
     }
 
@@ -748,14 +556,70 @@ final class Application extends Singleton implements IContext
     public function initPackages()
     {
         $this->packages['/'] = General\Package::i();
-        $m = $this;
-        $callback = function ($x) use ($m) {
-            return $x[0] != '.' && is_dir($m->modulesDir . '/' . $x);
-        };
-        $packages = File::scandir($this->modulesDir, $callback);
+
+        $rxNamespace = '/^RAAS\\\\(\\w+)$/umi';
+        $rxPackage = '/^RAAS\\\\(\\w+)\\\\Package$/umi';
+
+        // Ищем среди существующих классов
+        foreach (get_declared_classes() as $classname) {
+            if (preg_match($rxPackage, $classname, $regs)) {
+                $package = mb_strtolower($regs[1]);
+                if (($package != 'general') &&
+                    !isset($this->packages[$package])
+                ) {
+                    $this->packages[$package] = $classname::i();
+                }
+            }
+        }
+
+        // Ищем среди карты классов
+        $classMapFile = $this->baseDir
+                      . '/vendor/composer/autoload_classmap.php';
+        if (is_file($classMapFile)) {
+            $classnames = include $classMapFile;
+            $classnames = array_keys((array)$classnames);
+            foreach ($classnames as $classname) {
+                if (preg_match($rxPackage, $classname, $regs)) {
+                    $package = mb_strtolower($regs[1]);
+                    if (($package != 'general') && !isset($this->packages[$package])) {
+                        $this->packages[$package] = $classname::i();
+                    }
+                }
+            }
+        }
+
+        // Ищем среди пространств имен
+        $namespacesFiles = ['autoload_namespaces.php', 'autoload_psr4.php'];
+        foreach ($namespacesFiles as $namespacesFile) {
+            $namespacesFile = $this->baseDir . '/vendor/composer/'
+                            . $namespacesFile;
+            if (is_file($namespacesFile)) {
+                $namespaces = include $namespacesFile;
+                $namespaces = array_keys((array)$namespaces);
+                foreach ($namespaces as $namespace) {
+                    $namespace = trim($namespace, '\\');
+                    if (preg_match($rxNamespace, $namespace, $regs)) {
+                        $classname = $namespace . '\\Package';
+                        if (class_exists($classname)) {
+                            $package = mb_strtolower($regs[1]);
+                            if (($package != 'general') &&
+                                !isset($this->packages[$package])
+                            ) {
+                                $this->packages[$package] = $classname::i();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Старый вариант - для совместимости
+        $packages = File::scandir($this->baseDir . '/modules', function ($x) {
+            return $x[0] != '.' && is_dir($this->baseDir . '/modules/' . $x);
+        });
         foreach ((array)$packages as $package) {
             $classname = 'RAAS\\' . ucfirst($package) . '\\Package';
-            if (class_exists($classname)) {
+            if (!$this->packages[$package] && class_exists($classname)) {
                 $this->packages[$package] = $classname::i();
             }
         }
@@ -995,45 +859,5 @@ final class Application extends Singleton implements IContext
         $mail->AddReplyTo($realFromEmail);
         $mail->Send();
         return true;
-    }
-
-
-
-    /**
-     * Функция автозагрузки классов
-     * @param string $class наименование класса с пространством имен
-     */
-    public function autoload($class)
-    {
-        $NS = Namespaces::getNSArray($class);
-        $classname = Namespaces::getClass($class);
-        if (is_array($NS) && $NS && $NS[0] == 'RAAS') {
-            if (isset($NS[1])) {
-                $p = $NS[1];
-                if ($p == 'General') {
-                    if (is_file(
-                        $this->systemDir . '/general/classes/package.class.php'
-                    )) {
-                        // General\Package::i();
-                    }
-                } else {
-                    if (is_file(
-                        $this->modulesDir . '/' . strtolower($p) .
-                        '/common/classes/package.class.php'
-                    )) {
-                        require_once $this->modulesDir . '/' . strtolower($p) .
-                                     '/common/classes/package.class.php';
-                        $classname = 'RAAS\\' . $p . '\\Package';
-                        $classname::i();
-                    }
-                }
-            }
-        } else {
-            switch ($classname) {
-                case 'Mustache_Engine':
-                    Mustache_Autoloader::register();
-                    break;
-            }
-        }
     }
 }

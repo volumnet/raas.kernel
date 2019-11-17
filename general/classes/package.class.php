@@ -40,10 +40,12 @@ class Package extends \RAAS\Package
         }
     }
 
+
     public function initModules()
     {
         return;
     }
+
 
     public function admin_users_showlist(Group $Group, array $IN)
     {
@@ -76,6 +78,7 @@ class Package extends \RAAS\Package
         return array('Set' => $Set, 'Pages' => $Pages, 'GSet' => $GSet);
     }
 
+
     public function checkLoginExists($login, $id = 0)
     {
         $SQL_query = "SELECT COUNT(*) FROM " . User::_tablename() . " WHERE login = ?";
@@ -88,55 +91,6 @@ class Package extends \RAAS\Package
         return (bool)$SQL_result;
     }
 
-    public function getAvailableUpdates()
-    {
-        $url = $this->application->updateURL . '?lang=' . $this->application->view->language;
-        $data = array();
-        foreach ($this->application->packages as $p => $Pack) {
-            $data['m'][] = $p;
-            foreach ($Pack->modules as $m => $Mod) {
-                $data['m'][] = $p . '.' . $m;
-            }
-        }
-        if ($data) {
-            $url .= '&' . http_build_query($data);
-        }
-        if (!($text = @file_get_contents($url, 0, $this->application->networkContext))) {
-            return array('failedToConnect' => true);
-        }
-        $DATA = array();
-        if (!$sxe = new \SimpleXMLElement($text)) {
-            return array('failedToConnect' => true);
-        }
-        foreach ($sxe->module as $module) {
-            if (!(string)$module['error']) {
-                $Context = null;
-                if ($module['alias'] == '/') {
-                    $Context = $this->application;
-                } elseif (!strstr($module['alias'], '.')) {
-                    $Context = $this->application->packages[(string)$module['alias']];
-                } else {
-                    list($p, $m) = explode('.', (string)$module['alias']);
-                    $Context = $this->application->packages[$p]->modules[$m];
-                }
-                if ($Context && ((int)$Context->versionTime < (int)$module->versionTime)) {
-                    $DATA[(string)$module['alias']] = (int)$module->versionTime;
-                }
-            }
-        }
-        return array('modules' => $DATA);
-    }
-
-    public function downloadUpdate(IContext $Context)
-    {
-        $url = $this->application->updateURL . '?action=download&lang=' . $this->application->view->language . '&m=' . ($Context instanceof Application ? '/' : $Context->mid);
-        if (!($text = file_get_contents($url, 0, $this->application->networkContext))) {
-            return false;
-        }
-        $file = tempnam(sys_get_temp_dir(), 'RAAS');
-        @file_put_contents($file, $text);
-        return $file;
-    }
 
     public function backupSQL()
     {

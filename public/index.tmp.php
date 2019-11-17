@@ -184,16 +184,6 @@ if (Application::i()->activeModule) {
                             <?php } ?>
                           </ul>
                         </li>
-                        <li class="dropdown-submenu">
-                          <a><i class="icon-picture"></i> <?php echo USER_THEME?>: <?php echo $VIEW->availableThemes[$VIEW->theme ? $VIEW->theme : '/']?></a>
-                          <ul class="dropdown-menu">
-                            <?php foreach ($VIEW->availableThemes as $key => $val) { ?>
-                                <?php if (($key != $VIEW->theme) && !(!$key && ($VIEW->theme == '/')) && !(!$VIEW->theme && ($key == '/'))) { ?>
-                                    <li><a href="?mode=set_theme&theme=<?php echo $key?>&back=1"><?php echo htmlspecialchars($val)?></a></li>
-                                <?php } ?>
-                            <?php } ?>
-                          </ul>
-                        </li>
                         <?php if ($USER && $USER->id) { ?>
                             <li><a href="?p=/&action=edit"><i class="icon-edit"></i> <?php echo constant('EDIT_YOUR_PROFILE')?></a></li>
                             <?php if($APPLICATION->loginType != 'http') { ?>
@@ -250,7 +240,7 @@ if (Application::i()->activeModule) {
           <?php if ($VIEW->context->versionName) { ?>
               <?php echo $VIEW->context->versionName?><br />
           <?php } ?>
-          <?php echo Application::versionName?>: <?php echo CORPORATE_RESOURCE_MANAGEMENT?><br />
+          <?php echo Application::i()->versionName?>: <?php echo CORPORATE_RESOURCE_MANAGEMENT?><br />
           <?php echo COPYRIGHT?> &copy; <a href="http://www.volumnet.ru/">Volume Networks</a>, <?php echo date('Y')?>. <?php echo ALL_RIGHTS_RESERVED?>.<br />
           <?php echo ICONS_BY?> <a href="http://glyphicons.com/" target="_blank">Glyphicons</a>
 

@@ -8,6 +8,8 @@
  */
 namespace RAAS;
 
+use SOME\Namespaces;
+
 /**
  * Класс абстрактного представления абстрактного пакета RAAS
  * @package RAAS
@@ -35,8 +37,9 @@ abstract class Abstract_Package_View extends \SOME\Singleton implements IAbstrac
             case 'application':
                 return $this->package->application;
                 break;
-            case 'package': case 'model':
-                $classname = \SOME\Namespaces::getNS($this) . '\\Package';
+            case 'package':
+            case 'model':
+                $classname = Namespaces::getNS($this, 0, 2) . '\\Package';
                 return $classname::i();
                 break;
             case 'parent':
@@ -94,7 +97,7 @@ abstract class Abstract_Package_View extends \SOME\Singleton implements IAbstrac
     public function exportLang()
     {
         foreach ((array)$this->translations as $key => $val) {
-            $name = implode('\\', array_slice(\SOME\Namespaces::getNSArray($this), 1)) . '\\' . $key;
+            $name = implode('\\', array_slice(Namespaces::getNSArray($this), 1)) . '\\' . $key;
             if (!defined($name)) {
                 define($name, $val);
             }

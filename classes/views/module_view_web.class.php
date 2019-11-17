@@ -5,27 +5,27 @@
  * @version 4.1
  * @author Alex V. Surnin <info@volumnet.ru>
  * @copyright 2011, Volume Networks
- */       
+ */
 namespace RAAS;
 
 /**
  * Класс web-представления абстрактного модуля RAAS
  * @package RAAS
- */       
+ */
 class Module_View_Web extends Abstract_Module_View implements IRightsContext_View_Web
 {
     /**
      * Экземпляр класса
-     * @var \RAAS\Module_View_Web     
-     */         
+     * @var \RAAS\Module_View_Web
+     */
     protected static $instance;
-    
+
     /**
      * Экземпляр стандартного модуля представления
      * @var \RAAS\View_StdSub
      */
     protected $_stdView;
-    
+
     public function __get($var)
     {
         switch ($var) {
@@ -43,7 +43,7 @@ class Module_View_Web extends Abstract_Module_View implements IRightsContext_Vie
                 break;
         }
     }
-    
+
     public function __set($var, $val)
     {
         if ($var == 'template' && !strstr($val, '/')) {
@@ -51,8 +51,8 @@ class Module_View_Web extends Abstract_Module_View implements IRightsContext_Vie
         }
         parent::__set($var, $val);
     }
-    
-    
+
+
     public function tmp($file)
     {
         if (!strstr($file, '/')) {
@@ -61,7 +61,7 @@ class Module_View_Web extends Abstract_Module_View implements IRightsContext_Vie
         return $this->parent->parent->tmp($file);
     }
 
-    
+
     public function header()
     {
         $this->menu[] = array('href' => '?p=' . $this->package->alias . '&m=' . $this->module->alias, 'name' => $this->_('__NAME'));
