@@ -87,8 +87,11 @@ abstract class Package extends Singleton implements IRightsContext
                 break;
             case 'application':
             case 'composer':
+            case 'requiredPHPVersion':
             case 'phpVersionCompatible':
+            case 'requiredExtensions':
             case 'missedExt':
+            case 'missedExtensions':
             case 'isCompatible':
             case 'version':
             case 'versionName':

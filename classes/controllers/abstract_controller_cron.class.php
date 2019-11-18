@@ -8,6 +8,8 @@
  */
 namespace RAAS;
 
+use Exception;
+
 /**
  * Класс Cron-контроллера ядра RAAS
  * @package RAAS
@@ -59,19 +61,39 @@ abstract class Abstract_Controller_Cron extends Abstract_Controller
 
     protected function checkCompatibility()
     {
-        return ($this->application->phpVersionCompatible && !$this->application->missedExt);
+        if (!$this->application->phpVersionCompatible) {
+            throw new Exception($this->view->_('PHP_VERSION_INCOMPATIBLE'));
+        }
+        if ($missedExt = $this->application->missedExt) {
+            throw new Exception(
+                sprintf(
+                    $this->view->_('PHP_VERSION_INCOMPATIBLE'),
+                    implode(', ', $missedExt)
+                )
+            );
+        }
+        return true;
     }
 
 
     protected function checkDB()
     {
-        return ($this->application->DSN && $this->application->initDB());
+        if (!$this->application->DSN) {
+            throw new Exception('Config file corrupted: no DSN is present');
+        }
+        if (!$this->application->initDB()) {
+            throw new Exception('Cannot connect to database');
+        }
+        return true;
     }
 
 
     protected function checkSOME()
     {
-        return $this->application->initSOME();
+        if (!$this->application->initSOME()) {
+            throw new Exception('SOME file corrupted');
+        }
+        return true;
     }
 
 
@@ -83,7 +105,7 @@ abstract class Abstract_Controller_Cron extends Abstract_Controller
     protected function fork()
     {
         $this->action = isset($GLOBALS['argv'][1]) ? $GLOBALS['argv'][1] : '';
-        $f = array($this, $this->action);
+        $f = [$this, $this->action];
         if (is_callable($f)) {
             $args = array_slice($GLOBALS['argv'], 2);
             call_user_func_array($f, $args);
@@ -91,7 +113,10 @@ abstract class Abstract_Controller_Cron extends Abstract_Controller
             $commandClassname = $this->action;
             $command = new $commandClassname($this);
             if ($command instanceof Command) {
-                call_user_func_array(array($command, 'process'), array_slice($GLOBALS['argv'], 2));
+                call_user_func_array(
+                    [$command, 'process'],
+                    array_slice($GLOBALS['argv'], 2)
+                );
             }
         }
     }
@@ -106,6 +131,7 @@ abstract class Abstract_Controller_Cron extends Abstract_Controller
         if ($this->encoding) {
             $text = iconv('UTF-8', $this->encoding . '//IGNORE', $text);
         }
-        echo number_format(microtime(true) - $this->st, 3, '.', ' ') . ' [' . memory_get_peak_usage() . ']: ' . $text . "\n";
+        echo number_format(microtime(true) - $this->st, 3, '.', ' ') .
+             ' [' . memory_get_peak_usage() . ']: ' . $text . "\n";
     }
 }

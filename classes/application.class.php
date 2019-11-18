@@ -163,7 +163,15 @@ final class Application extends Singleton implements IContext
 
             // Файлы и директории
             case 'baseDir':
-                return realpath($_SERVER['DOCUMENT_ROOT']);
+                if (isset($_SERVER['DOCUMENT_ROOT']) &&
+                    $_SERVER['DOCUMENT_ROOT']
+                ) {
+                    return realpath($_SERVER['DOCUMENT_ROOT']);
+                }
+                if (stristr(__DIR__, 'vendor')) {
+                    return realpath(__DIR__ . '/../../../..');
+                }
+                return realpath(__DIR__ . '/../..');
                 break;
             case 'baseFilesDir':
                 $dir = $this->baseDir . '/files';
@@ -216,8 +224,11 @@ final class Application extends Singleton implements IContext
                 return false;
                 break;
             case 'composer':
+            case 'requiredPHPVersion':
             case 'phpVersionCompatible':
+            case 'requiredExtensions':
             case 'missedExt':
+            case 'missedExtensions':
             case 'isCompatible':
             case 'version':
             case 'versionName':

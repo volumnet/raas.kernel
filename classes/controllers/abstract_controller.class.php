@@ -169,7 +169,7 @@ abstract class Abstract_Controller extends Singleton implements IAbstract_Contex
     {
         $arr = [];
         if (!$this->model->phpVersionCompatible) {
-            $arr['PHP_VERSION_INCOMPATIBLE'] = Application::requiredPHPVersion;
+            $arr['PHP_VERSION_INCOMPATIBLE'] = Application::i()->requiredPHPVersion;
         }
         if ($missedExt = $this->model->missedExt) {
             $arr['PHP_EXTENSION_REQUIRED'] = $missedExt;

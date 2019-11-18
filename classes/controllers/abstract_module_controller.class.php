@@ -14,22 +14,22 @@ use SOME\Singleton;
 /**
  * Класс абстрактного контроллера модуля RAAS
  * @package RAAS
- * @property-read \RAAS\Module $module ссылка на экземпляр модуля
- * @property-read \RAAS\Module $model ссылка на экземпляр модуля
- * @property-read \RAAS\Abstract_Package_Controller $parent ссылка на экземпляр активного контроллера пакета
- * @property-read \RAAS\Abstract_Module_View $view ссылка на экземпляр текущего представления модуля
+ * @property-read Module $module ссылка на экземпляр модуля
+ * @property-read Module $model ссылка на экземпляр модуля
+ * @property-read Abstract_Package_Controller $parent ссылка на экземпляр активного контроллера пакета
+ * @property-read Abstract_Module_View $view ссылка на экземпляр текущего представления модуля
  */
 abstract class Abstract_Module_Controller extends Singleton implements IAbstract_Context_Controller
 {
     /**
      * Ссылка на экземпляр текущего представления модуля
-     * @var \RAAS\Abstract_Module_View
+     * @var Abstract_Module_View
      */
     protected $view;
 
     /**
      * Экземпляр класса
-     * @var \RAAS\Abstract_Module_Controller
+     * @var Abstract_Module_Controller
      */
     protected static $instance;
 
@@ -106,15 +106,15 @@ abstract class Abstract_Module_Controller extends Singleton implements IAbstract
 
     public function config()
     {
-        return array();
+        return [];
     }
 
 
     protected function checkCompatibility()
     {
-        $arr = array();
+        $arr = [];
         if (!$this->model->phpVersionCompatible) {
-            $arr['PHP_VERSION_INCOMPATIBLE'] = Application::requiredPHPVersion;
+            $arr['PHP_VERSION_INCOMPATIBLE'] = Application::i()->requiredPHPVersion;
         }
         if ($missedExt = $this->model->missedExt) {
             $arr['PHP_EXTENSION_REQUIRED'] = $missedExt;

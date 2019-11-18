@@ -39,19 +39,28 @@ trait ContextTrait
                 }
                 return $this->composerData;
                 break;
-            case 'phpVersionCompatible':
+            case 'requiredPHPVersion':
                 if (!$this->composer['require']['php']) {
-                    return true;
+                    return false;
                 }
                 $requiredPHPVersion = preg_replace(
                     '/^.*?(\\d)/umi',
                     '$1',
                     $this->composer['require']['php']
                 );
-                $verCmp = version_compare($requiredPHPVersion, phpversion());
+                return $requiredPHPVersion;
+                break;
+            case 'phpVersionCompatible':
+                if (!$this->requiredPHPVersion) {
+                    return true;
+                }
+                $verCmp = version_compare(
+                    $this->requiredPHPVersion,
+                    phpversion()
+                );
                 return ($verCmp <= 0);
                 break;
-            case 'missedExt':
+            case 'requiredExtensions':
                 if (!$this->composer['require']) {
                     return [];
                 }
@@ -64,9 +73,13 @@ trait ContextTrait
                 $requiredExt = array_map(function ($x) {
                     return preg_replace('/^ext-/umi', '', $x);
                 }, $requiredExt);
+                return $requiredExt;
+                break;
+            case 'missedExt':
+            case 'missedExtensions':
                 $extLoaded = array_map('trim', get_loaded_extensions());
                 $extLoaded = array_values($extLoaded);
-                $diff = array_diff($requiredExt, $extLoaded);
+                $diff = array_diff($this->requiredExtensions, $extLoaded);
                 return array_values($diff);
                 break;
             case 'isCompatible':
