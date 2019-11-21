@@ -1,10 +1,10 @@
 {
     "name": "volumnet/raas.kernel",
     "description": "RAAS v4.2.6 Remote Automated Assistant",
-    "version": "4.2.6",
+    "version": "4.2.7",
     "license": "GPL-3.0-or-later",
     "require": {
-        "php": ">=5.6",
+        "php": "^5.6",
         "ext-session": ">=0",
         "ext-iconv": ">=0",
         "ext-pcre": ">=0",
@@ -15,7 +15,7 @@
         "ext-gd": ">=0",
         "ext-PDO": ">=0",
         "ext-mbstring": ">=0",
-        "volumnet/some4": ">=4.5.2",
+        "volumnet/some4": "^4.5.2",
         "phpmailer/phpmailer": "~6.1"
     },
     "require-dev": {

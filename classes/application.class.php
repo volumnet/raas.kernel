@@ -491,18 +491,15 @@ final class Application extends Singleton implements IContext
         $m = $sender->mid;
         $ns = Namespaces::getNS($sender);
 
-        $sqlQuery = "SELECT *
-                       FROM " . $this->dbprefix . "registry
-                      WHERE m = ?
-                        AND name = ?";
-        $deleteQuery = "DELETE FROM " . $this->dbprefix . "registry
-                         WHERE m = ?
-                           AND name = ?";
         $arr = ['name' => $var, 'value' => $val];
         $key = null;
         if (get_class($sender) == __CLASS__) {
             $key = '';
         } elseif (($ns == __NAMESPACE__) || $m == '/') {
+            $sqlQuery = "SELECT *
+                           FROM " . $this->dbprefix . "registry
+                          WHERE m = ?
+                            AND name = ?";
             $sqlResult = $this->SQL->getline([$sqlQuery, '', $var]);
             if (!$sqlResult ||
                 !isset($sqlResult['locked']) ||
@@ -511,16 +508,13 @@ final class Application extends Singleton implements IContext
                 $key = '';
             }
         } elseif (preg_match('/^RAAS\\\\/umi', $ns)) {
-            $sqlResult = $this->SQL->getline([$sqlQuery, (string)$m, $var]);
-            if (!$sqlResult ||
-                !isset($sqlResult['locked']) ||
-                !$sqlResult['locked']
-            ) {
-                $key = $m;
-            }
+            $key = $m;
         }
         if ($key !== null) {
             if ($val === null) {
+                $deleteQuery = "DELETE FROM " . $this->dbprefix . "registry
+                                 WHERE m = ?
+                                   AND name = ?";
                 $this->SQL->query([$deleteQuery, $key, $var]);
                 unset($this->registry[$key][$var]);
             } else {
