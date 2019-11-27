@@ -93,50 +93,54 @@ if (Application::i()->activeModule) {
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
     <meta name="generator" content="RAAS4" />
     <title><?php echo $metaTitle?></title>
-    <link type="text/css" rel="stylesheet" href="<?php echo $VIEW->themeURL . ($VIEW->templateType ? '/' . $VIEW->templateType : '')?>/style.css?v=<?php echo date('Y-m-d', filemtime(__DIR__ . '/style.css'))?>" />
+    <link href="<?php echo $VIEW->themeURL . ($VIEW->templateType ? '/' . $VIEW->templateType : '')?>/style.css?v=<?php echo date('Y-m-d', filemtime(__DIR__ . '/style.css'))?>" rel="stylesheet" />
 
-    <link type="text/css" href="<?php echo $VIEW->publicURL?>/jquery-ui/css/redmond/jquery-ui-1.8.23.custom.css" rel="stylesheet" />
-    <link type="text/css" href="<?php echo $VIEW->publicURL?>/timepicker/jquery-ui-timepicker-addon.css" rel="stylesheet" />
-    <link type="text/css" href="<?php echo $VIEW->publicURL?>/colorpicker/css/colorpicker.css" rel="stylesheet" />
-    <link type="text/css" href="<?php echo $VIEW->publicURL?>/bootstrap-multiselect.css" rel="stylesheet" />
-    <link type="text/css" href="<?php echo $VIEW->publicURL?>/codemirror/lib/codemirror.css" rel="stylesheet" />
-    <link type="text/css" href="<?php echo $VIEW->publicURL?>/fonts/font-awesome.min.css" rel="stylesheet" />
+    <link href="/vendor/components/jqueryui/themes/redmond/jquery-ui.min.css" rel="stylesheet" />
+    <link href="/vendor/trentrichardson/jquery-timepicker-addon/dist/jquery-ui-timepicker-addon.min.css" rel="stylesheet" />
+    <link href="/vendor/npm-asset/spectrum-colorpicker/spectrum.css" rel="stylesheet" />
+    <link href="/vendor/npm-asset/bootstrap-multiselect/dist/css/bootstrap-multiselect.css" rel="stylesheet" />
+    <link href="/vendor/npm-asset/codemirror/lib/codemirror.css" rel="stylesheet" />
+    <link href="/vendor/fortawesome/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
     <?php foreach ($VIEW->css as $css) { ?>
-        <link type="text/css" rel="stylesheet" href="<?php echo $css?>" />
+        <link href="<?php echo $css?>" rel="stylesheet" />
     <?php } ?>
-    <script src="<?php echo $VIEW->publicURL?>/jquery.js" type="text/javascript"></script>
-    <script src="<?php echo $VIEW->publicURL?>/jquery.scrollTo.js" type="text/javascript"></script>
-    <script src="<?php echo $VIEW->publicURL?>/jquery.form.js" type="text/javascript"></script>
-    <script src="<?php echo $VIEW->publicURL?>/bootstrap.js" type="text/javascript"></script>
-    <script src="<?php echo $VIEW->publicURL?>/jquery.raas.js" type="text/javascript"></script>
-    <script type="text/javascript" src="<?php echo $VIEW->publicURL?>/jquery-ui/js/jquery-ui-1.8.23.custom.min.js"></script>
-    <script type="text/javascript" src="<?php echo $VIEW->publicURL?>/modernizr.js"></script>
-    <script type="text/javascript" src="<?php echo $VIEW->publicURL?>/jquery-ui/development-bundle/ui/i18n/jquery.ui.datepicker-<?php echo $VIEW->language?>.js "></script>
-    <script type="text/javascript" src="<?php echo $VIEW->publicURL?>/timepicker/jquery-ui-timepicker-addon.js"></script>
+
+    <script src="/vendor/components/jquery/jquery.min.js"></script>
+    <script src="/vendor/flesler/jquery.scrollto/jquery.scrollTo.min.js"></script>
+    <script src="/vendor/jquery-form/form/dist/jquery.form.min.js"></script>
+    <script src="<?php echo $VIEW->publicURL?>/bootstrap.js"></script>
+    <script src="<?php echo $VIEW->publicURL?>/jquery.raas.js"></script>
+    <script src="/vendor/components/jqueryui/ui/minified/jquery-ui.min.js"></script>
+    <script src="/vendor/components/jqueryui/ui/minified/i18n/jquery.ui.datepicker-<?php echo $VIEW->language?>.min.js"></script>
+    <script src="/vendor/trentrichardson/jquery-timepicker-addon/dist/jquery-ui-timepicker-addon.min.js"></script>
     <?php if ($VIEW->language != 'en') { ?>
-        <script type="text/javascript" src="<?php echo $VIEW->publicURL?>/timepicker/jquery-ui-timepicker-addon-i18n.js"></script>
-        <script type="text/javascript">
+        <script src="/vendor/trentrichardson/jquery-timepicker-addon/dist/i18n/jquery-ui-timepicker-addon-i18n.min.js"></script>
+        <script>
         $.timepicker.setDefaults($.timepicker.regional['<?php echo $VIEW->language?>']);
         </script>
     <?php } ?>
-    <script type="text/javascript" src="<?php echo $VIEW->publicURL?>/colorpicker/js/colorpicker.js"></script>
-    <script type="text/javascript" src="<?php echo $VIEW->publicURL?>/context.js"></script>
-    <script type="text/javascript">
+    <script src="/vendor/npm-asset/spectrum-colorpicker/spectrum.js"></script>
+    <script src="<?php echo $VIEW->publicURL?>/context.js"></script>
+    <script>
     jQuery(document).ready(function($) {
       context.init({preventDoubleContext: false});
     });</script>
-    <script type="text/javascript" src="<?php echo $VIEW->publicURL?>/bootstrap-multiselect.js"></script>
-    <script type="text/javascript" src="<?php echo $VIEW->publicURL?>/codemirror/lib/codemirror.js"></script>
-    <script type="text/javascript" src="<?php echo $VIEW->publicURL?>/codemirror/mode/xml/xml.js"></script>
-    <script type="text/javascript" src="<?php echo $VIEW->publicURL?>/codemirror/mode/javascript/javascript.js"></script>
-    <script type="text/javascript" src="<?php echo $VIEW->publicURL?>/codemirror/mode/css/css.js"></script>
-    <script type="text/javascript" src="<?php echo $VIEW->publicURL?>/codemirror/mode/htmlmixed/htmlmixed.js"></script>
-    <script type="text/javascript" src="<?php echo $VIEW->publicURL?>/codemirror/mode/clike/clike.js"></script>
-    <script type="text/javascript" src="<?php echo $VIEW->publicURL?>/codemirror/mode/php/php.js"></script>
-    <script type="text/javascript" src="<?php echo $VIEW->publicURL?>/ckeditor/ckeditor.js"></script>
-    <script type="text/javascript" src="<?php echo $VIEW->publicURL?>/ckeditor/adapters/jquery.js"></script>
+    <script src="/vendor/npm-asset/bootstrap-multiselect/dist/js/bootstrap-multiselect.js"></script>
+    <script src="/vendor/npm-asset/codemirror/lib/codemirror.js"></script>
+    <script src="/vendor/npm-asset/codemirror/mode/xml/xml.js"></script>
+    <script src="/vendor/npm-asset/codemirror/mode/javascript/javascript.js"></script>
+    <script src="/vendor/npm-asset/codemirror/mode/css/css.js"></script>
+    <script src="/vendor/npm-asset/codemirror/mode/htmlmixed/htmlmixed.js"></script>
+    <script src="/vendor/npm-asset/codemirror/mode/clike/clike.js"></script>
+    <script src="/vendor/npm-asset/codemirror/mode/php/php.js"></script>
+    <script src="/vendor/ckeditor/ckeditor/ckeditor.js"></script>
+    <script src="<?php echo $VIEW->publicURL?>/ckeditor.config.js"></script>
+    <?php if (is_file(Application::i()->baseDir . '/js/ckeditor.config.js')) { ?>
+        <script src="/js/ckeditor.config.js"></script>
+    <?php } ?>
+    <script src="/vendor/ckeditor/ckeditor/adapters/jquery.js"></script>
     <?php foreach ($VIEW->head_js as $js) { ?>
-        <script src="<?php echo $js?>" type="text/javascript"></script>
+        <script src="<?php echo $js?>"></script>
     <?php } ?>
   </head>
   <body class="body">
@@ -247,9 +251,9 @@ if (Application::i()->activeModule) {
         </footer>
       </div>
     </div>
-    <script src="<?php echo $VIEW->themeURL . ($VIEW->templateType ? '/' . $VIEW->templateType : '')?>/index.js" type="text/javascript"></script>
+    <script src="<?php echo $VIEW->themeURL . ($VIEW->templateType ? '/' . $VIEW->templateType : '')?>/index.js"></script>
     <?php foreach ($VIEW->js as $js) { ?>
-        <script src="<?php echo $js?>" type="text/javascript"></script>
+        <script src="<?php echo $js?>"></script>
     <?php } ?>
   </body>
 </html>

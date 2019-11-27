@@ -424,19 +424,17 @@ jQuery(function($) {
             $('input[data-type="month"]', thisObj).datepicker({ dateFormat: 'yy-mm' });
             
             $('input[data-type="datetime-local"], input[data-type="datetime"]', thisObj).not('[disabled]').each(function() {
-                if (!Modernizr.inputtypes.datetime) {
-                    $(this).val($(this).val().replace(/T/, ' '));
-                }
+                $(this).val($(this).val().replace(/T/, ' '));
                 $(this).attr('readonly', 'readonly').datetimepicker({ timeFormat: 'hh:mm' })
             });
-            $('input:visible[type="color"]', thisObj).attr('readonly', 'readonly').not('[disabled]').ColorPicker({
-                onShow: function (colpkr) { $(colpkr).fadeIn(500); return false; },
-                onHide: function (colpkr) { $(colpkr).fadeOut(500); return false; },
-                onBeforeShow: function () { $(this).ColorPickerSetColor(this.value.replace(/#/, '')); },
-                onSubmit: function (hsb, hex, rgb, el) { $(el).val('#' + hex); }
+            $('input:visible[type="color"]', thisObj).attr('readonly', 'readonly').not('[disabled]').spectrum({
+                showInput: true,
+                showInitial: true,
+                preferredFormat: 'hex',
             });
+            
             $('input[type="range"]', thisObj).not('[disabled]').each(function() {
-                if (($(this).attr('type') == 'number') && Modernizr.inputtypes.number) {
+                if ($(this).attr('type') == 'number') {
                     return;
                 }
                 var obj = this;
@@ -509,7 +507,7 @@ jQuery(function($) {
                 CodeMirror.fromTextArea(this, codeMirrorData);
             });
             $('textarea.htmlarea', thisObj).not('[disabled]').each(function() { 
-                $(this).ckeditor();
+                $(this).ckeditor(ckEditorConfig);
             });
             $('input[data-hint], textarea[data-hint], select[data-hint]', thisObj).each(function() {
                 var text = '<a class="btn" href="#" rel="popover" data-content="' + $(this).attr('data-hint') + '"><i class="icon-question-sign"></i></a>';
