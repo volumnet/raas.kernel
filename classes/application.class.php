@@ -303,6 +303,7 @@ final class Application extends Singleton implements IContext
     public function run($controller = 'web', $debugMode = false)
     {
         ob_start();
+        $_SESSION['KCFINDER']['uploadURL'] = '/files/common/';
         $this->startMicrotime = microtime(true);
         $this->debug = $debugMode;
 

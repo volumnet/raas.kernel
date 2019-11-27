@@ -1,7 +1,7 @@
 {
     "name": "volumnet/raas.kernel",
-    "description": "RAAS v4.2.8 Remote Automated Assistant",
-    "version": "4.2.8",
+    "description": "RAAS v4.2.9 Remote Automated Assistant",
+    "version": "4.2.9",
     "license": "GPL-3.0-or-later",
     "require": {
         "php": "^5.6",
@@ -18,7 +18,7 @@
         "volumnet/some4": "^4.5.2",
         "phpmailer/phpmailer": "~6.1",
         "ckeditor/ckeditor": "^4.13",
-        "sunhater/kcfinder": "dev-master",
+        "sunhater/kcfinder": "dev-master@dev",
         "components/jquery": "^1.12.4",
         "flesler/jquery.scrollto": "^2.1.2",
         "components/jqueryui": "^1.10",
