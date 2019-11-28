@@ -1,7 +1,7 @@
 {
     "name": "volumnet/raas.kernel",
-    "description": "RAAS v4.2.11 Remote Automated Assistant",
-    "version": "4.2.11",
+    "description": "RAAS v4.2.12 Remote Automated Assistant",
+    "version": "4.2.12",
     "license": "GPL-3.0-or-later",
     "minimum-stability": "dev",
     "prefer-stable": true,
@@ -44,7 +44,7 @@
         }
     ],
     "autoload": {
-        "classmap": ["classes/", "general/classes/", "include/phpQuery-onefile.php"] 
+        "classmap": ["classes/", "general/classes/"] 
     },
     "repositories": [
         {
