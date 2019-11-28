@@ -1,7 +1,7 @@
 {
     "name": "volumnet/raas.kernel",
-    "description": "RAAS v4.2.10 Remote Automated Assistant",
-    "version": "4.2.10",
+    "description": "RAAS v4.2.11 Remote Automated Assistant",
+    "version": "4.2.11",
     "license": "GPL-3.0-or-later",
     "minimum-stability": "dev",
     "prefer-stable": true,
@@ -29,7 +29,8 @@
         "npm-asset/bootstrap-multiselect": "^0.9",
         "npm-asset/codemirror": "^5.49.0",
         "npm-asset/spectrum-colorpicker": "^1.8.0",
-        "fortawesome/font-awesome": "^4.7.0"
+        "fortawesome/font-awesome": "^4.7.0",
+        "electrolinux/phpquery": "^0.9.6"
     },
     "require-dev": {
         "phpunit/phpunit": "5.*",

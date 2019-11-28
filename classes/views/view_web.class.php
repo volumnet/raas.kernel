@@ -8,6 +8,8 @@
  */
 namespace RAAS;
 
+use SOME\File;
+
 /**
  * Класс web-представления ядра RAAS
  * @package RAAS
@@ -121,13 +123,20 @@ class View_Web extends Abstract_View implements IContext_View_Web
      * Имена контейнеров-массивов
      * @var array
      */
-    private static $arrayContainers = array('data', 'content', 'localError', 'css', 'js', 'head_js');
+    private static $arrayContainers = [
+        'data',
+        'content',
+        'localError',
+        'css',
+        'js',
+        'head_js'
+    ];
 
     /**
      * Имена контейнеров-строк
      * @var array
      */
-    private static $stringContainers = array('template', 'title');
+    private static $stringContainers = ['template', 'title'];
 
     /**
      * Экземпляр класса
@@ -139,14 +148,21 @@ class View_Web extends Abstract_View implements IContext_View_Web
     {
         switch ($var) {
             case 'themeDir':
-                return $this->theme ? ($this->application->baseDir . '/themes/' . $this->theme) : $this->application->publicDir;
+                if ($this->theme) {
+                    return $this->application->baseDir . '/themes/' .
+                           $this->theme;
+                }
+                return $this->application->publicDir;
                 break;
 
             case 'modulesURL':
                 return 'modules';
                 break;
             case 'themeURL':
-                return ($this->theme && ($this->theme != '/')) ? ('themes/' . $this->theme) : $this->publicURL;
+                if ($this->theme && ($this->theme != '/')) {
+                    return 'themes/' . $this->theme;
+                }
+                return $this->publicURL;
                 break;
             case 'publicURL':
                 return mb_substr(
@@ -155,23 +171,37 @@ class View_Web extends Abstract_View implements IContext_View_Web
                 );
                 break;
 
-            case 'templateType': case 'data': case 'content': case 'localError': case 'menu': case 'submenu': case 'contextmenu': case 'path': case 'theme':
+            case 'templateType':
+            case 'data':
+            case 'content':
+            case 'localError':
+            case 'menu':
+            case 'submenu':
+            case 'contextmenu':
+            case 'path':
+            case 'theme':
             case 'renderStarted':
                 return $this->$var;
                 break;
             case 'availableThemes':
-                $dir = (array)@\SOME\File::scandir($this->application->baseDir . '/themes');
-                $temp = array('/' => $this->_('DEFAULT_THEME'));
+                $dir = (array)@File::scandir(
+                    $this->application->baseDir . '/themes'
+                );
+                $temp = ['/' => $this->_('DEFAULT_THEME')];
                 foreach ($dir as $row) {
-                    if (is_file($this->application->baseDir . '/themes/' . $row . '/theme.ini')) {
-                        $arr = parse_ini_file($this->application->baseDir . '/themes/' . $row . '/theme.ini');
+                    $filename = $this->application->baseDir . '/themes/'
+                              . $row . '/theme.ini';
+                    if (is_file($filename)) {
+                        $arr = parse_ini_file($filename);
                         $temp[$row] = $arr[$this->language];
                     }
                 }
                 return $temp;
                 break;
             default:
-                if (in_array($var, self::$arrayContainers) || in_array($var, self::$stringContainers)) {
+                if (in_array($var, self::$arrayContainers) ||
+                    in_array($var, self::$stringContainers)
+                ) {
                     return $this->$var;
                 } else {
                     return parent::__get($var);
@@ -182,7 +212,10 @@ class View_Web extends Abstract_View implements IContext_View_Web
 
     public function __set($var, $val)
     {
-        if (in_array($var, self::$arrayContainers) || in_array($var, self::$stringContainers) || in_array($var, array('menu', 'submenu', 'contextmenu', 'path'))) {
+        if (in_array($var, self::$arrayContainers) ||
+            in_array($var, self::$stringContainers) ||
+            in_array($var, ['menu', 'submenu', 'contextmenu', 'path'])
+        ) {
             $this->$var = $val;
         } else {
             switch ($var) {
@@ -263,7 +296,7 @@ class View_Web extends Abstract_View implements IContext_View_Web
     }
 
 
-    public function assignVars(array $IN = array())
+    public function assignVars(array $IN = [])
     {
         if (isset($IN['localError'])) {
             foreach ($IN['localError'] as $e) {
@@ -274,7 +307,10 @@ class View_Web extends Abstract_View implements IContext_View_Web
             $this->data = array_merge((array)$this->data, (array)$IN['DATA']);
         }
         if (isset($IN['CONTENT'])) {
-            $this->content = array_merge((array)$this->content, (array)$IN['CONTENT']);
+            $this->content = array_merge(
+                (array)$this->content,
+                (array)$IN['CONTENT']
+            );
         }
         unset($IN['localError'], $IN['DATA'], $IN['CONTENT']);
         $this->content = array_merge((array)$this->content, (array)$IN);
@@ -286,8 +322,10 @@ class View_Web extends Abstract_View implements IContext_View_Web
      */
     public function processXSLT($content)
     {
-        if ($this->theme && ($this->theme != '/') && is_file($this->themeDir . '/theme.xsl')) {
-
+        if ($this->theme &&
+            ($this->theme != '/') &&
+            is_file($this->themeDir . '/theme.xsl')
+        ) {
         }
         return $content;
     }
@@ -302,8 +340,16 @@ class View_Web extends Abstract_View implements IContext_View_Web
         $this->renderStarted = true;
         extract($this->prepareVars(), EXTR_SKIP);
 
-        if ($this->application->debug && ($this->application->exceptions || $this->application->sqlExceptions)) {
-            foreach (array_merge((array)$this->application->exceptions, (array)$this->application->sqlExceptions) as $e) {
+        if ($this->application->debug &&
+            (
+                $this->application->exceptions ||
+                $this->application->sqlExceptions
+            )
+        ) {
+            foreach (array_merge(
+                (array)$this->application->exceptions,
+                (array)$this->application->sqlExceptions
+            ) as $e) {
                 array_unshift($localError, $this->debugShowException($e));
             }
         }
@@ -364,7 +410,9 @@ class View_Web extends Abstract_View implements IContext_View_Web
             $f .= '.tmp.php';
         }
 
-        if ($this->templateType && is_file($dir . '/' . $this->templateType . '/' . $f)) {
+        if ($this->templateType &&
+            is_file($dir . '/' . $this->templateType . '/' . $f)
+        ) {
             return $dir . '/' . $this->templateType . '/' . $f;
         } elseif (is_file($dir . '/' . $f)) {
             return $dir . '/' . $f;
@@ -374,15 +422,15 @@ class View_Web extends Abstract_View implements IContext_View_Web
     }
 
 
-    public function getMenu(array $SUBMENU = array())
+    public function getMenu(array $SUBMENU = [])
     {
-        $menu = array();
+        $menu = [];
         foreach ($SUBMENU as $i => $item) {
             if (is_array($item)) {
                 $row = $item;
                 unset($row['submenu']);
             } else {
-                $row = array('name' => (string)$item);
+                $row = ['name' => (string)$item];
             }
             if (isset($row, $row['href']) && $row && $row['href']) {
                 $A = $this->nav;
@@ -418,10 +466,17 @@ class View_Web extends Abstract_View implements IContext_View_Web
      */
     protected function prepareVars()
     {
-        $temp = array();
+        $temp = [];
         $this->exportLang();
-        foreach (array_merge(self::$arrayContainers, self::$stringContainers) as $key) {
-            $temp[(strtolower($key) == $key) ? strtoupper($key) : $key] = $this->$key;
+        foreach (array_merge(
+            self::$arrayContainers,
+            self::$stringContainers
+        ) as $key) {
+            $temp[
+                (strtolower($key) == $key) ?
+                strtoupper($key) :
+                $key
+            ] = $this->$key;
         }
         $temp['USER'] = $this->model->user;
         $temp['APPLICATION'] = $this->application;

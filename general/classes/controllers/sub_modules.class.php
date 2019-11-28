@@ -170,6 +170,8 @@ class Sub_Modules extends Abstract_Sub_Controller
                                 continue;
                             }
                             Access::flushRights();
+                        } elseif (($row->type == 'password') && !$_POST[$row->name]) {
+                            continue;
                         }
                         $Context->registrySet(
                             $row->name,

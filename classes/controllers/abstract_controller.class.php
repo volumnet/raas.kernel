@@ -485,6 +485,43 @@ abstract class Abstract_Controller extends Singleton implements IAbstract_Contex
                 'caption' => $this->view->_('SENDING_EMAIL'),
                 'placeholder' => 'info@' . $_SERVER['HTTP_HOST'],
             ],
+            [
+                'type' => 'select',
+                'name' => 'smtp_encryption',
+                'caption' => $this->view->_('SMTP_ENCRYPTION'),
+                'children' => [
+                    ['value' => '', 'caption' => $this->view->_('_NONE')],
+                    ['value' => 'ssl', 'caption' => 'SSL'],
+                    ['value' => 'tls', 'caption' => 'TLS'],
+                ],
+            ],
+            [
+                'type' => 'text',
+                'name' => 'smtp_username',
+                'caption' => $this->view->_('SMTP_USERNAME'),
+                'placeholder' => $this->view->_('FILL_TO_USE_SMTP')
+            ],
+            [
+                'type' => 'password',
+                'name' => 'smtp_password',
+                'caption' => $this->view->_('SMTP_PASSWORD'),
+            ],
+            [
+                'type' => 'text',
+                'name' => 'smtp_host',
+                'caption' => $this->view->_('SMTP_HOST'),
+                'placeholder' => 'ssl://' . $_SERVER['HTTP_HOST'],
+            ],
+            [
+                'type' => 'number',
+                'name' => 'smtp_port',
+                'caption' => $this->view->_('SMTP_PORT'),
+            ],
+            [
+                'type' => 'checkbox',
+                'name' => 'smtp_force_local',
+                'caption' => $this->view->_('SMTP_FORCE_LOCAL'),
+            ],
         ];
     }
 

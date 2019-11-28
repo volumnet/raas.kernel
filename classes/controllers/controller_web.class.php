@@ -42,7 +42,11 @@ class Controller_Web extends Abstract_Controller
     public function isFirst()
     {
         if (parent::isFirst()) {
-            $this->authSession(trim($_POST['login']), $this->model->md5It(trim($_POST['password'])), (bool)$_POST['save_password']);
+            $this->authSession(
+                trim($_POST['login']),
+                $this->model->md5It(trim($_POST['password'])),
+                (bool)$_POST['save_password']
+            );
             new Redirector();
         }
     }
@@ -50,11 +54,12 @@ class Controller_Web extends Abstract_Controller
 
     /**
      * Функция проверки подключения к базе данных
-     * @return bool true, если подключение прошло успешно, false в противном случае
+     * @return bool true, если подключение прошло успешно,
+     *              false в противном случае
      */
     protected function checkDB()
     {
-        $localError = array();
+        $localError = [];
         if ($this->model->DSN && $this->model->initDB()) {
             return true;
         } else {
@@ -69,42 +74,85 @@ class Controller_Web extends Abstract_Controller
      */
     protected function configureDB()
     {
-        $CONTENT = array();
+        $CONTENT = [];
         foreach ($this->application->availableDatabases as $key => $val) {
-            $CONTENT['databases'][] = array('value' => $key, 'caption' => $this->view->_($val));
+            $CONTENT['databases'][] = [
+                'value' => $key,
+                'caption' => $this->view->_($val)
+            ];
         }
-        $CONTENT['loginTypes'] = array(
-            array('value' => 'session', 'caption' => $this->view->_('SESSION_LOGIN')), array('value' => 'http', 'caption' => $this->view->_('HTTP_LOGIN'))
-        );
+        $CONTENT['loginTypes'] = [
+            [
+                'value' => 'session',
+                'caption' => $this->view->_('SESSION_LOGIN')
+            ],
+            [
+                'value' => 'http',
+                'caption' => $this->view->_('HTTP_LOGIN')
+            ]
+        ];
         $t = $this;
-        $Form = new Form(array(
+        $Form = new Form([
             'caption' => $this->view->_('CONFIGURE_DB'),
             'commit' => function () use ($t) {
                 $t->model->configureDB($_POST);
                 new Redirector();
             },
-            'children' => array(
-                array('type' => 'hidden', 'name' => 'dbtype', 'default' => 'mysql'),
-                array(
+            'children' => [
+                [
+                    'type' => 'hidden',
+                    'name' => 'dbtype',
+                    'default' => 'mysql'
+                ],
+                [
                     'name' => 'dbhost',
                     'required' => 'required',
                     'caption' => $this->view->_('DBHOST'),
-                    'default' => ($this->model->dbhost ? $this->model->dbhost : '127.0.0.1')
-                ),
-                array('name' => 'dbuser', 'required' => 'required', 'caption' => $this->view->_('DBUSER'), 'default' => 'root'),
-                array('type' => 'password', 'name' => 'dbpass', 'caption' => $this->view->_('DBPASS')),
-                array('name' => 'dbname', 'required' => 'required', 'caption' => $this->view->_('DBNAME'), 'default' => $_SERVER['HTTP_HOST']),
-                array('name' => 'dbprefix', 'caption' => $this->view->_('DBPREFIX'), 'default' => $this->model->dbprefix),
-                array(
+                    'default' => (
+                        $this->model->dbhost ?
+                        $this->model->dbhost :
+                        '127.0.0.1'
+                    )
+                ],
+                [
+                    'name' => 'dbuser',
+                    'required' => 'required',
+                    'caption' => $this->view->_('DBUSER'),
+                    'default' => 'root'
+                ],
+                [
+                    'type' => 'password',
+                    'name' => 'dbpass',
+                    'caption' => $this->view->_('DBPASS')
+                ],
+                [
+                    'name' => 'dbname',
+                    'required' => 'required',
+                    'caption' => $this->view->_('DBNAME'),
+                    'default' => $_SERVER['HTTP_HOST']
+                ],
+                [
+                    'name' => 'dbprefix',
+                    'caption' => $this->view->_('DBPREFIX'),
+                    'default' => $this->model->dbprefix
+                ],
+                [
                     'type' => 'select',
                     'name' => 'loginType',
                     'caption' => $this->view->_('SELECT_LOGIN_TYPE'),
                     'required' => 'required',
                     'children' => $CONTENT['loginTypes'],
                     'default' => $this->model->loginType
-                )
-            )
-        ));
+                ],
+                [
+                    'type' => 'checkbox',
+                    'name' => 'prod',
+                    'caption' => $this->view->_('PRODUCTION_SERVER'),
+                    'export' => 'boolval',
+                    'default' => $this->model->prod
+                ],
+            ]
+        ]);
         $this->view->configureDB($Form->process());
     }
 
@@ -157,7 +205,7 @@ class Controller_Web extends Abstract_Controller
     protected function login()
     {
         $t = $this;
-        $Form = new Form(array(
+        $Form = new Form([
             'caption' => $this->view->_('USER_AUTHENTICATE'),
             'Item' => $this->model->user,
             'submitCaption' => $this->view->_('LOG_IN'),
@@ -170,9 +218,9 @@ class Controller_Web extends Abstract_Controller
                 } else {
                     $t->model->user->auth(trim($_POST['login']), $t->model->md5It(trim($_POST['password'])));
                     if (!$t->model->user->id) {
-                        return array('name' => 'INVALID', 'value' => 'login', 'description' => 'INVALID_LOGIN_OR_PASSWORD');
+                        return ['name' => 'INVALID', 'value' => 'login', 'description' => 'INVALID_LOGIN_OR_PASSWORD'];
                     } elseif (!$t->model->user->ipFilter($_SERVER['REMOTE_ADDR'])) {
-                        return array('name' => 'INVALID', 'value' => '%REMOTE_ADDR%', 'description' => 'INVALID_IP');
+                        return ['name' => 'INVALID', 'value' => '%REMOTE_ADDR%', 'description' => 'INVALID_IP'];
                     }
                 }
             },
@@ -185,20 +233,20 @@ class Controller_Web extends Abstract_Controller
                 new Redirector();
             },
             'import' => function () {
-                return ($_SERVER['REQUEST_METHOD'] == 'POST') ? $_POST : array();
+                return ($_SERVER['REQUEST_METHOD'] == 'POST') ? $_POST : [];
             },
-            'children' => array(
-                array('name' => 'login', 'maxlength' => 16, 'required' => 'required', 'caption' => $this->view->_('LOGIN_NAME')),
-                array(
+            'children' => [
+                ['name' => 'login', 'maxlength' => 16, 'required' => 'required', 'caption' => $this->view->_('LOGIN_NAME')],
+                [
                     'type' => 'password',
                     'name' => 'password',
                     'maxlength' => 16,
                     'required' => 'required',
                     'caption' => $this->view->_('PASSWORD')
-                ),
-                array('type' => 'checkbox', 'name' => 'save_password', 'caption' => $this->view->_('REMEMBER_PASSWORD'), 'export' => 'intval')
-            )
-        ));
+                ],
+                ['type' => 'checkbox', 'name' => 'save_password', 'caption' => $this->view->_('REMEMBER_PASSWORD'), 'export' => 'intval']
+            ]
+        ]);
         $this->view->login($Form->process());
     }
 
@@ -236,7 +284,7 @@ class Controller_Web extends Abstract_Controller
         if ($this->mode == 'logout') {
             $this->logout();
             return;
-        } elseif (!in_array($this->mode, array('admin', 'manual'))) {
+        } elseif (!in_array($this->mode, ['admin', 'manual'])) {
             if ($this->packageName && isset($this->model->packages[$this->packageName]) && ($pack = $this->model->packages[$this->packageName])) {
                 if ($pack->registryGet('isActive') && $pack->isCompatible) {
                     if ($this->model->user->access($pack)->canDo) {

@@ -58,12 +58,6 @@ final class Application extends Singleton implements IContext
     private $startMicrotime = 0;
 
     /**
-     * Режим отладки
-     * @var bool
-     */
-    private $debug = false;
-
-    /**
      * Контроллер ядра
      * @var Abstract_Controller
      */
@@ -129,7 +123,8 @@ final class Application extends Singleton implements IContext
         'dbuser',
         'dbpass',
         'dbprefix',
-        'loginType'
+        'loginType',
+        'prod',
     ];
 
     /**
@@ -244,12 +239,14 @@ final class Application extends Singleton implements IContext
                 break;
             case 'packages':
             case 'activePackage':
-            case 'debug':
             case 'exceptions':
             case 'sqlExceptions':
             case 'SQL':
             case 'user':
                 return $this->$var;
+                break;
+            case 'debug':
+                return !$this->prod;
                 break;
             default:
                 if (in_array($var, self::$configVars) &&
@@ -298,21 +295,18 @@ final class Application extends Singleton implements IContext
     /**
      * Метод запуска приложения
      * @param string $controller наименование контроллера
-     * @param bool $debugMode режим отладки
      */
-    public function run($controller = 'web', $debugMode = false)
+    public function run($controller = 'web')
     {
         ob_start();
         $_SESSION['KCFINDER']['uploadURL'] = '/files/common/';
         $this->startMicrotime = microtime(true);
-        $this->debug = $debugMode;
 
         mb_internal_encoding('UTF-8');
-        set_error_handler([$this, 'errorHandler'], error_reporting());
-        // set_exception_handler([$this, 'errorHandler']);
         session_start();
         $_SESSION['RAAS_STARTED'] = microtime(true);
         $this->getConfig();
+        set_error_handler([$this, 'errorHandler'], error_reporting());
 
         $classname = ('RAAS\\Controller_' . ucfirst($controller));
         if (!class_exists($classname)) {
@@ -352,7 +346,7 @@ final class Application extends Singleton implements IContext
         if (count($this->exceptions) < 10) {
             $this->exceptions[] = $e;
         }
-        if ($this->debug) {
+        if (!$this->prod) {
             echo '<pre class="error">' .
                     $e->getMessage() .
                     ' in ' . $e->getFile() .
@@ -587,7 +581,9 @@ final class Application extends Singleton implements IContext
             foreach ($classnames as $classname) {
                 if (preg_match($rxPackage, $classname, $regs)) {
                     $package = mb_strtolower($regs[1]);
-                    if (($package != 'general') && !isset($this->packages[$package])) {
+                    if (($package != 'general') &&
+                        !isset($this->packages[$package])
+                    ) {
                         $this->packages[$package] = $classname::i();
                     }
                 }
@@ -804,8 +800,37 @@ final class Application extends Singleton implements IContext
             $message = $message[0];
         }
 
+        $smtpUser = $this->registryGet('smtp_username');
+        $smtpForceLocal = (bool)(int)$this->registryGet('smtp_force_local');
+
         $mail = new PHPMailer();
-        $mail->IsMail();
+        if ($smtpUser && ($this->prod || $smtpForceLocal)) {
+            $smtpHost = $this->registryGet('smtp_host');
+            $smtpEncryption = $this->registryGet('smtp_encryption');
+            $smtpPort = (int)$this->registryGet('smtp_port');
+            if (!$smtpHost && $_SERVER['HTTP_HOST']) {
+                $smtpHost = $_SERVER['HTTP_HOST'];
+            }
+            if ($smtpEncryption == 'ssl') {
+                $smtpHost = 'ssl://' . $smtpHost;
+            }
+            if (!$smtpPort) {
+                $smtpPort = ($smtpEncryption == 'ssl') ? 465 : 25;
+            }
+
+            $mail->isSMTP();
+            $mail->SMTPAuth = true;
+            $mail->SMTPDebug = 0;
+            if ($smtpEncryption == 'tls') {
+                $mail->SMTPSecure = 'TLS';
+            }
+            $mail->Host = $smtpHost;
+            $mail->Port = $smtpPort;
+            $mail->Username = $smtpUser;
+            $mail->Password = $this->registryGet('smtp_password');
+        } else {
+            $mail->IsMail();
+        }
         $mail->From = $realFromEmail;
         $mail->CharSet = "utf-8";
         $mail->FromName = $from;

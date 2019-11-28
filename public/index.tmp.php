@@ -245,7 +245,7 @@ if (Application::i()->activeModule) {
               <?php echo $VIEW->context->versionName?><br />
           <?php } ?>
           <?php echo Application::i()->versionName?>: <?php echo CORPORATE_RESOURCE_MANAGEMENT?><br />
-          <?php echo COPYRIGHT?> &copy; <a href="http://www.volumnet.ru/">Volume Networks</a>, <?php echo date('Y')?>. <?php echo ALL_RIGHTS_RESERVED?>.<br />
+          <?php echo COPYRIGHT?> &copy; <a href="http://www.volumnet.ru/" target="_blank">Volume Networks</a>, <?php echo date('Y')?>. <?php echo ALL_RIGHTS_RESERVED?>.<br />
           <?php echo ICONS_BY?> <a href="http://glyphicons.com/" target="_blank">Glyphicons</a>
 
         </footer>
