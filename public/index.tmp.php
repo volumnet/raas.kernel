@@ -135,8 +135,12 @@ if (Application::i()->activeModule) {
     <script src="/vendor/npm-asset/codemirror/mode/php/php.js"></script>
     <script src="/vendor/ckeditor/ckeditor/ckeditor.js"></script>
     <script src="<?php echo $VIEW->publicURL?>/ckeditor.config.js"></script>
+    <script src="<?php echo $VIEW->publicURL?>/raas.config.js"></script>
     <?php if (is_file(Application::i()->baseDir . '/js/ckeditor.config.js')) { ?>
         <script src="/js/ckeditor.config.js"></script>
+    <?php } ?>
+    <?php if (is_file(Application::i()->baseDir . '/js/raas.config.js')) { ?>
+        <script src="/js/raas.config.js"></script>
     <?php } ?>
     <script src="/vendor/ckeditor/ckeditor/adapters/jquery.js"></script>
     <?php foreach ($VIEW->head_js as $js) { ?>
