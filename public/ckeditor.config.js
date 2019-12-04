@@ -16,6 +16,7 @@ ckEditorConfig = {
     contentsCss: ['/css/ckeditor.css'],
     skin: 'moono',
 
+    filebrowserUploadMethod: 'form',
     filebrowserBrowseUrl: '/vendor/sunhater/kcfinder/browse.php?type=file',
     filebrowserImageBrowseUrl: '/vendor/sunhater/kcfinder/browse.php?type=image',
     filebrowserFlashBrowseUrl: '/vendor/sunhater/kcfinder/browse.php?type=file',
