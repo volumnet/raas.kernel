@@ -759,8 +759,8 @@ final class Application extends Singleton implements IContext
     ) {
         $toArr = (array)$toArr;
         $realFromEmail = trim($this->registryGet('email_from'));
-        if (!$realFromEmail && $SERVER['HTTP_HOST']) {
-            $realFromEmail = 'info@' . $SERVER['HTTP_HOST'];
+        if (!$realFromEmail && $_SERVER['HTTP_HOST']) {
+            $realFromEmail = 'info@' . $_SERVER['HTTP_HOST'];
         }
         if (!$realFromEmail && $fromEmail) {
             $realFromEmail = $fromEmail;
