@@ -474,7 +474,7 @@ jQuery(function($) {
             $('select[multiple]').not('[disabled]', thisObj).multiselect({
                 buttonText: function(options, select) {
                     if (options.length == 0) {
-                      return '-- <b class="caret"></b>';
+                      return '--';
                     }
                     else {
                       var selected = '';
@@ -486,7 +486,7 @@ jQuery(function($) {
                           i++;
                       });
                       selected = selected.substr(0, selected.length -2);
-                      return selected + (options.length > 3 ? '...' : '') + ' <b class="caret"></b>';
+                      return selected + (options.length > 3 ? '...' : '');
                     }
                 },
                 maxHeight: 200
