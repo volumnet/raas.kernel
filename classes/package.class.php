@@ -185,9 +185,7 @@ abstract class Package extends Singleton implements IRightsContext
                 'value' => date('Y-m-d H:i:s'),
                 'locked' => 1,
             ]);
-            if (Application::i()->debug) {
-                $this->registrySet('isActive', 1);
-            }
+            $this->registrySet('isActive', 1);
         }
     }
 
