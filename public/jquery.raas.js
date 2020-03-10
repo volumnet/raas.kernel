@@ -74,9 +74,9 @@ jQuery(function($) {
                     });
                 }
                 if ($(this).is(':checked')) {
-                    $obj.attr('checked', 'checked');
+                    $obj.prop('checked', true);
                 } else {
-                    $obj.removeAttr('checked');
+                    $obj.prop('checked', false);
                 }
                 if ($('input:checkbox:checked', $li).length > 0) {
                     methods.unfold($li, true);
