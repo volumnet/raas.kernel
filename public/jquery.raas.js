@@ -87,9 +87,9 @@ jQuery(function($) {
             clickCheckboxAccurate: function(e)
             {
                 if ($(this).is(':checked')) {
-                    $(this).removeAttr('checked');
+                    $(this).prop('checked', false);
                 } else {
-                    $(this).attr('checked', 'checked');
+                    $(this).prop('checked', true);
                 }
                 e.stopPropagation();
                 e.preventDefault();
