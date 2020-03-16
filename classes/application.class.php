@@ -525,7 +525,10 @@ final class Application extends Singleton implements IContext
 
     public function install()
     {
-        if (!$this->registryGet('installDate')) {
+        if (!$this->registryGet('installDate') ||
+            !$this->registryGet('baseVersion') ||
+            ($this->registryGet('baseVersion') != $this->version)
+        ) {
             if (is_file($this->installFile)) {
                 $sqlQuery = file_get_contents($this->installFile);
                 if ($sqlQuery) {
@@ -534,6 +537,7 @@ final class Application extends Singleton implements IContext
                 }
             }
             $this->registrySet('installDate', date('Y-m-d H:i:s'));
+            $this->registrySet('baseVersion', $this->version);
 
             Attachment::clearLostAttachments();
             Attachment::clearLostFiles();

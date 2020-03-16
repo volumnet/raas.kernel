@@ -60,6 +60,12 @@ class View_Web extends Abstract_View implements IContext_View_Web
     protected $title;
 
     /**
+     * Подзаголовок страницы
+     * @var string
+     */
+    protected $subtitle;
+
+    /**
      * Верхнее меню, пункты в виде array('name' => 'текст ссылки', ['href' => 'ссылка', ...прочие аттрибуты тега <a...></a>...])
      * @var \ArrayObject
      */
@@ -136,7 +142,7 @@ class View_Web extends Abstract_View implements IContext_View_Web
      * Имена контейнеров-строк
      * @var array
      */
-    private static $stringContainers = ['template', 'title'];
+    private static $stringContainers = ['template', 'title', 'subtitle'];
 
     /**
      * Экземпляр класса

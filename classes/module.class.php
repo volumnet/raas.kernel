@@ -134,7 +134,10 @@ abstract class Module extends Singleton implements IRightsContext
 
     public function install()
     {
-        if (!$this->registryGet('installDate')) {
+        if (!$this->registryGet('installDate') ||
+            !$this->registryGet('baseVersion') ||
+            ($this->registryGet('baseVersion') != $this->version)
+        ) {
             $u = $this->updater;
             if ($u) {
                 $u->preInstall();
@@ -155,6 +158,7 @@ abstract class Module extends Singleton implements IRightsContext
                 'value' => date('Y-m-d H:i:s'),
                 'locked' => 1
             ]);
+            $this->registrySet('baseVersion', $this->version);
             $this->registrySet('isActive', 1);
         }
     }

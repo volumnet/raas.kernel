@@ -226,6 +226,9 @@ if (Application::i()->activeModule) {
               </div>
           <?php } ?>
           <h1 class="h1"><?php echo $TITLE?></h1>
+          <?php if ($SUBTITLE) { ?>
+              <div class="subtitle"><?php echo $SUBTITLE?></div>
+          <?php } ?>
           <?php if ($localError) { ?>
               <div class="alert alert-error alert-block">
                 <button type="button" class="close" data-dismiss="alert">&times;</button>
