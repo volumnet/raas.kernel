@@ -1,7 +1,12 @@
 <?php
 namespace RAAS;
 
-abstract class CustomField extends \SOME\SOME
+use Exception;
+use SimpleXMLElement;
+use SOME\CSV;
+use SOME\SOME;
+
+abstract class CustomField extends SOME
 {
     const data_table = '';
     const DictionaryClass = '';
@@ -11,14 +16,39 @@ abstract class CustomField extends \SOME\SOME
     protected static $tablename = '';
     protected static $defaultOrderBy = "priority";
 
-    protected static $cognizableVars = array('stdSource');
+    protected static $cognizableVars = ['stdSource'];
 
-    public static $fieldTypes = array(
-        'text', 'color', 'date', 'datetime-local', 'email', 'number', 'range', 'tel', 'time', 'url', 'month', /*'week', */'password',
-        'checkbox', 'radio', 'file', 'image', 'select', 'textarea', 'htmlarea'
-    );
+    public static $fieldTypes = [
+        'text',
+        'color',
+        'date',
+        'datetime-local',
+        'email',
+        'number',
+        'range',
+        'tel',
+        'time',
+        'url',
+        'month',
+        /*'week',*/
+        'password',
+        'checkbox',
+        'radio',
+        'file',
+        'image',
+        'select',
+        'textarea',
+        'htmlarea'
+    ];
 
-    public static $sourceTypes = array('dictionary', 'ini', 'csv', 'xml', 'sql', 'php');
+    public static $sourceTypes = [
+        'dictionary',
+        'ini',
+        'csv',
+        'xml',
+        'sql',
+        'php'
+    ];
 
     /**
      * @todo
@@ -31,35 +61,44 @@ abstract class CustomField extends \SOME\SOME
                 break;
             case 'Field':
                 $t = $this;
-                $f = new \RAAS\Field();
+                $f = new Field();
                 $f->type = $this->datatype;
-                foreach (array('placeholder', 'pattern') as $key) {
+                foreach (['placeholder', 'pattern'] as $key) {
                     if ((string)$this->$key !== '') {
                         $f->$key = (string)$this->$key;
                     }
                 }
-                foreach (array('required', 'maxlength', 'multiple') as $key) {
+                foreach (['required', 'maxlength', 'multiple'] as $key) {
                     if ((int)$this->$key) {
                         $f->$key = (int)$this->$key;
                     }
                 }
-                foreach (array('min_val', 'max_val', 'step') as $key) {
+                foreach (['min_val', 'max_val', 'step'] as $key) {
                     if ((float)$this->$key) {
                         $f->{str_replace('_val', '', $key)} = (float)$this->$key;
                     }
                 }
                 $f->name = $this->urn;
                 $f->caption = $this->name;
-                $f->children = $this->_getFieldChildren((array)$this->_stdSource(), $f);
+                $f->children = $this->_getFieldChildren(
+                    (array)$this->_stdSource(),
+                    $f
+                );
                 $f->export = 'is_null';
                 $f->import = function ($Field) use ($t) {
                     return $t->getValues();
                 };
-                // 2015-07-06, AVS: добавил && (!$t->multiple || $t->required), чтобы автоматом не подставлял первое попавшееся во множественном
-                if (!in_array($t->datatype, array('image', 'file')) && (!$t->multiple || $t->required)) {
+                // 2015-07-06, AVS: добавил && (!$t->multiple || $t->required),
+                // чтобы автоматом не подставлял первое попавшееся
+                // во множественном
+                if (!in_array($t->datatype, ['image', 'file']) &&
+                    (!$t->multiple || $t->required)
+                ) {
                     $f->default = $t->defval;
                 }
-                if (in_array($t->datatype, array('image', 'file')) && $t->getValue()->id) {
+                if (in_array($t->datatype, ['image', 'file']) &&
+                    $t->getValue()->id
+                ) {
                     //$f->required = false;
                 }
                 $f->meta['CustomField'] = $t;
@@ -70,7 +109,9 @@ abstract class CustomField extends \SOME\SOME
                             $t->deleteValues();
                             if ($Field->multiple) {
                                 foreach ($_FILES[$Field->name]['tmp_name'] as $key => $val) {
-                                    if (is_uploaded_file($_FILES[$Field->name]['tmp_name'][$key]) && $t->validate($_FILES[$Field->name]['tmp_name'][$key])) {
+                                    if (is_uploaded_file($_FILES[$Field->name]['tmp_name'][$key]) &&
+                                        $t->validate($_FILES[$Field->name]['tmp_name'][$key])
+                                    ) {
                                         $att = new Attachment();
                                         $att->upload = $_FILES[$Field->name]['tmp_name'][$key];
                                         $att->filename = $_FILES[$Field->name]['name'][$key];
@@ -91,7 +132,9 @@ abstract class CustomField extends \SOME\SOME
                                     unset($att);
                                 }
                             } else {
-                                if (is_uploaded_file($_FILES[$Field->name]['tmp_name']) && $t->validate($_FILES[$Field->name]['tmp_name'])) {
+                                if (is_uploaded_file($_FILES[$Field->name]['tmp_name']) &&
+                                    $t->validate($_FILES[$Field->name]['tmp_name'])
+                                ) {
                                     $att = new Attachment((int)$t2['attachment']);
                                     $att->upload = $_FILES[$Field->name]['tmp_name'];
                                     $att->filename = $_FILES[$Field->name]['name'];
@@ -127,9 +170,15 @@ abstract class CustomField extends \SOME\SOME
                 break;
             case 'inherited':
                 if ($this->Owner) {
-                    $SQL_query = "SELECT MIN(inherited) FROM " . static::$dbprefix . static::data_table . " WHERE pid = ? AND fid = ?";
-                    $SQL_bind = array((int)$this->Owner->id, (int)$this->id);
-                    return (bool)(int)static::$SQL->getvalue(array($SQL_query, $SQL_bind));
+                    $sqlQuery = "SELECT MIN(inherited)
+                                   FROM " . static::$dbprefix . static::data_table . "
+                                  WHERE pid = ?
+                                    AND fid = ?";
+                    $sqlBind = [(int)$this->Owner->id, (int)$this->id];
+                    return (bool)(int)static::$SQL->getvalue([
+                        $sqlQuery,
+                        $sqlBind
+                    ]);
                 }
                 return false;
                 break;
@@ -143,7 +192,8 @@ abstract class CustomField extends \SOME\SOME
     public function commit()
     {
         if (!$this->id || !$this->priority) {
-            $this->priority = static::$SQL->getvalue("SELECT MAX(priority) FROM " . static::_tablename()) + 1;
+            $sqlQuery = "SELECT MAX(priority) FROM " . static::_tablename();
+            $this->priority = static::$SQL->getvalue($sqlQuery) + 1;
         }
         if (!$this->urn && $this->name) {
             $this->urn = \SOME\Text::beautify($this->name);
@@ -151,8 +201,21 @@ abstract class CustomField extends \SOME\SOME
         if (!$this->classname) {
             $this->classname = static::$references['parent']['classname'];
         }
-        $SQL_query = "SELECT COUNT(*) FROM " . static::_tablename() . " WHERE urn = ? AND classname = ? AND pid = ? AND id != ?";
-        while (in_array($this->urn, array('name', 'description')) || (int)static::$SQL->getvalue(array($SQL_query, $this->urn, $this->classname, (int)$this->pid, (int)$this->id))) {
+        $sqlQuery = "SELECT COUNT(*)
+                       FROM " . static::_tablename() . "
+                      WHERE urn = ?
+                        AND classname = ?
+                        AND pid = ?
+                        AND id != ?";
+        while (in_array($this->urn, ['name', 'description']) ||
+            (int)static::$SQL->getvalue([
+                $sqlQuery,
+                $this->urn,
+                $this->classname,
+                (int)$this->pid,
+                (int)$this->id
+            ])
+        ) {
             $this->urn = '_' . $this->urn . '_';
         }
         parent::commit();
@@ -171,14 +234,23 @@ abstract class CustomField extends \SOME\SOME
     }
 
 
+    /**
+     * Возвращает "сырое" значение по индексу
+     * @param int $index Индекс (начиная с 0)
+     * @return mixed
+     */
     public function getValue($index = 0)
     {
         if (!$this->Owner || !static::data_table) {
             return null;
         }
-        $SQL_query = "SELECT value FROM " . static::$dbprefix . static::data_table . " WHERE pid = ? AND fid = ? AND fii = ?";
-        $SQL_bind = array((int)$this->Owner->id, (int)$this->id, (int)$index);
-        $value = static::$SQL->getvalue(array($SQL_query, $SQL_bind));
+        $sqlQuery = "SELECT value
+                       FROM " . static::$dbprefix . static::data_table . "
+                      WHERE pid = ?
+                        AND fid = ?
+                        AND fii = ?";
+        $sqlBind = [(int)$this->Owner->id, (int)$this->id, (int)$index];
+        $value = static::$SQL->getvalue([$sqlQuery, $sqlBind]);
         switch ($this->datatype) {
             case 'image':
             case 'file':
@@ -197,6 +269,13 @@ abstract class CustomField extends \SOME\SOME
     }
 
 
+    /**
+     * Возвращает значение (значения) поля
+     * @param bool $forceArray Представить в виде массива,
+     *                         даже если значение одно
+     * @return mixed Значение поля, если оно одно и не установлен $forceArray,
+     *               массив значений в противном случае
+     */
     public function getValues($forceArray = false)
     {
         if (!$this->Owner || !static::data_table) {
@@ -205,9 +284,13 @@ abstract class CustomField extends \SOME\SOME
         if (!$this->multiple && !$forceArray) {
             return $this->getValue();
         }
-        $SQL_query = "SELECT value FROM " . static::$dbprefix . static::data_table . " WHERE pid = ? AND fid = ? ORDER BY fii ASC";
-        $SQL_bind = array((int)$this->Owner->id, (int)$this->id);
-        $values = static::$SQL->getcol(array($SQL_query, $SQL_bind));
+        $sqlQuery = "SELECT value
+                       FROM " . static::$dbprefix . static::data_table . "
+                      WHERE pid = ?
+                        AND fid = ?
+                   ORDER BY fii ASC";
+        $sqlBind = [(int)$this->Owner->id, (int)$this->id];
+        $values = static::$SQL->getcol([$sqlQuery, $sqlBind]);
         switch ($this->datatype) {
             case 'image':
             case 'file':
@@ -240,6 +323,11 @@ abstract class CustomField extends \SOME\SOME
     }
 
 
+    /**
+     * Возвращает человеко-понятное значение
+     * @param mixed $x "Сырое" значение (используется первое текущее, если null)
+     * @return mixed
+     */
     public function doRich($x = null)
     {
         if ($x === null) {
@@ -264,6 +352,51 @@ abstract class CustomField extends \SOME\SOME
                 break;
         }
         return $x;
+    }
+
+
+    /**
+     * Возвращает человеко-понятное значение по индексу
+     * @param int $index Индекс (начиная с 0)
+     * @return mixed
+     */
+    public function getRichValue($index = 0)
+    {
+        $val = $this->getValue($index);
+        $result = $this->doRich($val);
+        return $result;
+    }
+
+
+    /**
+     * Возвращает человеко-понятное значение (значения) поля
+     * @param bool $forceArray Представить в виде массива,
+     *                         даже если значение одно
+     * @return mixed Значение поля, если оно одно и не установлен $forceArray,
+     *               массив значений в противном случае
+     */
+    public function getRichValues($forceArray = false)
+    {
+        $values = $this->getValues(true);
+        $result = array_map(function ($x) {
+            return $this->doRich($x);
+        }, $values);
+        if ((count($result) == 1) && !$forceArray) {
+            $result = array_shift($result);
+        }
+        return $result;
+    }
+
+
+    /**
+     * Возвращает "склеенную" строку человеко-понятных значений
+     * @param string $separator Разделитель значений
+     * @return string
+     */
+    public function getRichString($separator = ', ')
+    {
+        $result = implode($separator, $this->getRichValues(true));
+        return $result;
     }
 
 
@@ -297,10 +430,13 @@ abstract class CustomField extends \SOME\SOME
         if (!$this->Owner || !static::data_table) {
             return null;
         }
-        $SQL_bind = array((int)$this->Owner->id, (int)$this->id);
-        $SQL_query = "SELECT MAX(fii) FROM " . static::$dbprefix . static::data_table . " WHERE pid = ? AND fid = ?";
-        $SQL_result = static::$SQL->getvalue(array($SQL_query, $SQL_bind));
-        return ($SQL_result === null ? 0 : $SQL_result + 1);
+        $sqlBind = [(int)$this->Owner->id, (int)$this->id];
+        $sqlQuery = "SELECT MAX(fii)
+                       FROM " . static::$dbprefix . static::data_table . "
+                      WHERE pid = ?
+                        AND fid = ?";
+        $sqlResult = static::$SQL->getvalue([$sqlQuery, $sqlBind]);
+        return ($sqlResult === null ? 0 : $sqlResult + 1);
     }
 
 
@@ -318,7 +454,12 @@ abstract class CustomField extends \SOME\SOME
         if (!$this->Owner || !static::data_table) {
             return null;
         }
-        $arr = array('pid' => (int)$this->Owner->id, 'fid' => (int)$this->id, 'fii' => (int)$index, 'value' => $value);
+        $arr = [
+            'pid' => (int)$this->Owner->id,
+            'fid' => (int)$this->id,
+            'fii' => (int)$index,
+            'value' => $value
+        ];
         static::$SQL->add(static::$dbprefix . static::data_table, $arr);
         return $value;
     }
@@ -329,12 +470,17 @@ abstract class CustomField extends \SOME\SOME
         if (!$this->Owner || !static::data_table) {
             return null;
         }
-        $SQL_bind = array((int)$this->Owner->id, (int)$this->id, (int)$index);
+        $sqlBind = [(int)$this->Owner->id, (int)$this->id, (int)$index];
         if ($index === null) {
             $index = $this->countValues();
         } else {
-            $SQL_query = "UPDATE " . static::$dbprefix . static::data_table . " SET fii = fii + 1 WHERE pid = ? AND fid = ? AND fii >= ? ORDER BY fii DESC";
-            static::$SQL->query(array($SQL_query, $SQL_bind));
+            $sqlQuery = "UPDATE " . static::$dbprefix . static::data_table . "
+                            SET fii = fii + 1
+                          WHERE pid = ?
+                            AND fid = ?
+                            AND fii >= ?
+                       ORDER BY fii DESC";
+            static::$SQL->query([$sqlQuery, $sqlBind]);
         }
         $this->setValue($value, $index);
     }
@@ -345,11 +491,19 @@ abstract class CustomField extends \SOME\SOME
         if (!$this->Owner || !static::data_table) {
             return null;
         }
-        $SQL_bind = array((int)$this->Owner->id, (int)$this->id, (int)$index);
-        $SQL_query = "DELETE FROM " . static::$dbprefix . static::data_table . " WHERE pid = ? AND fid = ? AND fii = ?";
-        static::$SQL->query(array($SQL_query, $SQL_bind));
-        $SQL_query = "UPDATE " . static::$dbprefix . static::data_table . " SET fii = fii - 1 WHERE pid = ? AND fid = ? AND fii > ? ORDER BY fii ASC";
-        static::$SQL->query(array($SQL_query, $SQL_bind));
+        $sqlBind = [(int)$this->Owner->id, (int)$this->id, (int)$index];
+        $sqlQuery = "DELETE FROM " . static::$dbprefix . static::data_table . "
+                      WHERE pid = ?
+                        AND fid = ?
+                        AND fii = ?";
+        static::$SQL->query([$sqlQuery, $sqlBind]);
+        $sqlQuery = "UPDATE " . static::$dbprefix . static::data_table . "
+                        SET fii = fii - 1
+                      WHERE pid = ?
+                        AND fid = ?
+                        AND fii > ?
+                   ORDER BY fii ASC";
+        static::$SQL->query([$sqlQuery, $sqlBind]);
     }
 
 
@@ -358,24 +512,31 @@ abstract class CustomField extends \SOME\SOME
         if (!$this->Owner || !static::data_table) {
             return null;
         }
-        $SQL_bind = array((int)$this->Owner->id, (int)$this->id);
-        static::$SQL->query(array("DELETE FROM " . static::$dbprefix . static::data_table . " WHERE pid = ? AND fid = ?", $SQL_bind));
+        $sqlQuery = "DELETE FROM " . static::$dbprefix . static::data_table . "
+                      WHERE pid = ?
+                        AND fid = ?";
+        $sqlBind = [(int)$this->Owner->id, (int)$this->id];
+        static::$SQL->query([$sqlQuery, $sqlBind]);
     }
 
 
     public function clearLostAttachments()
     {
-        if (in_array($this->datatype, array('file', 'image'))) {
-            $SQL_query = "SELECT value FROM " . static::$dbprefix . static::data_table . " WHERE fid = " . (int)$this->id;
-            $SQL_result = array_filter(static::$SQL->getcol($SQL_query), 'intval');
-            $SQL_query = "SELECT * FROM " . Attachment::_tablename() . "
-                           WHERE classname = '" . self::$SQL->real_escape_string(get_class($this)) . "' AND pid = " . (int)$this->id;
-            if ($SQL_result) {
-                $SQL_query .= " AND id NOT IN (" . implode(", ", $SQL_result) . ")";
+        if (in_array($this->datatype, ['file', 'image'])) {
+            $sqlQuery = "SELECT value
+                           FROM " . static::$dbprefix . static::data_table . "
+                          WHERE fid = " . (int)$this->id;
+            $sqlResult = array_filter(static::$SQL->getcol($sqlQuery), 'intval');
+            $sqlQuery = "SELECT *
+                           FROM " . Attachment::_tablename() . "
+                          WHERE classname = '" . self::$SQL->real_escape_string(get_class($this)) . "'
+                            AND pid = " . (int)$this->id;
+            if ($sqlResult) {
+                $sqlQuery .= " AND id NOT IN (" . implode(", ", $sqlResult) . ")";
             }
-            $SQL_result = Attachment::getSQLSet($SQL_query);
-            if ($SQL_result) {
-                foreach ($SQL_result as $row) {
+            $sqlResult = Attachment::getSQLSet($sqlQuery);
+            if ($sqlResult) {
+                foreach ($sqlResult as $row) {
                     Attachment::delete($row);
                 }
             }
@@ -385,22 +546,34 @@ abstract class CustomField extends \SOME\SOME
 
     public function inheritValues()
     {
-        $SQL_query = "UPDATE " . static::$dbprefix . static::data_table . " SET inherited = 1 WHERE pid = ? AND fid = ?";
-        $SQL_bind = array((int)$this->Owner->id, (int)$this->id);
-        static::$SQL->query(array($SQL_query, $SQL_bind));
+        $sqlQuery = "UPDATE " . static::$dbprefix . static::data_table . "
+                        SET inherited = 1
+                      WHERE pid = ?
+                        AND fid = ?";
+        $sqlBind = [(int)$this->Owner->id, (int)$this->id];
+        static::$SQL->query([$sqlQuery, $sqlBind]);
 
-        if ($this->Owner->all_children_ids && is_array($this->Owner->all_children_ids)) {
-            if ($temp = array_values(array_map('intval', array_filter($this->Owner->all_children_ids, 'intval')))) {
-                $SQL_query = "DELETE FROM " . static::$dbprefix . static::data_table . " WHERE fid = " . (int)$this->id . " AND pid IN (" . implode(", ", $temp) . ")";
-                static::$SQL->query($SQL_query);
+        if ($this->Owner->all_children_ids &&
+            is_array($this->Owner->all_children_ids)
+        ) {
+            if ($temp = array_values(array_map('intval', array_filter(
+                $this->Owner->all_children_ids,
+                'intval'
+            )))) {
+                $sqlQuery = "DELETE FROM " . static::$dbprefix . static::data_table . "
+                              WHERE fid = " . (int)$this->id . "
+                                AND pid IN (" . implode(", ", $temp) . ")";
+                static::$SQL->query($sqlQuery);
 
                 $classname = get_class($this->Owner);
-                $SQL_query = "INSERT INTO " . static::$dbprefix . static::data_table . " (pid, fid, fii, value, inherited)
-                              SELECT tP.id AS pid, tD.fid, tD.fii, tD.value, tD.inherited
-                                FROM " . $classname::_tablename() . " AS tP
-                                JOIN " . static::$dbprefix . static::data_table . " AS tD
-                               WHERE tD.pid = " . (int)$this->Owner->id . " AND fid = " . (int)$this->id . " AND tP.id IN (" . implode(", ", $temp) . ")";
-                static::$SQL->query($SQL_query);
+                $sqlQuery = "INSERT INTO " . static::$dbprefix . static::data_table . " (pid, fid, fii, value, inherited)
+                             SELECT tP.id AS pid, tD.fid, tD.fii, tD.value, tD.inherited
+                               FROM " . $classname::_tablename() . " AS tP
+                               JOIN " . static::$dbprefix . static::data_table . " AS tD
+                              WHERE tD.pid = " . (int)$this->Owner->id . "
+                                AND fid = " . (int)$this->id . "
+                                AND tP.id IN (" . implode(", ", $temp) . ")";
+                static::$SQL->query($sqlQuery);
             }
         }
     }
@@ -408,11 +581,11 @@ abstract class CustomField extends \SOME\SOME
 
     protected static function parseCSV($text)
     {
-        $csv = new \SOME\CSV($text);
-        $data = array();
+        $csv = new CSV($text);
+        $data = [];
 
         list($currentStep) = each(array_filter($csv->data[0], 'trim'));
-        $backtrace = array(array($currentStep, &$data));
+        $backtrace = [[$currentStep, &$data]];
         $last = null;
 
         for ($i = 0; $i < count($csv->data); $i++) {
@@ -423,8 +596,8 @@ abstract class CustomField extends \SOME\SOME
                 for ($j = 0; ($j < count($backtrace)) && ($backtrace[$j][0] <= $step); $j++) {
                 }
                 if ($j >= count($backtrace)) {
-                    $last['children'] = array();
-                    $backtrace[] = array($step, &$last['children']);
+                    $last['children'] = [];
+                    $backtrace[] = [$step, &$last['children']];
                 } else {
                     $backtrace = array_slice($backtrace, 0, $j);
                 }
@@ -434,7 +607,7 @@ abstract class CustomField extends \SOME\SOME
 
             $val = trim(isset($row[0]) ? $row[0] : '');
             $key = trim(isset($row[1]) && $row[1] ? $row[1] : $row[0]);
-            $backtrace[count($backtrace) - 1][1][$key] = array('name' => $val);
+            $backtrace[count($backtrace) - 1][1][$key] = ['name' => $val];
             $last =& $backtrace[count($backtrace) - 1][1][$key];
         }
 
@@ -445,9 +618,9 @@ abstract class CustomField extends \SOME\SOME
     protected static function parseINI($text)
     {
         $ini = @parse_ini_string($text);
-        $data = array();
+        $data = [];
         foreach ($ini as $key => $val) {
-            $data[trim($key)] = array('name' => trim($val));
+            $data[trim($key)] = ['name' => trim($val)];
         }
         return $data;
     }
@@ -455,24 +628,40 @@ abstract class CustomField extends \SOME\SOME
 
     protected static function parseXML($text)
     {
-        $data = array();
-        if ($text instanceof \SimpleXMLElement) {
+        $data = [];
+        if ($text instanceof SimpleXMLElement) {
             $sxe = $text;
         } else {
             try {
-                $sxe = new \SimpleXMLElement((string)$text);
-            } catch (\Exception $e) {
+                $sxe = new SimpleXMLElement((string)$text);
+            } catch (Exception $e) {
                 try {
-                    $sxe = new \SimpleXMLElement('<dictionary>' . $text . '</dictionary>');
-                } catch (\Exception $e) {
+                    $sxe = new SimpleXMLElement(
+                        '<dictionary>' . $text . '</dictionary>'
+                    );
+                } catch (Exception $e) {
                 }
             }
         }
         if ($sxe) {
             foreach ($sxe->children() as $row) {
-                $val = trim(isset($row['title']) && trim($row['title']) ? $row['title'] : (isset($row['name']) && trim($row['name']) ? $row['name'] : $row->getName()));
-                $key = trim(isset($row['value']) && trim($row['value']) ? $row['value'] : (isset($row['id']) && trim($row['id']) ? $row['id'] : $val));
-                $data[$key] = array('name' => $val);
+                if (isset($row['title']) && trim($row['title'])) {
+                    $val = $row['title'];
+                } elseif (isset($row['name']) && trim($row['name'])) {
+                    $val = $row['name'];
+                } else {
+                    $val = $row->getName();
+                }
+                $val = trim($val);
+                if (isset($row['value']) && trim($row['value'])) {
+                    $key = $row['value'];
+                } elseif (isset($row['id']) && trim($row['id'])) {
+                    $key = $row['id'];
+                } else {
+                    $key = $val;
+                }
+                $key = trim($key);
+                $data[$key] = ['name' => $val];
                 if ($temp = static::parseXML($row)) {
                     $data[$key]['children'] = $temp;
                 }
@@ -484,30 +673,41 @@ abstract class CustomField extends \SOME\SOME
 
     protected static function parseSQL($text, $pid = 0)
     {
-        $data = array();
+        $data = [];
         if (is_array($text)) {
-            $SQL_result = $text;
+            $sqlResult = $text;
         } else {
-            if (preg_match('/(INSERT )|(UPDATE )|(DELETE )|(FILE )|(CREATE )|(ALTER )|(INDEX )|(DROP )|(REPLACE )/i', $text)) {
+            $rx = '/(INSERT )|(UPDATE )|(DELETE )|(FILE )|(CREATE )|(ALTER )|(INDEX )|(DROP )|(REPLACE )/i';
+            if (preg_match($rx, $text)) {
                 return $data;
             }
-            $SQL_result = static::$SQL->get((string)$text);
+            $sqlResult = static::$SQL->get((string)$text);
         }
-        if ($SQL_result) {
-            // $rawData = array_values(array_filter($SQL_result, create_function('$x', '$v = "' . addslashes($pid) . '"; return ($x["pid"] == $v) || (!$x["pid"] && !$v);')));
+        if ($sqlResult) {
+            // $rawData = array_values(array_filter($sqlResult, create_function('$x', '$v = "' . addslashes($pid) . '"; return ($x["pid"] == $v) || (!$x["pid"] && !$v);')));
             $rawData = array_values(
                 array_filter(
-                    $SQL_result,
+                    $sqlResult,
                     function ($x) use ($pid) {
                         return ($x['pid'] == $pid) || (!$x['pid'] && !$pid);
                     }
                 )
             );
             foreach ($rawData as $row) {
-                $val = trim(isset($row['name']) && trim($row['name']) ? $row['name'] : array_shift(array_values($row)));
-                $key = trim(isset($row['val']) && trim($row['val']) ? $row['val'] : $val);
-                $data[$key] = array('name' => $val);
-                if ($temp = static::parseSQL($SQL_result, $key)) {
+                if (isset($row['name']) && trim($row['name'])) {
+                    $val = $row['name'];
+                } else {
+                    $val = array_shift(array_values($row));
+                }
+                $val = trim($val);
+                if (isset($row['val']) && trim($row['val'])) {
+                    $key = $row['val'];
+                } else {
+                    $key = $val;
+                }
+                $key = trim($key);
+                $data[$key] = ['name' => $val];
+                if ($temp = static::parseSQL($sqlResult, $key)) {
                     $data[$key]['children'] = $temp;
                 }
             }
@@ -518,7 +718,7 @@ abstract class CustomField extends \SOME\SOME
 
     protected static function parsePHP($text)
     {
-        $data = array();
+        $data = [];
         if (is_array($text)) {
             $result = $text;
         } else {
@@ -528,15 +728,17 @@ abstract class CustomField extends \SOME\SOME
             foreach ((array)$result as $key => $arr) {
                 $key = trim($key);
                 if (is_array($arr)) {
-                    $data[$key] = array();
+                    $data[$key] = [];
                     if (isset($arr['name'])) {
                         $data[$key]['name'] = $arr['name'];
                     }
-                    if (isset($arr['children']) && ($temp = static::parsePHP($arr['children']))) {
+                    if (isset($arr['children']) &&
+                        ($temp = static::parsePHP($arr['children']))
+                    ) {
                         $data[$key]['children'] = $temp;
                     }
                 } else {
-                    $data[$key] = array('name' => trim($arr));
+                    $data[$key] = ['name' => trim($arr)];
                 }
             }
         }
@@ -546,11 +748,11 @@ abstract class CustomField extends \SOME\SOME
 
     protected static function parseDictionary(Dictionary $Dictionary)
     {
-        $data = array();
+        $data = [];
         foreach ($Dictionary->children as $row) {
             $key = $row->urn;
             $val = $row->name;
-            $data[$key] = array('name' => $val);
+            $data[$key] = ['name' => $val];
             if ($temp = static::parseDictionary($row)) {
                 $data[$key]['children'] = $temp;
             }
@@ -559,7 +761,7 @@ abstract class CustomField extends \SOME\SOME
     }
 
 
-    protected function getCaption($key = '', $DATA = array())
+    protected function getCaption($key = '', $DATA = [])
     {
         if (!$DATA) {
             $DATA =& $this->stdSource;
@@ -568,7 +770,9 @@ abstract class CustomField extends \SOME\SOME
             return $DATA[$key]['name'];
         }
         foreach ($DATA as $k => $row) {
-            if (isset($row['children']) && ($v = $this->getCaption($key, $row['children']))) {
+            if (isset($row['children']) &&
+                ($v = $this->getCaption($key, $row['children']))
+            ) {
                 return $v;
             }
         }
@@ -576,7 +780,7 @@ abstract class CustomField extends \SOME\SOME
     }
 
 
-    protected function getFromCaption($val = '', $DATA = array())
+    protected function getFromCaption($val = '', $DATA = [])
     {
         if (!$DATA) {
             $DATA =& $this->stdSource;
@@ -585,7 +789,9 @@ abstract class CustomField extends \SOME\SOME
             if (mb_strtolower(trim($row['name'])) == mb_strtolower(trim($val))) {
                 return $k;
             }
-            if (isset($row['children']) && ($v = $this->getFromCaption($val, $row['children']))) {
+            if (isset($row['children']) &&
+                ($v = $this->getFromCaption($val, $row['children']))
+            ) {
                 return $v;
             }
         }
@@ -596,7 +802,7 @@ abstract class CustomField extends \SOME\SOME
     protected function _stdSource()
     {
         if (!trim($this->source)) {
-            return array();
+            return [];
         }
         switch ($this->source_type) {
             case 'csv':
@@ -616,23 +822,34 @@ abstract class CustomField extends \SOME\SOME
                 break;
             case 'dictionary':
                 $classname = static::DictionaryClass;
-                return (array)static::parseDictionary(new $classname((int)$this->source));
+                return (array)static::parseDictionary(
+                    new $classname((int)$this->source)
+                );
                 break;
         }
     }
 
-    protected function _getFieldChildren(array $stdSource = array(), \RAAS\Field $parentField)
+    protected function _getFieldChildren(array $stdSource, Field $parentField)
     {
         $options = new OptionCollection();
         $options->Parent = $parentField;
         if (!$parentField->required) {
-            $option = new Option(array('value' => '', 'caption' => ($parentField->placeholder ?: '--')));
+            $option = new Option([
+                'value' => '',
+                'caption' => ($parentField->placeholder ?: '--')
+            ]);
             $options[] = $option;
         }
         foreach ((array)$stdSource as $key => $val) {
-            $Option = new Option(array('value' => $key, 'caption' => $val['name']));
+            $Option = new Option([
+                'value' => $key,
+                'caption' => $val['name']
+            ]);
             if (isset($val['children'])) {
-                $Option->children = $this->_getFieldChildren($val['children'], $parentField);
+                $Option->children = $this->_getFieldChildren(
+                    $val['children'],
+                    $parentField
+                );
             }
             $options[] = $Option;
         }
@@ -644,7 +861,7 @@ abstract class CustomField extends \SOME\SOME
     {
         $args = func_get_args();
         if (!isset($args[0]['where'])) {
-            $args[0]['where'] = array();
+            $args[0]['where'] = [];
         } else {
             $args[0]['where'] = (array)$args[0]['where'];
         }
