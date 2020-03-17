@@ -395,7 +395,14 @@ abstract class CustomField extends SOME
      */
     public function getRichString($separator = ', ')
     {
-        $result = implode($separator, $this->getRichValues(true));
+        $richValues = array_map(function ($x) {
+            if (is_object($x)) {
+                return $x->name;
+            } else {
+                return $x;
+            }
+        }, $this->getRichValues(true));
+        $result = implode($separator, $richValues);
         return $result;
     }
 
