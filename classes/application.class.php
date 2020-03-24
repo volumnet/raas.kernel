@@ -388,6 +388,12 @@ final class Application extends Singleton implements IContext
      */
     public function initDB()
     {
+        if (!trim($this->DSN) ||
+            !trim($this->config['dbuser']) ||
+            !trim($this->config['dbname'])
+        ) {
+            return false;
+        }
         try {
             $this->SQL = new DB(
                 $this->DSN,
@@ -682,7 +688,10 @@ final class Application extends Singleton implements IContext
     private function getConfig()
     {
         if (is_file($this->configFile)) {
-            @include_once $this->configFile;
+            // 2020-03-24, AVS: заменил на eval...file_get_contents
+            // Потому что @include, судя по всему, кэшируется сквозь запросы
+            // @include $this->configFile;
+            @eval('?>' . file_get_contents($this->configFile));
             foreach (self::$configVars as $var) {
                 $this->config[$var] = $$var;
             }

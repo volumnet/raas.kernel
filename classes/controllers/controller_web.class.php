@@ -74,86 +74,8 @@ class Controller_Web extends Abstract_Controller
      */
     protected function configureDB()
     {
-        $CONTENT = [];
-        foreach ($this->application->availableDatabases as $key => $val) {
-            $CONTENT['databases'][] = [
-                'value' => $key,
-                'caption' => $this->view->_($val)
-            ];
-        }
-        $CONTENT['loginTypes'] = [
-            [
-                'value' => 'session',
-                'caption' => $this->view->_('SESSION_LOGIN')
-            ],
-            [
-                'value' => 'http',
-                'caption' => $this->view->_('HTTP_LOGIN')
-            ]
-        ];
-        $t = $this;
-        $Form = new Form([
-            'caption' => $this->view->_('CONFIGURE_DB'),
-            'commit' => function () use ($t) {
-                $t->model->configureDB($_POST);
-                new Redirector();
-            },
-            'children' => [
-                [
-                    'type' => 'hidden',
-                    'name' => 'dbtype',
-                    'default' => 'mysql'
-                ],
-                [
-                    'name' => 'dbhost',
-                    'required' => 'required',
-                    'caption' => $this->view->_('DBHOST'),
-                    'default' => (
-                        $this->model->dbhost ?
-                        $this->model->dbhost :
-                        '127.0.0.1'
-                    )
-                ],
-                [
-                    'name' => 'dbuser',
-                    'required' => 'required',
-                    'caption' => $this->view->_('DBUSER'),
-                    'default' => 'root'
-                ],
-                [
-                    'type' => 'password',
-                    'name' => 'dbpass',
-                    'caption' => $this->view->_('DBPASS')
-                ],
-                [
-                    'name' => 'dbname',
-                    'required' => 'required',
-                    'caption' => $this->view->_('DBNAME'),
-                    'default' => $_SERVER['HTTP_HOST']
-                ],
-                [
-                    'name' => 'dbprefix',
-                    'caption' => $this->view->_('DBPREFIX'),
-                    'default' => $this->model->dbprefix
-                ],
-                [
-                    'type' => 'select',
-                    'name' => 'loginType',
-                    'caption' => $this->view->_('SELECT_LOGIN_TYPE'),
-                    'required' => 'required',
-                    'children' => $CONTENT['loginTypes'],
-                    'default' => $this->model->loginType
-                ],
-                [
-                    'type' => 'checkbox',
-                    'name' => 'prod',
-                    'caption' => $this->view->_('PRODUCTION_SERVER'),
-                    'export' => 'boolval',
-                    'default' => $this->model->prod
-                ],
-            ]
-        ]);
-        $this->view->configureDB($Form->process());
+        $form = new ConfigureDBForm();
+        $this->view->configureDB($form->process());
     }
 
 
