@@ -36,6 +36,7 @@ use SOME\SOME;
  * @property User $user активный пользователь системы
  * @property-read DB $SQL подключение к базе данных
  * @property-read string $DSN строка подключения к базе данных
+ * @property-read Updater $updater мастер обновлений
  */
 final class Application extends Singleton implements IContext
 {
@@ -219,6 +220,7 @@ final class Application extends Singleton implements IContext
                 return false;
                 break;
             case 'composer':
+            case 'updater':
             case 'requiredPHPVersion':
             case 'phpVersionCompatible':
             case 'requiredExtensions':
@@ -535,12 +537,19 @@ final class Application extends Singleton implements IContext
             !$this->registryGet('baseVersion') ||
             ($this->registryGet('baseVersion') != $this->version)
         ) {
+            $u = $this->updater;
+            if ($u) {
+                $u->preInstall();
+            }
             if (is_file($this->installFile)) {
                 $sqlQuery = file_get_contents($this->installFile);
                 if ($sqlQuery) {
                     $sqlQuery = $this->prepareSQL($sqlQuery);
                     $this->SQL->query($sqlQuery);
                 }
+            }
+            if ($u) {
+                $u->postInstall();
             }
             $this->registrySet('installDate', date('Y-m-d H:i:s'));
             $this->registrySet('baseVersion', $this->version);

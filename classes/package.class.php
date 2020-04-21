@@ -23,7 +23,7 @@ use SOME\Singleton;
  * @property-read Abstract_Package_View $view представление пакета
  * @property-read [Module] $modules массив загруженных модулей
  * @property Module $activeModule активный модуль
- * @property Updater $updater мастер обновлений
+ * @property-read Updater $updater мастер обновлений
  * @property-read array $composer Содержимое файла composer.json
  */
 abstract class Package extends Singleton implements IRightsContext

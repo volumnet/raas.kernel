@@ -4,19 +4,10 @@
  */
 namespace RAAS\General;
 
+use SOME\Pages;
 use RAAS\Abstract_Sub_Controller;
-use RAAS\User as User;
-use RAAS\Group as Group;
-use RAAS\Level as Level;
-use RAAS\Redirector as Redirector;
-use RAAS\Application as Application;
-use RAAS\Update as Update;
-use RAAS\IContext as IContext;
-use RAAS\IRightsContext as IRightsContext;
-use RAAS\Form as Form;
-use RAAS\Field as Field;
-use RAAS\Option as Option;
-use RAAS\FormTab as FormTab;
+use RAAS\Application;
+use RAAS\Backup;
 
 /**
  * Класс модуля резервного копирования
@@ -38,6 +29,23 @@ class Sub_Backup extends Abstract_Sub_Controller
                 $this->model->backupFiles();
                 exit;
                 break;
+            default:
+                $this->showlist();
+                break;
         }
+    }
+
+
+    /**
+     * Просмотр списка резервных копий
+     */
+    private function showlist()
+    {
+        $pages = new Pages(
+            (isset($this->nav['page']) ? $this->nav['page'] : 1),
+            Application::i()->registryGet('rowsPerPage')
+        );
+        $set = Backup::getSet([], $pages);
+        $this->view->showlist(['Set' => $set, 'Pages' => $pages]);
     }
 }

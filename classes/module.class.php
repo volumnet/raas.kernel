@@ -24,7 +24,7 @@ use RAAS\Updater;
  * @property-read Package $parent объект родительского пакета
  * @property-read Abstract_Module_Controller $controller контроллер модуля
  * @property-read Abstract_Module_View $view представление модуля
- * @property Updater $updater мастер обновлений
+ * @property-read Updater $updater мастер обновлений
  * @property-read array $composer Содержимое файла composer.json
  */
 abstract class Module extends Singleton implements IRightsContext

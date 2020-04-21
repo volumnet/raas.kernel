@@ -37,8 +37,7 @@ class View_Web extends Package_View_Web
         }
         if ($this->model->user->root) {
             $this->menu[] = array('name' => $this->_('MODULES'), 'href' => '?mode=admin&sub=modules');
-            $this->menu[] = array('name' => $this->_('BACKUP_SQL'), 'href' => '?mode=admin&sub=backup&action=sql');
-            $this->menu[] = array('name' => $this->_('BACKUP_FILES'), 'href' => '?mode=admin&sub=backup&action=files');
+            $this->menu[] = array('name' => $this->_('BACKUPS'), 'href' => '?mode=admin&sub=backup');
         }
     }
 

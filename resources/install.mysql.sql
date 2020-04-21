@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS {$DBPREFIX$}attachments (
   KEY classname (classname,pid),
   KEY classname_2 (classname),
   KEY pid (pid)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='Attachments';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Attachments';
 
 CREATE TABLE IF NOT EXISTS {$DBPREFIX$}backups (
   id int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID#',
@@ -26,24 +26,36 @@ CREATE TABLE IF NOT EXISTS {$DBPREFIX$}backups (
   KEY (type),
   INDEX (post_date),
   KEY (attachment_id)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='Backups';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Backups';
 
 CREATE TABLE IF NOT EXISTS {$DBPREFIX$}crontab (
   id int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID#',
   name VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'Name',
   vis TINYINT(1) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Is active',
   once TINYINT(1) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Process once',
-  weekday VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'Weekday',
--- @todo
-  attachment_id INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Attachment ID#',
-  preserve TINYINT(1) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Preserve from deletion',
+  minutes VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'Minutes',
+  hours VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'Hours',
+  days VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'Days',
+  weekdays VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'Weekdays',
+  command_classname VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'Command classname',
+  args TEXT NULL DEFAULT NULL COMMENT 'Command arguments',
+  priority INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Priority',
 
   PRIMARY KEY (id),
-  KEY (uid),
-  KEY (type),
+  INDEX (priority)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Crontab';
+
+CREATE TABLE IF NOT EXISTS {$DBPREFIX$}crontab_logs (
+  id int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID#',
+  pid INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Crontab task ID#',
+  post_date DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'Backup date/time',
+  attachment_id INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Attachment ID#',
+  
+  PRIMARY KEY (id),
+  KEY (pid),
   INDEX (post_date),
   KEY (attachment_id)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='Crontab';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Crontab logs';
 
 CREATE TABLE IF NOT EXISTS {$DBPREFIX$}groups (
   id smallint(5) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID#',
@@ -52,7 +64,7 @@ CREATE TABLE IF NOT EXISTS {$DBPREFIX$}groups (
   description text COMMENT 'Description',
   PRIMARY KEY (id),
   KEY pid (pid)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='Groups of users';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Groups of users';
 
 CREATE TABLE IF NOT EXISTS {$DBPREFIX$}groups_levels_assoc (
   gid smallint(5) unsigned NOT NULL DEFAULT '0' COMMENT 'Group ID#',
@@ -109,7 +121,7 @@ CREATE TABLE IF NOT EXISTS {$DBPREFIX$}users (
   cache_rights text COMMENT 'Rights table serialize',
   prefs text COMMENT 'User preferences',
   PRIMARY KEY (id)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='Users';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Users';
 
 CREATE TABLE IF NOT EXISTS {$DBPREFIX$}users_groups_assoc (
   uid smallint(5) unsigned NOT NULL DEFAULT '0' COMMENT 'User ID#',
