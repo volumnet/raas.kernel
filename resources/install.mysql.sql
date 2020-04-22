@@ -12,22 +12,6 @@ CREATE TABLE IF NOT EXISTS {$DBPREFIX$}attachments (
   KEY pid (pid)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Attachments';
 
-CREATE TABLE IF NOT EXISTS {$DBPREFIX$}backups (
-  id int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID#',
-  uid INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Author ID#',
-  type ENUM('db', 'files-full', 'files-inc') NOT NULL COMMENT 'Backup type',
-  post_date DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'Backup date/time',
-  name VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'Name',
-  attachment_id INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Attachment ID#',
-  preserve TINYINT(1) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Preserve from deletion',
-
-  PRIMARY KEY (id),
-  KEY (uid),
-  KEY (type),
-  INDEX (post_date),
-  KEY (attachment_id)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Backups';
-
 CREATE TABLE IF NOT EXISTS {$DBPREFIX$}crontab (
   id int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID#',
   name VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'Name',
@@ -37,6 +21,7 @@ CREATE TABLE IF NOT EXISTS {$DBPREFIX$}crontab (
   hours VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'Hours',
   days VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'Days',
   weekdays VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'Weekdays',
+  command_line VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'Arbitrary command line',
   command_classname VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'Command classname',
   args TEXT NULL DEFAULT NULL COMMENT 'Command arguments',
   priority INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Priority',

@@ -4,6 +4,7 @@
  */
 namespace RAAS\General;
 
+use DateTime;
 use RAAS\Table;
 
 /**
@@ -18,7 +19,7 @@ class BackupsTable extends Table
     {
         switch ($var) {
             case 'view':
-                return ViewSub_Users::i();
+                return ViewSub_Backup::i();
                 break;
             default:
                 return parent::__get($var);
@@ -33,10 +34,14 @@ class BackupsTable extends Table
         unset($params['view']);
         $defaultParams = array(
             'columns' => [
+                'id' => [
+                    'caption' => $this->view->_('ID'),
+                ],
                 'post_date' => [
                     'caption' => $this->view->_('DATETIME'),
                     'callback' => function ($item) {
-                        return date($this->view->_('DATETIMEFORMAT'), strtotime($item->post_date));
+                        $dt = DateTime::createFromFormat('Y-m-d H-i-s', $item->postDate);
+                        return $dt->format($this->view->_('DATETIMEFORMAT'));
                     }
                 ],
                 'type' => [
@@ -46,10 +51,31 @@ class BackupsTable extends Table
                     }
                 ],
                 'name' => [
-                    'caption' => $this->view->_('name'),
+                    'caption' => $this->view->_('NAME'),
                     'callback' => function ($item) {
                         return htmlspecialchars($item->name);
                     }
+                ],
+                'preserveFromDeletion' => [
+                    'caption' => $this->view->_('PRESERVE_FROM_DELETION'),
+                    'callback' => function ($item) {
+                        return ($item->preserveFromDeletion ? '<span class="fa fa-check"></span>' : '');
+                    }
+                ],
+                'size' => [
+                    'caption' => $this->view->_('SIZE'),
+                    'callback' => function ($item) {
+                        $sizesPrefixes = [
+                            $this->view->_('FILESIZE_BYTES'),
+                            $this->view->_('FILESIZE_KBYTES'),
+                            $this->view->_('FILESIZE_MBYTES'),
+                            $this->view->_('FILESIZE_GBYTES')
+                        ];
+                        $filesize = (int)@filesize($item->filepath);
+                        $sizelog = floor(log10($filesize) / 3);
+                        return round($filesize / pow(10, ($sizelog * 3)), 1) .
+                               $sizesPrefixes[$sizelog];
+                    },
                 ],
                 ' ' => [
                     'callback' => function ($item) {
@@ -58,8 +84,7 @@ class BackupsTable extends Table
                 ]
             ],
             'caption' => $this->view->_('BACKUPS'),
-            'Set' => $params['Set'],
-            'Pages' => $params['Pages'],
+            'emptyString' => $this->view->_('NO_BACKUPS_FOUND'),
         );
         $arr = array_merge($defaultParams, $params);
         parent::__construct($arr);

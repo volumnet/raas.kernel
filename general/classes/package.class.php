@@ -94,46 +94,10 @@ class Package extends \RAAS\Package
 
     public function backupSQL()
     {
+        $sql = Application::i()->getSQLDump();
         header('Content-Type: text/plain;encoding=UTF-8');
-        header('Content-Disposition: attachment; filename="' . $this->dbname . '.sql"');
-
-        $SQL_query = "SHOW TABLES";
-        $tables = $this->SQL->getcol($SQL_query);
-        for ($i = 0; $i < count($tables); $i++) {
-            $tablename = $tables[$i];
-            if ($i) {
-                echo "\n\n" .
-                     "-- *************************************************************\n";
-            }
-            echo "-- \n" .
-                 "-- Table structure: " . $tablename . "\n" .
-                 "-- \n" .
-                 "DROP TABLE IF EXISTS " . $tablename . ";\n";
-            $SQL_query = "SHOW CREATE TABLE " . $tablename;
-            $SQL_result = $this->SQL->getline($SQL_query);
-            echo $SQL_result['Create Table'] . ";";
-            $SQL_query = "SELECT * FROM " . $tablename;
-            $SQL_result = $this->SQL->get($SQL_query);
-            $SQL_query = "";
-
-            $chunks = array();
-            for ($j = 0, $k = 0, $size = 0; $j < count($SQL_result); $j++) {
-                $size += strlen(json_encode($SQL_result[$j]));
-                if (($size >= self::dangerQuerySize) || ($j == count($SQL_result) - 1)) {
-                    $SQL_query .= $this->SQL->export($tablename, array_slice($SQL_result, $k, $j + 1 - $k), false) . ";\n";
-                    $chunks[] = array($k, $j - $k + 1);
-                    $k = $j + 1;
-                    $size = 0;
-                }
-            }
-            if (trim($SQL_query)) {
-                echo "\n\n" .
-                     "-- \n" .
-                     "-- Table data: " . $tablename . "\n" .
-                     "-- \n";
-                echo $SQL_query;
-            }
-        }
+        header('Content-Disposition: attachment; filename="' . date('Y-m-d H-i') . ' ' . $this->dbname . '.sql"');
+        echo $sql;
     }
 
     public function backupFiles()

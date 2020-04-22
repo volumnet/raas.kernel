@@ -177,10 +177,11 @@ final class Application extends Singleton implements IContext
                 return $dir;
                 break;
             case 'filesDir':
-                $dir = realpath($this->baseFilesDir . '/common');
+                $dir = $this->baseFilesDir . '/common';
                 if (!is_dir($dir)) {
                     @mkdir($dir, 0777, true);
                 }
+                $dir = realpath($dir);
                 return $dir;
                 break;
             case 'baseFilesURL':
@@ -188,6 +189,17 @@ final class Application extends Singleton implements IContext
                 break;
             case 'filesURL':
                 return $this->baseFilesURL . '/common';
+                break;
+            case 'backupsDir':
+                $dir = $this->baseDir . '/backups';
+                if (!is_dir($dir)) {
+                    @mkdir($dir, 0777, true);
+                }
+                $dir = realpath($dir);
+                return $dir;
+                break;
+            case 'backupsURL':
+                return '/backups';
                 break;
             case 'configFile':
                 return $this->baseDir . '/config.php';
@@ -912,5 +924,52 @@ final class Application extends Singleton implements IContext
         $mail->AddReplyTo($realFromEmail);
         $mail->Send();
         return true;
+    }
+
+
+    /**
+     * Получает дамп базы данных, либо сохраняет его в файл
+     * @param string|null $filename Файл для сохранения
+     * @param bool $gzip Сжать дамп через gzip
+     * @return string Текст дампа, если не указан файл
+     */
+    public function getSQLDump($filename = null, $gzip = false)
+    {
+        $cmd = 'mysqldump --default-character-set=utf8';
+        if ($user = $this->config['dbuser']) {
+            $cmd .= ' -u ' . $user;
+        }
+        if ($pass = $this->config['dbpass']) {
+            $cmd .= ' -p' . $pass;
+        }
+        $cmd .= ' ' . $this->config['dbname'];
+        $result = exec($cmd, $output);
+        $output = implode("\n", $output);
+        if ($gzip) {
+            $output = gzencode($output);
+        }
+        if ($filename) {
+            file_put_contents($filename, $output);
+        }
+        return $output;
+    }
+
+
+    /**
+     * Восстановить базу данных из дампа
+     * @return PDOStatement|false Результат выполнения запроса,
+     *                            либо false, если неудачно
+     */
+    public function restoreSQLDump($filename)
+    {
+        if (!is_file($filename)) {
+            return;
+        }
+        $backup = Backup::importById($_GET['id']);
+        $sqlQuery = @file_get_contents($filename);
+        if (mb_strtolower(pathinfo($filename, PATHINFO_EXTENSION)) == 'gz') {
+            $sqlQuery = gzdecode($sqlQuery);
+        }
+        return $this->SQL->query($sqlQuery);
     }
 }
