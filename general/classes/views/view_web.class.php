@@ -38,6 +38,7 @@ class View_Web extends Package_View_Web
         if ($this->model->user->root) {
             $this->menu[] = array('name' => $this->_('MODULES'), 'href' => '?mode=admin&sub=modules');
             $this->menu[] = array('name' => $this->_('BACKUPS'), 'href' => '?mode=admin&sub=backup');
+            $this->menu[] = array('name' => $this->_('CRONTAB'), 'href' => '?mode=admin&sub=crontab');
         }
     }
 

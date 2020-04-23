@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS {$DBPREFIX$}crontab (
   command_line VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'Arbitrary command line',
   command_classname VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'Command classname',
   args TEXT NULL DEFAULT NULL COMMENT 'Command arguments',
+  processing TINYINT(1) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Is processing now',
   priority INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Priority',
 
   PRIMARY KEY (id),

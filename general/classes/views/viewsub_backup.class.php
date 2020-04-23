@@ -6,6 +6,7 @@ namespace RAAS\General;
 
 use RAAS\Abstract_Sub_View;
 use RAAS\Backup;
+use RAAS\FilesBackup;
 
 /**
  * Класс представления подмодуля резервного копирования
@@ -75,11 +76,13 @@ class ViewSub_Backup extends Abstract_Sub_View
             'href' => $this->url . '&action=add_files',
             'icon' => 'plus'
         ];
-        $arr[] = [
-            'name' => $this->_('ADD_INCREMENTAL_FILES_BACKUP'),
-            'href' => $this->url . '&action=add_inc_files',
-            'icon' => 'plus'
-        ];
+        if (FilesBackup::getLastBackup()) {
+            $arr[] = [
+                'name' => $this->_('ADD_INCREMENTAL_FILES_BACKUP'),
+                'href' => $this->url . '&action=add_inc_files',
+                'icon' => 'plus'
+            ];
+        }
         $arr[] = [
             'name' => $this->_('DOWNLOAD_DB_BACKUP'),
             'href' => $this->url . '&action=sql',

@@ -357,4 +357,23 @@ abstract class Package extends Singleton implements IRightsContext
             }
         }
     }
+
+
+    /**
+     * Устанавливает порядки отображения для сущностей
+     * @param string $classname Класс сущности
+     * @param array<
+     *            (int|string)[] ID# сущности => int Порядок отображения
+     *        > $priorities Порядки отображения
+     */
+    public function setEntitiesPriority($classname, array $priorities = [])
+    {
+        foreach ($priorities as $key => $val) {
+            $this->SQL->update(
+                $classname::_tablename(),
+                "id = " . (int)$key,
+                ['priority' => (int)$val]
+            );
+        }
+    }
 }
