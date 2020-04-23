@@ -1,15 +1,21 @@
 <?php
 namespace RAAS\General;
 
-use RAAS\User as User;
+use RAAS\Application as Application;
+use RAAS\DBBackup;
+use RAAS\FilesBackup;
 use RAAS\Group as Group;
-use RAAS\Level as Level;
 use RAAS\IRightsContext as IRightsContext;
 use RAAS\IContext as IContext;
-use RAAS\Application as Application;
+use RAAS\Level as Level;
+use RAAS\User as User;
 
 class Package extends \RAAS\Package
 {
+    /**
+     * Критический размер запроса (чтобы влез в SQL), байт
+     * @deprecated
+     */
     const dangerQuerySize = 100000;
 
     protected static $instance;
@@ -94,24 +100,23 @@ class Package extends \RAAS\Package
 
     public function backupSQL()
     {
-        $sql = Application::i()->getSQLDump();
+        $tmpname = tempnam(sys_get_temp_dir(), '');
+        $fp = fopen($tmpname, 'w+');
+        DBBackup::writeSQLDump($fp);
+        fclose($fp);
         header('Content-Type: text/plain;encoding=UTF-8');
         header('Content-Disposition: attachment; filename="' . date('Y-m-d H-i') . ' ' . $this->dbname . '.sql"');
-        echo $sql;
+        readfile($tmpname);
+        unlink($tmpname);
+        exit;
     }
 
     public function backupFiles()
     {
         $tmpname = tempnam(sys_get_temp_dir(), '');
-        $z = new \SOME\ZipArchive();
-        $z->open($tmpname, \SOME\ZipArchive::CREATE);
-        $dir = \SOME\File::scandir($this->application->baseFilesDir);
-        foreach ($dir as $f) {
-            $z->addFile($this->application->baseFilesDir . '/' . $f, $f);
-        }
-        $z->close();
+        FilesBackup::writeArchive($tmpname);
         header('Content-Type: application/zip');
-        header('Content-Disposition: attachment; filename="' . $_SERVER['HTTP_HOST'] . '.zip"');
-        echo file_get_contents($tmpname);
+        header('Content-Disposition: attachment; filename="' . date('Y-m-d H-i') . ' ' . $_SERVER['HTTP_HOST'] . '.zip"');
+        readfile($tmpname);
     }
 }

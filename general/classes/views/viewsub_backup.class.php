@@ -4,7 +4,6 @@
  */
 namespace RAAS\General;
 
-use DateTime;
 use RAAS\Abstract_Sub_View;
 use RAAS\Backup;
 
@@ -119,17 +118,19 @@ class ViewSub_Backup extends Abstract_Sub_View
                          $this->_('RESTORE_TEXT') .
                          '\')'
         ];
-        $arr[] = [
-            'href' => $backup->fileURL,
-            'name' => $this->_('DOWNLOAD'),
-            'icon' => 'download',
-        ];
-        if (mb_strtolower(pathinfo($backup->filename, PATHINFO_EXTENSION)) == 'gz') {
+        if (is_file($backup->filename)) {
             $arr[] = [
-                'href' => $this->url . '&action=download_uncompressed&id=' . $backup->id,
-                'name' => $this->_('DOWNLOAD_UNCOMPRESSED'),
+                'href' => $backup->fileURL,
+                'name' => $this->_('DOWNLOAD'),
                 'icon' => 'download',
             ];
+            if (mb_strtolower(pathinfo($backup->filename, PATHINFO_EXTENSION)) == 'gz') {
+                $arr[] = [
+                    'href' => $this->url . '&action=download_uncompressed&id=' . $backup->id,
+                    'name' => $this->_('DOWNLOAD_UNCOMPRESSED'),
+                    'icon' => 'download',
+                ];
+            }
         }
         if ($backup->id) {
             $edit = ($this->action == 'edit');
@@ -141,15 +142,27 @@ class ViewSub_Backup extends Abstract_Sub_View
                 ];
             }
         }
-        $arr[] = [
-            'href' => $this->url . '&action=delete&id=' . $backup->id
-                   .  ($showlist ? '&back=1' : ''),
-            'name' => $this->_('DELETE'),
-            'icon' => 'remove',
-            'onclick' => 'return confirm(\'' .
-                         $this->_('DELETE_TEXT') .
-                         '\')'
-        ];
+        if ($backup->canBeDeleted) {
+            $arr[] = [
+                'href' => $this->url . '&action=delete&id=' . $backup->id
+                       .  ($showlist ? '&back=1' : ''),
+                'name' => $this->_('DELETE'),
+                'icon' => 'remove',
+                'onclick' => 'return confirm(\'' .
+                             $this->_('DELETE_TEXT') .
+                             '\')'
+            ];
+        } else {
+            $arr[] = [
+                'name' => $this->_('DELETE'),
+                'icon' => 'remove',
+                'style' => 'opacity: .5; cursor: not-allowed;',
+                'title' => $this->_('CANNOT_DELETE_BECAUSE_BACKUP_HAS_CHILD_INCREMENTAL_BACKUPS'),
+                'onclick' => 'alert(\'' .
+                             $this->_('CANNOT_DELETE_BECAUSE_BACKUP_HAS_CHILD_INCREMENTAL_BACKUPS') .
+                             '\'); return false;'
+            ];
+        }
         return $arr;
     }
 
@@ -170,8 +183,7 @@ class ViewSub_Backup extends Abstract_Sub_View
                     mb_strtoupper(str_replace('-', '_', $backup->type))
                 )
             );
-            $dt = DateTime::createFromFormat('Y-m-d H-i-s', $backup->postDate);
-            $subtitleArr[] = $this->_('DATETIME') . ': ' . $dt->format(
+            $subtitleArr[] = $this->_('DATETIME') . ': ' . $backup->dateTime->format(
                 $this->_('DATETIMEFORMAT')
             );
             $sizesPrefixes = [
@@ -184,7 +196,7 @@ class ViewSub_Backup extends Abstract_Sub_View
             $sizelog = floor(log10($filesize) / 3);
             $subtitleArr[] = $this->_('SIZE') . ': '
                            . '<a href="' . htmlspecialchars($backup->fileURL) . '" target="_blank">'
-                           .    round($filesize / pow(10, ($sizelog * 3)), 1)
+                           .    round($filesize / (pow(10, ($sizelog * 3)) ?: 1), 1)
                            .    $sizesPrefixes[$sizelog]
                            . '</a>';
             return implode('; ', $subtitleArr);

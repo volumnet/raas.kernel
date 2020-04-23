@@ -4,7 +4,6 @@
  */
 namespace RAAS\General;
 
-use DateTime;
 use RAAS\Table;
 
 /**
@@ -40,8 +39,7 @@ class BackupsTable extends Table
                 'post_date' => [
                     'caption' => $this->view->_('DATETIME'),
                     'callback' => function ($item) {
-                        $dt = DateTime::createFromFormat('Y-m-d H-i-s', $item->postDate);
-                        return $dt->format($this->view->_('DATETIMEFORMAT'));
+                        return $item->dateTime->format($this->view->_('DATETIMEFORMAT'));
                     }
                 ],
                 'type' => [
@@ -73,7 +71,7 @@ class BackupsTable extends Table
                         ];
                         $filesize = (int)@filesize($item->filepath);
                         $sizelog = floor(log10($filesize) / 3);
-                        return round($filesize / pow(10, ($sizelog * 3)), 1) .
+                        return round($filesize / (pow(10, ($sizelog * 3)) ?: 1), 1) .
                                $sizesPrefixes[$sizelog];
                     },
                 ],

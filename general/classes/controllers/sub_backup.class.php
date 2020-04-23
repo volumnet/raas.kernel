@@ -9,6 +9,10 @@ use RAAS\Abstract_Sub_Controller;
 use RAAS\Application;
 use RAAS\Backup;
 use RAAS\DBBackup;
+use RAAS\Exception;
+use RAAS\FilesBackup;
+use RAAS\FilesIncBackup;
+use RAAS\NoFilesForBackupException;
 use RAAS\Redirector;
 
 /**
@@ -37,10 +41,26 @@ class Sub_Backup extends Abstract_Sub_Controller
             case 'add_sql':
                 $backup = new DBBackup();
                 $backup->commit();
-                new Redirector('history:back');
+                new Redirector($this->url);
+                break;
+            case 'add_files':
+                $backup = new FilesBackup();
+                $backup->commit();
+                new Redirector($this->url);
+                break;
+            case 'add_inc_files':
+                try {
+                    $backup = new FilesIncBackup();
+                    $backup->commit();
+                    new Redirector($this->url);
+                } catch (Exception $e) {
+                    $this->showlist([$e]);
+                }
                 break;
             case 'sql':
-                ob_end_clean();
+                while (ob_get_level()) {
+                    ob_end_clean();
+                }
                 $this->model->backupSQL();
                 exit;
                 break;
@@ -54,7 +74,7 @@ class Sub_Backup extends Abstract_Sub_Controller
                 if ($backup) {
                     $backup->restore();
                 }
-                new Redirector('history:back');
+                new Redirector($this->url);
                 break;
             case 'download_uncompressed':
                 $backup = Backup::importById($_GET['id']);
@@ -77,11 +97,7 @@ class Sub_Backup extends Abstract_Sub_Controller
                 if ($backup) {
                     Backup::delete($backup);
                 }
-                new Redirector(
-                    isset($_GET['back']) ?
-                    'history:back' :
-                    $this->url
-                );
+                new Redirector($this->url);
                 break;
             default:
                 $this->showlist();
@@ -106,14 +122,25 @@ class Sub_Backup extends Abstract_Sub_Controller
 
     /**
      * Просмотр списка резервных копий
+     * @param Exception[] $exceptions Исключения для отображения ошибок
      */
-    private function showlist()
+    private function showlist(array $exceptions = [])
     {
         $pages = new Pages(
             (isset($this->nav['page']) ? $this->nav['page'] : 1),
             Application::i()->registryGet('rowsPerPage')
         );
         $set = array_values(Backup::load());
-        $this->view->showlist(['Set' => $set]);
+        $localError = [];
+        foreach ($exceptions as $exception) {
+            if ($exception instanceof NoFilesForBackupException) {
+                $localError[] = [
+                    'name' => 'INVALID',
+                    'value' => '',
+                    'description' => $this->view->_('NO_FILES_FOR_BACKUP_ARCHIVE')
+                ];
+            }
+        }
+        $this->view->showlist(['Set' => $set, 'localError' => $localError]);
     }
 }

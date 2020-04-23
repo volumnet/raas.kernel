@@ -4,12 +4,16 @@
  */
 namespace RAAS;
 
+use DateTime;
+
 /**
  * Класс абстрактной резервной копии
+ * @property-read DateTime $dateTime Дата/время резервной копии в формате DateTime
  * @property-read string $filename Имя файла (без пути) резервной копии
  * @property-read string $filepath Путь к файлу резервной копии
  * @property-read string $fileURL URL файла резервной копии
  * @property-read string $type Тип резервной копии
+ * @property-read bool $canBeDeleted Резервная копия может быть удалена
  */
 abstract class Backup
 {
@@ -25,13 +29,13 @@ abstract class Backup
     protected static $data = [];
 
     /**
-     * дата/время резервной копии
+     * Дта/время резервной копии
      * @var string
      */
     public $postDate;
 
     /**
-     * ID# (дата/время) резервной копии
+     * ID# резервной копии
      * @var string
      */
     public $id;
@@ -65,6 +69,9 @@ abstract class Backup
     public function __get($var)
     {
         switch ($var) {
+            case 'dateTime':
+                return DateTime::createFromFormat('Y-m-d H-i-s', $this->postDate);
+                break;
             case 'filename':
                 // @abstract
                 exit;
@@ -81,6 +88,9 @@ abstract class Backup
                 break;
             case 'type':
                 return static::TYPE;
+                break;
+            case 'canBeDeleted':
+                return true;
                 break;
         }
     }
@@ -179,6 +189,9 @@ abstract class Backup
      */
     public static function delete(self $object)
     {
+        if (!$object->canBeDeleted) {
+            return;
+        }
         static::load();
         if (is_file($object->filepath)) {
             unlink($object->filepath);
