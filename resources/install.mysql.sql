@@ -25,6 +25,8 @@ CREATE TABLE IF NOT EXISTS {$DBPREFIX$}crontab (
   command_classname VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'Command classname',
   args TEXT NULL DEFAULT NULL COMMENT 'Command arguments',
   processing TINYINT(1) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Is processing now',
+  save_log TINYINT(1) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Save log',
+  email_log VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'Email for sending log',
   priority INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Priority',
 
   PRIMARY KEY (id),

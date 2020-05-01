@@ -4,6 +4,9 @@
  */
 namespace RAAS\General;
 
+use ReflectionClass;
+use RAAS\Application;
+use RAAS\Command;
 use RAAS\Crontab;
 use RAAS\Form;
 use RAAS\Field;
@@ -14,6 +17,12 @@ use RAAS\Field;
  */
 class EditCrontabForm extends Form
 {
+    /**
+     * Аргументы из POST-массива
+     * @var mixed[]
+     */
+    protected $postArgs = [];
+
     public function __get($var)
     {
         switch ($var) {
@@ -34,7 +43,7 @@ class EditCrontabForm extends Form
             $launchTimes[$mm . 'm'] = 'EVERY_' . $mm . '_MINUTES';
         }
         $launchTimes['1h'] = 'EVERY_HOUR';
-        foreach ([2, 3, 6, 12] as $hh) {
+        foreach ([2, 3, 6, 8, 12] as $hh) {
             $launchTimes[$hh . 'h'] = 'EVERY_' . $hh . '_HOURS';
         }
         $launchTimes['1d'] = 'EVERY_DAY';
@@ -67,8 +76,32 @@ class EditCrontabForm extends Form
         ] as $i => $ww) {
             $wwChildren[] = ['value' => $i, 'caption' => $this->view->_($ww)];
         }
+        $commands = $this->getCommands();
+        $commandsChildren = [];
+        foreach ($commands as $command => $commandData) {
+            $commandsChildren[] = [
+                'value' => $command,
+                'caption' => $commandData['caption'] . ' (' . $command . ')',
+            ];
+        }
+
 
         $item = isset($params['Item']) ? $params['Item'] : null;
+        if ($item->id) {
+            $command = $item->command_classname;
+            $commandOnChange = 'if (confirm(\'' . addslashes($this->view->_('CHANGE_COMMAND_EXISTING_CONFIRM')) . '\')) { '
+                             .    ' $(\'[data-command-arg]\').val(\'\'); '
+                             .    ' this.form.submit(); '
+                             . '}';
+        } else {
+            $command = $params['command'];
+            $commandOnChange = 'if (confirm(\'' . addslashes($this->view->_('CHANGE_COMMAND_NEW_CONFIRM')) . '\')) { '
+                             .    ' var url = document.location.href; '
+                             .    ' url = url.replace(/(&|\\?)command=[\\w\\\\]+/, \'\'); '
+                             .    ' url += (/\\?/.test(url) ? \'&\' : \'?\') + \'command=\' + this.value; '
+                             .    ' document.location.href = url; '
+                             . '}';
+        }
         $defaultParams = [
             'caption' => $this->view->_('EDIT_TASK'),
             'parentUrl' => Sub_Crontab::i()->url,
@@ -90,6 +123,71 @@ class EditCrontabForm extends Form
                     'caption' => $this->view->_('LAUNCH_TIME'),
                     'default' => '1',
                     'children' => $launchTimeChildren,
+                    'import' => function ($field) {
+                        $item = $field->Form->Item;
+                        if ($item->once) {
+                            return '1';
+                        } elseif (preg_match('/\\*(\\/(\\d+))?/umi', $item->minutes, $regs) &&
+                            ($item->hours == '*')
+                        ) {
+                            if (in_array($regs[2], ['', '1', '5'])) {
+                                return '5m';
+                            } elseif (in_array($regs[2], ['10', '15', '20', '30'])) {
+                                return $regs[2] . 'm';
+                            }
+                        } elseif (($item->minutes == '0') &&
+                            preg_match('/\\*(\\/(\\d+))?/umi', $item->hours, $regs)
+                        ) {
+                            if (in_array($regs[2], ['', '1'])) {
+                                return '1h';
+                            } elseif (in_array($regs[2], ['2', '3', '6', '8', '12'])) {
+                                return $regs[2] . 'h';
+                            }
+                        } elseif (($item->minutes == '0') &&
+                            ($item->hours == '0')
+                        ) {
+                            return '1d';
+                        }
+                        return '';
+                    },
+                    'export' => function ($field) {
+                        $item = $field->Form->Item;
+                        if ($_POST[$field->name] == '1') {
+                            $item->once = 1;
+                        } else {
+                            $item->once = 0;
+                        }
+                        if (preg_match(
+                            '/(\\d+)m/umis',
+                            $_POST[$field->name],
+                            $regs
+                        )) {
+                            $minutes = '*';
+                            if ((int)$regs[1] > 5) {
+                                $minutes .= '/' . (int)$regs[1];
+                            }
+                            $item->minutes = $minutes;
+                            $item->hours = '*';
+                        } elseif (preg_match(
+                            '/(\\d+)h/umis',
+                            $_POST[$field->name],
+                            $regs
+                        )) {
+                            $item->minutes = '0';
+                            $hours = '*';
+                            if ((int)$regs[1] > 1) {
+                                $hours .= '/' . (int)$regs[1];
+                            }
+                            $item->hours = $hours;
+                        } elseif (preg_match(
+                            '/1d/umis',
+                            $_POST[$field->name],
+                            $regs
+                        )) {
+                            $item->minutes = '0';
+                            $item->hours = '0';
+                        }
+                    }
                 ],
                 'minutes' => [
                     'type' => 'select',
@@ -131,28 +229,110 @@ class EditCrontabForm extends Form
                     'type' => 'select',
                     'name' => 'command_classname',
                     'caption' => $this->view->_('COMMAND'),
-                    'children' => $commands,
+                    'children' => $commandsChildren,
+                    'placeholder' => $this->view->_('ARBITRARY_COMMAND_LINE'),
+                    'onchange' => $commandOnChange,
+                    'default' => $command,
                 ],
-                'command_line' => [
-                    'name' => 'command_line',
-                ],
-                'args' => [
-                    'name' => 'args',
-                    'caption' => $this->view->_('ADDITIONAL_ARGUMENTS'),
-                    'multiple' => true,
-                    'export' => function ($field) {
-                        $val = (array)$_POST[$field->name];
-                        $val = array_map('trim', $val);
-                        $field->Form->Item->{$field->name} = json_encode($val);
+            ],
+            'export' => function ($form) {
+                $item = $form->Item;
+                $this->postArgs = [];
+                $form->exportDefault();
+                $item->arguments = $this->postArgs;
+            }
+        ];
+        if ($command) {
+            $commandData = Crontab:: getCommandData($command);
+            for ($i = 0; $i < count($commandData['args']); $i++) {
+                $arg = $commandData['args'][$i];
+                $defaultParams['children']['args_' . $arg['var']] = [
+                    'type' => ($arg['type'] == 'checkbox') ? 'select' : 'text',
+                    'name' => 'args_' . $arg['var'],
+                    'caption' => $arg['caption']
+                              ?  ($arg['caption'] . ' ($' . $arg['var'] . ')')
+                              : '$' . $arg['var'],
+                    'placeholder' => $arg['default'],
+                    'data-command-arg' => 1,
+                    'import' => function ($field) use ($commandData, $i) {
+                        $item = $field->Form->Item;
+                        $itemArgs = $item->arguments;
+                        $arg = $commandData['args'][$i];
+                        $itemArg = $itemArgs[$i];
+                        if ($arg['type'] == 'checkbox') {
+                            $itemArg = $itemArg ? 1 : -1;
+                        }
+                        return $itemArg;
                     },
-                    'import' => function ($field) {
-                        $val = json_decode($field->Form->Item->{$field->name}, true);
-                        $val = array_map('trim', $val);
-                        return $val;
+                    'export' => function ($field) use ($commandData, $i) {
+                        $val = null;
+                        $arg = $commandData['args'][$i];
+                        $postVal = trim($_POST[$field->name]);
+                        if ($postVal !== '') {
+                            switch ($arg['type']) {
+                                case 'checkbox':
+                                    $val = ($postVal > 0);
+                                    break;
+                                case 'number':
+                                    if (preg_match('/\\d/umis', $postVal)) {
+                                        if (in_array(
+                                            $arg['phpType'],
+                                            ['float', 'real', 'double']
+                                        )) {
+                                            $val = (float)$postVal;
+                                        } else {
+                                            $val = (int)$postVal;
+                                        }
+                                    }
+                                    break;
+                                default:
+                                    $val = $postVal;
+                                    break;
+                            }
+                        }
+                        $this->postArgs[$i] = $val;
                     },
-                ],
-
-            ]
+                ];
+                if ($arg['type'] == 'checkbox') {
+                    $defaultParams['children']['args_' . $arg['var']]['placeholder'] = '--';
+                    $defaultParams['children']['args_' . $arg['var']]['children'] = [
+                        ['value' => '1', 'caption' => $this->view->_('_YES')],
+                        ['value' => '-1', 'caption' => $this->view->_('_NO')],
+                    ];
+                }
+            }
+            $defaultParams['children']['additional_args'] = [
+                'name' => 'additional_args',
+                'caption' => $this->view->_('ADDITIONAL_ARGUMENTS'),
+                'multiple' => true,
+                'data-command-arg' => 1,
+                'import' => function ($field) use ($commandData) {
+                    $item = $field->Form->Item;
+                    $itemArgs = $item->arguments;
+                    $val = array_slice($itemArgs, count($commandData['args']));
+                    $val = array_map('trim', $val);
+                    return $val;
+                },
+                'export' => function ($field) use ($commandData) {
+                    $vals = array_map(function ($x) {
+                        return (trim($x) !== '') ? trim($x) : null;
+                    }, (array)$_POST[$field->name]);
+                    $this->postArgs = array_merge($this->postArgs, $vals);
+                }
+            ];
+        } else {
+            $defaultParams['children']['command_line'] = [
+                'name' => 'command_line',
+            ];
+        }
+        $defaultParams['children']['save_log'] = [
+            'type' => 'checkbox',
+            'name' => 'save_log',
+            'caption' => $this->view->_('SAVE_LOG'),
+        ];
+        $defaultParams['children']['email_log'] = [
+            'name' => 'email_log',
+            'caption' => $this->view->_('EMAIL_LOG'),
         ];
         $arr = array_merge($defaultParams, $params);
         parent::__construct($arr);
@@ -165,11 +345,14 @@ class EditCrontabForm extends Form
      */
     public function exportVals(Field $field)
     {
-        $val = array_map('intval', (array)$_POST[$field->name]);
-        $val = array_values(array_unique($val));
-        sort($val);
-        $val = implode(',', $val);
-        $field->Form->Item->{$field->name} = $val;
+        if (in_array($_POST['time'], ['1', '']) ||
+            !in_array($field->name, ['minutes', 'hours'])
+        ) {
+            $field->Form->Item->{$field->name} = $this->compactValues(
+                (array)$_POST[$field->name],
+                $field->name
+            );
+        }
     }
 
 
@@ -181,14 +364,134 @@ class EditCrontabForm extends Form
     public function importVals(Field $field)
     {
         $val = trim($field->Form->Item->{$field->name});
-        if ($val === '') {
-            return [];
-        }
-        $val = explode(',', $val);
-        $val = array_map('intval', $val);
-        $val = array_values(array_unique($val));
-        sort($val);
+        $val = $this->expandValues($val, $field->name);
         return $val;
     }
+
+
+    /**
+     * По возможности сокращает запись данных
+     * @param int[] $data Данные
+     * @param string $fieldName Наименование поля
+     * @return string
+     */
+    protected function compactValues(array $data, $fieldName)
+    {
+        if (!$data) {
+            return '*';
+        }
+        $data = array_map('intval', $data);
+        sort($data);
+        $from = $to = 0;
+        $steps = [];
+        switch ($fieldName) {
+            case 'minutes':
+                $from = 0;
+                $to = 60;
+                $steps = [5, 10, 15, 20, 30];
+                break;
+            case 'hours':
+                $from = 0;
+                $to = 24;
+                $steps = [1, 2, 3, 4, 6, 12];
+                break;
+        }
+        if ($steps) {
+            $steps = array_reverse($steps);
+            foreach ($steps as $step) {
+                $range = range($from, $to - 1, $step);
+                if ($data == $range) {
+                    if ((($fieldName == 'minutes') && ($step == 5)) ||
+                        (($fieldName == 'hours') && ($step == 1))
+                    ) {
+                        return '*';
+                    } else {
+                        return '*/' . $step;
+                    }
+                }
+            }
+        }
+        return implode(',', $data);
+    }
+
+
+    /**
+     * Разворачивает данные из строки в массив
+     * @param string $data Данные в виде строки
+     * @param string $fieldName Наименование поля
+     * @return string
+     */
+    protected function expandValues($data, $fieldName)
+    {
+        if (($data === '') ||
+            ($data == '*') ||
+            (($fieldName == 'minutes') && ($data == '*/5'))
+        ) {
+            return [];
+        }
+        if (preg_match('/\\*\\/(\\d+)/umis', $data, $regs)) {
+            switch ($fieldName) {
+                case 'minutes':
+                    $from = 0;
+                    $to = 59;
+                    break;
+                case 'hours':
+                    $from = 0;
+                    $to = 23;
+                    break;
+                case 'days':
+                    $from = 1;
+                    $to = 31;
+                    break;
+                case 'weekdays':
+                    $from = 0;
+                    $to = 6;
+                    break;
+            }
+            return range($from, $to, (int)$regs[1]);
+        }
+        $vals = explode(',', $data);
+        $vals = array_map('intval', $vals);
+        sort($vals);
+        return $vals;
+    }
+
+
+    /**
+     * Получает список команд
+     * @return array <pre>array<string[] Класс команды => [
+     *     'caption' => string Наименование команды,
+     *     'args' => array<[
+     *         'var' => string Переменная аргумента,
+     *         'type' => string Тип данных,
+     *         'phpType' => string Оригинальный тип данных,
+     *         'caption' => string Наименование аргумента,
+     *         'default' => mixed Значение по умолчанию
+     *     ]>
+     * ]></pre>
+     */
+    public function getCommands()
+    {
+        $result = [];
+        $classMapFile = Application::i()->baseDir
+                      . '/vendor/composer/autoload_classmap.php';
+        if (is_file($classMapFile)) {
+            $classnames = include $classMapFile;
+            $classnames = array_filter(array_keys($classnames), function ($x) {
+                return stristr($x, 'Command') &&
+                       is_subclass_of($x, Command::class);
+            });
+            foreach ($classnames as $command) {
+                $reflectionClass = new ReflectionClass($command);
+                if ($reflectionClass->isAbstract()) {
+                    continue;
+                }
+                $result[$command] = Crontab::getCommandData($command);
+            }
+        }
+        return $result;
+    }
+
+
 
 }
