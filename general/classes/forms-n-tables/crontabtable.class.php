@@ -45,12 +45,33 @@ class CrontabTable extends Table
                 'name' => [
                     'caption' => $this->view->_('NAME'),
                     'callback' => function ($item) {
-                        return '<a href="' . $this->view->url . '&id=' . (int)$item->id . '">' .
-                                  '<span' . (!$item->vis ? ' class="muted"' : '') . '>' .
-                                     htmlspecialchars($item->name) .
-                                  '</span>' .
-                               '</a>';
+                        $text = ' <div>
+                                    <a href="' . $this->view->url . '&id=' . (int)$item->id . '">
+                                      <span' . (!$item->vis ? ' class="muted"' : '') . '>
+                                        ' . htmlspecialchars($item->name) . '
+                                      </span>
+                                    </a>
+                                 <div class="muted" style="font-size: .75em">';
+                        if ($item->command_classname) {
+                            $text .= htmlspecialchars($item->command_classname . ' ' . $item->args);
+                        } elseif ($item->command_line) {
+                            $text .= htmlspecialchars($item->command_line . ' ' . $item->args);
+                        }
+                        $text .= '</div>';
+                        return $text;
                     }
+                ],
+                'minutes' => [
+                    'caption' => $this->view->_('MINUTES')
+                ],
+                'hours' => [
+                    'caption' => $this->view->_('HOURS')
+                ],
+                'days' => [
+                    'caption' => $this->view->_('DAYS')
+                ],
+                'weekdays' => [
+                    'caption' => $this->view->_('WEEKDAYS')
                 ],
                 'processing' => [
                     'caption' => $this->view->_('IS_PROCESSING_NOW'),
