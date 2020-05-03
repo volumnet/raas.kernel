@@ -134,4 +134,14 @@ abstract class Abstract_Controller_Cron extends Abstract_Controller
         echo number_format(microtime(true) - $this->st, 3, '.', ' ') .
              ' [' . memory_get_peak_usage() . ']: ' . $text . "\n";
     }
+
+
+    /**
+     * Запуск команды планировщика
+     */
+    public function master()
+    {
+        $command = new CronCommand($this);
+        $command->process();
+    }
 }

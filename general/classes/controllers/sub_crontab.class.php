@@ -4,8 +4,11 @@
  */
 namespace RAAS\General;
 
+use SOME\Pages;
 use RAAS\Abstract_Sub_Controller;
+use RAAS\Application;
 use RAAS\Crontab;
+use RAAS\CrontabLog;
 use RAAS\StdSub;
 
 /**
@@ -42,8 +45,37 @@ class Sub_Crontab extends Abstract_Sub_Controller
                 $item = new Crontab((int)$this->id);
                 StdSub::delete($item, $this->url);
                 break;
+            case 'delete_log':
+                $items = [];
+                $ids = (array)$_GET['id'];
+                if (in_array('all', $ids, true)) {
+                    $pids = (array)$_GET['pid'];
+                    $pids = array_filter($pids, 'trim');
+                    $pids = array_map('intval', $pids);
+                    if ($pids) {
+                        $items = CrontabLog::getSet([
+                            'where' => "pid IN (" . implode(", ", $pids) . ")"
+                        ]);
+                    }
+                } else {
+                    $items = array_map(function ($x) {
+                        return new CrontabLog((int)$x);
+                    }, $ids);
+                }
+                $items = array_values($items);
+                $Item = isset($items[0]) ? $items[0] : new CrontabLog();
+                StdSub::delete(
+                    $items,
+                    $this->url . '&id=' . (int)$Item->pid
+                );
+                break;
             default:
-                $this->showlist();
+                $task = new Crontab((int)$this->id);
+                if ($task->id) {
+                    $this->showTask($task);
+                } else {
+                    $this->showlist();
+                }
                 break;
         }
     }
@@ -75,5 +107,28 @@ class Sub_Crontab extends Abstract_Sub_Controller
             }
         }
         $this->view->showlist(['Set' => Crontab::getSet()]);
+    }
+
+
+    /**
+     * Просмотр логов задачи
+     * @param Crontab $task Задача
+     */
+    private function showTask(Crontab $task)
+    {
+        $pages = new Pages(
+            $_GET['page'] ?: 1,
+            Application::i()->registryGet('rowsPerPage')
+        );
+        $set = CrontabLog::getSet([
+            'where' => "pid = " . (int)$task->id,
+            'orderBy' => 'post_date DESC'
+        ], $pages);
+
+        $this->view->showTask([
+            'Item' => $task,
+            'Set' => $set,
+            'Pages' => $pages
+        ]);
     }
 }

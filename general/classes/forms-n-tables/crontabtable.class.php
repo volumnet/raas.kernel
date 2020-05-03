@@ -4,7 +4,12 @@
  */
 namespace RAAS\General;
 
-class CrontabTable extends \RAAS\Table
+use RAAS\Table;
+
+/**
+ * Класс таблицы задач планировщика
+ */
+class CrontabTable extends Table
 {
     protected $_view;
 
@@ -45,6 +50,15 @@ class CrontabTable extends \RAAS\Table
                                      htmlspecialchars($item->name) .
                                   '</span>' .
                                '</a>';
+                    }
+                ],
+                'processing' => [
+                    'caption' => $this->view->_('IS_PROCESSING_NOW'),
+                    'callback' => function ($item) {
+                        if (strtotime($item->start_time) > 0) {
+                            return '<span class="text-success fa fa-circle" title="' . date($this->view->_('DATETIMEFORMAT')) . '"></span>';
+                        }
+                        return '';
                     }
                 ],
                 'priority' => [

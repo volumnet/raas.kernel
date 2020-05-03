@@ -4,7 +4,9 @@
  */
 namespace RAAS\General;
 
+use SOME\Pages;
 use RAAS\Crontab;
+use RAAS\CrontabLog;
 
 /**
  * Класс представления планировщика
@@ -37,13 +39,6 @@ class ViewSub_Crontab extends \RAAS\Abstract_Sub_View
     public function edit(array $in = [])
     {
         $Set = [];
-        // foreach ($in['Item']->logs as $row) {
-        //     $Set[] = $row;
-        // }
-        // $in['Table'] = new CrontabLogsTable(array_merge($in, [
-        //     'ctxMenu' => 'getCrontabLogContextMenu',
-        //     'Set' => $Set
-        // ]));
         $this->assignVars($in);
         $this->path[] = array('name' => $this->_('CRONTAB'), 'href' => $this->url);
         $this->title = $in['Form']->caption;
@@ -56,7 +51,9 @@ class ViewSub_Crontab extends \RAAS\Abstract_Sub_View
 
     /**
      * Список задач
-     * @param array $in Входные данные
+     * @param array $in <pre>[
+     *     'Set' => Crontab[]
+     * ]</pre>
      */
     public function showlist(array $in = [])
     {
@@ -75,10 +72,29 @@ class ViewSub_Crontab extends \RAAS\Abstract_Sub_View
 
 
     /**
+     * Просмотр задачи
+     * @param array $in <pre>[
+     *     'Item' => Crontab Задача,
+     *     'Set' => CrontabLog[] Список логов,
+     *     'Pages' => Pages Постраничная разбивка
+     * ]</pre>
+     */
+    public function showTask(array $in = [])
+    {
+        $in['Table'] = new CrontabLogsTable($in);
+        $this->assignVars($in);
+        $this->path[] = array('name' => $this->_('CRONTAB'), 'href' => $this->url);
+        $this->title = $in['Table']->caption;
+        $this->contextmenu = $this->getCrontabContextMenu($in['Item']);
+        $this->subtitle = $this->getCrontabSubtitle($in['Item']);
+        $this->template = $in['Table']->template;
+        $this->js[] = $this->publicURL . '/multitable.js';
+    }
+
+
+    /**
      * Возвращает контекстное меню для задачи
-     * @param Crontab $field Задача для получения контекстного меню
-     * @param int $i Порядок задачи в списке
-     * @param int $c Количество задач в списке
+     * @param Crontab $item Задача для получения контекстного меню
      * @return array<[
      *             'href' ?=> string Ссылка,
      *             'name' => string Заголовок пункта
@@ -87,12 +103,19 @@ class ViewSub_Crontab extends \RAAS\Abstract_Sub_View
      *             'onclick' ?=> string JavaScript-команда при клике,
      *         ]>
      */
-
     public function getCrontabContextMenu(Crontab $item)
     {
         $arr = [];
         if ($item->id) {
+            $view = (($this->action == '') && $this->nav['id']);
             $edit = ($this->action == 'edit');
+            if (!$view) {
+                $arr[] = [
+                    'href' => $this->url . '&id=' . (int)$item->id,
+                    'name' => $this->_('LOGS'),
+                    'icon' => 'th-list'
+                ];
+            }
             if (!$edit) {
                 $arr[] = [
                     'href' => $this->url . '&action=edit&id=' . (int)$item->id,
@@ -116,6 +139,63 @@ class ViewSub_Crontab extends \RAAS\Abstract_Sub_View
                 'onclick' => 'return confirm(\'' . $this->_('DELETE_TEXT') . '\')'
             ];
         }
+        return $arr;
+    }
+
+
+    /**
+     * Возвращает контекстное меню для лога задачи
+     * @param CrontabLog $item Задача для получения контекстного меню
+     * @return array<[
+     *             'href' ?=> string Ссылка,
+     *             'name' => string Заголовок пункта
+     *             'icon' ?=> string Наименование иконки,
+     *             'title' ?=> string Всплывающая подсказка
+     *             'onclick' ?=> string JavaScript-команда при клике,
+     *         ]>
+     */
+    public function getCrontabLogContextMenu(CrontabLog $item)
+    {
+        $arr = [];
+        if ($item->id) {
+            $arr[] = [
+                'href' => $item->file->fileURL,
+                'target' => '_blank',
+                'name' => $this->_('VIEW'),
+                'icon' => 'search'
+            ];
+            $arr[] = [
+                'href' => $this->url . '&action=delete_log&id=' . (int)$item->id . '&back=1',
+                'name' => $this->_('DELETE'),
+                'icon' => 'remove',
+                'onclick' => 'return confirm(\'' . $this->_('DELETE_TEXT') . '\')'
+            ];
+        }
+        return $arr;
+    }
+
+
+    /**
+     * Возвращает контекстное меню для списка логов задачи
+     * @return array<[
+     *             'href' ?=> string Ссылка,
+     *             'name' => string Заголовок пункта
+     *             'icon' ?=> string Наименование иконки,
+     *             'title' ?=> string Всплывающая подсказка
+     *             'onclick' ?=> string JavaScript-команда при клике,
+     *         ]>
+     */
+    public function getAllCrontabLogsContextMenu()
+    {
+        $arr = [];
+        $arr[] = [
+            'name' => $this->_('DELETE'),
+            'href' => $this->url . '&action=delete_log&back=1',
+            'icon' => 'remove',
+            'onclick' => 'return confirm(\''
+                      .  $this->_('DELETE_MULTIPLE_TEXT')
+                      .  '\')'
+        ];
         return $arr;
     }
 
