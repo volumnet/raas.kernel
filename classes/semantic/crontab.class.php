@@ -34,9 +34,9 @@ class Crontab extends SOME
     protected static $aiPriority = true;
 
     protected static $children = [
-        'children' => [
+        'logs' => [
             'classname' => CrontabLog::class,
-            'FK' => 'pid'
+            'FK' => 'pid',
         ]
     ];
 
@@ -71,6 +71,13 @@ class Crontab extends SOME
     {
         if ($this->command_classname) {
             $this->command_line = '';
+        }
+        if (!trim($this->name)) {
+            if ($this->command_classname) {
+                $this->name = $this->commandData['caption'];
+            } else {
+                $this->name = $this->command_line;
+            }
         }
         parent::commit();
     }
@@ -327,5 +334,14 @@ class Crontab extends SOME
             $result[] = $val;
         }
         return $result;
+    }
+
+
+    public static function delete(SOME $item)
+    {
+        foreach ((array)$item->logs as $log) {
+            CrontabLog::delete($log);
+        }
+        parent::delete($item);
     }
 }

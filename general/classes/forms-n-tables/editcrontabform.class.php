@@ -38,7 +38,7 @@ class EditCrontabForm extends Form
 
     public function __construct(array $params = [])
     {
-        $launchTimes = ['1' => 'LAUNCH_ONCE'];
+        $launchTimes = [];
         foreach ([5, 10, 15, 20, 30] as $mm) {
             $launchTimes[$mm . 'm'] = 'EVERY_' . $mm . '_MINUTES';
         }
@@ -47,6 +47,7 @@ class EditCrontabForm extends Form
             $launchTimes[$hh . 'h'] = 'EVERY_' . $hh . '_HOURS';
         }
         $launchTimes['1d'] = 'EVERY_DAY';
+        $launchTimes['1'] = 'LAUNCH_ONCE';
         $launchTimes[''] = 'CUSTOM';
         $launchTimeChildren = [];
         foreach ($launchTimes as $val => $caption) {
@@ -91,6 +92,7 @@ class EditCrontabForm extends Form
             $command = $item->command_classname;
             $commandOnChange = 'if (confirm(\'' . addslashes($this->view->_('CHANGE_COMMAND_EXISTING_CONFIRM')) . '\')) { '
                              .    ' $(\'[data-command-arg]\').val(\'\'); '
+                             .    ' $(\'[name="name"]\').val(\'\'); '
                              .    ' this.form.submit(); '
                              . '}';
         } else {
@@ -115,13 +117,12 @@ class EditCrontabForm extends Form
                 'name' => [
                     'name' => 'name',
                     'caption' => $this->view->_('NAME'),
-                    'required' => 'required',
                 ],
                 'time' => [
                     'type' => 'select',
                     'name' => 'time',
                     'caption' => $this->view->_('LAUNCH_TIME'),
-                    'default' => '1',
+                    'default' => '5m',
                     'children' => $launchTimeChildren,
                     'import' => function ($field) {
                         $item = $field->Form->Item;
