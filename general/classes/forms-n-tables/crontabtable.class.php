@@ -55,7 +55,7 @@ class CrontabTable extends Table
                         if ($item->command_classname) {
                             $text .= htmlspecialchars($item->command_classname . ' ' . $item->args);
                         } elseif ($item->command_line) {
-                            $text .= htmlspecialchars($item->command_line . ' ' . $item->args);
+                            $text .= htmlspecialchars($item->command_line);
                         }
                         $text .= '</div>';
                         return $text;
