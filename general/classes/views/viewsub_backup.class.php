@@ -121,19 +121,17 @@ class ViewSub_Backup extends Abstract_Sub_View
                          $this->_('RESTORE_TEXT') .
                          '\')'
         ];
-        if (is_file($backup->filename)) {
+        $arr[] = [
+            'href' => $backup->fileURL,
+            'name' => $this->_('DOWNLOAD'),
+            'icon' => 'download',
+        ];
+        if (mb_strtolower(pathinfo($backup->filename, PATHINFO_EXTENSION)) == 'gz') {
             $arr[] = [
-                'href' => $backup->fileURL,
-                'name' => $this->_('DOWNLOAD'),
+                'href' => $this->url . '&action=download_uncompressed&id=' . $backup->id,
+                'name' => $this->_('DOWNLOAD_UNCOMPRESSED'),
                 'icon' => 'download',
             ];
-            if (mb_strtolower(pathinfo($backup->filename, PATHINFO_EXTENSION)) == 'gz') {
-                $arr[] = [
-                    'href' => $this->url . '&action=download_uncompressed&id=' . $backup->id,
-                    'name' => $this->_('DOWNLOAD_UNCOMPRESSED'),
-                    'icon' => 'download',
-                ];
-            }
         }
         if ($backup->id) {
             $edit = ($this->action == 'edit');

@@ -35,30 +35,41 @@ class BackupsTable extends Table
             'columns' => [
                 'id' => [
                     'caption' => $this->view->_('ID'),
+                    'callback' => function ($item) {
+                        return '<a href="' . htmlspecialchars($item->fileURL) . '" target="_blank">' .
+                                  htmlspecialchars($item->id) .
+                               '</a>';
+                    },
                 ],
                 'post_date' => [
                     'caption' => $this->view->_('DATETIME'),
                     'callback' => function ($item) {
-                        return $item->dateTime->format($this->view->_('DATETIMEFORMAT'));
-                    }
+                        return '<a href="' . htmlspecialchars($item->fileURL) . '" target="_blank">' .
+                                  $item->dateTime->format($this->view->_('DATETIMEFORMAT')) .
+                               '</a>';
+                    },
                 ],
                 'type' => [
                     'caption' => $this->view->_('TYPE'),
                     'callback' => function ($item) {
-                        return htmlspecialchars($this->view->_('BACKUP_TYPE_' . mb_strtoupper(str_replace('-', '_', $item->type))));
-                    }
+                        return '<a href="' . htmlspecialchars($item->fileURL) . '" target="_blank">' .
+                                  htmlspecialchars($this->view->_('BACKUP_TYPE_' . mb_strtoupper(str_replace('-', '_', $item->type)))) .
+                               '</a>';
+                    },
                 ],
                 'name' => [
                     'caption' => $this->view->_('NAME'),
                     'callback' => function ($item) {
-                        return htmlspecialchars($item->name);
-                    }
+                        return '<a href="' . htmlspecialchars($item->fileURL) . '" target="_blank">' .
+                                  htmlspecialchars($item->name) .
+                               '</a>';
+                    },
                 ],
                 'preserveFromDeletion' => [
                     'caption' => $this->view->_('PRESERVE_FROM_DELETION'),
                     'callback' => function ($item) {
                         return ($item->preserveFromDeletion ? '<span class="fa fa-check"></span>' : '');
-                    }
+                    },
                 ],
                 'size' => [
                     'caption' => $this->view->_('SIZE'),
