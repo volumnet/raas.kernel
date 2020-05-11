@@ -419,13 +419,29 @@ jQuery(function($) {
                 html = html.replace(rx, 'type="text"$4');
                 $(this).after(clearDate.clone(true)).replaceWith($(html).attr({'data-type': type, 'readonly': 'readonly'}));
             })
-            $('input[data-type="date"]', thisObj).datepicker({ dateFormat: 'yy-mm-dd' });
-            $('input[data-type="time"]', thisObj).timepicker({ timeFormat: 'hh:mm' });
-            $('input[data-type="month"]', thisObj).datepicker({ dateFormat: 'yy-mm' });
+            $('input[data-type="date"]', thisObj).datepicker({ 
+                dateFormat: 'yy-mm-dd',
+                changeMonth: true,
+                changeYear: true,
+            });
+            $('input[data-type="time"]', thisObj).timepicker({ 
+                timeFormat: 'hh:mm',
+                changeMonth: true,
+                changeYear: true, 
+            });
+            $('input[data-type="month"]', thisObj).datepicker({ 
+                dateFormat: 'yy-mm',
+                changeMonth: true,
+                changeYear: true, 
+            });
             
             $('input[data-type="datetime-local"], input[data-type="datetime"]', thisObj).not('[disabled]').each(function() {
                 $(this).val($(this).val().replace(/T/, ' '));
-                $(this).attr('readonly', 'readonly').datetimepicker({ timeFormat: 'hh:mm' })
+                $(this).attr('readonly', 'readonly').datetimepicker({ 
+                    timeFormat: 'hh:mm',
+                    changeMonth: true,
+                    changeYear: true,
+                })
             });
             $('input:visible[type="color"]', thisObj).attr('readonly', 'readonly').not('[disabled]').spectrum({
                 showInput: true,
