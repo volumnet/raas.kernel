@@ -61,6 +61,15 @@ class CrontabTable extends Table
                         return $text;
                     }
                 ],
+                'once' => [
+                    'caption' => $this->view->_('LAUNCH_ONCE'),
+                    'style' => 'text-align: center',
+                    'callback' => function ($item) {
+                        if ($item->once) {
+                            return '<span class="fa fa-check"></span>';
+                        }
+                    },
+                ],
                 'minutes' => [
                     'caption' => $this->view->_('MINUTES')
                 ],
