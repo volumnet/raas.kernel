@@ -5,7 +5,7 @@
 namespace RAAS;
 
 /**
- * Класс команды планировщика
+ * Команда планировщика
  */
 class CronCommand extends Command
 {

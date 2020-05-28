@@ -5,7 +5,7 @@
 namespace RAAS;
 
 /**
- * Класс блокирующей команды
+ * Блокирующая команда
  */
 abstract class LockCommand extends Command
 {

@@ -5,7 +5,7 @@
 namespace RAAS;
 
 /**
- * Класс комманды проверки отправки почты
+ * Команда проверки отправки почты
  */
 class MailTestCommand extends Command
 {
