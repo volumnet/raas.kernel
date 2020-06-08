@@ -13,7 +13,10 @@ class CronCommand extends Command
     {
         $timestamp = time();
         $tasks = Crontab::getSet([
-            'where' => "vis",
+            'where' => [
+                "vis"
+                "(NOT start_time OR (start_time < NOW() - INTERVAL 2 HOUR))"
+            ],
             'orderBy' => 'priority'
         ]);
         foreach ($tasks as $task) {
