@@ -132,6 +132,15 @@ class ViewSub_Crontab extends \RAAS\Abstract_Sub_View
                 'icon' => $item->vis ? 'ok' : '',
                 'title' => $this->_($item->vis ? 'TURN_OFF' : 'TURN_ON')
             ];
+            $t = strtotime($item->start_time);
+            if ($t > 0) {
+                $arr[] = [
+                    'name' => $this->_('RESET'),
+                    'href' => $this->url . '&action=reset&id='
+                           .  (int)$item->id . '&back=1',
+                    'icon' => 'refresh',
+                ];
+            }
             $arr[] = [
                 'href' => $this->url . '&action=delete&id=' . (int)$item->id . ($edit ? '' : '&back=1'),
                 'name' => $this->_('DELETE'),

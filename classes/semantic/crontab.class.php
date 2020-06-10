@@ -133,27 +133,28 @@ class Crontab extends SOME
             return;
         }
         $this->start_time = date('Y-m-d H-i-s');
+        if ($this->once) {
+            $this->vis = 0;
+        }
         $this->commit();
 
-        $result = '';
-        ob_start(function ($x) use (&$result) {
+        $result = $logChunk = '';
+        $logFilename = null;
+        $log = null;
+        $t = $this;
+        ob_start(function ($x) use (&$result, &$logChunk, $t, &$logFilename, &$log) {
             $result .= $x;
-            return $x;
-        }, 2); // 2 байта, т.к. значение 1 используется как системное
-        $this->processCommand($controller);
-        ob_end_flush();
-
-        if ($result = trim($result)) {
-            if ($this->save_log) {
+            $logChunk .= $x;
+            if (!$logFilename && $t->save_log) {
                 $logTime = time();
                 $log = new CrontabLog([
-                    'pid' => (int)$this->id,
+                    'pid' => (int)$t->id,
                     'post_date' => date('Y-m-d H:i:s', $logTime)
                 ]);
-                $filename = date('Y-m-d H-i-s', $logTime) . ' task' . (int)$this->id
-                          . '_' . uniqid('') . '.txt';
-                $filepath = sys_get_temp_dir() . '/' . $filename;
-                file_put_contents($filepath, $result);
+                $logFilename = date('Y-m-d H-i-s', $logTime) . ' task' . (int)$t->id
+                             . '_' . uniqid('') . '.txt';
+                $filepath = sys_get_temp_dir() . '/' . $logFilename;
+                touch($filepath);
                 $attachment = Attachment::createFromFile(
                     $filepath,
                     $log,
@@ -163,7 +164,23 @@ class Crontab extends SOME
                 );
                 $log->attachment_id = (int)$attachment->id;
                 $log->commit();
+                $logFilename = $attachment->file;
             }
+            if ($logFilename && (strlen($logChunk) > 1024)) {
+                file_put_contents($logFilename, $logChunk, FILE_APPEND);
+                $logChunk = '';
+            }
+            return $x;
+        }, 2); // 2 байта, т.к. значение 1 используется как системное
+        $this->processCommand($controller);
+        ob_end_flush();
+
+        if ($logChunk = rtrim($logChunk)) {
+            if ($logFilename && $this->save_log) {
+                file_put_contents($logFilename, $logChunk, FILE_APPEND);
+            }
+        }
+        if ($result = trim($result)) {
             if ($this->email_log) {
                 $toArr = preg_split('/(,|;| )/umis', $this->email_log);
                 $toArr = array_filter($toArr, 'trim');
@@ -184,9 +201,6 @@ class Crontab extends SOME
         }
 
         $this->start_time = '';
-        if ($this->once) {
-            $this->vis = 0;
-        }
         $this->commit();
     }
 
@@ -209,6 +223,13 @@ class Crontab extends SOME
             system($cmd);
         }
         return $result;
+    }
+
+
+    public function reset()
+    {
+        $this->start_time = '0000-00-00 00:00';
+        $this->commit();
     }
 
 

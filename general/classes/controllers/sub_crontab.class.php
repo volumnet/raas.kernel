@@ -41,6 +41,10 @@ class Sub_Crontab extends Abstract_Sub_Controller
                 $item = new Crontab((int)$this->id);
                 StdSub::chvis($item, $this->url);
                 break;
+            case 'reset':
+                $item = new Crontab((int)$this->id);
+                StdSub::reset($item, $this->url);
+                break;
             case 'delete':
                 $item = new Crontab((int)$this->id);
                 StdSub::delete($item, $this->url);
