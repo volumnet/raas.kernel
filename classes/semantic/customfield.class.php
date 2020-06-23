@@ -1,7 +1,6 @@
 <?php
 namespace RAAS;
 
-use Exception;
 use SimpleXMLElement;
 use SOME\CSV;
 use SOME\SOME;
