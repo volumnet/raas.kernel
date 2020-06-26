@@ -566,8 +566,8 @@ final class Application extends Singleton implements IContext
             $this->registrySet('installDate', date('Y-m-d H:i:s'));
             $this->registrySet('baseVersion', $this->version);
 
-            Attachment::clearLostAttachments();
-            Attachment::clearLostFiles();
+            // Attachment::clearLostAttachments();
+            // Attachment::clearLostFiles();
         }
     }
 
