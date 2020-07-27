@@ -837,9 +837,12 @@ abstract class CustomField extends SOME
 
     protected function _getFieldChildren(array $stdSource, Field $parentField)
     {
+        // 2020-07-27, AVS: добавил $level, чтобы не предлагал placeholder в
+        // многоуровневых select'ах
+        static $level = 0;
         $options = new OptionCollection();
         $options->Parent = $parentField;
-        if (!$parentField->required) {
+        if (!$parentField->required && !$level) {
             $option = new Option([
                 'value' => '',
                 'caption' => ($parentField->placeholder ?: '--')
@@ -852,10 +855,12 @@ abstract class CustomField extends SOME
                 'caption' => $val['name']
             ]);
             if (isset($val['children'])) {
+                $level++;
                 $Option->children = $this->_getFieldChildren(
                     $val['children'],
                     $parentField
                 );
+                $level--;
             }
             $options[] = $Option;
         }
