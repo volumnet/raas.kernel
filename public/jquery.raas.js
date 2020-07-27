@@ -425,7 +425,7 @@ jQuery(function($) {
                 changeYear: true,
             });
             $('input[data-type="time"]', thisObj).timepicker({ 
-                timeFormat: 'hh:mm',
+                timeFormat: 'HH:mm',
                 changeMonth: true,
                 changeYear: true, 
             });
@@ -438,7 +438,7 @@ jQuery(function($) {
             $('input[data-type="datetime-local"], input[data-type="datetime"]', thisObj).not('[disabled]').each(function() {
                 $(this).val($(this).val().replace(/T/, ' '));
                 $(this).attr('readonly', 'readonly').datetimepicker({ 
-                    timeFormat: 'hh:mm',
+                    timeFormat: 'HH:mm',
                     changeMonth: true,
                     changeYear: true,
                 })
