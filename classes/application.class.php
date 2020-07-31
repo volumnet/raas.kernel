@@ -159,10 +159,14 @@ final class Application extends Singleton implements IContext
 
             // Файлы и директории
             case 'baseDir':
-                if (isset($_SERVER['DOCUMENT_ROOT']) &&
-                    $_SERVER['DOCUMENT_ROOT']
+                if (defined('RAAS_BASEDIR')) {
+                    return realpath(RAAS_BASEDIR);
+                }
+                if (isset($_SERVER['SCRIPT_FILENAME']) &&
+                    $_SERVER['SCRIPT_FILENAME'] &&
+                    (basename($_SERVER['SCRIPT_FILENAME']) == 'index.php')
                 ) {
-                    return realpath($_SERVER['DOCUMENT_ROOT']);
+                    return realpath(dirname($_SERVER['SCRIPT_FILENAME']));
                 }
                 if (stristr(__DIR__, 'vendor')) {
                     return realpath(__DIR__ . '/../../../..');

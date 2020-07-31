@@ -30,10 +30,14 @@ class Module_View_Web extends Abstract_Module_View implements IRightsContext_Vie
     {
         switch ($var) {
             case 'publicURL':
-                return mb_substr(
-                    $this->model->publicDir,
-                    mb_strlen(Application::i()->baseDir)
-                );
+                if (stristr($this->model->publicDir, Application::i()->baseDir)) {
+                    mb_substr(
+                        $this->model->publicDir,
+                        mb_strlen(Application::i()->baseDir)
+                    );
+                } elseif ($this->model->composer['name']) {
+                    return '/vendor/' . $this->model->composer['name'] . '/public';
+                }
                 break;
             case 'stdView':
                 if (!$this->_stdView) {

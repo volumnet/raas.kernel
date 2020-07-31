@@ -1,3 +1,0 @@
-raasConfig = {
-    shownLevel: 1,
-};

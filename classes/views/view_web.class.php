@@ -171,10 +171,16 @@ class View_Web extends Abstract_View implements IContext_View_Web
                 return $this->publicURL;
                 break;
             case 'publicURL':
-                return mb_substr(
-                    Application::i()->publicDir,
-                    mb_strlen(Application::i()->baseDir)
-                );
+                if (stristr(Application::i()->publicDir, Application::i()->baseDir)) {
+                    return mb_substr(
+                        Application::i()->publicDir,
+                        mb_strlen(Application::i()->baseDir)
+                    );
+                } elseif (Application::i()->composer['name']) {
+                    return '/vendor/' . Application::i()->composer['name'] . '/public';
+                } else {
+                    return '/vendor/volumnet/raas.kernel/public';
+                }
                 break;
 
             case 'templateType':
