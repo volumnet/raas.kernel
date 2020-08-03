@@ -97,9 +97,6 @@ if (Application::i()->activeModule) {
 
     <link href="/vendor/components/jqueryui/themes/redmond/jquery-ui.min.css" rel="stylesheet" />
     <link href="/vendor/trentrichardson/jquery-timepicker-addon/dist/jquery-ui-timepicker-addon.min.css" rel="stylesheet" />
-    <link href="/vendor/npm-asset/spectrum-colorpicker/spectrum.css" rel="stylesheet" />
-    <link href="/vendor/npm-asset/bootstrap-multiselect/dist/css/bootstrap-multiselect.css" rel="stylesheet" />
-    <link href="/vendor/npm-asset/codemirror/lib/codemirror.css" rel="stylesheet" />
     <link href="/vendor/fortawesome/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
     <?php foreach ($VIEW->css as $css) { ?>
         <link href="<?php echo $css?>" rel="stylesheet" />
