@@ -31,7 +31,7 @@ class Package_View_Web extends Abstract_Package_View implements IRightsContext_V
         switch ($var) {
             case 'publicURL':
                 if (stristr($this->model->publicDir, Application::i()->baseDir)) {
-                    mb_substr(
+                    return mb_substr(
                         $this->model->publicDir,
                         mb_strlen(Application::i()->baseDir)
                     );

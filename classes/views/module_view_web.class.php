@@ -31,7 +31,7 @@ class Module_View_Web extends Abstract_Module_View implements IRightsContext_Vie
         switch ($var) {
             case 'publicURL':
                 if (stristr($this->model->publicDir, Application::i()->baseDir)) {
-                    mb_substr(
+                    return mb_substr(
                         $this->model->publicDir,
                         mb_strlen(Application::i()->baseDir)
                     );
