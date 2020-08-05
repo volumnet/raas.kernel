@@ -9,6 +9,29 @@ class View_Web extends Package_View_Web
 {
     protected static $instance;
 
+    public function __get($var)
+    {
+        switch ($var) {
+            case 'publicURL':
+                if (stristr(Application::i()->systemDir, Application::i()->baseDir)) {
+                    return mb_substr(
+                        Application::i()->systemDir,
+                        mb_strlen(Application::i()->baseDir)
+                    ) . '/general/public/';
+                } elseif (Application::i()->composer['name']) {
+                    return '/vendor/' . Application::i()->composer['name'] . '/general/public';
+                } else {
+                    return '/vendor/volumnet/raas.kernel/general/public';
+                }
+                break;
+
+            default:
+                return parent::__get($var);
+                break;
+        }
+    }
+
+
     public function __set($var, $val)
     {
         if ($var == 'template' && !strstr($val, '/')) {
