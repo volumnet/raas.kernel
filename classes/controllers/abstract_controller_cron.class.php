@@ -111,13 +111,17 @@ abstract class Abstract_Controller_Cron extends Abstract_Controller
             call_user_func_array($f, $args);
         } elseif (class_exists($this->action)) {
             $commandClassname = $this->action;
-            $command = new $commandClassname($this);
+            $command = @new $commandClassname($this);
             if ($command instanceof Command) {
                 call_user_func_array(
                     [$command, 'process'],
                     array_slice($GLOBALS['argv'], 2)
                 );
+            } else {
+                $this->doLog('"' . $commandClassname . '" is not a command');
             }
+        } else {
+            $this->doLog('"' . $this->action . '" is not found');
         }
     }
 
