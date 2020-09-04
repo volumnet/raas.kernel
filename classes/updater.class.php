@@ -48,6 +48,12 @@ class Updater
         ) < 0) {
             $this->update20200412();
         }
+        if (version_compare(
+            Application::i()->registryGet('baseVersion'),
+            '4.2.51'
+        ) < 0) {
+            $this->update20200904();
+        }
         return true;
     }
 
@@ -117,6 +123,21 @@ class Updater
                            INDEX (post_date),
                            KEY (attachment_id)
                          ) COMMENT='Crontab logs'";
+            $this->SQL->query($sqlQuery);
+        }
+    }
+
+
+    /**
+     * Добавляет идентификатор процесса в crontab
+     */
+    public function update20200904()
+    {
+        if (in_array(SOME::_dbprefix() . "crontab", $this->tables) &&
+            !in_array("pid", $this->columns(SOME::_dbprefix() . "crontab"))
+        ) {
+            $sqlQuery = "ALTER TABLE " . SOME::_dbprefix() . "crontab
+                           ADD pid int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'Process ID#' AFTER id";
             $this->SQL->query($sqlQuery);
         }
     }

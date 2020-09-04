@@ -9,6 +9,7 @@ use RAAS\Abstract_Sub_Controller;
 use RAAS\Application;
 use RAAS\Crontab;
 use RAAS\CrontabLog;
+use RAAS\Redirector;
 use RAAS\StdSub;
 
 /**
@@ -44,6 +45,20 @@ class Sub_Crontab extends Abstract_Sub_Controller
             case 'reset':
                 $item = new Crontab((int)$this->id);
                 StdSub::reset($item, $this->url);
+                break;
+            case 'run':
+                $item = new Crontab((int)$this->id);
+                if ($item->id) {
+                    if (stristr(PHP_OS, 'win')) {
+                        $cmd = 'START /D "' . Application::i()->baseDir . '/cron" php cron.php master ' . (int)$item->id;
+                        pclose(popen($cmd, 'r'));
+                    } else {
+                        $cmd = 'cd "' . Application::i()->baseDir . '/cron" && php cron.php master ' . (int)$item->id . ' > /dev/null 2>&1 & echo $!';
+                        exec($cmd);
+                    }
+                    sleep(1);
+                }
+                new Redirector($this->url);
                 break;
             case 'delete':
                 $item = new Crontab((int)$this->id);

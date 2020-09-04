@@ -136,6 +136,7 @@ class Crontab extends SOME
         if ($this->once) {
             $this->vis = 0;
         }
+        $this->pid = (int)getmypid();
         $this->commit();
 
         $result = $logChunk = '';
@@ -166,7 +167,13 @@ class Crontab extends SOME
                 $log->commit();
                 $logFilename = $attachment->file;
             }
-            if ($logFilename && (strlen($logChunk) > 1024)) {
+            if ($logFilename &&
+                (
+                    (strlen($logChunk) > 1024) ||
+                    strstr($logChunk, "\n") ||
+                    strstr($logChunk, "\r")
+                )
+            ) {
                 file_put_contents($logFilename, $logChunk, FILE_APPEND);
                 $logChunk = '';
             }
@@ -200,6 +207,7 @@ class Crontab extends SOME
             }
         }
 
+        $this->pid = 0;
         $this->start_time = '';
         $this->commit();
     }
@@ -229,6 +237,32 @@ class Crontab extends SOME
     public function reset()
     {
         $this->start_time = '0000-00-00 00:00';
+        if ($this->pid) {
+            if (stristr(PHP_OS, 'win')) {
+                $cmd = 'taskkill /F /PID ' . (int)$this->pid;
+            } else {
+                $cmd = 'kill ' . (int)$this->pid;
+            }
+            $result = exec($cmd);
+            if (stristr(PHP_OS, 'win')) {
+                $result = iconv('cp866', 'UTF-8', $result);
+            }
+
+            if ($this->save_log) {
+                $logs = CrontabLog::getSet([
+                    'where' => "pid = " . (int)$this->id,
+                    'orderBy' => "post_date DESC",
+                    'limit' => 1,
+                ]);
+                if ($logs) {
+                    $log = $logs[0];
+                    if ($log->file->id && $log->file->file) {
+                        file_put_contents($log->file->file, "\n" . $result, FILE_APPEND);
+                    }
+                }
+            }
+            $this->pid = 0;
+        }
         $this->commit();
     }
 

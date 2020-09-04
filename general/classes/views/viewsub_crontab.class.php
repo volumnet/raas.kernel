@@ -109,6 +109,7 @@ class ViewSub_Crontab extends \RAAS\Abstract_Sub_View
         if ($item->id) {
             $view = (($this->action == '') && $this->nav['id']);
             $edit = ($this->action == 'edit');
+            $t = strtotime($item->start_time);
             if (!$view) {
                 $arr[] = [
                     'href' => $this->url . '&id=' . (int)$item->id,
@@ -132,13 +133,19 @@ class ViewSub_Crontab extends \RAAS\Abstract_Sub_View
                 'icon' => $item->vis ? 'ok' : '',
                 'title' => $this->_($item->vis ? 'TURN_OFF' : 'TURN_ON')
             ];
-            $t = strtotime($item->start_time);
             if ($t > 0) {
                 $arr[] = [
-                    'name' => $this->_('RESET'),
+                    'name' => $this->_('STOP_COMMAND'),
                     'href' => $this->url . '&action=reset&id='
                            .  (int)$item->id . '&back=1',
-                    'icon' => 'refresh',
+                    'icon' => 'stop',
+                ];
+            } else {
+                $arr[] = [
+                    'name' => $this->_('RUN_COMMAND'),
+                    'href' => $this->url . '&action=run&id='
+                           .  (int)$item->id . '&back=1',
+                    'icon' => 'play',
                 ];
             }
             $arr[] = [

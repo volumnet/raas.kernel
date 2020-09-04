@@ -86,7 +86,11 @@ class CrontabTable extends Table
                     'caption' => $this->view->_('IS_PROCESSING_NOW'),
                     'callback' => function ($item) {
                         if (strtotime($item->start_time) > 0) {
-                            return '<span class="text-success fa fa-circle" title="' . date($this->view->_('DATETIMEFORMAT'), strtotime($item->start_time)) . '"></span>';
+                            $title = date($this->view->_('DATETIMEFORMAT'), strtotime($item->start_time));
+                            if ($item->pid) {
+                                $title .= '; PID#' . (int)$item->pid;
+                            }
+                            return '<span class="text-success fa fa-circle" title="' . $title . '"></span>';
                         }
                         return '';
                     }

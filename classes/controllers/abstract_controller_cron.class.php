@@ -145,7 +145,8 @@ abstract class Abstract_Controller_Cron extends Abstract_Controller
      */
     public function master()
     {
+        $taskId = $GLOBALS['argv'][2] ?: null;
         $command = new CronCommand($this);
-        $command->process();
+        $command->process($taskId);
     }
 }
