@@ -24,6 +24,9 @@ class MailTestCommand extends Command
             $message,
             $fromEmail,
             $fromEmail,
+            true,
+            [],
+            [],
             true
         );
     }

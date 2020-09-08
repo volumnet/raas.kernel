@@ -10,6 +10,7 @@ namespace RAAS;
 
 use ReflectionClass;
 use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
 use RecursiveIteratorIterator;
 use RecursiveDirectoryIterator;
 use SOME\DB;
@@ -784,6 +785,7 @@ final class Application extends Singleton implements IContext
      *            'name' => имя файла,
      *            'type' => MIME-тип файла
      *        ]> $embedded Массив встраиваемых файлов
+     * @param bool $debugMode Режим отладки для SMTP
      */
     public function sendmail(
         $toArr,
@@ -793,7 +795,8 @@ final class Application extends Singleton implements IContext
         $fromEmail = null,
         $isHTML = true,
         $attach = [],
-        $embedded = []
+        $embedded = [],
+        $debugMode = false
     ) {
         $toArr = (array)$toArr;
         $realFromEmail = trim($this->registryGet('email_from'));
@@ -858,7 +861,7 @@ final class Application extends Singleton implements IContext
 
             $mail->isSMTP();
             $mail->SMTPAuth = true;
-            $mail->SMTPDebug = 0;
+            $mail->SMTPDebug = $debugMode ? SMTP::DEBUG_LOWLEVEL : 0;
             if ($smtpEncryption == 'tls') {
                 $mail->SMTPSecure = 'TLS';
             }
