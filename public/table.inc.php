@@ -1,4 +1,4 @@
-<?php 
+<?php
 $_RAASTable_Attrs = function(\RAAS\TableElement $TableElement, $additional = array()) {
     $arr = (array)$TableElement->attrs;
     if ($TableElement instanceof \RAAS\Table) {
