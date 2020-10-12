@@ -23,6 +23,7 @@ class CronCommand extends Command
             if ($task->id) {
                 $tasks[] = $task;
             }
+            $timestamp = true;
         } else {
             $tasks = Crontab::getSet([
                 'where' => [
