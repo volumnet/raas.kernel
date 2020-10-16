@@ -54,7 +54,10 @@ import RAASInitInputs from './head/raas.init-inputs.js';
 import RAASQueryString from './head/raas.query-string.js'
 
 window.formatPrice = formatPrice;
-jQuery(function($) {
+
+jQuery(document).ready(function($) {
+    window.app = new Vue(App);
+
     $.fn.extend({
         RAAS_tree: RAASTree,
         RAAS_autocompleter: RAASAutocompleter,
@@ -115,9 +118,4 @@ jQuery(function($) {
         .append('<a href="#" data-role="raas-repo-move"><i class="icon icon-resize-vertical"></i></a>');
     $('*[data-role="raas-repo-block"]').each(function() { $(this).RAAS_repo() });
     $('nav.menuLeft ul').RAAS_menuTree({ shownLevel: raasConfig.shownLevel });
-
-});
-
-jQuery(document).ready(function($) {
-    // window.app = new Vue(App);
 });
