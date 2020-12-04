@@ -102,7 +102,7 @@ jQuery(document).ready(function($) {
     });
     
     $.datepicker.setDefaults({ dateFormat: 'yy-mm-dd' });
-    $.timepicker.setDefaults({ timeFormat: 'hh:mm', separator: ' ' });
+    $.timepicker.setDefaults({ dateFormat: 'yy-mm-dd', timeFormat: 'hh:mm', separator: ' ' });
     
     $('body').RAASInitInputs();
     $(':reset').click(function() { document.location.reload(); return false; });

@@ -152,16 +152,16 @@ function separateScripts($text, $allowedRx = '')
     $result = $text;
     if (preg_match_all($rx, $text, $regs)) {
         foreach ($regs[0] as $i => $script) {
-            if ($allowedRx && !preg_match($allowedRx, $script)) {
+            if ($allowedRx && preg_match($allowedRx, $script)) {
                 $newScript = '';
-                if (!stristr($script, ' type="text/javascript"')) {
+                if (stristr($script, ' type="text/javascript"')) {
                     $newScript = str_ireplace(
                         ' type="text/javascript"',
                         ' type="application/javascript"',
                         $script
                     );
                 }
-                if (stristr($script, ' type="')) {
+                if (!stristr($script, ' type="')) {
                     $newScript = str_ireplace(
                         '<script',
                         '<script type="application/javascript"',
@@ -177,7 +177,16 @@ function separateScripts($text, $allowedRx = '')
             }
         }
     }
-    return [$result, $scripts];
+
+    $rx = '/\\<style.*?\\>.*?\\<\\/style\\>/umis';
+    $styles = '';
+    if (preg_match_all($rx, $text, $regs)) {
+        foreach ($regs[0] as $i => $style) {
+            $styles .= $style . "\n";
+            $result = str_replace($style, '', $result);
+        }
+    }
+    return [$result, $scripts, $styles];
 }
 
 $metaTitle = $TITLE . ' — RAAS';
@@ -203,6 +212,8 @@ ob_start();
     <?php foreach ($VIEW->css as $css) { ?>
         <link href="<?php echo $css?>" rel="stylesheet" />
     <?php } ?>
+    <!-- Here will be in-text styles inserted -->
+    <!--styles--><!--/styles-->
 
     <script src="<?php echo $VIEW->publicURL?>/application.js"></script>
     <script src="/vendor/components/jqueryui/ui/minified/i18n/jquery.ui.datepicker-<?php echo $VIEW->language?>.min.js"></script>
@@ -390,7 +401,9 @@ ob_start();
         ob_get_clean(),
         '/(maps.*?yandex.*constructor)|(type="text\\/html")/umis'
     );
-    echo $content[0] . $content[1];
+    $text = $content[0] . $content[1];
+    $text = str_replace('<!--styles--><!--/styles-->', $content[2], $text);
+    echo $text;
     foreach ($VIEW->js as $js) { ?>
         <script src="<?php echo $js?>"></script>
     <?php } ?>
