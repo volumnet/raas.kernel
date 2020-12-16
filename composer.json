@@ -1,7 +1,7 @@
 {
     "name": "volumnet/raas.kernel",
-    "description": "RAAS v4.2.55 Remote Automated Assistant",
-    "version": "4.2.55",
+    "description": "RAAS v4.2.56 Remote Automated Assistant",
+    "version": "4.2.56",
     "license": "GPL-3.0-or-later",
     "minimum-stability": "dev",
     "prefer-stable": true,
@@ -40,6 +40,9 @@
     ],
     "autoload": {
         "classmap": ["classes/", "general/classes/"] 
+    },
+    "autoload-dev": {
+        "classmap": ["tests"]
     },
     "repositories": [
         {

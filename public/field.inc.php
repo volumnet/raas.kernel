@@ -239,6 +239,7 @@ $_RAASForm_Control = function (
                 $attrs['required'] = false;
             } elseif ($field->type == 'codearea') {
                 $attrs['class'] = 'code codearea fullscreen';
+                $attrs['v-pre'] = 'v-pre';
             }
             if ($field->multiple) {
                 ?>
