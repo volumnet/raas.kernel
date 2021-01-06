@@ -272,7 +272,7 @@ abstract class Package extends Singleton implements IRightsContext
                 is_dir($this->baseDir . '/' . $x)
             );
         });
-        foreach ($modules as $module) {
+        foreach ((array)$modules as $module) {
             $classname = Namespaces::getNS(static::class) . '\\'
                        . ucfirst($module) . '\\Module';
             if (class_exists($classname)) {

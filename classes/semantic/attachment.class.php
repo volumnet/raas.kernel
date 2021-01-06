@@ -1,18 +1,43 @@
 <?php
+/**
+ * Вложение
+ */
 namespace RAAS;
 
-use SOME\SOME;
-use SOME\Thumbnail;
 use SOME\Namespaces;
+use SOME\SOME;
 use SOME\Text;
+use SOME\Thumbnail;
+use RAAS\IContext;
 
+/**
+ * Класс вложения
+ * @property-read IContext $model Контекст-модель
+ * @property-read string $dirpath Путь к папке, где размещается файл
+ * @property-read string $dirURL URL папки, где размещается файл
+ * @property-read string $ext Расширение реального файла
+ * @property-read string $fileURL URL файла
+ * @property-read string $tnURL URL стандартного эскиза, описанного около
+ *     квадрата
+ * @property-read string $smallURL URL стандартного эскиза, вписанного в квадрат
+ * @property-read string $file Путь к файлу
+ * @property-read string $tn Путь к стандартному эскизу, описанному около
+ *     квадрата
+ * @property-read string $small Путь к стандартному эскизу, вписанному в квадрат
+ * @property SOME $parent Родительский объект
+ */
 class Attachment extends SOME
 {
+    /**
+     * Стандартный размер эскиза
+     */
     const tnsize = 300;
 
     protected static $tablename = 'attachments';
+
     protected static $objectCascadeDelete = true;
-    protected static $cognizableVars = array('parent');
+
+    protected static $cognizableVars = ['parent'];
 
     public function __get($var)
     {
@@ -56,13 +81,16 @@ class Attachment extends SOME
                 if (!$this->image) {
                     return false;
                 }
-                return $this->dirURL . '/' . pathinfo($this->realname, PATHINFO_FILENAME) . '_tn.jpg';
+                return $this->dirURL . '/' .
+                    pathinfo($this->realname, PATHINFO_FILENAME) . '_tn.jpg';
                 break;
             case 'smallURL':
                 if (!$this->image) {
                     return false;
                 }
-                return $this->dirURL . '/' . pathinfo($this->realname, PATHINFO_FILENAME) . '_small.' . $this->ext;
+                return $this->dirURL . '/' .
+                    pathinfo($this->realname, PATHINFO_FILENAME) . '_small.' .
+                    $this->ext;
                 break;
             case 'file':
                 if (!$this->realname) {
@@ -75,20 +103,24 @@ class Attachment extends SOME
                     return false;
                 }
                 $pathinfo = pathinfo($this->realname);
-                return $this->dirpath . '/' . pathinfo($this->realname, PATHINFO_FILENAME) . '_tn.jpg';
+                return $this->dirpath . '/' .
+                    pathinfo($this->realname, PATHINFO_FILENAME) . '_tn.jpg';
                 break;
             case 'small':
                 if (!$this->image) {
                     return false;
                 }
                 $pathinfo = pathinfo($this->realname);
-                return $this->dirpath . '/' . pathinfo($this->realname, PATHINFO_FILENAME) . '_small.' . $this->ext;
+                return $this->dirpath . '/' .
+                    pathinfo($this->realname, PATHINFO_FILENAME) . '_small.' .
+                    $this->ext;
                 break;
             default:
                 return parent::__get($var);
                 break;
         }
     }
+
 
     public function __set($var, $val)
     {
@@ -104,6 +136,7 @@ class Attachment extends SOME
                 break;
         }
     }
+
 
     public function commit()
     {
@@ -121,27 +154,36 @@ class Attachment extends SOME
     }
 
 
-    public static function delete(self $Item)
+    public static function delete(SOME $Item)
     {
         $Item->deleteFile();
         parent::delete($Item);
     }
 
 
+    /**
+     * Удаляет файлы вложения
+     */
     protected function deleteFile()
     {
         if (is_file($this->dirpath . '/' . $this->realname)) {
             unlink($this->dirpath . '/' . $this->realname);
         }
         if ($this->image) {
-            if (is_file($this->dirpath . '/' . pathinfo($this->realname, PATHINFO_FILENAME) . '_tn.jpg')) {
-                unlink($this->dirpath . '/' . pathinfo($this->realname, PATHINFO_FILENAME) . '_tn.jpg');
+            $tnpath = $this->dirpath . '/' .
+                pathinfo($this->realname, PATHINFO_FILENAME) . '_tn.jpg';
+            $smallpath = $this->dirpath . '/' .
+                pathinfo($this->realname, PATHINFO_FILENAME) . '_small.' .
+                pathinfo($this->realname, PATHINFO_EXTENSION);
+            if (is_file($tnpath)) {
+                unlink($tnpath);
             }
-            if (is_file($this->dirpath . '/' . pathinfo($this->realname, PATHINFO_FILENAME) . '_small.' . pathinfo($this->realname, PATHINFO_EXTENSION))) {
-                unlink($this->dirpath . '/' . pathinfo($this->realname, PATHINFO_FILENAME) . '_small.' . pathinfo($this->realname, PATHINFO_EXTENSION));
+            if (is_file($smallpath)) {
+                unlink($smallpath);
             }
             $temp = pathinfo($this->realname);
-            $temp = glob($this->dirpath . '/' . $temp['filename'] . '.*.' . $temp['extension']);
+            $temp = glob($this->dirpath . '/' . $temp['filename'] . '.*.' .
+                $temp['extension']);
             foreach ($temp as $val) {
                 if (is_file($val)) {
                     unlink($val);
@@ -151,6 +193,9 @@ class Attachment extends SOME
     }
 
 
+    /**
+     * Загружает файл вложения
+     */
     protected function uploadFile()
     {
         if ($this->copy) {
@@ -162,20 +207,35 @@ class Attachment extends SOME
     }
 
 
+    /**
+     * Загружает изображение
+     */
     protected function uploadImage()
     {
         $type = @getimagesize($this->upload);
-        $types = array(IMAGETYPE_GIF => 'gif', IMAGETYPE_JPEG => 'jpg', IMAGETYPE_PNG => 'png');
+        $types = [
+            IMAGETYPE_GIF => 'gif',
+            IMAGETYPE_JPEG => 'jpg',
+            IMAGETYPE_PNG => 'png'
+        ];
         if (!($type && isset($type[2]) && isset($types[$type[2]]))) {
             return false;
         }
         $this->mime = image_type_to_mime_type($type[2]);
-        // 2020-03-10, AVS: Заменил pathinfo, т.к. некорректно работает с русскими буквами
+        // 2020-03-10, AVS: Заменил pathinfo, т.к. некорректно работает
+        // с русскими буквами
         $filenameWOext = preg_replace('/\\.\\w+$/umi', '', $this->filename);
         $this->filename = $filenameWOext . '.' . $types[$type[2]];
         $this->realname = $this->getUniqueFilename();
-        if (($this->maxWidth && ($this->maxWidth < $type[0])) || ($this->maxHeight && ($this->maxHeight < $type[1]))) {
-            Thumbnail::make($this->upload, $this->file, $this->maxWidth ? $this->maxWidth : INF, $this->maxHeight ? $this->maxHeight : -1);
+        if (($this->maxWidth && ($this->maxWidth < $type[0])) ||
+            ($this->maxHeight && ($this->maxHeight < $type[1]))
+        ) {
+            Thumbnail::make(
+                $this->upload,
+                $this->file,
+                $this->maxWidth ? $this->maxWidth : INF,
+                $this->maxHeight ? $this->maxHeight : -1
+            );
             if (!$this->copy) {
                 unlink($this->upload);
             }
@@ -186,14 +246,31 @@ class Attachment extends SOME
     }
 
 
+    /**
+     * Создает эскизы изображения
+     */
     public function createThumbnail()
     {
         if (is_file($this->file) && $this->image) {
-            Thumbnail::make($this->file, $this->tn, $this->tnsize ? $this->tnsize : self::tnsize, -1, Thumbnail::THUMBNAIL_CROP, true);
+            Thumbnail::make(
+                $this->file,
+                $this->tn,
+                $this->tnsize ? $this->tnsize : self::tnsize,
+                -1,
+                Thumbnail::THUMBNAIL_CROP,
+                true
+            );
             if ($this->tn) {
                 chmod($this->tn, 0777);
             }
-            Thumbnail::make($this->file, $this->small, $this->tnsize ? $this->tnsize : self::tnsize, -1, Thumbnail::THUMBNAIL_FRAME, true);
+            Thumbnail::make(
+                $this->file,
+                $this->small,
+                $this->tnsize ? $this->tnsize : self::tnsize,
+                -1,
+                Thumbnail::THUMBNAIL_FRAME,
+                true
+            );
             if ($this->small) {
                 chmod($this->small, 0777);
             }
@@ -201,12 +278,16 @@ class Attachment extends SOME
     }
 
 
+    /**
+     * Чистит "потерянные" вложения (у которых нет файлов)
+     */
     public static function clearLostAttachments()
     {
         $Set = static::getSet();
         foreach ($Set as $row) {
             if (!is_file($row->file)) {
-                if (is_file($old_file = Application::i()->filesDir . '/' . $row->realname)) {
+                $old_file = Application::i()->filesDir . '/' . $row->realname;
+                if (is_file($old_file)) {
                     rename($old_file, $row->file);
                 } else {
                     static::delete($row);
@@ -214,14 +295,19 @@ class Attachment extends SOME
             }
             if ($row->image) {
                 if ($row->tn && !is_file($row->tn)) {
-                    if (is_file($old_file = Application::i()->filesDir . '/' . pathinfo($row->realname, PATHINFO_FILENAME) . '_tn.jpg')) {
+                    $old_file = Application::i()->filesDir . '/' .
+                        pathinfo($row->realname, PATHINFO_FILENAME) . '_tn.jpg';
+                    if (is_file($old_file)) {
                         rename($old_file, $row->tn);
                     } else {
                         $row->createThumbnail();
                     }
                 }
                 if ($row->small && !is_file($row->small)) {
-                    if (is_file($old_file = Application::i()->filesDir . '/' . pathinfo($row->realname, PATHINFO_FILENAME) . '_small.' . $row->ext)) {
+                    $old_file = Application::i()->filesDir . '/' .
+                        pathinfo($row->realname, PATHINFO_FILENAME) .
+                        '_small.' . $row->ext;
+                    if (is_file($old_file)) {
                         rename($old_file, $row->small);
                     } else {
                         $row->createThumbnail();
@@ -234,23 +320,31 @@ class Attachment extends SOME
     }
 
 
+    /**
+     * Чистит "потерянные" файлы вложений (для которых нет вложений)
+     * @param string $dirname Путь к папке, где чистить
+     */
     public static function clearLostFiles($dirname = null)
     {
         if (!$dirname) {
             $dirname = Application::i()->filesDir;
         }
         $Set = static::getSet();
-        $temp = array();
+        $temp = [];
         foreach ($Set as $row) {
             if (is_file($row->file)) {
-                $temp[] = preg_replace('/\\.\\w+$/umi', '', realpath($row->file));
+                $temp[] = preg_replace(
+                    '/\\.\\w+$/umi',
+                    '',
+                    realpath($row->file)
+                );
             }
         }
         $Set = $temp;
         $temp = glob($dirname . '/*');
         $temp = array_filter($temp, 'is_file');
         $temp = array_map('realpath', $temp);
-        $toDelete = array();
+        $toDelete = [];
         foreach ($temp as $val) {
             $file = preg_replace('/\\.\\w+$/umi', '', realpath($val));
             $file = preg_replace('/_(small|tn)$/umi', '', $file);
@@ -266,6 +360,10 @@ class Attachment extends SOME
     }
 
 
+    /**
+     * Возвращает родительский объект
+     * @return SOME
+     */
     protected function _parent()
     {
         $classname = $this->classname;
@@ -276,9 +374,16 @@ class Attachment extends SOME
     }
 
 
+    /**
+     * Получает уникальное имя файла (которого еще нет, на основе загружаемого)
+     * @param bool $ignoreExtension Считать существующим имя при наличии файла
+     *     с таким именем и любым расширением (false - только с таким же)
+     * @return string Сгенерированное имя
+     */
     protected function getUniqueFilename($ignoreExtension = true)
     {
-        // 2020-03-10, AVS: Заменил pathinfo, т.к. некорректно работает с русскими буквами
+        // 2020-03-10, AVS: Заменил pathinfo, т.к. некорректно работает
+        // с русскими буквами
         $filenameWOext = preg_replace('/\\.\\w+$/umi', '', $this->filename);
         $filename = Text::beautify($filenameWOext);
         $ext = Text::beautify(pathinfo($this->filename, PATHINFO_EXTENSION));
@@ -289,8 +394,21 @@ class Attachment extends SOME
     }
 
 
-    public static function createFromFile($filename, SOME $parentField = null, $maxSize = 1920, $tnSize = 300, $mime = 'application/octet-stream')
-    {
+    /**
+     * Создает вложение из файла
+     * @param string $filename Файл, из которого нужно создать вложение
+     * @param SOME|null $parentField Родительский объект
+     * @param int $maxSize Максимальный размер полноразмерного изображения
+     * @param int $tnSize Размер эскиза
+     * @param string $mime MIME-тип вложения
+     */
+    public static function createFromFile(
+        $filename,
+        SOME $parentField = null,
+        $maxSize = 1920,
+        $tnSize = 300,
+        $mime = 'application/octet-stream'
+    ) {
         $att = new static();
         $basename = basename($filename);
         $basenameWOExt = pathinfo($filename, PATHINFO_FILENAME);
@@ -312,7 +430,7 @@ class Attachment extends SOME
         if ($type) {
             $newExt = image_type_to_extension($type[2], false);
             $newExt = strtolower($newExt);
-            if (in_array($newExt, array('jpeg', 'pjpeg'))) {
+            if (in_array($newExt, ['jpeg', 'pjpeg'])) {
                 $newExt = 'jpg';
             }
             $att->filename = $basenameWOExt . '.' . $newExt;

@@ -11,11 +11,11 @@ abstract class Dictionary extends \SOME\SOME
     protected static $parents = array('parents' => 'parent');
     protected static $children = array('children' => array('classname' => 'RAAS\\Dictionary', 'FK' => 'pid'));
     protected static $links = array();
-    
+
     public static $ordersBy = array('id' => 'ID', 'urn' => 'URN', 'name' => 'NAME', 'priority' => 'MANUAL');
-    
+
     public static $availableExtensions = array('csv', 'ini', 'xml', 'sql');
-    
+
     public function commit()
     {
         if (!$this->id || !$this->priority) {
@@ -27,18 +27,18 @@ abstract class Dictionary extends \SOME\SOME
             parent::commit();
         }
     }
-    
+
     public function parseCSV($text)
     {
         $csv = new \SOME\CSV($text);
-        list($currentStep) = each(array_filter($csv->data[0], 'trim'));
+        $currentStep = array_shift(array_keys(array_filter($csv->data[0], 'trim')));
         $backtrace = array(array($currentStep, $this));
         $last = null;
-        
+
         for ($i = 0; $i < count($csv->data); $i++) {
             $row = $csv->data[$i];
-            list($step) = each(array_filter($row, 'trim'));
-        
+            $step = array_shift(array_keys(array_filter($row, 'trim')));
+
             if ($step != $currentStep) {
                 for ($j = 0; ($j < count($backtrace)) && ($backtrace[$j][0] <= $step); $j++);
                 if ($j >= count($backtrace)) {
@@ -49,14 +49,14 @@ abstract class Dictionary extends \SOME\SOME
                 $currentStep = $step;
             }
             $row = array_slice($row, $currentStep);
-            
+
             $val = trim(isset($row[0]) && trim($row[0]) ? $row[0] : '');
             $key = trim(isset($row[1]) && trim($row[1]) ? $row[1] : '');
             $last = self::exportByNameURN($val, $key, $backtrace[count($backtrace) - 1][1]);
         }
     }
-    
-    
+
+
     public function parseINI($text)
     {
         $ini = parse_ini_string($text);
@@ -64,8 +64,8 @@ abstract class Dictionary extends \SOME\SOME
             $last = self::exportByNameURN(trim($val), trim($key), $this);
         }
     }
-    
-    
+
+
     public function parseXML($text)
     {
         if ($text instanceof \SimpleXMLElement) {
@@ -90,8 +90,8 @@ abstract class Dictionary extends \SOME\SOME
             }
         }
     }
-    
-    
+
+
     public function parseSQL($text, $pid = 0)
     {
         if (is_array($text)) {
@@ -99,11 +99,16 @@ abstract class Dictionary extends \SOME\SOME
         } else {
             if (preg_match('/(INSERT )|(UPDATE )|(DELETE )|(FILE )|(CREATE )|(ALTER )|(INDEX )|(DROP )|(REPLACE )/i', $text)) {
                 return;
-            } 
+            }
             $SQL_result = self::$SQL->get((string)$text);
         }
         if ($SQL_result) {
-            $rawData = array_values(array_filter($SQL_result, create_function('$x', 'return $x["pid"] == "' . self::$SQL->real_escape_string($pid) . '";')));
+            $rawData = array_values(array_filter(
+                $SQL_result,
+                function ($x) use ($pid) {
+                    return $x["pid"] == $pid;
+                }
+            ));
             foreach ($rawData as $row) {
                 $val = trim(isset($row['name']) && trim($row['name']) ? $row['name'] : array_shift(array_values($row)));
                 $key = trim(isset($row['val']) && trim($row['val']) ? $row['val'] : $val);
@@ -112,9 +117,9 @@ abstract class Dictionary extends \SOME\SOME
             }
         }
     }
-    
-    
-    protected static function exportByNameURN($name, $urn = null, self $Parent)
+
+
+    protected static function exportByNameURN($name, $urn = null, self $Parent = null)
     {
         if ($Item = static::importByLike($urn, $name, $Parent)) {
             if ($name && ($Item->name != $name)) {
@@ -132,8 +137,8 @@ abstract class Dictionary extends \SOME\SOME
         }
         return $Item;
     }
-    
-    
+
+
     protected static function importByLike($urn = null, $name = null, self $Parent)
     {
         if (!$urn && !$name) {
@@ -150,5 +155,5 @@ abstract class Dictionary extends \SOME\SOME
             return new static($SQL_result);
         }
     }
-    
+
 }

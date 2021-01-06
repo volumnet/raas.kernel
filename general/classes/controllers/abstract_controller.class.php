@@ -113,6 +113,7 @@ abstract class Abstract_Controller extends \RAAS\Abstract_Package_Controller
         $OUT['CONTENT']['H'] = date('H');
 
         $OUT['CONTENT']['ip'] = $_SERVER['REMOTE_ADDR'];
+        $OUT['CONTENT']['serverIP'] = $_SERVER['SERVER_ADDR'];
         $OUT['CONTENT']['NAME'] = Application::i()->versionName;
         if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
             $OUT['CONTENT']['proxy'] = $_SERVER['HTTP_X_FORWARDED_FOR'];

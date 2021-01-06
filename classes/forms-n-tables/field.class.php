@@ -374,7 +374,7 @@ class Field extends OptionContainer
                         if ($tmp_ch = array_filter($tmp_ch, function ($x) use ($classname) {
                             return $x['classname'] == $classname;
                         })) {
-                            list($childrenN) = each($tmp_ch);
+                            $childrenN = array_shift(array_keys($tmp_ch));
                         }
                     }
                     if ($childrenN && $row->$childrenN && is_array($row->$childrenN)) {

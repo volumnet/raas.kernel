@@ -239,8 +239,8 @@ $_RAASForm_Control = function (
                 $attrs['required'] = false;
             } elseif ($field->type == 'codearea') {
                 $attrs['class'] = 'code codearea fullscreen';
-                $attrs['v-pre'] = 'v-pre';
             }
+            $attrs['v-pre'] = 'v-pre';
             if ($field->multiple) {
                 ?>
                 <div data-role="raas-repo-block">
@@ -280,6 +280,7 @@ $_RAASForm_Control = function (
             if (!$field->type) {
                 $attrs['type'] = 'text';
             }
+            $attrs['v-pre'] = 'v-pre';
             if ($field->multiple) {
                 ?>
                 <div data-role="raas-repo-block">

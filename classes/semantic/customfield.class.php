@@ -1,22 +1,52 @@
 <?php
+/**
+ * Пользовательское поле
+ */
 namespace RAAS;
 
 use SimpleXMLElement;
 use SOME\CSV;
 use SOME\SOME;
 
+/**
+ * Класс пользовательского поля
+ *
+ * <pre>Предустановленные типы:
+ * [Стандартный источник] => array<
+ *     string[] Значение пункта => [
+ *         'name' => string Подпись пункта,
+ *         'children' =>? [Стандартный источник]
+ *     ]
+ * ></pre>
+ * @property-read SOME|null $Owner Сущность, к которому относится поле с данными
+ * @property-read Field $Field Поле для RAAS-формы
+ * @property-read bool $inherited Наследуемое поле
+ * @property-read array $stdSource Стандартный источник
+ */
 abstract class CustomField extends SOME
 {
+    /**
+     * Таблица данных
+     */
     const data_table = '';
+
+    /**
+     * Класс справочника
+     */
     const DictionaryClass = '';
 
     protected $Owner;
 
     protected static $tablename = '';
+
     protected static $defaultOrderBy = "priority";
 
     protected static $cognizableVars = ['stdSource'];
 
+    /**
+     * Типы полей
+     * @var string[]
+     */
     public static $fieldTypes = [
         'text',
         'color',
@@ -40,6 +70,10 @@ abstract class CustomField extends SOME
         'htmlarea'
     ];
 
+    /**
+     * Типы источников данных
+     * @var string[]
+     */
     public static $sourceTypes = [
         'dictionary',
         'ini',
@@ -221,12 +255,22 @@ abstract class CustomField extends SOME
     }
 
 
+    /**
+     * Проверяет, заполнено ли поле
+     * @param mixed $val Значение для проверки
+     * @return bool
+     */
     public function isFilled($val)
     {
         return $this->Field->_isFilled($val);
     }
 
 
+    /**
+     * Проверяет, корректно ли заполнено поле
+     * @param mixed $val Значение для проверки
+     * @return bool
+     */
     public function validate($val)
     {
         return $this->Field->_validate($val);
@@ -406,6 +450,11 @@ abstract class CustomField extends SOME
     }
 
 
+    /**
+     * Возвращает "сырое"" значение из человеко-понятного
+     * @param mixed $x Человеко-понятное значение
+     * @return mixed
+     */
     public function fromRich($x = null)
     {
         switch ($this->datatype) {
@@ -431,6 +480,10 @@ abstract class CustomField extends SOME
     }
 
 
+    /**
+     * Возвращает количество значений в множественном поле
+     * @return int
+     */
     public function countValues()
     {
         if (!$this->Owner || !static::data_table) {
@@ -446,6 +499,13 @@ abstract class CustomField extends SOME
     }
 
 
+    /**
+     * Устанавливает значение поля
+     * @param mixed $value Значение для установки
+     * @param int $index Индекс значения
+     * @return mixed|null Исходное значение, если удалось установить,
+     *     null в противном случае
+     */
     public function setValue($value, $index = 0)
     {
         switch ($this->datatype) {
@@ -471,6 +531,13 @@ abstract class CustomField extends SOME
     }
 
 
+    /**
+     * Добавляет значение поля, смещая индексы
+     * @param mixed $value Значение для установки
+     * @param int|null $index Индекс значения, null если добавить в конец
+     * @return mixed|null Исходное значение, если удалось установить,
+     *     null в противном случае
+     */
     public function addValue($value, $index = null)
     {
         if (!$this->Owner || !static::data_table) {
@@ -488,10 +555,14 @@ abstract class CustomField extends SOME
                        ORDER BY fii DESC";
             static::$SQL->query([$sqlQuery, $sqlBind]);
         }
-        $this->setValue($value, $index);
+        return $this->setValue($value, $index);
     }
 
 
+    /**
+     * Удаляет значение поля, смещая индексы
+     * @param int|null $index Индекс значения
+     */
     public function deleteValue($index = 0)
     {
         if (!$this->Owner || !static::data_table) {
@@ -513,6 +584,9 @@ abstract class CustomField extends SOME
     }
 
 
+    /**
+     * Удаляет все значения поля
+     */
     public function deleteValues()
     {
         if (!$this->Owner || !static::data_table) {
@@ -526,6 +600,10 @@ abstract class CustomField extends SOME
     }
 
 
+    /**
+     * Очищает "потерянные" вложения (для которых нет записей в таблице данных
+     * для данного типа поля)
+     */
     public function clearLostAttachments()
     {
         if (in_array($this->datatype, ['file', 'image'])) {
@@ -550,6 +628,9 @@ abstract class CustomField extends SOME
     }
 
 
+    /**
+     * Наследует значения поля
+     */
     public function inheritValues()
     {
         $sqlQuery = "UPDATE " . static::$dbprefix . static::data_table . "
@@ -585,18 +666,23 @@ abstract class CustomField extends SOME
     }
 
 
+    /**
+     * Разбирает CSV-текст источника в стандартный источник
+     * @param string $text Текст для разбора
+     * @return array <pre>[Стандартный источник]</pre>
+     */
     protected static function parseCSV($text)
     {
         $csv = new CSV($text);
         $data = [];
 
-        list($currentStep) = each(array_filter($csv->data[0], 'trim'));
+        $currentStep = array_shift(array_keys(array_filter($csv->data[0], 'trim')));
         $backtrace = [[$currentStep, &$data]];
         $last = null;
 
         for ($i = 0; $i < count($csv->data); $i++) {
             $row = $csv->data[$i];
-            list($step) = each(array_filter($row, 'trim'));
+            $step = array_shift(array_keys(array_filter($row, 'trim')));
 
             if ($step != $currentStep) {
                 for ($j = 0; ($j < count($backtrace)) && ($backtrace[$j][0] <= $step); $j++) {
@@ -621,6 +707,11 @@ abstract class CustomField extends SOME
     }
 
 
+    /**
+     * Разбирает INI-текст источника в стандартный источник
+     * @param string $text Текст для разбора
+     * @return array <pre>[Стандартный источник]</pre>
+     */
     protected static function parseINI($text)
     {
         $ini = @parse_ini_string($text);
@@ -632,6 +723,11 @@ abstract class CustomField extends SOME
     }
 
 
+    /**
+     * Разбирает XML-текст источника в стандартный источник
+     * @param string $text Текст для разбора
+     * @return array <pre>[Стандартный источник]</pre>
+     */
     protected static function parseXML($text)
     {
         $data = [];
@@ -677,6 +773,13 @@ abstract class CustomField extends SOME
     }
 
 
+    /**
+     * Разбирает результат SQL-запроса источника в стандартный источник
+     * @param string $text Текст запроса
+     * @param int $pid Фильтрация по родительскому ID#
+     *     (для внутреннего использования)
+     * @return array <pre>[Стандартный источник]</pre>
+     */
     protected static function parseSQL($text, $pid = 0)
     {
         $data = [];
@@ -690,7 +793,6 @@ abstract class CustomField extends SOME
             $sqlResult = static::$SQL->get((string)$text);
         }
         if ($sqlResult) {
-            // $rawData = array_values(array_filter($sqlResult, create_function('$x', '$v = "' . addslashes($pid) . '"; return ($x["pid"] == $v) || (!$x["pid"] && !$v);')));
             $rawData = array_values(
                 array_filter(
                     $sqlResult,
@@ -722,6 +824,11 @@ abstract class CustomField extends SOME
     }
 
 
+    /**
+     * Разбирает результат выполнения PHP-кода источника в стандартный источник
+     * @param string $text PHP-код для выполнения
+     * @return array <pre>[Стандартный источник]</pre>
+     */
     protected static function parsePHP($text)
     {
         $data = [];
@@ -752,10 +859,15 @@ abstract class CustomField extends SOME
     }
 
 
-    protected static function parseDictionary(Dictionary $Dictionary)
+    /**
+     * Разбирает дерево справочника источника в стандартный источник
+     * @param Dictionary $dictionary Справочник для разбора
+     * @return array <pre>[Стандартный источник]</pre>
+     */
+    protected static function parseDictionary(Dictionary $dictionary)
     {
         $data = [];
-        foreach ($Dictionary->children as $row) {
+        foreach ($dictionary->children as $row) {
             $key = $row->urn;
             $val = $row->name;
             $data[$key] = ['name' => $val];
@@ -767,15 +879,22 @@ abstract class CustomField extends SOME
     }
 
 
-    protected function getCaption($key = '', $DATA = [])
+    /**
+     * Получает подпись к значению
+     * @param mixed $key Значение для обработки
+     * @param array $data <pre>[Стандартный источник]</pre> Источник
+     *     для обработки. Если пустой, используется стандартный источник поля
+     * @return string
+     */
+    protected function getCaption($key = '', $data = [])
     {
-        if (!$DATA) {
-            $DATA =& $this->stdSource;
+        if (!$data) {
+            $data =& $this->stdSource;
         }
-        if (isset($DATA[$key])) {
-            return $DATA[$key]['name'];
+        if (isset($data[$key])) {
+            return $data[$key]['name'];
         }
-        foreach ($DATA as $k => $row) {
+        foreach ($data as $k => $row) {
             if (isset($row['children']) &&
                 ($v = $this->getCaption($key, $row['children']))
             ) {
@@ -786,6 +905,13 @@ abstract class CustomField extends SOME
     }
 
 
+    /**
+     * Получает значение из подписи
+     * @param mixed $val Подпись для обработки
+     * @param array $data <pre>[Стандартный источник]</pre> Источник
+     *     для обработки. Если пустой, используется стандартный источник поля
+     * @return mixed
+     */
     protected function getFromCaption($val = '', $DATA = [])
     {
         if (!$DATA) {
@@ -805,6 +931,10 @@ abstract class CustomField extends SOME
     }
 
 
+    /**
+     * Возвращает стандартный источник поля
+     * @return array <pre>[Стандартный источник]</pre>
+     */
     protected function _stdSource()
     {
         if (!trim($this->source)) {
@@ -835,6 +965,13 @@ abstract class CustomField extends SOME
         }
     }
 
+
+    /**
+     * Возвращает набор опций для формы RAAS
+     * @param array $stdSource <pre>[Стандартный источник]</pre> Источник поля
+     * @param Field $parentField Родительское поле для опций
+     * @return OptionCollection
+     */
     protected function _getFieldChildren(array $stdSource, Field $parentField)
     {
         // 2020-07-27, AVS: добавил $level, чтобы не предлагал placeholder в
@@ -899,7 +1036,7 @@ abstract class CustomField extends SOME
     }
 
 
-    public static function delete($object)
+    public static function delete(SOME $object)
     {
         $object->deleteValues();
         parent::delete($object);

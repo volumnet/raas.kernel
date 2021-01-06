@@ -357,7 +357,7 @@ ob_start();
                   <ul class="dropdown-menu"><?php echo $managementMenu?></ul>
                 </div>
             <?php } ?>
-            <h1 class="h1"><?php echo $TITLE?></h1>
+            <h1 class="h1" v-pre><?php echo $TITLE?></h1>
             <?php if ($SUBTITLE) { ?>
                 <div class="subtitle"><?php echo $SUBTITLE?></div>
             <?php } ?>

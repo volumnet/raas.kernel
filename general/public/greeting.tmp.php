@@ -10,8 +10,16 @@
   <?php echo ($USER->adminRights ? '<b class="text-success">' . _YES . '</b>' : '<b class="text-error">' . _NO . '</b>')?><br />
   <b><?php echo YOUR_IP?>:</b>
   <?php
-      echo $ip . ( isset($proxy) ? ' (<b>' . PROXY . ':</b> ' . $proxy . ')' : '');
+  echo $ip;
+  if ($proxy && ($proxy != $ip)) {
+      echo ' (<b>' . PROXY . ':</b> ' . $proxy . ')';
+  }
   ?>
+  <br />
+  <b><?php echo SERVER_IP?>:</b>
+  <?php echo $serverIP; ?><br />
+  <b><?php echo __PHP_VERSION?>:</b>
+  <?php echo PHP_VERSION ?>
   <br />
 </p>
 <script type="text/javascript" src="<?php echo $APPLICATION->activePackage->view->publicURL?>/greeting.js"></script>
