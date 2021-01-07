@@ -945,7 +945,10 @@ final class Application extends Singleton implements IContext
     public function setcookie($var, $val)
     {
         $lifetime = $this->registryGet('cookieLifetime') * 86400;
-        $subdomainRx = '/' . $this->registryGet('subdomainCookies') . '/umis';
+        $subdomainRx = $this->registryGet('subdomainCookies');
+        if ($subdomainRx) {
+            $subdomainRx = '/' . $this->registryGet('subdomainCookies') . '/umis';
+        }
         $domainL2 = explode('.', $_SERVER['HTTP_HOST']);
         $domainL2 = array_slice($domainL2, -2);
         if (count($domainL2) == 2) {
@@ -963,7 +966,7 @@ final class Application extends Singleton implements IContext
             $val = json_encode($val);
         }
         $_COOKIE[$var] = $val;
-        if ($domainL2 && preg_match($subdomainRx, $var)) {
+        if ($domainL2 && $subdomainRx && preg_match($subdomainRx, $var)) {
             setcookie($var, '', time() - $lifetime, '/', '');
             setcookie($var, $val, time() + $lifetime, '/', $domainL2);
         } else {
