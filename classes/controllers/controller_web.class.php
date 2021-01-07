@@ -201,7 +201,7 @@ class Controller_Web extends Abstract_Controller
      */
     protected function fork()
     {
-        setcookie('p', $this->packageName, time() + $this->model->registryGet('cookieLifetime') * 86400, '/');
+        Application::i()->setcookie('p', $this->packageName);
         $this->model->activePackage = $this->model->packages['/'];
         if ($this->mode == 'logout') {
             $this->logout();
@@ -263,12 +263,10 @@ class Controller_Web extends Abstract_Controller
             $_SESSION['login'] = trim($login);
             $_SESSION['password_md5'] = $passwordMD5;
             if ($savePassword) {
-                setcookie('login', $login, time() + $this->model->registryGet('cookieLifetime') * 86400, '/');
-                setcookie(
+                Application::i()->setcookie('login', $login);
+                Application::i()->setcookie(
                     'password_md5',
-                    $passwordMD5 . Application::i()->md5It($passwordMD5 . Application::COOKIES_SALT),
-                    time() + $this->model->registryGet('cookieLifetime') * 86400,
-                    '/'
+                    $passwordMD5 . Application::i()->md5It($passwordMD5 . Application::COOKIES_SALT)
                 );
             }
         }
@@ -280,12 +278,12 @@ class Controller_Web extends Abstract_Controller
      */
     public function cleanSessionAuth($clearSession = false)
     {
-        setcookie('login', '', time() - 1, '/');
-        setcookie('password_md5', '', time() - 1, '/');
+        Application::i()->setcookie('login', null);
+        Application::i()->setcookie('password_md5', null);
         unset($_SESSION['login']);
         unset($_SESSION['password_md5']);
         if ($clearSession) {
-            setcookie(session_name(), '', time() - 1, '/');
+            Application::i()->setcookie(session_name());
             session_destroy();
         }
     }

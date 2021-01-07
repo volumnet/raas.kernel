@@ -328,7 +328,7 @@ class Form extends FieldContainer
     public function redirectDefault()
     {
         if (isset($_POST['@oncommit'])) {
-            setcookie('RAASForm@oncommit', $_POST['@oncommit'], time() + Application::i()->registryGet('cookieLifetime') * 86400, '/');
+            Application::i()->setcookie('RAASForm@oncommit', $_POST['@oncommit']);
             switch ($_POST['@oncommit']) {
                 case self::ONCOMMIT_EDIT:
                     new Redirector($this->__get('selfUrl'));

@@ -932,4 +932,43 @@ final class Application extends Singleton implements IContext
         $mail->Send();
         return true;
     }
+
+
+    /**
+     * Сохраняет cookie в зависимости от настроек, устанавливает переменную
+     *     $_COOKIE[$var]. Не-строковые переменные кодируются в json_encode.
+     *     Если $val == null, удаляет cookie.
+     * @param string $var Наименование переменной
+     * @param mixed $val Значение переменной
+     * @return string Установленное значение
+     */
+    public function setcookie($var, $val)
+    {
+        $lifetime = $this->registryGet('cookieLifetime') * 86400;
+        $subdomainRx = '/' . $this->registryGet('subdomainCookies') . '/umis';
+        $domainL2 = explode('.', $_SERVER['HTTP_HOST']);
+        $domainL2 = array_slice($domainL2, -2);
+        if (count($domainL2) == 2) {
+            $domainL2 = '.' . implode('.', $domainL2);
+        } else {
+            $domainL2 = null;
+        }
+        if ($val === null) {
+            unset($_COOKIE[$var]);
+            setcookie($var, '', time() - $lifetime, '/', '');
+            setcookie($var, '', time() - $lifetime, '/', $domainL2);
+            return null;
+        }
+        if (!is_scalar($val)) {
+            $val = json_encode($val);
+        }
+        $_COOKIE[$var] = $val;
+        if ($domainL2 && preg_match($subdomainRx, $var)) {
+            setcookie($var, '', time() - $lifetime, '/', '');
+            setcookie($var, $val, time() + $lifetime, '/', $domainL2);
+        } else {
+            setcookie($var, '', time() - $lifetime, '/', $domainL2);
+            setcookie($var, $val, time() + $lifetime, '/', '');
+        }
+    }
 }
