@@ -959,7 +959,9 @@ final class Application extends Singleton implements IContext
         if ($val === null) {
             unset($_COOKIE[$var]);
             setcookie($var, '', time() - $lifetime, '/', '');
-            setcookie($var, '', time() - $lifetime, '/', $domainL2);
+            if ($domainL2) {
+                setcookie($var, '', time() - $lifetime, '/', $domainL2);
+            }
             return null;
         }
         if (!is_scalar($val)) {
@@ -970,8 +972,11 @@ final class Application extends Singleton implements IContext
             setcookie($var, '', time() - $lifetime, '/', '');
             setcookie($var, $val, time() + $lifetime, '/', $domainL2);
         } else {
-            setcookie($var, '', time() - $lifetime, '/', $domainL2);
+            if ($domainL2) {
+                setcookie($var, '', time() - $lifetime, '/', $domainL2);
+            }
             setcookie($var, $val, time() + $lifetime, '/', '');
         }
+        return $val;
     }
 }
