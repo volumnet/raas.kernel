@@ -87,33 +87,16 @@ class HTMLRenderer
 
 
     /**
-     * Получает дополнительные атрибуты
-     * @param array|callable $additionalData Дополнительные данные,
-     *     либо callback($this), их возвращающий
-     * @return array <pre>array<
-     *     string[] Наименование атрибута => string Значение
-     * ></pre>
-     */
-    public function getAdditionalAttributes($additionalData = [])
-    {
-        $result = [];
-        if ($additionalData) {
-            if (is_callable($additionalData)) {
-                $result = (array)$additionalData($this);
-            } elseif (is_array($additionalData)) {
-                $result = $additionalData;
-            }
-        }
-        $result = array_filter($result, function ($x) {
-            return $x[0] != '_';
-        }, ARRAY_FILTER_USE_KEY);
-        return $result;
-    }
-
-
-    /**
      * Склеивает два массива атрибутов
-     * @param array $attrs1 description
+     * @param array $attrs1 <pre>array<
+     *     string[] Наименование атрибута => mixed Значение
+     * ></pre> Первый массив атрибутов
+     * @param array $attrs2 <pre>array<
+     *     string[] Наименование атрибута => mixed Значение
+     * ></pre> Второй массив атрибутов
+     * @return array <pre>array<
+     *     string[] Наименование атрибута => mixed Значение
+     * ></pre>
      */
     public function mergeAttributes($attrs1 = [], $attrs2 = [])
     {

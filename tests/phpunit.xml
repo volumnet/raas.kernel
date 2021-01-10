@@ -2,11 +2,12 @@
 
 <phpunit colors="true" bootstrap="./bootstrap.php">
   <testsuites>
-    <testsuite>
+    <testsuite name="HTMLRenderer">
+      <file>src/views/renderers/HTMLRendererTest.php</file>
     </testsuite>
   </testsuites>
   <filter>
-    <whitelist>
+    <whitelist addUncoveredFilesFromWhitelist="false">
       <directory suffix=".php">../classes</directory> 
       <directory suffix=".php">../general</directory> 
     </whitelist>

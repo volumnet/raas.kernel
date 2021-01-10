@@ -6,6 +6,7 @@ namespace RAAS;
 
 /**
  * Класс теста рендерера HTML
+ * @covers RAAS\HTMLRenderer
  */
 class HTMLRendererTest extends BaseTest
 {
@@ -211,48 +212,6 @@ class HTMLRendererTest extends BaseTest
         $this->assertEquals([
             'default' => 1,
             'value' => 'def',
-        ], $result);
-    }
-
-
-    /**
-     * Проверка получения дополнительных атрибутов
-     */
-    public function testGetAdditionalAttributes()
-    {
-        $renderer = new HTMLRenderer();
-
-        $result = $renderer->getAdditionalAttributes([
-            'type' => 'text',
-            '_aaa' => 'bbb',
-            'value' => '1'
-        ]);
-
-        $this->assertEquals([
-            'type' => 'text',
-            'value' => '1'
-        ], $result);
-    }
-
-
-    /**
-     * Проверка получения дополнительных атрибутов - случай с коллбэком
-     */
-    public function testGetAdditionalAttributesWithCallback()
-    {
-        $renderer = new HTMLRenderer();
-
-        $result = $renderer->getAdditionalAttributes(function () {
-            return [
-                'type' => 'text',
-                '_aaa' => 'bbb',
-                'value' => '1'
-            ];
-        });
-
-        $this->assertEquals([
-            'type' => 'text',
-            'value' => '1'
         ], $result);
     }
 
