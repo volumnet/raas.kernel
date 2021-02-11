@@ -362,6 +362,16 @@ final class Application extends Singleton implements IContext
         } else {
             $e = func_get_arg(0);
         }
+        $eTrace = $e->getTrace();
+                // var_dump($eTrace); exit;
+        foreach ($eTrace as $i => $trace) {
+            if (stristr($trace['file'], 'eval') && $_SESSION['EVAL_DEBUG']) {
+                $newMessage = $_SESSION['EVAL_DEBUG'] . ':' . $trace['line']
+                    . ': ' . $e->getMessage();
+                $e = new Exception($newMessage, $e->getCode(), $e);
+                break;
+            }
+        }
         if (count($this->exceptions) < 10) {
             $this->exceptions[] = $e;
         }
