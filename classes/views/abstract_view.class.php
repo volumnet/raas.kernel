@@ -8,6 +8,7 @@
  */
 namespace RAAS;
 
+use SOME\File;
 use SOME\Singleton;
 
 /**
@@ -64,7 +65,7 @@ abstract class Abstract_View extends Singleton implements IAbstract_Context_View
 
             // Файлы и директории
             case 'languagesDir':
-                return realpath(__DIR__ . '/../../languages');
+                return Application::i()->languagesDir;
                 break;
 
             case 'mode':
@@ -82,7 +83,7 @@ abstract class Abstract_View extends Singleton implements IAbstract_Context_View
                 break;
 
             case 'availableLanguages':
-                $dir = (array)\SOME\File::scandir($this->languagesDir);
+                $dir = (array)File::scandir($this->languagesDir);
                 $temp = [];
                 foreach ($dir as $row) {
                     $arr = parse_ini_file($this->languagesDir . '/' . $row);

@@ -42,17 +42,15 @@ class Updater
      */
     public function preInstall()
     {
-        if (version_compare(
-            Application::i()->registryGet('baseVersion'),
-            '4.2.28'
-        ) < 0) {
+        $v = Application::i()->registryGet('baseVersion');
+        if (version_compare($v, '4.2.28') < 0) {
             $this->update20200412();
         }
-        if (version_compare(
-            Application::i()->registryGet('baseVersion'),
-            '4.2.51'
-        ) < 0) {
+        if (version_compare($v, '4.2.51') < 0) {
             $this->update20200904();
+        }
+        if (version_compare($v, '4.2.66') < 0) {
+            $this->update20210301();
         }
         return true;
     }
@@ -138,6 +136,21 @@ class Updater
         ) {
             $sqlQuery = "ALTER TABLE " . SOME::_dbprefix() . "crontab
                            ADD pid int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'Process ID#' AFTER id";
+            $this->SQL->query($sqlQuery);
+        }
+    }
+
+
+    /**
+     * Добавляет HTTP-метод в логи пользователя
+     */
+    public function update20210301()
+    {
+        if (in_array(SOME::_dbprefix() . "users_log", $this->tables) &&
+            !in_array("method", $this->columns(SOME::_dbprefix() . "users_log"))
+        ) {
+            $sqlQuery = "ALTER TABLE " . SOME::_dbprefix() . "users_log
+                           ADD method VARCHAR(8) NOT NULL DEFAULT '' COMMENT 'HTTP method' AFTER ip";
             $this->SQL->query($sqlQuery);
         }
     }
