@@ -1,7 +1,7 @@
 {
     "name": "volumnet/raas.kernel",
-    "description": "RAAS v4.2.68 Remote Automated Assistant",
-    "version": "4.2.68",
+    "description": "RAAS v4.2.69 Remote Automated Assistant",
+    "version": "4.2.69",
     "license": "GPL-3.0-or-later",
     "minimum-stability": "dev",
     "prefer-stable": true,
@@ -17,7 +17,7 @@
         "ext-gd": ">=0",
         "ext-PDO": ">=0",
         "ext-mbstring": ">=0",
-        "volumnet/some4": "^4.5.3",
+        "volumnet/some4": "^4.5.12",
         "phpmailer/phpmailer": "~6.1",
         "ckeditor/ckeditor": "^4.13",
         "sunhater/kcfinder": "dev-master",
