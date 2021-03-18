@@ -125,7 +125,36 @@ class Sub_Crontab extends Abstract_Sub_Controller
                 );
             }
         }
-        $this->view->showlist(['Set' => Crontab::getSet()]);
+        if (stristr(PHP_OS, 'win')) {
+            $cmd = 'tasklist';
+        } else {
+            $cmd = 'ps -A';
+        }
+        ob_start();
+        system($cmd);
+        $rawTaskList = trim(ob_get_clean());
+        $taskList = explode("\n", $rawTaskList);
+        if (stristr(PHP_OS, 'win')) {
+            $taskList = array_slice($taskList, 2);
+            $tasksIds = array_map(function ($x) {
+                $x = explode('  ', trim($x), 2);
+                $x = trim($x[1]);
+                $x = explode(' ', $x, 2);
+                $id = (int)$x[0];
+                return $id;
+            }, $taskList);
+        } else {
+            $taskList = array_slice($taskList, 2);
+            $tasksIds = array_map(function ($x) {
+                $x = explode(' ', trim($x), 2);
+                $id = (int)$x[0];
+                return $id;
+            }, $taskList);
+        }
+        $this->view->showlist([
+            'Set' => Crontab::getSet(),
+            'tasksIds' => $tasksIds
+        ]);
     }
 
 

@@ -81,12 +81,18 @@ class Attachment extends SOME
                 if (!$this->image) {
                     return false;
                 }
+                if (stristr($this->mime, 'svg')) {
+                    return $this->fileURL;
+                }
                 return $this->dirURL . '/' .
                     pathinfo($this->realname, PATHINFO_FILENAME) . '_tn.jpg';
                 break;
             case 'smallURL':
                 if (!$this->image) {
                     return false;
+                }
+                if (stristr($this->mime, 'svg')) {
+                    return $this->fileURL;
                 }
                 return $this->dirURL . '/' .
                     pathinfo($this->realname, PATHINFO_FILENAME) . '_small.' .
@@ -142,7 +148,7 @@ class Attachment extends SOME
     {
         if ($this->upload && is_file($this->upload)) {
             $this->deleteFile();
-            if ($this->image) {
+            if ($this->image && !stristr($this->mime, 'svg')) {
                 $this->uploadImage();
                 $this->createThumbnail();
             } else {
@@ -216,7 +222,8 @@ class Attachment extends SOME
         $types = [
             IMAGETYPE_GIF => 'gif',
             IMAGETYPE_JPEG => 'jpg',
-            IMAGETYPE_PNG => 'png'
+            IMAGETYPE_PNG => 'png',
+            IMAGETYPE_WEBP => 'webp',
         ];
         if (!($type && isset($type[2]) && isset($types[$type[2]]))) {
             return false;

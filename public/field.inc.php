@@ -158,7 +158,7 @@ $_RAASForm_Control = function (
             <?php }
             $attrs = ['type' => 'file'];
             if ($field->type == 'image') {
-                $attrs['accept'] = 'image/jpeg,image/png,image/gif';
+                $attrs['accept'] = 'image/jpeg,image/png,image/gif,image/webp,image/svg+xml';
             }
             if ($field->multiple) {
                 ?>

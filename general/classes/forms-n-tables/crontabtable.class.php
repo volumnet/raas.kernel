@@ -30,6 +30,7 @@ class CrontabTable extends Table
     {
         $view = $this->view;
         unset($params['view']);
+        $tasksIds = (array)$params['tasksIds'];
         $defaultParams = array(
             'columns' => [
                 'id' => [
@@ -84,13 +85,19 @@ class CrontabTable extends Table
                 ],
                 'processing' => [
                     'caption' => $this->view->_('IS_PROCESSING_NOW'),
-                    'callback' => function ($item) {
+                    'callback' => function ($item) use ($tasksIds) {
                         if (strtotime($item->start_time) > 0) {
                             $title = date($this->view->_('DATETIMEFORMAT'), strtotime($item->start_time));
                             if ($item->pid) {
                                 $title .= '; PID#' . (int)$item->pid;
                             }
-                            return '<span class="text-success fa fa-circle" title="' . $title . '"></span>';
+                            if (in_array($item->pid, $tasksIds)) {
+                                $className = 'text-success';
+                            } else {
+                                $className = 'text-warning';
+                                $title .= "\n" . $this->view->_('NOT_FOUND');
+                            }
+                            return '<span class="' . $className . ' fa fa-circle" title="' . $title . '"></span>';
                         }
                         return '';
                     }

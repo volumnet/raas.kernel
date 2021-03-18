@@ -20,6 +20,9 @@ class CronCommand extends Command
         $tasks = [];
         if ($taskId) {
             $task = new Crontab($taskId);
+            // 2021-03-17, AVS: добавил принудительное сохранение логов
+            // при запуске вручную
+            $task->save_log = true;
             if ($task->id) {
                 $tasks[] = $task;
             }

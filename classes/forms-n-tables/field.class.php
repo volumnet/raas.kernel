@@ -35,10 +35,29 @@ class Field extends OptionContainer
     /**
      * Допустимые типы полей
      */
-    public static $fieldTypes = array(
-        'text', 'color', 'date', 'datetime-local', 'email', 'number', 'range', 'tel', 'time', 'url', 'month', /*'week', */'password',
-        'checkbox', 'radio', 'file', 'image', 'select', 'textarea', 'htmlarea', 'template'
-    );
+    public static $fieldTypes = [
+        'text',
+        'color',
+        'date',
+        'datetime-local',
+        'email',
+        'number',
+        'range',
+        'tel',
+        'time',
+        'url',
+        'month',
+        /*'week', */
+        'password',
+        'checkbox',
+        'radio',
+        'file',
+        'image',
+        'select',
+        'textarea',
+        'htmlarea',
+        'template',
+    ];
 
     /**
      * Значение по умолчанию
@@ -207,30 +226,75 @@ class Field extends OptionContainer
 
     /**
      * Проверка ошибок
-     * @return array массив ошибок вида array('name' => 'код ошибки', 'value' => 'имя поля', 'description' => 'текстовое описание ошибки');
+     * @return array массив ошибок вида ['name' => 'код ошибки', 'value' => 'имя поля', 'description' => 'текстовое описание ошибки'];
      */
     public function getErrors()
     {
-        $localError = array();
+        $localError = [];
         if (!$this->isFilled) {
             if ($this->required) {
-                if (!(in_array($this->type, array('file', 'image')) && isset($this->Form->Item) && ($this->Form->Item instanceof \SOME\SOME) && $this->Form->Item->__id())) {
-                    if (in_array($this->type, array('file', 'image'))) {
-                        $localError[] = array('name' => 'MISSED', 'value' => $this->name, 'description' => sprintf($this->view->_($this->__get('errorEmptyFileString')), $this->caption));
+                if (!(in_array($this->type, ['file', 'image']) && isset($this->Form->Item) && ($this->Form->Item instanceof \SOME\SOME) && $this->Form->Item->__id())) {
+                    if (in_array($this->type, ['file', 'image'])) {
+                        $localError[] = [
+                            'name' => 'MISSED',
+                            'value' => $this->name,
+                            'description' => sprintf(
+                                $this->view->_(
+                                    $this->__get('errorEmptyFileString')
+                                ),
+                                $this->caption
+                            )
+                        ];
                     } else {
-                        $localError[] = array('name' => 'MISSED', 'value' => $this->name, 'description' => sprintf($this->view->_($this->__get('errorEmptyString')), $this->caption));
+                        $localError[] = [
+                            'name' => 'MISSED',
+                            'value' => $this->name,
+                            'description' => sprintf(
+                                $this->view->_(
+                                    $this->__get('errorEmptyString')
+                                ),
+                                $this->caption
+                            )
+                        ];
                     }
                 }
             }
         } elseif ($this->confirm && !$this->matchConfirm) {
-            $localError[] = array('name' => 'INVALID', 'value' => $this->name, 'description' => sprintf($this->view->_($this->__get('errorDoesntMatch')), $this->caption));
+            $localError[] = [
+                'name' => 'INVALID',
+                'value' => $this->name,
+                'description' => sprintf(
+                    $this->view->_(
+                        $this->__get('errorDoesntMatch')
+                    ),
+                    $this->caption
+                )
+            ];
         } else {
             $v = $this->validate;
             if ($v !== true) {
-                if (in_array($this->type, array('file', 'image'))) {
-                    $e = array('name' => 'INVALID', 'value' => $this->name, 'description' => sprintf($this->view->_($this->__get('errorInvalidFileString')), $this->caption));
+                if (in_array($this->type, ['file', 'image'])) {
+                    $e = [
+                        'name' => 'INVALID',
+                        'value' => $this->name,
+                        'description' => sprintf(
+                            $this->view->_(
+                                $this->__get('errorInvalidFileString')
+                            ),
+                            $this->caption
+                        )
+                    ];
                 } else {
-                    $e = array('name' => 'INVALID', 'value' => $this->name, 'description' => sprintf($this->view->_($this->__get('errorInvalidString')), $this->caption));
+                    $e = [
+                        'name' => 'INVALID',
+                        'value' => $this->name,
+                        'description' => sprintf(
+                            $this->view->_(
+                                $this->__get('errorInvalidString')
+                            ),
+                            $this->caption
+                        )
+                    ];
                 }
                 if ($this->multiple) {
                     $e['indexes'] = $v;
@@ -334,8 +398,29 @@ class Field extends OptionContainer
                 return (bool)preg_match('/^\\d{4}-W\\d{2}$/i', $val);
                 break;
             case 'image':
-                $type = @getimagesize($val);
-                if ($val && !in_array($type[2], array(IMAGETYPE_GIF, IMAGETYPE_PNG, IMAGETYPE_JPEG))) {
+                if ($val) {
+                    $type = @getimagesize($val);
+                    if (in_array($type[2], [
+                        IMAGETYPE_GIF,
+                        IMAGETYPE_PNG,
+                        IMAGETYPE_JPEG,
+                        IMAGETYPE_WEBP,
+                    ])) {
+                        return true;
+                    } else {
+                        $mime = mime_content_type($val);
+                        if (stristr($mime, 'svg')) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+                if ($val && !in_array($type[2], [
+                    IMAGETYPE_GIF,
+                    IMAGETYPE_PNG,
+                    IMAGETYPE_JPEG,
+                    IMAGETYPE_WEBP,
+                ])) {
                     return false;
                 }
                 return true;
@@ -349,7 +434,7 @@ class Field extends OptionContainer
 
     /**
      * Обработка массива \SOME\SOME объектов
-     * @param array([\SOME\SOME]) массив объектов для обработки
+     * @param [[\SOME\SOME]] массив объектов для обработки
      * @param string $nameN имя свойства, где хранится наименование объекта
      * @param int|null $levelN уровень обработки дочерних элементов, null - не ограничено
      * @param string|null $childrenN свойство, где хранятся дочерние элементы, null - определить автоматически
@@ -358,10 +443,17 @@ class Field extends OptionContainer
      * @param bool $useOptionGroups - Если установлен в TRUE, каждая опция, содержащая дочерние, будет представлена как OptGroup, если FALSE - то как Option
      * @param callable|null $filter - Функция для фильтрации элементов - принимает в качестве единственного аргумента SOME-объект для фильтрации,
      *                                Возвращает TRUE, если элемент удовлетворяет критерию фильтрации или FALSE в противном случае. NULL - не фильтровать.
-     * @return array([Option]) массив опций
+     * @return [[Option]] массив опций
      */
-    protected function parseSet(array $Set = array(), $nameN = 'name', $level = null, $childrenN = null, $additionalF = null, $useOptionGroups = false, $filter = null)
-    {
+    protected function parseSet(
+        array $Set = [],
+        $nameN = 'name',
+        $level = null,
+        $childrenN = null,
+        $additionalF = null,
+        $useOptionGroups = false,
+        $filter = null
+    ) {
         $options = new OptionCollection();
         $options->Parent = $this;
         foreach ($Set as $row) {
@@ -392,7 +484,10 @@ class Field extends OptionContainer
                 } else {
                     $optionClassName = 'RAAS\Option';
                 }
-                $Option = new $optionClassName(array('value' => (string)$row->$idN, 'caption' => (string)$row->$nameN));
+                $Option = new $optionClassName([
+                    'value' => (string)$row->$idN,
+                    'caption' => (string)$row->$nameN
+                ]);
                 if ($additionalF) {
                     $add = $additionalF($row);
                     foreach ($add as $key => $val) {
@@ -516,7 +611,7 @@ class Field extends OptionContainer
      */
     public function oncommitDefault()
     {
-        if (in_array($this->type, array('image', 'file'))) {
+        if (in_array($this->type, ['image', 'file'])) {
             $Item = $this->Form->Item;
             $Field = $this;
             $f = function ($x) use ($Item, $Field) {
@@ -541,14 +636,14 @@ class Field extends OptionContainer
                 return null;
             };
             if (is_array($_FILES[$this->name]['tmp_name'])) {
-                $arr = array();
+                $arr = [];
                 foreach ($_FILES[$this->name]['tmp_name'] as $key => $val) {
                     if (is_uploaded_file($_FILES[$this->name]['tmp_name'][$key])) {
-                        $arr[] = array(
+                        $arr[] = [
                             'name' => $_FILES[$this->name]['name'][$key],
                             'tmp_name' => $_FILES[$this->name]['tmp_name'][$key],
                             'type' => $_FILES[$this->name]['type'][$key]
-                        );
+                        ];
                     }
                 }
                 if ($v = array_filter(array_map($f, $arr))) {

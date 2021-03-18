@@ -272,7 +272,7 @@ abstract class Abstract_Controller extends Singleton implements IAbstract_Contex
      */
     protected function applyPersonalSettings()
     {
-        if (isset($this->model->user->preferences['lang'])) {
+        if ($this->model->user->preferences['lang']) {
             $this->view->loadLanguage(
                 (string)$this->model->user->preferences['lang']
             );

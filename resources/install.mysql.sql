@@ -130,27 +130,6 @@ CREATE TABLE IF NOT EXISTS {$DBPREFIX$}users_levels_assoc (
   KEY m (m)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Users-rights levels associations';
 
-CREATE TABLE IF NOT EXISTS {$DBPREFIX$}users_log (
-  uid smallint(5) unsigned NOT NULL AUTO_INCREMENT COMMENT 'User ID#',
-  last_activity_date datetime NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'Last activity date',
-  ip varchar(255) NOT NULL DEFAULT '' COMMENT 'IP Address',
-  method varchar(8) NOT NULL DEFAULT '' COMMENT 'HTTP method',
-  package varchar(32) NOT NULL DEFAULT '' COMMENT 'Package',
-  module varchar(32) NOT NULL DEFAULT '' COMMENT 'Module',
-  sub varchar(32) NOT NULL DEFAULT '' COMMENT 'Submodule',
-  action_name varchar(32) NOT NULL DEFAULT '' COMMENT 'Action',
-  id int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Element ID#',
-  PRIMARY KEY (uid,last_activity_date),
-  KEY uid (uid),
-  KEY last_activity_date (last_activity_date),
-  KEY method (method),
-  KEY package (package),
-  KEY module (module),
-  KEY sub (sub),
-  KEY action_name (action_name),
-  KEY id (id)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Users activity log';
-
 CREATE TABLE IF NOT EXISTS {$DBPREFIX$}users_rights (
   uid smallint(5) unsigned NOT NULL DEFAULT '0' COMMENT 'User ID#',
   m varchar(32) NOT NULL DEFAULT '' COMMENT 'MID',

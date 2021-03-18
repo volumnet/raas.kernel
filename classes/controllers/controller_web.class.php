@@ -201,6 +201,8 @@ class Controller_Web extends Abstract_Controller
      */
     protected function fork()
     {
+        $log = new UserLog();
+        $log->commit();
         Application::i()->setcookie('p', $this->packageName);
         $this->model->activePackage = $this->model->packages['/'];
         if ($this->mode == 'logout') {

@@ -52,6 +52,12 @@ class Updater
         if (version_compare($v, '4.2.66') < 0) {
             $this->update20210301();
         }
+        if (version_compare($v, '4.2.67') < 0) {
+            $this->update20210315();
+        }
+        if (version_compare($v, '4.2.68') < 0) {
+            $this->update20210317();
+        }
         return true;
     }
 
@@ -151,6 +157,52 @@ class Updater
         ) {
             $sqlQuery = "ALTER TABLE " . SOME::_dbprefix() . "users_log
                            ADD method VARCHAR(8) NOT NULL DEFAULT '' COMMENT 'HTTP method' AFTER ip";
+            $this->SQL->query($sqlQuery);
+        }
+    }
+
+
+    /**
+     * Добавляет первичный ключ в логи пользователей
+     */
+    public function update20210315()
+    {
+        if (in_array(SOME::_dbprefix() . "users_log", $this->tables)) {
+            if (in_array(
+                "id",
+                $this->columns(SOME::_dbprefix() . "users_log")
+            ) && !in_array(
+                "element_id",
+                $this->columns(SOME::_dbprefix() . "users_log")
+            )) {
+                $sqlQuery = "ALTER TABLE `users_log`
+                            CHANGE uid uid SMALLINT(5) UNSIGNED NOT NULL COMMENT 'User ID#',
+                            CHANGE id element_id INT UNSIGNED NOT NULL COMMENT 'Element ID#'";
+                $this->SQL->query($sqlQuery);
+            }
+            if (!in_array(
+                "id",
+                $this->columns(SOME::_dbprefix() . "users_log")
+            )) {
+                $sqlQuery = "ALTER TABLE " . SOME::_dbprefix() . "users_log
+                              DROP PRIMARY KEY";
+                $this->SQL->query($sqlQuery);
+                $sqlQuery = "ALTER TABLE " . SOME::_dbprefix() . "users_log
+                               ADD id INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID#' FIRST,
+                               ADD PRIMARY KEY (id)";
+                $this->SQL->query($sqlQuery);
+            }
+        }
+    }
+
+
+    /**
+     * Убирает таблицу логов пользователей (перенесли в файлы)
+     */
+    public function update20210317()
+    {
+        if (in_array(SOME::_dbprefix() . "users_log", $this->tables)) {
+            $sqlQuery = "DROP TABLE IF EXISTS " . SOME::_dbprefix() . "users_log";
             $this->SQL->query($sqlQuery);
         }
     }
