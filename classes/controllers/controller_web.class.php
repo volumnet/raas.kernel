@@ -285,7 +285,7 @@ class Controller_Web extends Abstract_Controller
         unset($_SESSION['login']);
         unset($_SESSION['password_md5']);
         if ($clearSession) {
-            Application::i()->setcookie(session_name());
+            Application::i()->setcookie(session_name(), null);
             session_destroy();
         }
     }

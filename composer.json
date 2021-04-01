@@ -1,7 +1,7 @@
 {
     "name": "volumnet/raas.kernel",
-    "description": "RAAS v4.2.69 Remote Automated Assistant",
-    "version": "4.2.69",
+    "description": "RAAS v4.2.70 Remote Automated Assistant",
+    "version": "4.2.70",
     "license": "GPL-3.0-or-later",
     "minimum-stability": "dev",
     "prefer-stable": true,
@@ -9,6 +9,7 @@
         "php": ">=5.6",
         "ext-session": ">=0",
         "ext-iconv": ">=0",
+        "ext-intl": ">=0",
         "ext-pcre": ">=0",
         "ext-date": ">=0",
         "ext-zlib": ">=0",
