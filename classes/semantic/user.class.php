@@ -24,11 +24,11 @@ class User extends \SOME\SOME implements IOwner
     {
         Access::flushRights($this);
         parent::commit();
-        if (isset($this->_SET_groups)) {
+        if ($this->_SET_groups) {
             $this->add_groups($this->_SET_groups, true);
             unset($this->_SET_groups);
         }
-        if (isset($this->_SET_rights)) {
+        if ($this->_SET_rights) {
             foreach ((array)$this->_SET_rights as $mid => $lid) {
                 if ($Context = Application::i()->getContext($mid)) {
                     $level = new Level($lid);

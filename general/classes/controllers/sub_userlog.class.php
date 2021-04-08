@@ -52,10 +52,10 @@ class Sub_UserLog extends Abstract_Sub_Controller
         $OUT['DATA']['date_from'] = $dateFrom = date('Y-m-d', $tFrom);
         $OUT['DATA']['date_to'] = $dateTo = date('Y-m-d', $tTo);
 
-        if ((int)$_GET['uid']) {
-            $OUT['DATA']['uid'] = (int)$_GET['uid'];
+        if ($_GET['uid']) {
+            $OUT['DATA']['uid'] = (array)$_GET['uid'];
             $filters[] = function ($x) {
-                return $x->uid == (int)$_GET['uid'];
+                return in_array($x->uid, (array)$_GET['uid']);
             };
         }
         if (trim($_GET['ip'])) {
