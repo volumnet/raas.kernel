@@ -6,7 +6,7 @@
   },
   "dependencies": {
     "bootstrap-multiselect": "^0.9.15",
-    "codemirror": "^5.56.0",
+    "codemirror": "^5.58.2",
     "inputmask": "^5.0.4-beta.33",
     "jquery": "^1.12.4",
     "jquery-form": "^4.3.0",
