@@ -146,7 +146,8 @@ class Crontab extends SOME
         ob_start(function ($x) use (&$result, &$logChunk, $t, &$logFilename, &$log) {
             $result .= $x;
             $logChunk .= $x;
-            if (!$logFilename && $t->save_log) {
+            // 2021-06-28, AVS: добавил проверку на непустоту выдачи
+            if (!$logFilename && $t->save_log && $x) {
                 $logTime = time();
                 $log = new CrontabLog([
                     'pid' => (int)$t->id,
