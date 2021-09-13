@@ -158,11 +158,10 @@ class Controller_Web extends Abstract_Controller
                 return ($_SERVER['REQUEST_METHOD'] == 'POST') ? $_POST : [];
             },
             'children' => [
-                ['name' => 'login', 'maxlength' => 16, 'required' => 'required', 'caption' => $this->view->_('LOGIN_NAME')],
+                ['name' => 'login', 'required' => 'required', 'caption' => $this->view->_('LOGIN_NAME')],
                 [
                     'type' => 'password',
                     'name' => 'password',
-                    'maxlength' => 16,
                     'required' => 'required',
                     'caption' => $this->view->_('PASSWORD')
                 ],

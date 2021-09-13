@@ -311,14 +311,12 @@ abstract class Abstract_Controller extends Singleton implements IAbstract_Contex
             'children' => [
                 [
                     'name' => 'login',
-                    'maxlength' => 16,
                     'required' => 'required',
                     'caption' => $this->view->_('LOGIN_NAME')
                 ],
                 [
                     'type' => 'password',
                     'name' => 'password',
-                    'maxlength' => 16,
                     'required' => 'required',
                     'caption' => $this->view->_('PASSWORD'),
                     'check' => function ($Field) use ($t) {

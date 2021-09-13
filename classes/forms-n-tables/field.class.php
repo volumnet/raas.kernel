@@ -364,11 +364,20 @@ class Field extends OptionContainer
                 return (bool)preg_match('/^(#[0-9A-F]{3})|(#[0-9A-F]{6})|#[0-9A-F]{8}$/i', $val);
                 break;
             case 'date':
-                return (bool)preg_match('/^\\d{4}-\\d{2}-\\d{2}$/i', $val);
+                return $this->checkDate($val);
                 break;
             case 'datetime':
             case 'datetime-local':
-                return (bool)preg_match('/^\\d{4}-\\d{2}-\\d{2}( |T)\\d{2}:\\d{2}(:\\d{2}(\\.\\d{2})?)?$/i', $val);
+                if (!preg_match('/^(.*?)( |T)(.*?)$/i', $val, $regs)) {
+                    return false;
+                }
+                if (!$this->checkDate($regs[1])) {
+                    return false;
+                }
+                if (!$this->checkTime($regs[3])) {
+                    return false;
+                }
+                return true;
                 break;
             case 'email':
                 return (bool)filter_var($val, FILTER_VALIDATE_EMAIL);
@@ -386,13 +395,13 @@ class Field extends OptionContainer
                 return true;
                 break;
             case 'time':
-                return (bool)preg_match('/^\\d{2}:\\d{2}(:\\d{2}(\\.\\d{2})?)?$/i', $val);
+                return $this->checkTime($val);
                 break;
             case 'url':
                 return (bool)filter_var($val, FILTER_VALIDATE_URL);
                 break;
             case 'month':
-                return (bool)preg_match('/^\\d{4}-\\d{2}$/i', $val);
+                return $this->checkDate($val . '-01');
                 break;
             case 'week':
                 return (bool)preg_match('/^\\d{4}-W\\d{2}$/i', $val);
@@ -429,6 +438,46 @@ class Field extends OptionContainer
                 return true;
                 break;
         }
+    }
+
+
+    /**
+     * Проверяет на корректность дату
+     * @param string $date Дата в формате ДД.ММ.ГГГГ
+     * @return bool
+     */
+    public function checkDate($date)
+    {
+        if (!preg_match('/^(\\d{4})-(\\d{2})-(\\d{2})$/mi', $date, $regs)) {
+            return false;
+        }
+        if (!checkdate((int)$regs[2], (int)$regs[3], (int)$regs[1])) {
+            return false;
+        }
+        return true;
+    }
+
+
+    /**
+     * Проверяет на корректность дату
+     * @param string $time Время в формате ЧЧ:ММ:(СС(.МММ)?)?
+     * @return bool
+     */
+    public function checkTime($time)
+    {
+        if (!preg_match('/^(\\d{2}):(\\d{2})(:(\\d{2})(\\.\\d+)?)?$/mi', $time, $regs)) {
+            return false;
+        }
+        if ((int)$regs[1] > 23) {
+            return false;
+        }
+        if ((int)$regs[2] > 59) {
+            return false;
+        }
+        if ((int)$regs[4] > 59) {
+            return false;
+        }
+        return true;
     }
 
 
