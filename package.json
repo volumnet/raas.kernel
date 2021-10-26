@@ -10,7 +10,7 @@
     "inputmask": "^5.0.4-beta.33",
     "jquery": "^1.12.4",
     "jquery-form": "^4.3.0",
-    "jquery-ui": "^1.12.1",
+    "jquery-ui": "^1.13.0",
     "jquery-ui-timepicker-addon": "^1.6.3",
     "jquery.event.swipe": "^0.5.4",
     "jquery.scrollto": "^2.1.2",
