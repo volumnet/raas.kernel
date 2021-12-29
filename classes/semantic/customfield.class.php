@@ -626,7 +626,7 @@ abstract class CustomField extends SOME
                     static::$cache[$this->Owner->id][$this->id],
                     $index,
                     0,
-                    [null],
+                    [null]
                 );
             }
             $sqlQuery = "UPDATE " . static::$dbprefix . static::data_table . "
@@ -667,7 +667,7 @@ abstract class CustomField extends SOME
             array_splice(
                 static::$cache[$this->Owner->id][$this->id],
                 $index,
-                1,
+                1
             );
         }
     }
