@@ -234,8 +234,11 @@ abstract class CustomField extends SOME
      * @param int[]|SOME[] $parents Родительские объекты
      * @param int[]|self[] $fields Поля
      */
-    public static function prefetch(array $parents = [], array $fields = [])
-    {
+    public static function prefetch(
+        array $parents = [],
+        array $fields = [],
+        $forceUpdate = false
+    ) {
         if (!$parents && !$fields) {
             return;
         }
@@ -258,7 +261,7 @@ abstract class CustomField extends SOME
             $sqlWhere[] = "pid IN (" . implode(", ", $parentsIds) . ")";
         }
         if ($fieldsIds) {
-            $sqlWhere[] = "fid IN (" . implode(", ", $parentsIds) . ")";
+            $sqlWhere[] = "fid IN (" . implode(", ", $fieldsIds) . ")";
         }
         if ($sqlWhere) {
             $sqlQuery .= " WHERE " . implode(" AND ", $sqlWhere);
@@ -267,6 +270,23 @@ abstract class CustomField extends SOME
         $sqlResult = static::$SQL->get($sqlQuery);
         foreach ($sqlResult as $sqlRow) {
             static::$cache[trim($sqlRow['pid'])][trim($sqlRow['fid'])][trim($sqlRow['fii'])] = $sqlRow['value'];
+        }
+    }
+
+
+    /**
+     * Предполучает значение кэша поля относительно одного родителя,
+     * если не существует
+     * @param SOME $parent Родительский объект, для которого нужно получить кэш
+     *     Если не задан, получает относительно Owner'а
+     */
+    public function prefetchIfNotExists(SOME $parent = null)
+    {
+        if (!$parent) {
+            $parent = $this->Owner;
+        }
+        if (!isset(static::$cache[$parent->id][$this->id])) {
+            static::prefetch([$parent], [$this]);
         }
     }
 
@@ -345,20 +365,8 @@ abstract class CustomField extends SOME
         if (!$this->Owner || !static::data_table) {
             return null;
         }
-        if (isset(static::$cache[$this->Owner->id][$this->id][$index])) {
-            $value = static::$cache[$this->Owner->id][$this->id][$index];
-        } else {
-            $sqlQuery = "SELECT value
-                           FROM " . static::$dbprefix . static::data_table . "
-                          WHERE pid = ?
-                            AND fid = ?
-                            AND fii = ?";
-            $sqlBind = [(int)$this->Owner->id, (int)$this->id, (int)$index];
-            $value = static::$SQL->getvalue([$sqlQuery, $sqlBind]);
-            if ($value !== null) {
-                static::$cache[trim($this->Owner->id)][trim($this->id)][trim($index)] = $value;
-            }
-        }
+        $this->prefetchIfNotExists();
+        $value = static::$cache[$this->Owner->id][$this->id][$index];
         switch ($this->datatype) {
             case 'image':
             case 'file':
@@ -392,18 +400,8 @@ abstract class CustomField extends SOME
         if (!$this->multiple && !$forceArray) {
             return $this->getValue();
         }
-        if (isset(static::$cache[$this->Owner->id][$this->id])) {
-            $values = static::$cache[$this->Owner->id][$this->id];
-        } else {
-            $sqlQuery = "SELECT value
-                           FROM " . static::$dbprefix . static::data_table . "
-                          WHERE pid = ?
-                            AND fid = ?
-                       ORDER BY fii ASC";
-            $sqlBind = [(int)$this->Owner->id, (int)$this->id];
-            $values = static::$SQL->getcol([$sqlQuery, $sqlBind]);
-            static::$cache[trim($this->Owner->id)][trim($this->id)] = $values;
-        }
+        $this->prefetchIfNotExists();
+        $values = static::$cache[$this->Owner->id][$this->id];
         switch ($this->datatype) {
             case 'image':
             case 'file':
@@ -559,16 +557,11 @@ abstract class CustomField extends SOME
         if (!$this->Owner || !static::data_table) {
             return null;
         }
-        if (is_array(static::$cache[$this->Owner->id][$this->id])) {
+        $this->prefetchIfNotExists();
+        if (static::$cache[$this->Owner->id][$this->id]) {
             return max(array_keys(static::$cache[$this->Owner->id][$this->id]));
         }
-        $sqlBind = [(int)$this->Owner->id, (int)$this->id];
-        $sqlQuery = "SELECT MAX(fii)
-                       FROM " . static::$dbprefix . static::data_table . "
-                      WHERE pid = ?
-                        AND fid = ?";
-        $sqlResult = static::$SQL->getvalue([$sqlQuery, $sqlBind]);
-        return ($sqlResult === null ? 0 : $sqlResult + 1);
+        return 0;
     }
 
 
@@ -593,6 +586,7 @@ abstract class CustomField extends SOME
         if (!$this->Owner || !static::data_table) {
             return null;
         }
+        $this->prefetchIfNotExists();
         $arr = [
             'pid' => (int)$this->Owner->id,
             'fid' => (int)$this->id,
@@ -621,6 +615,7 @@ abstract class CustomField extends SOME
         if ($index === null) {
             $index = $this->countValues();
         } else {
+            $this->prefetchIfNotExists();
             if (isset(static::$cache[$this->Owner->id][$this->id])) {
                 array_splice(
                     static::$cache[$this->Owner->id][$this->id],
@@ -650,11 +645,12 @@ abstract class CustomField extends SOME
         if (!$this->Owner || !static::data_table) {
             return null;
         }
-        $sqlBind = [(int)$this->Owner->id, (int)$this->id, (int)$index];
+        $this->prefetchIfNotExists();
         $sqlQuery = "DELETE FROM " . static::$dbprefix . static::data_table . "
                       WHERE pid = ?
                         AND fid = ?
                         AND fii = ?";
+        $sqlBind = [(int)$this->Owner->id, (int)$this->id, (int)$index];
         static::$SQL->query([$sqlQuery, $sqlBind]);
         $sqlQuery = "UPDATE " . static::$dbprefix . static::data_table . "
                         SET fii = fii - 1
