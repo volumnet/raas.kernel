@@ -559,7 +559,9 @@ abstract class CustomField extends SOME
         }
         $this->prefetchIfNotExists();
         if (static::$cache[$this->Owner->id][$this->id]) {
-            return max(array_keys(static::$cache[$this->Owner->id][$this->id]));
+            // 2021-01-12, AVS: исправил, иначе каждый раз при одной записи
+            // выдает 0 и перезаписывает множественное поле в один индекс
+            return max(array_keys(static::$cache[$this->Owner->id][$this->id])) + 1;
         }
         return 0;
     }
