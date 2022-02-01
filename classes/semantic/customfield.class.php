@@ -417,7 +417,7 @@ abstract class CustomField extends SOME
                     function ($x) {
                         return str_replace(',', '.', $x);
                     },
-                    $values
+                    (array)$values
                 );
                 break;
             case 'datetime':
@@ -426,9 +426,13 @@ abstract class CustomField extends SOME
                     function ($x) {
                         return str_replace(' ', 'T', $x);
                     },
-                    $values
+                    (array)$values
                 );
                 break;
+        }
+        if ($forceArray) {
+            $values = (array)$values;
+            // 2022-01-26, AVS: Если хотим получить массив, то принудительно приводим к массиву, иначе возникают ошибки во многих местах
         }
         return $values;
     }
