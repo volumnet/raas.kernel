@@ -47,7 +47,7 @@ class CrontabTable extends Table
                     'caption' => $this->view->_('NAME'),
                     'callback' => function ($item) {
                         $text = ' <div>
-                                    <a href="' . $this->view->url . '&id=' . (int)$item->id . '">
+                                    <a href="' . $this->view->url . '&id=' . (int)$item->id . '&action=edit">
                                       <span' . (!$item->vis ? ' class="muted"' : '') . '>
                                         ' . htmlspecialchars($item->name) . '
                                       </span>
@@ -100,6 +100,17 @@ class CrontabTable extends Table
                             return '<span class="' . $className . ' fa fa-circle" title="' . $title . '"></span>';
                         }
                         return '';
+                    }
+                ],
+                'logsCounter' => [
+                    'caption' => $this->view->_('LOGS'),
+                    'callback' => function ($item) {
+                        $text = '<a href="' . $this->view->url . '&id=' . (int)$item->id . '">
+                                   <span' . (!$item->vis ? ' class="muted"' : '') . '>
+                                     ' . htmlspecialchars($item->logsCounter) . '
+                                   </span>
+                                 </a>';
+                        return $text;
                     }
                 ],
                 'priority' => [

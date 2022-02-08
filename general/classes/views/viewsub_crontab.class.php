@@ -149,6 +149,12 @@ class ViewSub_Crontab extends \RAAS\Abstract_Sub_View
                 ];
             }
             $arr[] = [
+                'href' => $this->url . '&action=delete_log&id=all&pid=' . (int)$item->id . '&back=1',
+                'name' => $this->_('CLEAR_LOGS'),
+                'icon' => 'remove-circle',
+                'onclick' => 'return confirm(\'' . $this->_('CLEAR_LOGS_TEXT') . '\')'
+            ];
+            $arr[] = [
                 'href' => $this->url . '&action=delete&id=' . (int)$item->id . ($edit ? '' : '&back=1'),
                 'name' => $this->_('DELETE'),
                 'icon' => 'remove',

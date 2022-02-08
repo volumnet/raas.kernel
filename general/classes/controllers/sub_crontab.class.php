@@ -152,7 +152,9 @@ class Sub_Crontab extends Abstract_Sub_Controller
             }, $taskList);
         }
         $this->view->showlist([
-            'Set' => Crontab::getSet(),
+            'Set' => Crontab::getSet([
+                'select' => ["COUNT(DISTINCT logs.id) AS logsCounter"],
+            ]),
             'tasksIds' => $tasksIds
         ]);
     }
