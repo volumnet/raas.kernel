@@ -79,6 +79,7 @@ abstract class Abstract_View extends Singleton implements IAbstract_Context_View
                 break;
 
             case 'language':
+            case 'translations':
                 return $this->$var;
                 break;
 

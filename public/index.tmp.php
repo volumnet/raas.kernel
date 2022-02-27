@@ -3,9 +3,10 @@
  * Основной шаблон RAAS
  */
 use RAAS\Application;
+use RAAS\AssetManager;
 
 /**
- * Возвращает код меню
+ * Возвращает структуру меню с учетом прав доступа
  * @param array $menu <pre>array<[
  *     'href' => string URL пункта меню,
  *     'name' => string Заголовок пункта ссылки,
@@ -15,13 +16,12 @@ use RAAS\Application;
  *     'counter' => int Счетчик,
  *     string[] Наименование атрибута => string Значение атрибута
  * ]></pre> Меню для отображения
- * @param 'breadcrumb'|null Тип меню
- * @return string HTML-код меню
+ * @return array Аналогичное меню
  */
-function showMenu(array $menu, $type = null)
+function getMenu(array $menu)
 {
     static $level = 0;
-    $text = '';
+    $result = [];
     if ($menu) {
         foreach ($menu as $row) {
             $attrs = '';
@@ -48,56 +48,12 @@ function showMenu(array $menu, $type = null)
                     continue;
                 }
             }
-
-            foreach ($row as $key => $val) {
-                if (!in_array($key, [
-                    'name',
-                    'href',
-                    'submenu',
-                    'counter',
-                    'active',
-                    'icon'
-                ])) {
-                    $attrs .= ' ' . htmlspecialchars($key)
-                           .  '="' . htmlspecialchars($val) . '"';
-                }
+            if ($row['submenu']) {
+                $row['submenu'] = getMenu($row['submenu']);
             }
-            $text .= '<li' . ($row['active'] ? ' class="active"' : '') . '>';
-            $children = '';
-            if (isset($row['submenu']) && is_array($row['submenu'])) {
-                $level++;
-                $children = showMenu($row['submenu'], $type);
-                $level--;
-            }
-            $text .= '  <a ' . $attrs . ((isset($row['href']) && $row['href']) ? ' href="' . htmlspecialchars($row['href']) . '"' : '') . '>';
-            if (isset($row['icon'])) {
-                $text .= '<i class="icon-' . htmlspecialchars($row['icon']) . '"></i> ';
-            }
-            $text .=    $row['name']
-                  .  '</a>';
-            if (isset($row['counter']) && $row['counter']) {
-                $text .= ' (<b>';
-                if (isset($row['href']) && $row['href']) {
-                    $text .= '<a href="' . htmlspecialchars($row['href']) . '">'
-                          .     (int)$row['counter']
-                          .  '</a>';
-                } else {
-                    $text .= '<b>' . (int)$row['counter'] . '</b>';
-                }
-                $text .= ')';
-            }
-            $text .= $children;
-            switch ($type) {
-                case 'breadcrumb':
-                    $text .= '<span class="divider">/</span>';
-                    break;
-            }
-            $text .= '</li>';
+            $result[] = $row;
         }
-        if ($text && $level) {
-            $text = '<ul>' . $text . '</ul>';
-        }
-        return $text;
+        return $result;
     }
 }
 
@@ -123,14 +79,17 @@ function rowContextMenu(
     $classname = 'pull-right',
     $btnClass = ''
 ) {
-    if ($menu && ($text = showMenu($menu))) {
-        return '<div class="btn-group ' . htmlspecialchars($classname) . '">
-                  <a href="#" class="btn dropdown-toggle ' . $btnClass . '" data-toggle="dropdown">
-                    ' . htmlspecialchars($title) . '
-                    <span class="caret"></span>
-                  </a>
-                  <ul class="dropdown-menu">' . $text . '</ul>
-                </div>';
+    // if ($menu && ($text = showMenu($menu))) {
+    //     return '<div class="btn-group ' . htmlspecialchars($classname) . '">
+    //               <a href="#" class="btn dropdown-toggle ' . $btnClass . '" data-toggle="dropdown">
+    //                 ' . htmlspecialchars($title) . '
+    //                 <span class="caret"></span>
+    //               </a>
+    //               <ul class="dropdown-menu">' . $text . '</ul>
+    //             </div>';
+    // }
+    if ($menuArr = getMenu((array)$menu)) {
+        return '<row-context-menu :menu="' . htmlspecialchars(json_encode($menuArr)) . '"></row-context-menu>';
     }
     return '';
 }
@@ -198,205 +157,106 @@ if (Application::i()->activeModule) {
 }
 
 ob_start();
+
+$packagesMenu = [];
+foreach ($APPLICATION->packages as $key => $pack) {
+    if ($access = $pack->access()) {
+        if (($pack->alias != '/') && !$access->A('p=' . $key)) {
+            continue;
+        }
+    }
+    if ($pack->registryGet('isActive') || !$key || ($key == '/')) {
+        $packagesMenu[] = [
+            'href' => '?p=' . $key,
+            'name' => $pack->view->_('__NAME'),
+            'active' => ($pack == $APPLICATION->activePackage)
+        ];
+    }
+}
+
+$translations = $VIEW->translations;
+if (Application::i()->activePackage) {
+    $translations = array_merge(
+        $translations,
+        Application::i()->activePackage->view->translations
+    );
+    if (Application::i()->activeModule) {
+        $translations = array_merge(
+            $translations,
+            Application::i()->activeModule->view->translations
+        );
+    }
+}
+
+
+$raasApplicationData = [
+    'packagesMenu' => $packagesMenu,
+    'mainMenu' => getMenu($MENU),
+    'leftMenu' => getMenu($SUBMENU),
+    'translations' => $translations,
+    'availableLanguages' => $VIEW->availableLanguages,
+    'hasActivePackage' => (bool)$APPLICATION->activePackage,
+    'breadcrumbs' => getMenu($PATH),
+    'title' => $TITLE,
+    'subtitle' => $SUBTITLE,
+    'errors' => $localError,
+    'managementMenu' => getMenu($CONTEXTMENU),
+    'versionName' => Application::i()->versionName,
+    'year' => (int)date('Y'),
+];
+if ($USER) {
+    $raasApplicationData['user'] = [
+        'login' => $USER->login,
+        'full_name' => $USER->full_name,
+        'lang' => $VIEW->language,
+        'loginType' => $APPLICATION->loginType,
+    ];
+}
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="<?php echo htmlspecialchars($VIEW->language)?>">
   <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="generator" content="RAAS4" />
     <title><?php echo $metaTitle?></title>
-    <link href="<?php echo $VIEW->themeURL . ($VIEW->templateType ? '/' . $VIEW->templateType : '')?>/style.css?v=<?php echo date('Y-m-d', filemtime(__DIR__ . '/style.css'))?>" rel="stylesheet" />
-    <link href="/vendor/components/jqueryui/themes/redmond/jquery-ui.min.css" rel="stylesheet" />
-    <link href="/vendor/trentrichardson/jquery-timepicker-addon/dist/jquery-ui-timepicker-addon.min.css" rel="stylesheet" />
-    <link href="/vendor/fortawesome/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
-    <?php foreach ($VIEW->css as $css) { ?>
-        <link href="<?php echo $css?>" rel="stylesheet" />
-    <?php } ?>
     <!-- Here will be in-text styles inserted -->
     <!--styles--><!--/styles-->
-
-    <script src="<?php echo $VIEW->publicURL?>/application.js"></script>
-    <script src="/vendor/components/jqueryui/ui/minified/i18n/jquery.ui.datepicker-<?php echo $VIEW->language?>.min.js"></script>
-    <?php if ($VIEW->language != 'en') { ?>
-        <script src="/vendor/trentrichardson/jquery-timepicker-addon/dist/i18n/jquery-ui-timepicker-addon-i18n.min.js"></script>
-        <script>
-        $.timepicker.setDefaults(
-            $.timepicker.regional['<?php echo $VIEW->language?>']
-        );
-        </script>
-    <?php } ?>
-    <script>
-    jQuery(document).ready(function($) {
-      context.init({preventDoubleContext: false});
-    });</script>
-    <script src="/vendor/ckeditor/ckeditor/ckeditor.js"></script>
-    <script src="<?php echo $VIEW->publicURL?>/ckeditor.config.js"></script>
-    <?php if (is_file(Application::i()->baseDir . '/js/ckeditor.config.js')) { ?>
-        <script src="/js/ckeditor.config.js"></script>
-    <?php } ?>
-    <?php if (is_file(Application::i()->baseDir . '/js/raas.config.js')) { ?>
-        <script src="/js/raas.config.js"></script>
-    <?php } ?>
-    <script src="/vendor/ckeditor/ckeditor/adapters/jquery.js"></script>
-    <?php foreach ($VIEW->head_js as $js) { ?>
-        <script src="<?php echo $js?>"></script>
-    <?php } ?>
+    <?php
+    AssetManager::requestCSS(array_merge([
+        $VIEW->publicURL . '/header.css',
+        $VIEW->publicURL . '/application.css',
+        $VIEW->themeURL . ($VIEW->templateType ? '/' . $VIEW->templateType : '') . '/style.css',
+    ], (array)$VIEW->css));
+    AssetManager::requestJS(array_merge([
+        $VIEW->publicURL . '/header.js'
+    ], (array)$VIEW->head_js), 'beforeApp');
+    AssetManager::requestJS(array_merge([
+        '/vendor/ckeditor/ckeditor/ckeditor.js',
+        $VIEW->publicURL . '/ckeditor.config.js',
+        '/js/ckeditor.config.js',
+        '/js/raas.config.js',
+        '/vendor/ckeditor/ckeditor/adapters/jquery.js',
+        $VIEW->publicURL . '/application.js', // Здесь, потому что последующие скрипты должны отрабатывать после подключения Vue
+    ], (array)$VIEW->js));
+    echo AssetManager::getRequestedCSS();
+    echo AssetManager::getRequestedJS('beforeApp');
+    echo AssetManager::getRequestedJS();
+    ?>
   </head>
   <body class="body">
     <div id="raas-app">
-      <?php if ($APPLICATION->activePackage) { ?>
-          <header class="body__head navbar navbar-inverse navbar-fixed-top">
-            <div class="navbar-inner">
-              <div class="container">
-                <nav class="menu-top">
-                  <ul class="nav">
-                    <li class="dropdown">
-                      <a class="dropdown-toggle brand menu-top__current-package" href="?" data-toggle="dropdown">
-                        RAAS.<?php echo htmlspecialchars($APPLICATION->activePackage->view->_('__NAME'))?><b class="caret"></b>
-                      </a>
-                      <ul class="dropdown-menu pull-right">
-                        <?php foreach ($APPLICATION->packages as $key => $pack) {
-                            if ($access = $pack->access()) {
-                                if (($pack->alias != '/') &&
-                                    !$access->A('p=' . $key)
-                                ) {
-                                    continue;
-                                }
-                            }
-                            if ((
-                                $pack->registryGet('isActive') ||
-                                !$key ||
-                                ($key == '/')
-                            ) && ($pack != $APPLICATION->activePackage)) { ?>
-                                <li>
-                                  <a href="?p=<?php echo $key?>">
-                                    <?php echo htmlspecialchars($pack->view->_('__NAME'))?>
-                                  </a>
-                                </li>
-                            <?php } ?>
-                        <?php } ?>
-                      </ul>
-                    </li>
-                    <?php echo showMenu($MENU)?>
-                  </ul>
-                </nav>
-                <?php if ($USER && $USER->id) { ?>
-                    <ul class="nav pull-right">
-                      <li class="dropdown">
-                        <a class="dropdown-toggle" href="?p=/&action=edit" data-toggle="dropdown" title="<?php echo EDIT_YOUR_PROFILE?>">
-                          <i class="icon-user icon-white"></i>
-                          <?php echo htmlspecialchars($USER->full_name ? $USER->full_name : $USER->login)?><b class="caret"></b>
-                        </a>
-                        <ul class="dropdown-menu">
-                          <li class="dropdown-submenu">
-                            <a>
-                              <i class="icon-globe"></i> <?php echo LANGUAGE?>:
-                              <?php echo $VIEW->availableLanguages[$VIEW->language]?>
-                            </a>
-                            <ul class="dropdown-menu">
-                              <?php foreach ($VIEW->availableLanguages as $key => $val) { ?>
-                                  <?php if ($key != $VIEW->language) { ?>
-                                      <li>
-                                        <a href="?mode=set_language&lang=<?php echo $key?>&back=1">
-                                          <?php echo htmlspecialchars($val)?>
-                                        </a>
-                                      </li>
-                                  <?php } ?>
-                              <?php } ?>
-                            </ul>
-                          </li>
-                          <?php if ($USER && $USER->id) { ?>
-                              <li>
-                                <a href="?p=/&action=edit">
-                                  <i class="icon-edit"></i>
-                                  <?php echo constant('EDIT_YOUR_PROFILE')?>
-                                </a>
-                              </li>
-                              <?php if($APPLICATION->loginType != 'http') { ?>
-                                  <li>
-                                    <a href="?mode=logout">
-                                      <i class="icon-off"></i>
-                                      <?php echo constant('EXIT')?>
-                                    </a>
-                                  </li>
-                              <?php } ?>
-                          <?php } ?>
-                        </ul>
-                      </li>
-                    </ul>
-                <?php } ?>
-              </div>
-            </div>
-          </header>
-      <?php } ?>
-      <div class="body__main-container-outer">
-        <div class="body__main-container">
-          <?php if ($SUBMENU) { ?>
-              <div class="span3 body__menu-left">
-                <nav class="menuLeft menu-left">
-                  <ul><?php echo showMenu($SUBMENU)?></ul>
-                </nav>
-              </div>
-          <?php } ?>
-          <article class="body__content span<?php echo $SUBMENU ? 9 : 12?>">
-            <?php if ($PATH) { ?>
-                <nav class="backtrace">
-                  <ul class="breadcrumb">
-                    <?php echo showMenu($PATH, 'breadcrumb')?>
-                  </ul>
-                </nav>
-            <?php }
-            if ($CONTEXTMENU &&
-                ($managementMenu = showMenu($CONTEXTMENU))
-            ) { ?>
-                <div class="btn-group pull-right">
-                  <a href="#" class="btn btn-info btn-large dropdown-toggle" data-toggle="dropdown">
-                    <?php echo MANAGEMENT?>
-                    <span class="caret"></span>
-                  </a>
-                  <ul class="dropdown-menu"><?php echo $managementMenu?></ul>
-                </div>
-            <?php } ?>
-            <h1 class="h1" v-pre><?php echo $TITLE?></h1>
-            <?php if ($SUBTITLE) { ?>
-                <div class="subtitle"><?php echo $SUBTITLE?></div>
-            <?php } ?>
-            <?php if ($localError) { ?>
-                <div class="alert alert-error alert-block">
-                  <button type="button" class="close" data-dismiss="alert">&times;</button>
-                  <h4><?php echo FOLLOWING_ERRORS_FOUND?>:</h4>
-                  <ul class="error">
-                    <?php foreach ($localError as $row) { ?>
-                        <li><?php echo nl2br(htmlspecialchars($row))?></li>
-                    <?php } ?>
-                  </ul>
-                </div>
-            <?php } ?>
-
-            <?php
-            if ($TEMPLATE) {
-                include $VIEW->tmp($TEMPLATE);
-            }
-            ?>
-          </article>
-          <footer class="body__copyright">
-            <?php if ($VIEW->context->versionName) { ?>
-                <?php echo $VIEW->context->versionName?><br />
-            <?php } ?>
-            <?php echo Application::i()->versionName?>:
-            <?php echo CORPORATE_RESOURCE_MANAGEMENT?><br />
-            <?php echo COPYRIGHT?> &copy;
-            <a href="http://www.volumnet.ru/" target="_blank">
-              Volume Networks
-            </a>,
-            <?php echo date('Y')?>. <?php echo ALL_RIGHTS_RESERVED?>.<br />
-            <?php echo ICONS_BY?>
-            <a href="http://glyphicons.com/" target="_blank">Glyphicons</a>
-          </footer>
-        </div>
-      </div>
+      <raas-app v-bind="$data" :fixed-header="fixedHeader">
+        <template>
+          <?php
+          if ($TEMPLATE) {
+              include $VIEW->tmp($TEMPLATE);
+          }
+          ?>
+        </template>
+      </raas-app>
     </div>
-    <?php /* <script src="<?php echo $VIEW->themeURL . ($VIEW->templateType ? '/' . $VIEW->templateType : '')?>/index.js"></script> */
+    <?php
     $content = separateScripts(
         ob_get_clean(),
         '/(maps.*?yandex.*constructor)|(type="text\\/html")/umis'
@@ -404,8 +264,9 @@ ob_start();
     $text = $content[0] . $content[1];
     $text = str_replace('<!--styles--><!--/styles-->', $content[2], $text);
     echo $text;
-    foreach ($VIEW->js as $js) { ?>
-        <script src="<?php echo $js?>"></script>
-    <?php } ?>
+    ?>
+    <script>
+    window.raasApplicationData = <?php echo json_encode($raasApplicationData, JSON_UNESCAPED_UNICODE)?>;
+    </script>
   </body>
 </html>

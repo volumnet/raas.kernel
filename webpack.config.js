@@ -1,5 +1,5 @@
 const TerserJSPlugin = require('terser-webpack-plugin');
-// const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const FixStyleOnlyEntriesPlugin = require("webpack-fix-style-only-entries");
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
@@ -10,12 +10,19 @@ const path = require('path');
 module.exports = {
     mode: 'production',
     entry: {
-        application: './public/src/application.js'
+        header: './public/src/header.js',
+        application: './public/src/application.js',
+        'ckeditor.config': './public/src/ckeditor.config.js'
     },
     resolve: {
         modules: ['node_modules'],
         alias: {
+            app: path.resolve(__dirname, 'public/src/'),
+            // css: path.resolve(__dirname, 'dev/css/'),
             jquery: path.resolve(__dirname, 'node_modules/jquery/dist/jquery'),
+            cms: path.resolve(__dirname, 'd:/web/home/libs/raas.cms/resources/js'),
+            // shop: path.resolve(__dirname, 'vendor/volumnet/raas.cms.shop/resources/js'),
+            // users: path.resolve(__dirname, 'vendor/volumnet/raas.cms.users/resources/js'),
             "./dependencyLibs/inputmask.dependencyLib": "./dependencyLibs/inputmask.dependencyLib.jquery"
         },
         extensions: [
@@ -26,20 +33,30 @@ module.exports = {
     },
     output: {
         filename: '[name].js',
-        path: __dirname+'/public'
-    },
-    externals: {
-        knockout: 'knockout',
-        jQuery: 'jquery',
-        $: 'jquery',
-        'window.jQuery': 'jquery',
+        path: __dirname+'/public',
+        publicPath: '/vendor/volumnet/raas.kernel/public/',
     },
     optimization: {
         minimizer: [
             new TerserJSPlugin({ 
                 terserOptions: { output: { comments: false, }}
             }), 
+            new OptimizeCSSAssetsPlugin({
+                cssProcessorPluginOptions: {
+                    preset: [
+                        'default', 
+                        { discardComments: { removeAll: true }}
+                    ],
+                },
+            }),
         ],
+    },
+    externals: {
+        knockout: 'knockout',
+        jquery: 'jQuery',
+        // vue: 'vue',
+        $: 'jquery',
+        'window.jQuery': 'jquery',
     },
     devtool: 'inline-source-map',
     module: {
@@ -52,16 +69,43 @@ module.exports = {
             {
                 test: /\.styl$/,
                 use: [
-                    'vue-style-loader',
-                    'style-loader',
+                    // 'vue-style-loader',
+                    // 'style-loader',
+                    { loader: MiniCssExtractPlugin.loader },
                     'css-loader',
                     'stylus-loader'
                 ]
             },
             {
+                test: /\.scss$/,
+                use: [
+                    // 'vue-style-loader',
+                    // 'style-loader',
+                    { loader: MiniCssExtractPlugin.loader },
+                    'css-loader',
+                    // {
+                    //   loader: 'postcss-loader', // Run postcss actions
+                    //   options: {
+                    //     plugins: function () { // postcss plugins, can be exported to postcss.config.js
+                    //       return [
+                    //         require('autoprefixer')
+                    //       ];
+                    //     }
+                    //   }
+                    // },
+                    {
+                        loader: "sass-loader",
+                        options: {
+                            additionalData: "@import 'app/_shared/init.scss';\n",
+                        },
+                    },
+                ]
+            },
+            {
                 test: /\.css$/,
                 use: [
-                    'style-loader',
+                    // 'style-loader',
+                    { loader: MiniCssExtractPlugin.loader },
                     'css-loader',
                 ]
             },
@@ -117,5 +161,6 @@ module.exports = {
         }),
         new VueLoaderPlugin(),
         new FixStyleOnlyEntriesPlugin(),
+        new MiniCssExtractPlugin({ filename: './[name].css' }),
     ]
 }

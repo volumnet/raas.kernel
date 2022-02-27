@@ -58,6 +58,9 @@ abstract class Abstract_Package_View extends \SOME\Singleton implements IAbstrac
             case 'url':
                 return '?p=' . $this->packageName;
                 break;
+            case 'translations':
+                return $this->$var;
+                break;
             default:
                 return $this->parent->$var;
                 break;

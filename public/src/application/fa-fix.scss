@@ -1,0 +1,10 @@
+@each $icon, $realIcon in $fa-icons {
+    .fa-#{$icon}, .icon-#{$icon} {
+        &:before {
+            @include center-alignment(1em, 1em);
+            display: inline-block;
+            @include fa($icon);
+            font-style: normal !important;
+        }
+    }
+}

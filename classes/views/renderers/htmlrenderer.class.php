@@ -13,7 +13,14 @@ class HTMLRenderer
      * Самозакрывающиеся элементы
      * @var string[]
      */
-    public static $selfClosingElements = ['img', 'br', 'input', 'meta', 'hr'];
+    public static $selfClosingElements = [
+        'img',
+        'br',
+        'input',
+        'meta',
+        'hr',
+        'link'
+    ];
 
     /**
      * Получает строку атрибутов
