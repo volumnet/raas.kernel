@@ -322,14 +322,13 @@ $_RAASForm_Field = function (Field $field) use (
     );
     if (in_array($field->type, ['htmlarea', 'codearea'])) {
         ?>
-        <div class="control-group<?php echo $err ? ' error' : ''?>">
+        <div class="control-group control-group_full<?php echo $err ? ' error' : ''?>">
           <?php if ($field->caption) { ?>
               <label class="control-label" for="<?php echo htmlspecialchars($field->name)?>">
                 <?php echo htmlspecialchars($field->caption)?>:
               </label>
-              <div class="controls clearfix">&nbsp;</div>
           <?php } ?>
-          <div class="clearfix"><?php echo $_RAASForm_Control($field)?></div>
+          <div class="controls controls_full"><?php echo $_RAASForm_Control($field)?></div>
         </div>
     <?php } elseif (($field->type == 'password') && $field->confirm) {
         $err2 = (bool)array_filter(

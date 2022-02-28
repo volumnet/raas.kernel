@@ -1,0 +1,55 @@
+.controls {
+    box-sizing: border-box;
+    overflow: hidden;
+    input[type="text"],
+    input[type="password"],
+    input[type="datetime"],
+    input[type="datetime-local"],
+    input[type="date"],
+    input[type="month"],
+    input[type="time"],
+    input[type="week"],
+    input[type="number"],
+    input[type="email"],
+    input[type="url"],
+    input[type="search"],
+    input[type="tel"],
+    input[type="color"], 
+    select, 
+    textarea {
+        @include viewport-up('md') {
+            max-width: 100%;
+        }
+        @include viewport-down('sm') {
+            width: 100%;
+        }
+    }
+}
+
+.controls > .radio:first-child,
+.controls > .checkbox:first-child {
+    padding-top: 5px;
+}
+
+.form-horizontal .controls {
+    // *display: inline-block;
+    // *padding-left: 20px;
+    // margin-left: 180px;
+    // *margin-left: 0;
+    @include viewport-up('md') {
+        flex-grow: 1;
+    }
+    @include viewport-down('md') {
+        width: 100%;
+    }
+    &_full {
+        padding-left: 0;
+    }
+}
+
+
+.form-horizontal .controls:not(.controls_full):first-child {
+    @include viewport-up('md') {
+        padding-left: calc(180px + .5rem);
+    }
+}

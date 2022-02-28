@@ -1,0 +1,16 @@
+.control-label {
+    box-sizing: border-box;
+    margin-bottom: 0;
+}
+
+.form-horizontal .control-label {
+    @include viewport-up('md') {
+        padding-top: 5px;
+        width: 180px;
+        text-align: right;
+        flex-shrink: 0;
+    }
+    @include viewport-down('sm') {
+        width: 100%;
+    }
+}
