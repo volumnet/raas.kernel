@@ -1,12 +1,17 @@
 <?php
+/**
+ * Форма редактирования пользователя
+ */
 namespace RAAS\General;
-use \RAAS\Application;
-use \RAAS\FormTab;
-use \RAAS\Field;
-use \RAAS\Option;
-use \RAAS\Group;
 
-class EditUserForm extends \RAAS\Form
+use RAAS\Application;
+use RAAS\Form;
+use RAAS\FormTab;
+use RAAS\Field;
+use RAAS\Option;
+use RAAS\Group;
+
+class EditUserForm extends Form
 {
     protected $_view;
 
@@ -23,136 +28,187 @@ class EditUserForm extends \RAAS\Form
     }
 
 
-    public function __construct(array $params = array())
+    public function __construct(array $params = [])
     {
         $view = $this->view;
         $t = $this;
         unset($params['view']);
-        $Item = isset($params['Item']) ? $params['Item'] : null;
+        $item = isset($params['Item']) ? $params['Item'] : null;
 
-        $defaultParams = array(
-            'caption' => $Item->id ? htmlspecialchars($Item->full_name ? $Item->full_name : $Item->login) : $this->view->_('ADD_USER'), 
-            'Item' => $Item,
-        );
-        
+        $defaultParams = [
+            'caption' => $item->id ?
+                htmlspecialchars(
+                    $item->full_name ?
+                    $item->full_name :
+                    $item->login
+                ) :
+                $this->view->_('ADD_USER'),
+            'Item' => $item,
+        ];
+
         /*** Вкладка редактирования пользователя ***/
-        $FormTab = new FormTab(array('name' => 'edit', 'caption' => $this->view->_('EDIT_USER')));
+        $formTab = new FormTab([
+            'name' => 'edit',
+            'caption' => $this->view->_('EDIT_USER')
+        ]);
         // Логин
-        $Field = new Field(array('name' => 'login', 'caption' => $this->view->_('LOGIN'), 'required' => 'required'));
-        if ($Item->id == Application::i()->user->id) {
-            $Field->readonly = 'readonly';
-            $Field->export = 'is_null';
+        $field = new Field([
+            'name' => 'login',
+            'caption' => $this->view->_('LOGIN'),
+            'required' => 'required'
+        ]);
+        if ($item->id == Application::i()->user->id) {
+            $field->readonly = 'readonly';
+            $field->export = 'is_null';
         } else {
-            $Field->required = 'required';
-            $Field->check = function($Field) use ($t) {
-                $localError = $Field->getErrors();
+            $field->required = 'required';
+            $field->check = function ($field) {
+                $localError = $field->getErrors();
                 if (!$localError) {
-                    if (Package::i()->checkLoginExists($_POST[$Field->name], $Field->Form->Item->id)) {
-                        $localError[] = array('name' => 'INVALID', 'value' => $Field->name, 'description' => $t->view->_('ERR_LOGIN_EXISTS'));
+                    if (Package::i()->checkLoginExists(
+                        $_POST[$field->name],
+                        $field->Form->Item->id
+                    )) {
+                        $localError[] = [
+                            'name' => 'INVALID',
+                            'value' => $field->name,
+                            'description' => $this->view->_('ERR_LOGIN_EXISTS')
+                        ];
                     }
                 }
                 return $localError;
-           };
+            };
         }
-        $FormTab->children[] = $Field;
+        $formTab->children['login'] = $field;
         // Пароль
-        $Field = new Field(array(
-            'type' => 'password', 
-            'name' => 'password', 
+        $field = new Field([
+            'type' => 'password',
+            'name' => 'password',
             'caption' => $this->view->_('PASSWORD'),
-            'confirm' => true, 
-            'export' => function($Field) use ($t) { 
-                if ($_POST[$Field->name]) {
-                    $Field->Form->Item->password_md5 = Application::i()->md5It(trim($_POST[$Field->name])); 
+            'confirm' => true,
+            'export' => function ($field) {
+                if ($_POST[$field->name]) {
+                    $field->Form->Item->password_md5 = Application::i()->md5It(trim($_POST[$field->name]));
                 }
             }
-        ));
-        if (!$Item->id) {
-            $Field->required = 'required';
+        ]);
+        if (!$item->id) {
+            $field->required = 'required';
         }
-        $FormTab->children[] = $Field;
+        $formTab->children['password'] = $field;
         // E-mail
-        $FormTab->children[] = new Field(array('type' => 'email', 'name' => 'email', 'caption' => $this->view->_('EMAIL')));
+        $formTab->children['email'] = new Field([
+            'type' => 'email',
+            'name' => 'email',
+            'caption' => $this->view->_('EMAIL'),
+        ]);
         // ФИО
-        $FormTab->children[] = new Field(array('name' => 'last_name', 'caption' => $this->view->_('LAST_NAME')));
-        $FormTab->children[] = new Field(array('name' => 'first_name', 'caption' => $this->view->_('FIRST_NAME')));
-        $FormTab->children[] = new Field(array('name' => 'second_name', 'caption' => $this->view->_('SECOND_NAME')));
+        $formTab->children['last_name'] = new Field([
+            'name' => 'last_name',
+            'caption' => $this->view->_('LAST_NAME'),
+        ]);
+        $formTab->children['first_name'] = new Field([
+            'name' => 'first_name',
+            'caption' => $this->view->_('FIRST_NAME'),
+        ]);
+        $formTab->children['second_name'] = new Field([
+            'name' => 'second_name',
+            'caption' => $this->view->_('SECOND_NAME'),
+        ]);
         // Глобальный админ
-        if ($Item->id != Application::i()->user->id) {
-            $FormTab->children[] = new Field(array('type' => 'checkbox', 'name' => 'root', 'caption' => $this->view->_('GLOBAL_ADMIN')));
+        if ($item->id != Application::i()->user->id) {
+            $formTab->children['root'] = new Field([
+                'type' => 'checkbox',
+                'name' => 'root',
+                'caption' => $this->view->_('GLOBAL_ADMIN'),
+            ]);
         }
         // Язык
-        $Field = new Field(array(
+        $field = new Field([
             'type' => 'select',
-            'name' => 'lang', 
+            'name' => 'lang',
             'caption' => $this->view->_('LANGUAGE'),
             'default' => $this->view->language,
-            'import' => function($Field) use ($t) { return $Field->Form->Item->preferences[$Field->name]; },
-            'export' => function($Field) use ($t) { 
-                $preferences = $Field->Form->Item->preferences;
-                if (isset($_POST[$Field->name])) {
-                    $preferences['lang'] = $_POST[$Field->name];
+            'import' => function ($field) {
+                return $field->Form->Item->preferences[$field->name];
+            },
+            'export' => function ($field) {
+                $preferences = $field->Form->Item->preferences;
+                if (isset($_POST[$field->name])) {
+                    $preferences['lang'] = $_POST[$field->name];
                 }
-                $Field->Form->Item->preferences = $preferences;
+                $field->Form->Item->preferences = $preferences;
             }
-        ));
+        ]);
         foreach ($this->view->availableLanguages as $key => $val) {
-            $Field->children[] = new Option(array('value' => $key, 'caption' => $val));
+            $field->children[] = new Option(['value' => $key, 'caption' => $val]);
         }
-        $FormTab->children[] = $Field;
-        $defaultParams['children']['common'] = $FormTab;
-        
+        $formTab->children['lang'] = $field;
+        $defaultParams['children']['common'] = $formTab;
+
         if (Application::i()->user->root) {
             // Группы
             $g = new Group();
-            $defaultParams['children']['groups'] = new FormTab(array(
-                'name' => 'user_groups', 
-                'caption' => $this->view->_('GROUPS'), 
-                'children' => array(
-                    array(
-                        'type' => 'checkbox', 
+            $defaultParams['children']['groups'] = new FormTab([
+                'name' => 'user_groups',
+                'caption' => $this->view->_('GROUPS'),
+                'children' => [
+                    'groups' => [
+                        'type' => 'checkbox',
                         'name' => 'groups',
-                        'children' => array('Set' => $g->children),
-                        'multiple' => 'multiple', 
-                        'import' => function($Field) use ($t) { 
-                            return array_keys($Field->Form->Item->associations); 
-                        }, 
-                        'export' => function($Field) use ($t) { 
-                            $arr = array();
-                            foreach ((array)$_POST[$Field->name] as $key => $val) {
+                        'children' => ['Set' => $g->children],
+                        'multiple' => 'multiple',
+                        'import' => function ($field) {
+                            return array_keys($field->Form->Item->associations);
+                        },
+                        'export' => function ($field) {
+                            $arr = [];
+                            foreach ((array)$_POST[$field->name] as $key => $val) {
                                 $arr[$val] = 1;
                             }
-                            $Field->Form->Item->_SET_groups = $arr;
+                            $field->Form->Item->_SET_groups = $arr;
                         }
-                    )
-                )
-            ));
+                    ]
+                ]
+            ]);
             if (Application::i()->user->id != $Form->Item->id) {
                 // Права доступа
-                $defaultParams['children']['rights'] = new FormTab(array(
+                $defaultParams['children']['rights'] = new FormTab([
                     'name' => 'rights',
-                    'caption' => $this->view->_('RIGHTS'), 
-                    'template' => 'rights', 
-                    'children' => array(array(
-                        'type' => 'select', 
-                        'name' => 'rights', 
-                        'multiple' => 'multiple',
-                        'export' => function($Field) use ($t) { $Field->Form->Item->_SET_rights = $_POST[$Field->name]; },
-                        'import' => function($Field) use ($t) {
-                            $DATA = array();
-                            $Item = $Field->Form->Item;
-                            foreach (Application::i()->packages as $row) {
-                                $level = $Item->access($row)->level;
-                                $DATA[$row->mid] = (int)($level instanceof Level ? $level->id : $level);
-                                foreach ($row->modules as $row2) {
-                                    $level = $Item->access($row2)->level;
-                                    $DATA[$row2->mid] = (int)($level instanceof Level ? $level->id : $level);
+                    'caption' => $this->view->_('RIGHTS'),
+                    'template' => 'rights',
+                    'children' => [
+                        'rights' => [
+                            'type' => 'select',
+                            'name' => 'rights',
+                            'multiple' => 'multiple',
+                            'export' => function ($field) {
+                                $field->Form->Item->_SET_rights = $_POST[$field->name];
+                            },
+                            'import' => function ($field) {
+                                $DATA = [];
+                                $item = $field->Form->Item;
+                                foreach (Application::i()->packages as $row) {
+                                    $level = $item->access($row)->level;
+                                    $DATA[$row->mid] = (int)(
+                                        $level instanceof Level ?
+                                        $level->id :
+                                        $level
+                                    );
+                                    foreach ($row->modules as $row2) {
+                                        $level = $item->access($row2)->level;
+                                        $DATA[$row2->mid] = (int)(
+                                            $level instanceof Level ?
+                                            $level->id :
+                                            $level
+                                        );
+                                    }
                                 }
+                                return $DATA;
                             }
-                            return $DATA;
-                        }
-                    ))
-                ));
+                        ]
+                    ],
+                ]);
             }
         }
         $arr = array_merge($defaultParams, $params);
