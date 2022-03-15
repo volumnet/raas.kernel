@@ -1,5 +1,5 @@
-import RAASIcon from './raas-icon.vue';
+import RaasIcon from './raas-icon.vue';
 
 export default {
-    'raas-icon': RAASIcon,
+    RaasIcon,
 }

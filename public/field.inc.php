@@ -275,7 +275,47 @@ $_RAASForm_Control = function (
             <input<?php echo $_RAASForm_Attrs($field, $attrs)?> />
             <?php
             break;
+        case 'text':
+        case 'number':
+        case 'email':
+        case 'tel':
+        case 'url':
+        case 'date':
+        case 'datetime-local':
+        case 'month':
+        case 'time':
+        case '':
+            // @todo TEST!!!
+            $attrs = [];
+            $fieldType = $field->type ?: 'text';
+            if (!$field->type) {
+                $attrs['type'] = 'text';
+            }
+            // $attrs['v-pre'] = 'v-pre';
+            // echo 'TEST!!!';
+            if ($field->multiple) {
+                ?>
+                <div data-role="raas-repo-block">
+                  <div data-role="raas-repo-container">
+                    <?php foreach ((array)$field->Form->DATA[$field->name] as $key => $val) { ?>
+                        <div data-role="raas-repo-element">
+                          <raas-field-<?php echo htmlspecialchars($fieldType)?> <?php echo $_RAASForm_Attrs($field, array_merge($attrs, ['value' => $val]))?>></raas-field-<?php echo htmlspecialchars($fieldType)?>>
+                        </div>
+                    <?php } ?>
+                  </div>
+                  <div data-role="raas-repo">
+                    <raas-field-<?php echo htmlspecialchars($fieldType)?> <?php echo $_RAASForm_Attrs($field, array_merge($attrs, ['disabled' => 'disabled']))?>></raas-field-<?php echo htmlspecialchars($fieldType)?>>
+                  </div>
+                </div>
+                <?php
+            } else {
+                ?>
+                <raas-field-<?php echo htmlspecialchars($fieldType)?> <?php echo $_RAASForm_Attrs($field, array_merge($attrs, ['value' => $field->Form->DATA[$field->name]]))?>></raas-field-<?php echo htmlspecialchars($fieldType)?>>
+                <?php
+            }
+            break;
         default:
+            // @todo убрать
             $attrs = [];
             if (!$field->type) {
                 $attrs['type'] = 'text';

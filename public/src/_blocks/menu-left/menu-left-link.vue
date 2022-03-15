@@ -14,7 +14,7 @@
 
 <template>
   <a :class="aClasses" :href="item.href" v-bind="attrs">
-    {{item.name}}
+    <span v-html="item.name"></span>
     <span class="menu-left__counter" v-if="item.counter">
       (<span class="menu-left__counter-inner">{{ item.counter }}</span>)
     </span>

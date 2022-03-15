@@ -43,7 +43,7 @@
   <a :class="aClasses" :href="item.href" v-bind="attrs" @click="!item.href && item.submenu && item.submenu.length && $emit('open')">
     <raas-icon v-if="item.icon" :icon="item.icon"></raas-icon>
     <span class="menu-mobile__link-title">
-      {{item.name}}
+      <span v-html="item.name"></span>
     </span>
     <span class="menu-mobile__counter" v-if="item.counter">
       (<span class="menu-mobile__counter-inner">{{ item.counter }}</span>)

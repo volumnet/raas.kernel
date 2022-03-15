@@ -23,7 +23,7 @@
 <template>
   <a :class="aClasses" :href="item.href" v-bind="attrs">
     <raas-icon v-if="item.icon" :icon="item.icon"></raas-icon>
-    {{item.name}}
+    <span v-html="item.name"></span>
     <span class="menu-dropdown__counter" v-if="item.counter">
       (<span class="menu-dropdown__counter-inner">{{ item.counter }}</span>)
     </span>

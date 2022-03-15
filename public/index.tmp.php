@@ -241,6 +241,8 @@ if ($USER) {
     ], (array)$VIEW->js));
     echo AssetManager::getRequestedCSS();
     echo AssetManager::getRequestedJS('beforeApp');
+    echo AssetManager::getRequestedCSS('custom');
+    echo AssetManager::getRequestedJS('custom');
     echo AssetManager::getRequestedJS();
     ?>
   </head>

@@ -43,7 +43,7 @@
     <ul class="menu-main__list">
       <li class="menu-main__item" :class="{ 'menu-main__item_active': menuItem.active }" v-for="menuItem of menu">
         <a :href="menuItem.href" class="menu-main__link" :class="{ 'menu-main__link_active': menuItem.active }">
-          {{menuItem.name}}
+          <span v-html="menuItem.name"></span>
           <span class="menu-main__counter" v-if="menuItem.counter">
             (<span class="menu-main__counter-inner">{{ menuItem.counter }}</span>)
           </span>

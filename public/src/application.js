@@ -22,10 +22,6 @@ import 'jquery-ui/ui/widgets/draggable.js';
 import 'jquery-ui/ui/widgets/slider.js';
 import 'jquery-ui/ui/widgets/autocomplete.js';
 
-import 'jquery-ui/ui/widgets/datepicker.js';
-import 'jquery-ui/ui/i18n/datepicker-ru.js';
-import 'jquery-ui-timepicker-addon';
-import 'jquery-ui-timepicker-addon/dist/i18n/jquery-ui-timepicker-ru.js';
 import 'spectrum-colorpicker';
 import './libs/context.js';
 
@@ -39,7 +35,7 @@ import 'codemirror/mode/htmlmixed/htmlmixed.js';
 import 'codemirror/mode/clike/clike.js';
 import 'codemirror/mode/php/php.js';
 // import 'jquery.event.swipe'
-// import 'inputmask/dist/jquery.inputmask.js'
+import 'inputmask/dist/jquery.inputmask.js'
 // import 'bootstrap-2.3.2/css/bootstrap.css'
 
 import Vue from 'vue/dist/vue.js'
@@ -58,24 +54,8 @@ import RAAS_queryString from './libs/raas.query-string.js';
 
 import YmapPlugin from 'vue-yandex-maps';
 
-import raasIconComponents from './_blocks/raas-icon';
-import menuLeftComponents from './_blocks/menu-left';
-import menuDropdownComponents from './_blocks/menu-dropdown';
-import rowContextMenuComponents from './_blocks/row-context-menu';
-import allContextMenuComponents from './_blocks/all-context-menu';
-import menuMobileComponents from './_blocks/menu-mobile';
 
 Vue.use(YmapPlugin, window.ymapSettings);
-
-window.raasComponents = Object.assign(
-    window.raasComponents, 
-    raasIconComponents,
-    menuLeftComponents,
-    menuDropdownComponents,
-    rowContextMenuComponents,
-    allContextMenuComponents,
-    menuMobileComponents,
-);
 
 jQuery(function ($) {
     $.fn.extend({

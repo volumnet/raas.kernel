@@ -72,7 +72,7 @@ export default {
          */
         leftMenu: {
             type: Array,
-            required: true,
+            required: false,
         },
         /**
          * Объекты меню пакетов
@@ -90,23 +90,23 @@ export default {
          */
         rootItem() {
             const activePackages = this.packagesMenu.filter(x => x.active);
-            const activeMainMenuItems = this.mainMenu.filter(x => x.active);
+            // const activeMainMenuItems = this.mainMenu.filter(x => x.active);
             const activePackageName = activePackages.length 
                 ? ('RAAS.' + activePackages[0].name) 
                 : 'RAAS';
             const result = {
                 name: activePackageName,
             };
-            const packagesItem = {
-                name: activePackageName,
-                icon: 'cubes',
-                system: true,
-            };
-            if (this.packagesMenu.length) {
-                packagesItem.submenu = this.packagesMenu;
-            }
+            // const packagesItem = {
+            //     name: activePackageName,
+            //     icon: 'cubes',
+            //     system: true,
+            // };
+            // if (this.packagesMenu.length) {
+            //     packagesItem.submenu = this.packagesMenu;
+            // }
             let submenu = [
-                packagesItem,
+                // packagesItem,
             ];
             if (this.user.login) {
                 const langSubmenu = [];
@@ -146,15 +146,26 @@ export default {
                 });
             }
             if (this.mainMenu.length) {
-                submenu.push({
-                    name: activeMainMenuItems.length ? activeMainMenuItems[0].name : this.$root.title,
-                    icon: 'bars',
-                    system: true,
-                    submenu: this.mainMenu,
-                });
+                submenu = submenu.concat(this.mainMenu.map(x => {
+                    const y = { ...x };
+                    y.system = true;
+                    return y;
+                }));
+                // submenu.push({
+                //     name: activeMainMenuItems.length ? activeMainMenuItems[0].name : this.$root.title,
+                //     icon: 'bars',
+                //     system: true,
+                //     submenu: this.mainMenu,
+                // });
             }
             if (this.leftMenu && this.leftMenu.length) {
                 submenu = submenu.concat(this.leftMenu);
+                if ((this.leftMenu.length == 1) && 
+                    this.leftMenu[0].submenu && 
+                    this.leftMenu[0].submenu.length
+                ) {
+                    submenu = submenu.concat(this.leftMenu[0].submenu);
+                }
             }
             result.submenu = submenu;
 

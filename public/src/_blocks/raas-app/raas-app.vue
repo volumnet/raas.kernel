@@ -1,8 +1,8 @@
 <style lang="scss">
 // @import "bootstrap/scss/bootstrap.scss"; 
-@import './bootstrap.scss';
-@import './bootstrap-fix.scss';
-@import './fa-fix.scss';
+@import 'app/application/bootstrap.scss';
+@import 'app/application/bootstrap-fix.scss';
+@import 'app/application/fa-fix.scss';
 
 // @import "bootstrap/scss/_reboot.scss"; 
 // @import "bootstrap/scss/_root.scss";
@@ -352,25 +352,10 @@
 </template>
 
 <script>
-import MenuPackages from '../_blocks/menu-packages/menu-packages.vue';
-import MenuMain from '../_blocks/menu-main/menu-main.vue';
-import MenuUser from '../_blocks/menu-user/menu-user.vue';
-import RaasBreadcrumbs from '../_blocks/breadcrumbs/breadcrumbs.vue';
-import MenuManagement from '../_blocks/menu-management/menu-management.vue';
-import RaasErrors from '../_blocks/errors/errors.vue';
-
 /**
  * Внутренняя часть приложения
  */
 export default {
-    components: {
-        MenuPackages,
-        MenuMain,
-        MenuUser,
-        RaasBreadcrumbs,
-        MenuManagement,
-        RaasErrors,
-    },
     props: {
         /**
          * Доступные языки
