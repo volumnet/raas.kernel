@@ -24,7 +24,7 @@
 
 <template>
   <nav class="menu-mobile" :class="{ 'menu-mobile_active': active }">
-    <button type="button" class="menu-mobile__title" @click.stop="active = !active"></button>
+    <button type="button" class="menu-mobile__title" @click="toggle($event)"></button>
     <menu-mobile-list :item="rootItem" :active="active" @close="active = false" @back="active = false"></menu-mobile-list>
   </nav>
 </template>
@@ -83,6 +83,16 @@ export default {
             required: true,
         },
     },
+    methods: {
+        toggle(e) {
+            if (!this.active) {
+                this.active = true;
+                e.stopPropagation();
+            } else {
+                this.active = false;
+            }
+        },
+    },
     computed: {
         /**
          * Корневой элемент
@@ -97,16 +107,16 @@ export default {
             const result = {
                 name: activePackageName,
             };
-            // const packagesItem = {
-            //     name: activePackageName,
-            //     icon: 'cubes',
-            //     system: true,
-            // };
-            // if (this.packagesMenu.length) {
-            //     packagesItem.submenu = this.packagesMenu;
-            // }
+            const packagesItem = {
+                name: activePackageName,
+                icon: 'cubes',
+                system: true,
+            };
+            if (this.packagesMenu.length) {
+                packagesItem.submenu = this.packagesMenu;
+            }
             let submenu = [
-                // packagesItem,
+                packagesItem,
             ];
             if (this.user.login) {
                 const langSubmenu = [];
