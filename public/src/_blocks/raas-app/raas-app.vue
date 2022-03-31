@@ -183,9 +183,14 @@
     }
     &__row_content {
         flex-grow: 1;
+        padding-bottom: 1rem;
     }
     &__container_content {
-        min-height: 250px;
+        flex-direction: column;
+        min-height: calc(100vh - 41px - 1rem);
+        #{$self}__main:only-child & {
+            min-height: calc(100vh - 1rem);
+        }
         @include viewport-up('md') {
             padding: 2rem 1rem;
             background: white;
@@ -219,6 +224,10 @@
         width: 100%;
         padding: 0 1rem;
         overflow: hidden;
+        &-outer {
+            display: flex;
+            flex-grow: 1;
+        }
         &-inner {
             width: 100%;
             overflow: auto;
@@ -268,7 +277,7 @@
     &__footer {
         background: white;
         border-top: 1px solid #ddd;
-        padding: 1rem;
+        padding: 1rem 1rem 0;
         font-size: 9px;
         text-align: center;
         flex-shrink: 0;
@@ -305,34 +314,32 @@
       </header>
     </div>
     <div class="body__main">
-      <main class="body__row body__row_content">
+      <div class="body__row body__row_content">
         <div class="body__container body__container_content">
-          <aside class="body__left" v-if="leftMenu">
-            <menu-left :menu="leftMenu"></menu-left>
-          </aside>
-          <article class="body__content">
-            <div class="body__breadcrumbs" v-if="breadcrumbs && breadcrumbs.length">
-              <raas-breadcrumbs :menu="breadcrumbs"></raas-breadcrumbs>
-            </div>
-            <div class="body__content-header">
-              <h1 class="body__title">{{ title }}</h1>
-              <div class="body__menu-management" v-if="managementMenu && managementMenu.length">
-                <menu-management :menu="managementMenu"></menu-management>
+          <main class="body__content-outer">
+            <aside class="body__left" v-if="leftMenu">
+              <menu-left :menu="leftMenu"></menu-left>
+            </aside>
+            <article class="body__content">
+              <div class="body__breadcrumbs" v-if="breadcrumbs && breadcrumbs.length">
+                <raas-breadcrumbs :menu="breadcrumbs"></raas-breadcrumbs>
               </div>
-            </div>
-            <div class="body__subtitle" v-if="subtitle" v-html="subtitle"></div>
-            <div class="body__errors" v-if="errors && errors.length">
-              <raas-errors :errors="errors" @close="errors = []"></raas-errors>
-            </div>
-            <div class="body__content-inner">
-              <slot></slot>
-            </div>
-          </article>
-        </div>
-      </main>
-      <footer class="body__footer">
-        <div class="body__row body__row_footer">
-          <div class="body__container body__container_footer">
+              <div class="body__content-header">
+                <h1 class="body__title">{{ title }}</h1>
+                <div class="body__menu-management" v-if="managementMenu && managementMenu.length">
+                  <menu-management :menu="managementMenu"></menu-management>
+                </div>
+              </div>
+              <div class="body__subtitle" v-if="subtitle" v-html="subtitle"></div>
+              <div class="body__errors" v-if="errors && errors.length">
+                <raas-errors :errors="errors" @close="errors = []"></raas-errors>
+              </div>
+              <div class="body__content-inner">
+                <slot></slot>
+              </div>
+            </article>
+          </main>
+          <footer class="body__footer">
             <div class="body__version">
               {{ versionName }}:
               {{ translations.CORPORATE_RESOURCE_MANAGEMENT }}
@@ -344,9 +351,9 @@
               </a>,
               {{ year }}. {{ translations.ALL_RIGHTS_RESERVED }}.
             </div>
-          </div>
+          </footer>
         </div>
-      </footer>
+      </div>
     </div>
   </div>  
 </template>

@@ -8,6 +8,8 @@
  */
 namespace RAAS;
 
+use SOME\SOME;
+
 /**
  * Класс поля формы
  * @package RAAS
@@ -233,7 +235,7 @@ class Field extends OptionContainer
         $localError = [];
         if (!$this->isFilled) {
             if ($this->required) {
-                if (!(in_array($this->type, ['file', 'image']) && isset($this->Form->Item) && ($this->Form->Item instanceof \SOME\SOME) && $this->Form->Item->__id())) {
+                if (!(in_array($this->type, ['file', 'image']) && isset($this->Form->Item) && ($this->Form->Item instanceof SOME) && $this->Form->Item->__id())) {
                     if (in_array($this->type, ['file', 'image'])) {
                         $localError[] = [
                             'name' => 'MISSED',
@@ -482,8 +484,8 @@ class Field extends OptionContainer
 
 
     /**
-     * Обработка массива \SOME\SOME объектов
-     * @param [[\SOME\SOME]] массив объектов для обработки
+     * Обработка массива SOME объектов
+     * @param [[SOME]] массив объектов для обработки
      * @param string $nameN имя свойства, где хранится наименование объекта
      * @param int|null $levelN уровень обработки дочерних элементов, null - не ограничено
      * @param string|null $childrenN свойство, где хранятся дочерние элементы, null - определить автоматически
@@ -506,7 +508,7 @@ class Field extends OptionContainer
         $options = new OptionCollection();
         $options->Parent = $this;
         foreach ($Set as $row) {
-            if ($row instanceof \SOME\SOME) {
+            if ($row instanceof SOME) {
                 $classname = get_class($row);
                 $children = null;
                 if (($level === null) || ($level > 0)) {
@@ -672,7 +674,7 @@ class Field extends OptionContainer
                             $a = $a[0];
                         }
                     } else {
-                        $a = new \RAAS\Attachment();
+                        $a = new Attachment();
                     }
                     $a->upload = $x['tmp_name'];
                     $a->filename = $x['name'];

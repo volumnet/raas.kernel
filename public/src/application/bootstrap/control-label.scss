@@ -12,5 +12,7 @@
     }
     @include viewport-down('sm') {
         width: 100%;
+        padding-left: 0;
+        padding-right: 0px;
     }
 }

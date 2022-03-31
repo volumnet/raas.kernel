@@ -526,6 +526,12 @@ abstract class Abstract_Controller extends Singleton implements IAbstract_Contex
                 'name' => 'smtp_force_local',
                 'caption' => $this->view->_('SMTP_FORCE_LOCAL'),
             ],
+            [
+                'type' => 'text',
+                'name' => 'php_command',
+                'caption' => $this->view->_('PHP_COMMAND'),
+                'placeholder' => 'php',
+            ],
         ];
     }
 

@@ -7,14 +7,13 @@
         padding: .5rem;
     }
     &__slider-outer {
-        flex-grow: 1;
         padding-left: 1rem;
     }
     &__input-outer {
         width: 6em;
     }
     &__slider {
-        width: 100%;
+        width: 218px;
         .ui-slider-handle {
             background: $primary;
         }
@@ -31,7 +30,7 @@
       <div class="raas-field-range__slider" ref="slider"></div>
     </div>
     <div class="raas-field-range__input-outer">
-      <input type="number" v-bind="$attrs" v-on="inputListeners" :value="value" @input="checkValue();" class="form-control raas-field-range__input" :min="min" :max="max" :step="step">
+      <input type="number" v-bind="$attrs" v-on="inputListeners" :value="pValue" @input="pValue = $event.target.value; checkValue();" class="form-control raas-field-range__input" :min="min" :max="max" :step="step">
     </div>
   </div>
 </template>

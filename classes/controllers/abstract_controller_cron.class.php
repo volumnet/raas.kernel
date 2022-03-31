@@ -62,15 +62,10 @@ abstract class Abstract_Controller_Cron extends Abstract_Controller
     protected function checkCompatibility()
     {
         if (!$this->application->phpVersionCompatible) {
-            throw new Exception($this->view->_('PHP_VERSION_INCOMPATIBLE'));
+            throw new Exception('PHP version incompatible');
         }
         if ($missedExt = $this->application->missedExt) {
-            throw new Exception(
-                sprintf(
-                    $this->view->_('PHP_VERSION_INCOMPATIBLE'),
-                    implode(', ', $missedExt)
-                )
-            );
+            throw new Exception('Missed extensions: ' . implode(', ', $missedExt));
         }
         return true;
     }

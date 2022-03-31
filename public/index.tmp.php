@@ -24,7 +24,6 @@ function getMenu(array $menu)
     $result = [];
     if ($menu) {
         foreach ($menu as $row) {
-            $attrs = '';
             // Проверка прав доступа
             $href = $row['href'];
             $href = parse_url($href, PHP_URL_QUERY);

@@ -5,21 +5,21 @@
  * @version 4.2
  * @author Alex V. Surnin <info@volumnet.ru>
  * @copyright 2013, Volume Networks
- */       
+ */
 namespace RAAS;
 
 /**
  * Класс контейнера опций
  * @package RAAS
  * @property-read Field $Field Поле, к которому принадлежит опция
- */       
+ */
 class OptionContainer extends FormElement
 {
 	/**
      * Тип поля $children
      */
     const childrenType = 'RAAS\OptionCollection';
-    
+
     public function __get($var)
     {
         switch ($var) {

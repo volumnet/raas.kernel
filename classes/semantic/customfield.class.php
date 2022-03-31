@@ -1073,13 +1073,15 @@ abstract class CustomField extends SOME
         static $level = 0;
         $options = new OptionCollection();
         $options->Parent = $parentField;
-        if (!$parentField->required && !$level) {
-            $option = new Option([
-                'value' => '',
-                'caption' => ($parentField->placeholder ?: '--')
-            ]);
-            $options[] = $option;
-        }
+        // 2022-03-29, AVS: убрал добавление опции по placeholder'у,
+        // т.к. она отражена во Vue
+        // if (!$parentField->required && !$level) {
+        //     $option = new Option([
+        //         'value' => '',
+        //         'caption' => ($parentField->placeholder ?: '--')
+        //     ]);
+        //     $options[] = $option;
+        // }
         foreach ((array)$stdSource as $key => $val) {
             $Option = new Option([
                 'value' => $key,

@@ -1,6 +1,7 @@
 .controls {
     box-sizing: border-box;
-    overflow: hidden;
+    // 2022-03-31, AVS: убрал, т.к. в загрузчиках прайсов выпадающее меню внутри контролов
+    // overflow: hidden;
     input[type="text"],
     input[type="password"],
     input[type="datetime"],
@@ -44,6 +45,7 @@
     }
     &_full {
         padding-left: 0;
+        padding-right: 0;
     }
 }
 

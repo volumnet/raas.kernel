@@ -145,6 +145,9 @@
     > * {
         box-sizing: border-box;
         padding: 0 0.5rem;
+        @include viewport-down('sm') {
+            padding: 0;
+        }
     }
 }
 
@@ -163,4 +166,8 @@ legend + .control-group {
 
 .form-horizontal .control-group.control-group_full {
     display: block;
+    .control-label {
+      padding-top: 0;
+      padding-bottom: 5px;
+   }
 }

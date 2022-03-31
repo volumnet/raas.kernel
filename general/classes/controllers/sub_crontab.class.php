@@ -49,11 +49,12 @@ class Sub_Crontab extends Abstract_Sub_Controller
             case 'run':
                 $item = new Crontab((int)$this->id);
                 if ($item->id) {
+                    $phpCommand = Application::i()->registryGet('php_command') ?: 'php';
                     if (stristr(PHP_OS, 'win')) {
-                        $cmd = 'START /D "' . Application::i()->baseDir . '/cron" php cron.php master ' . (int)$item->id;
+                        $cmd = 'START /D "' . Application::i()->baseDir . '/cron" ' . $phpCommand . ' cron.php master ' . (int)$item->id;
                         pclose(popen($cmd, 'r'));
                     } else {
-                        $cmd = 'cd "' . Application::i()->baseDir . '/cron" && php cron.php master ' . (int)$item->id . ' > /dev/null 2>&1 & echo $!';
+                        $cmd = 'cd "' . Application::i()->baseDir . '/cron" && ' . $phpCommand . ' cron.php master ' . (int)$item->id . ' > /dev/null 2>&1 & echo $!';
                         exec($cmd);
                     }
                     sleep(1);

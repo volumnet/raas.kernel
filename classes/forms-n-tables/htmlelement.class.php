@@ -53,7 +53,7 @@ abstract class HTMLElement
 
     public function __get($var)
     {
-        switch($var) {
+        switch ($var) {
             case 'view':
                 return \RAAS\Application::i()->context->view;
                 break;
@@ -69,7 +69,7 @@ abstract class HTMLElement
 
     public function __set($var, $val)
     {
-        switch ($var){
+        switch ($var) {
             case 'caption':
                 $this->$var = (string)$val;
                 break;
@@ -98,7 +98,6 @@ abstract class HTMLElement
                 }
                 break;
         }
-
     }
 
 
@@ -113,5 +112,64 @@ abstract class HTMLElement
         foreach ($params as $key => $val) {
             $this->__set($key, $val);
         }
+    }
+
+
+    /**
+     * Возвращает представление поля в виде JSON-сериализуемого массива
+     * @param bool $extended Развернутое представление
+     * @return array
+     */
+    public function getArrayCopy($extended = false)
+    {
+        $result = [];
+        $attrs = array_map(function ($x) {
+            return $this->asJSONValue($x);
+        }, (array)$this->attrs);
+        if ($attrs) {
+            if ($extended) {
+                $result['attrs'] = $attrs;
+            } else {
+                $result = array_merge($result, $attrs);
+            }
+        }
+        if ($extended) {
+            $meta = array_map(function ($x) {
+                return $this->asJSONValue($x);
+            }, (array)$this->meta);
+            if ($meta) {
+                $result['meta'] = $meta;
+            }
+        }
+        if ($caption = $this->asJSONValue($this->caption)) {
+            $result['caption'] = $caption;
+        }
+        if ($this->children) {
+            foreach ($this->children as $key => $val) {
+                if ($val = $val->getArrayCopy($extended)) {
+                    $result['children'][$key] = $val;
+                }
+            }
+        }
+        return $result;
+    }
+
+
+    /**
+     * Возвращает представление значения в виде JSON-сериализуемого значения
+     * @return array
+     */
+    public function asJSONValue($val)
+    {
+        if (is_scalar($val)) {
+            return $val;
+        } elseif (is_array($val)) {
+            return array_map(function ($x) {
+                return $this->asJSONValue($x);
+            }, $val);
+        } elseif ($val instanceof static) {
+            return $val->getArrayCopy();
+        }
+        return null;
     }
 }
