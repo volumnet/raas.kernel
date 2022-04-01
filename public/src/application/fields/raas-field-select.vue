@@ -3,7 +3,7 @@
     <option v-if="placeholder" value="">
       {{placeholder}}
     </option>
-    <option :value="option.value" v-for="option in flatSource">
+    <option :value="option.value" v-bind="option" v-for="option in flatSource">
       <template v-for="n in option.level">
         &nbsp;&nbsp;&nbsp;
       </template>
