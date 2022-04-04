@@ -1,5 +1,5 @@
 <template>
-  <select v-bind="$attrs" v-on="inputListeners" :value="value">
+  <select v-bind="$attrs" v-on="inputListeners" :value="pValue">
     <option v-if="placeholder" value="">
       {{placeholder}}
     </option>

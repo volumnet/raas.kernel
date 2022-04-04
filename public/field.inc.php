@@ -193,6 +193,43 @@ $_RAASForm_Control = function (
         case 'radio':
             echo $_RAASForm_Checkbox($field->children);
             break;
+        case 'select':
+            $attrs['type'] = false;
+            if ($field->placeholder) {
+                for ($i = count($field->children) - 1; $i >= 0; $i--) {
+                    $field->children[$i + 1] = $field->children[$i];
+                }
+                $field->children[0] = new Option([
+                    'caption' => $field->placeholder,
+                    'value' => ''
+                ]);
+            }
+            if ($field->multiple && !$field->{'data-raas-multiselect'}) {
+                $attrs = array_merge($attrs, ['multiple' => false]);
+                ?>
+                <div data-role="raas-repo-block">
+                  <div data-role="raas-repo-container">
+                    <?php foreach ((array)$field->Form->DATA[$field->name] as $key => $val) {
+                        $field->value = $val; ?>
+                        <div data-role="raas-repo-element">
+                          <select<?php echo $_RAASForm_Attrs($field, $attrs)?>>
+                            <?php echo $_RAASForm_Options($field->children)?>
+                          </select>
+                        </div>
+                    <?php } ?>
+                  </div>
+                  <div data-role="raas-repo">
+                    <select<?php echo $_RAASForm_Attrs($field, array_merge($attrs, ['disabled' => 'disabled']))?>>
+                      <?php echo $_RAASForm_Options($field->children)?>
+                    </select>
+                  </div>
+                </div>
+            <?php } else { ?>
+                <select<?php echo $_RAASForm_Attrs($field, $attrs)?>>
+                  <?php echo $_RAASForm_Options($field->children)?>
+                </select>
+            <?php }
+            break;
         default:
             // @todo TEST!!!
             $attrs = [];
