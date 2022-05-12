@@ -982,9 +982,11 @@ final class Application extends Singleton implements IContext
             setcookie($var, '', time() - $lifetime, '/', '');
             setcookie($var, $val, time() + $lifetime, '/', $domainL2);
         } else {
-            if ($domainL2) {
-                setcookie($var, '', time() - $lifetime, '/', $domainL2);
-            }
+            // 2022-04-11, AVS: убрал удаление, т.к. порядок не определен, а на домене третьего уровня без rx'а глючит
+            // 2022-04-11, AVS: пока оставил, судя по всему ошибка не в этом, а в HTTPOnly
+            // if ($domainL2) {
+            //     setcookie($var, '', time() - $lifetime, '/', $domainL2);
+            // }
             setcookie($var, $val, time() + $lifetime, '/', '');
         }
         return $val;

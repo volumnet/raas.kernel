@@ -153,17 +153,17 @@ class Crontab extends SOME
                     'pid' => (int)$t->id,
                     'post_date' => date('Y-m-d H:i:s', $logTime)
                 ]);
-                $logFilename = date('Y-m-d H-i-s', $logTime) . ' task' . (int)$t->id
-                             . '_' . uniqid('') . '.txt';
-                $filepath = sys_get_temp_dir() . '/' . $logFilename;
-                touch($filepath);
-                $attachment = Attachment::createFromFile(
-                    $filepath,
-                    $log,
-                    null,
-                    null,
-                    'text/plain'
-                );
+                $log->commit();
+
+                $attachment = new Attachment([
+                    'filename' => date('Y-m-d H-i-s', $logTime)
+                        . ' task' . (int)$t->id . '_' . uniqid('') . '.txt',
+                    'touchFile' => true,
+                    'mime' => 'text/plain',
+                ]);
+                $attachment->parent = $log;
+                $attachment->commit();
+
                 $log->attachment_id = (int)$attachment->id;
                 $log->commit();
                 $logFilename = $attachment->file;

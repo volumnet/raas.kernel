@@ -1,5 +1,5 @@
 <template>
-  <textarea v-bind="$attrs" v-on="inputListeners" :value="value"></textarea>
+  <textarea v-bind="$attrs" v-on="inputListeners" :value="pValue" @input="pValue = $event.target.value"></textarea>
 </template>
 
 <script>

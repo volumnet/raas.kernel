@@ -108,7 +108,8 @@ function separateScripts($text, $allowedRx = '')
     $rx = '/\\<script.*?\\>.*?\\<\\/script\\>/umis';
     $scripts = '';
     $result = $text;
-    if (preg_match_all($rx, $text, $regs)) {
+    preg_match_all($rx, $text, $regs);
+    if ($regs[0]) {
         foreach ($regs[0] as $i => $script) {
             if ($allowedRx && preg_match($allowedRx, $script)) {
                 $newScript = '';

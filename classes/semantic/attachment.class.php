@@ -156,6 +156,12 @@ class Attachment extends SOME
                 $this->uploadFile();
             }
             parent::commit();
+            $this->upload = null;
+        } elseif ($this->filename && $this->touchFile) {
+            $this->realname = $this->getUniqueFilename();
+            parent::commit();
+            touch($this->file);
+            $this->touchFile = false;
         }
     }
 

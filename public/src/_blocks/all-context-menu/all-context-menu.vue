@@ -1,7 +1,6 @@
 <style lang="scss" scoped>
 .all-context-menu {
     $self: &;
-    float: right;
     position: relative;
     &__title {
         display: flex;
