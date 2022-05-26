@@ -397,7 +397,12 @@ class Attachment extends SOME
     {
         // 2020-03-10, AVS: Заменил pathinfo, т.к. некорректно работает
         // с русскими буквами
-        $filenameWOext = preg_replace('/\\.\\w+$/umi', '', $this->filename);
+        if ($this->realname) {
+            $initialFilename = $this->realname;
+        } else {
+            $initialFilename = $this->filename;
+        }
+        $filenameWOext = preg_replace('/\\.\\w+$/umi', '', $initialFilename);
         $filename = Text::beautify($filenameWOext);
         $ext = Text::beautify(pathinfo($this->filename, PATHINFO_EXTENSION));
         for ($i = 0; glob($this->dirpath . '/' . $filename . '.' . ($ignoreExtension ? '*' : $ext)); $i++) {

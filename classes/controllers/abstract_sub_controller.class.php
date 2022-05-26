@@ -5,7 +5,7 @@
  * @version 4.1
  * @author Alex V. Surnin <info@volumnet.ru>
  * @copyright 2013, Volume Networks
- */       
+ */
 namespace RAAS;
 
 /**
@@ -16,21 +16,21 @@ namespace RAAS;
  * @property-read \RAAS\Module|\RAAS\Package $model ссылка на экземпляр текущего пакета или модуля
  * @property-read \RAAS\Abstract_Module_Controller|\RAAS\Abstract_Package_Controller $parent ссылка на экземпляр активного контроллера пакета или модуля
  * @property \RAAS\Abstract_Sub_View $view ссылка на экземпляр текущего представления подмодуля
- */       
+ */
 abstract class Abstract_Sub_Controller extends \SOME\Singleton
 {
     /**
      * Ссылка на экземпляр текущего представления подмодуля
-     * @var \RAAS\Abstract_Sub_View     
-     */         
+     * @var \RAAS\Abstract_Sub_View
+     */
     protected $_view;
-    
+
     /**
      * Экземпляр класса
-     * @var \RAAS\Abstract_Sub_Controller     
-     */         
+     * @var \RAAS\Abstract_Sub_Controller
+     */
     protected static $instance;
-    
+
     public function __get($var)
     {
         switch ($var) {
@@ -68,7 +68,7 @@ abstract class Abstract_Sub_Controller extends \SOME\Singleton
                 }
                 return $this->_view;
                 break;
-            
+
             case 'mid': case 'alias':
                 $classname = \SOME\Namespaces::getClass(\get_called_class());
                 $classname = str_ireplace('Sub_', '', $classname);

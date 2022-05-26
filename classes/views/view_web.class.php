@@ -378,8 +378,12 @@ class View_Web extends Abstract_View implements IContext_View_Web
              . ' data:'
              . ' https://*.googleapis.com'
              . ' http://*.googleapis.com'
-             . ' https://*.yandex.ru'
              . ' https://*.gstatic.com'
+             . ' https://*.yandex.ru'
+             . ' https://*.yandex.net'
+             . ' https://yandex.ru'
+             . ' https://*.yastatic.net'
+             . ' https://yastatic.net'
              . ' http://*.webspellchecker.net;';
         header($csp);
         if (!Application::i()->debug) {
