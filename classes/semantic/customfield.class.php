@@ -53,6 +53,34 @@ abstract class CustomField extends SOME
     protected static $cognizableVars = ['stdSource'];
 
     /**
+     * Кэш источников данных
+     * @var array <pre><code>array<
+     *     string[] ID# поля => array stdSource поля
+     * ></code></pre>
+     */
+    public static $sourceCache = [];
+
+    /**
+     * Кэш соответствия значений и наименований по источникам данных
+     * @var array <pre><code>array<
+     *     string[] ID# поля => array<
+     *         string[] Значение => string Наименование
+     *     >
+     * ></code></pre>
+     */
+    public static $sourceAssocCache = [];
+
+    /**
+     * Кэш соответствия наименований и значений по источникам данных
+     * @var array <pre><code>array<
+     *     string[] ID# поля => array<
+     *         string[] Наименование (приведено к нижнему регистру) => string Значение
+     *     >
+     * ></code></pre>
+     */
+    public static $sourceAssocCacheReverse = [];
+
+    /**
      * Типы полей
      * @var string[]
      */
@@ -976,52 +1004,36 @@ abstract class CustomField extends SOME
     /**
      * Получает подпись к значению
      * @param mixed $key Значение для обработки
-     * @param array $data <pre>[Стандартный источник]</pre> Источник
-     *     для обработки. Если пустой, используется стандартный источник поля
      * @return string
      */
-    protected function getCaption($key = '', $data = [])
+    protected function getCaption($key = '')
     {
-        if (!$data) {
-            $data =& $this->stdSource;
+        if (!$key) {
+            return null;
         }
-        if (isset($data[$key])) {
-            return $data[$key]['name'];
+        if (!static::$sourceAssocCache[$this->id]) {
+            $this->stdSource; // Вызовем для формирования ассоциативного массива
         }
-        foreach ($data as $k => $row) {
-            if (isset($row['children']) &&
-                ($v = $this->getCaption($key, $row['children']))
-            ) {
-                return $v;
-            }
-        }
-        return null;
+        $result = static::$sourceAssocCache[$this->id][$key];
+        return $result;
     }
 
 
     /**
      * Получает значение из подписи
      * @param mixed $val Подпись для обработки
-     * @param array $data <pre>[Стандартный источник]</pre> Источник
-     *     для обработки. Если пустой, используется стандартный источник поля
      * @return mixed
      */
-    protected function getFromCaption($val = '', $DATA = [])
+    protected function getFromCaption($val = '')
     {
-        if (!$DATA) {
-            $DATA =& $this->stdSource;
+        if (!$val) {
+            return null;
         }
-        foreach ($DATA as $k => $row) {
-            if (mb_strtolower(trim($row['name'])) == mb_strtolower(trim($val))) {
-                return $k;
-            }
-            if (isset($row['children']) &&
-                ($v = $this->getFromCaption($val, $row['children']))
-            ) {
-                return $v;
-            }
+        if (!static::$sourceAssocCacheReverse[$this->id]) {
+            $this->stdSource; // Вызовем для формирования ассоциативного массива
         }
-        return null;
+        $result = static::$sourceAssocCacheReverse[$this->id][mb_strtolower(trim($val))];
+        return $result;
     }
 
 
@@ -1034,29 +1046,60 @@ abstract class CustomField extends SOME
         if (!trim($this->source)) {
             return [];
         }
+        if (static::$sourceCache[$this->id]) {
+            return static::$sourceCache[$this->id];
+        }
+        $result = [];
         switch ($this->source_type) {
             case 'csv':
-                return (array)static::parseCSV($this->source);
+                $result = (array)static::parseCSV($this->source);
                 break;
             case 'ini':
-                return (array)static::parseINI($this->source);
+                $result = (array)static::parseINI($this->source);
                 break;
             case 'xml':
-                return (array)static::parseXML($this->source);
+                $result = (array)static::parseXML($this->source);
                 break;
             case 'sql':
-                return (array)static::parseSQL($this->source);
+                $result = (array)static::parseSQL($this->source);
                 break;
             case 'php':
-                return (array)static::parsePHP($this->source);
+                $result = (array)static::parsePHP($this->source);
                 break;
             case 'dictionary':
                 $classname = static::DictionaryClass;
-                return (array)static::parseDictionary(
+                $result = (array)static::parseDictionary(
                     new $classname((int)$this->source)
                 );
                 break;
         }
+        static::$sourceCache[trim($this->id)] = $result;
+        static::$sourceAssocCache[trim($this->id)] = $this->getSourceAssoc($result);
+        static::$sourceAssocCacheReverse[trim($this->id)] = [];
+        foreach (static::$sourceAssocCache[trim($this->id)] as $key => $val) {
+            static::$sourceAssocCacheReverse[trim($this->id)][trim(mb_strtolower($val))] = $key;
+        }
+        return $result;
+    }
+
+
+    /**
+     * Определяет ассоциации по источнику данных
+     * @param array $source Источник данных stdSource
+     * @return array <pre><code>array<
+     *     string[] Значение => string Наименование
+     * ></code></pre>
+     */
+    protected function getSourceAssoc(array $source)
+    {
+        $result = [];
+        foreach ($source as $key => $val) {
+            $result[$key] = $val['name'];
+            if (isset($val['children'])) {
+                $result += $this->getSourceAssoc($val['children']);
+            }
+        }
+        return $result;
     }
 
 

@@ -450,7 +450,12 @@ abstract class Abstract_Controller extends Singleton implements IAbstract_Contex
             100,
             150,
             200,
+            250,
+            500,
             1000,
+            2000,
+            2500,
+            5000,
             10000
         ] as $i) {
             $CONTENT['rowsPerPage'][] = ['value' => $i, 'caption' => $i];
@@ -502,12 +507,14 @@ abstract class Abstract_Controller extends Singleton implements IAbstract_Contex
             [
                 'type' => 'text',
                 'name' => 'smtp_username',
+                'autocomplete' => 'new-password',
                 'caption' => $this->view->_('SMTP_USERNAME'),
                 'placeholder' => $this->view->_('FILL_TO_USE_SMTP')
             ],
             [
                 'type' => 'password',
                 'name' => 'smtp_password',
+                'autocomplete' => 'new-password',
                 'caption' => $this->view->_('SMTP_PASSWORD'),
             ],
             [
