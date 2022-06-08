@@ -153,7 +153,7 @@ class Process extends SOME
             return false;
         }
         $cmd = 'echo "' . $password . '" | sudo -S reboot';
-        $result = exec($cmd);
+        $result = exec($cmd, $output);
         return $result;
     }
 }

@@ -43,30 +43,6 @@ class Sub_Processes extends Abstract_Sub_Controller
                 Process::kill($this->id);
                 new Redirector($this->url);
                 break;
-            // case 'delete_log':
-            //     $items = [];
-            //     $ids = (array)$_GET['id'];
-            //     if (in_array('all', $ids, true)) {
-            //         $pids = (array)$_GET['pid'];
-            //         $pids = array_filter($pids, 'trim');
-            //         $pids = array_map('intval', $pids);
-            //         if ($pids) {
-            //             $items = CrontabLog::getSet([
-            //                 'where' => "pid IN (" . implode(", ", $pids) . ")"
-            //             ]);
-            //         }
-            //     } else {
-            //         $items = array_map(function ($x) {
-            //             return new CrontabLog((int)$x);
-            //         }, $ids);
-            //     }
-            //     $items = array_values($items);
-            //     $Item = isset($items[0]) ? $items[0] : new CrontabLog();
-            //     StdSub::delete(
-            //         $items,
-            //         $this->url . '&id=' . (int)$Item->pid
-            //     );
-            //     break;
             default:
                 $this->showlist();
                 break;
@@ -79,7 +55,7 @@ class Sub_Processes extends Abstract_Sub_Controller
      */
     private function reboot()
     {
-        if (!Application::i()->registryGet('allowReboot')/* || stristr(PHP_OS, 'win')*/) {
+        if (!Application::i()->registryGet('allowReboot') || stristr(PHP_OS, 'win')) {
             exit;
         }
         $form = new RebootForm();

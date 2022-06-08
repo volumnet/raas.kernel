@@ -94,8 +94,9 @@ class ProcessesTable extends Table
                     'callback' => function ($item) {
                         $text = '';
                         if ($process = $item['process']) {
+                            $t = strtotime($process->post_date);
                             $text .= '<div>'
-                                  .     date('Y-m-d H:i:s', strtotime($process->post_date))
+                                  .     date('Y-m-d H:i:s', $t) . ' (' . (time() - $t) . 's)'
                                   .     ': ';
                             if (stristr($process->query, '://')) {
                                 $text .= '<a href="' . htmlspecialchars($process->query) . '" target="_blank">'
@@ -107,7 +108,7 @@ class ProcessesTable extends Table
                             $text .= '</div>';
                             if ($process->ip) {
                                 $text .= '<div style="font-size: .75em">
-                                            <a href="https://www.nic.ru/whois/?searchWord=' . htmlspecialchars($process->ip) . '">
+                                            <a href="https://www.nic.ru/whois/?searchWord=' . htmlspecialchars($process->ip) . '" target="_blank">
                                               ' . htmlspecialchars($process->ip) . '
                                             </a>'
                                       .     htmlspecialchars($process->user_agent)
