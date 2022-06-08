@@ -71,7 +71,7 @@ class Sub_Processes extends Abstract_Sub_Controller
         $tasks = Process::getSystemTasks();
         usort($tasks, function ($a, $b) {
             if ($a['process'] && $b['process']) {
-                return $a['process']->post_date - $b['process']->post_date;
+                return strcmp($a['process']->post_date, $b['process']->post_date);
             } elseif ($a['process'] && !$b['process']) {
                 return -1;
             } elseif (!$a['process'] && $b['process']) {
