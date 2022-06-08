@@ -81,6 +81,10 @@ class View_Web extends Package_View_Web
                 'href' => '?mode=admin&sub=crontab'
             ];
             $this->menu[] = [
+                'name' => $this->_('PROCESSES'),
+                'href' => '?mode=admin&sub=processes'
+            ];
+            $this->menu[] = [
                 'name' => $this->_('USER_LOG'),
                 'href' => '?mode=admin&sub=user_log'
             ];

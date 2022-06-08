@@ -237,18 +237,8 @@ class Crontab extends SOME
 
     public function reset()
     {
-        $this->start_time = '0000-00-00 00:00';
         if ($this->pid) {
-            if (stristr(PHP_OS, 'win')) {
-                $cmd = 'taskkill /F /PID ' . (int)$this->pid;
-            } else {
-                $cmd = 'kill ' . (int)$this->pid;
-            }
-            $result = exec($cmd);
-            if (stristr(PHP_OS, 'win')) {
-                $result = iconv('cp866', 'UTF-8', $result);
-            }
-
+            Process::kill($this->pid);
             if ($this->save_log) {
                 $logs = CrontabLog::getSet([
                     'where' => "pid = " . (int)$this->id,
@@ -262,9 +252,7 @@ class Crontab extends SOME
                     }
                 }
             }
-            $this->pid = 0;
         }
-        $this->commit();
     }
 
 

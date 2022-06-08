@@ -58,6 +58,9 @@ class Updater
         if (version_compare($v, '4.2.68') < 0) {
             $this->update20210317();
         }
+        if (version_compare($v, '4.2.94') < 0) {
+            $this->update20220608();
+        }
         return true;
     }
 
@@ -203,6 +206,27 @@ class Updater
     {
         if (in_array(SOME::_dbprefix() . "users_log", $this->tables)) {
             $sqlQuery = "DROP TABLE IF EXISTS " . SOME::_dbprefix() . "users_log";
+            $this->SQL->query($sqlQuery);
+        }
+    }
+
+
+    /**
+     * Добавляет таблицу процессов
+     */
+    public function update20220608()
+    {
+        if (in_array(SOME::_dbprefix() . "processes", $this->tables)) {
+            $sqlQuery = "CREATE TABLE IF NOT EXISTS " . SOME::_dbprefix() . "processes (
+                          id INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID#',
+                          post_date DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'Start date/time',
+                          query VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'Process query',
+                          user_agent VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'User agent',
+                          ip VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'IP address',
+
+                          PRIMARY KEY (id),
+                          INDEX (post_date)
+                        ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Processes';";
             $this->SQL->query($sqlQuery);
         }
     }

@@ -152,6 +152,7 @@ abstract class Abstract_Controller extends Singleton implements IAbstract_Contex
             if ($this->checkDB()) {
                 if ($this->checkSOME()) {
                     $this->model->install();
+                    Process::checkIn();
                     if ($this->auth()) {
                         $this->applyPersonalSettings();
                         $this->model->initPackages();

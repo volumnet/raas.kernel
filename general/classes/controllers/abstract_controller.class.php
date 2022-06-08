@@ -44,6 +44,8 @@ abstract class Abstract_Controller extends \RAAS\Abstract_Package_Controller
             parent::execute();
         } elseif (($this->sub == 'crontab') && $this->model->user->root) {
             parent::execute();
+        } elseif (($this->sub == 'processes') && $this->model->user->root) {
+            parent::execute();
         } elseif (($this->sub == 'user_log') && $this->model->user->root) {
             Sub_UserLog::i()->run();
         } else {

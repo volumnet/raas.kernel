@@ -49,6 +49,7 @@ abstract class Abstract_Controller_Cron extends Abstract_Controller
         if ($this->checkCompatibility()) {
             if ($this->checkDB()) {
                 if ($this->checkSOME()) {
+                    Process::checkIn();
                     while (ob_get_level()) {
                         ob_end_clean();
                     }
