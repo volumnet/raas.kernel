@@ -192,9 +192,9 @@ class ViewSub_Modules extends Abstract_Sub_View
         $arr = [];
         $repairConfirmation = (($Item instanceof Package) ? 'PACKAGE' : 'MODULE')
                             . '_REPAIR_CONFIRMATION' ;
+        $edit = ($this->action == 'edit');
+        $levels = ($this->action == 'levels');
         if (!(($Item instanceof Application) || ($Item instanceof Package))) {
-            $edit = ($this->action == 'edit');
-            $levels = ($this->action == 'levels');
             if (!$edit) {
                 $arr[] = [
                     'name' => $this->_('EDIT'),

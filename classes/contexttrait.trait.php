@@ -40,7 +40,7 @@ trait ContextTrait
                 return $this->composerData;
                 break;
             case 'requiredPHPVersion':
-                if (!$this->composer['require']['php']) {
+                if (!isset($this->composer['require']['php']) || !$this->composer['require']['php']) {
                     return false;
                 }
                 $requiredPHPVersion = preg_replace(
@@ -61,7 +61,7 @@ trait ContextTrait
                 return ($verCmp <= 0);
                 break;
             case 'requiredExtensions':
-                if (!$this->composer['require']) {
+                if (!isset($this->composer['require']) || !$this->composer['require']) {
                     return [];
                 }
                 $requiredExt = array_filter(
@@ -88,7 +88,7 @@ trait ContextTrait
             case 'version':
             case 'versionName':
                 $key = ($var == 'version' ? 'version' : 'description');
-                if ($val = $this->composer[$key]) {
+                if (isset($this->composer[$key]) && ($val = $this->composer[$key])) {
                     return $val;
                 }
                 break;

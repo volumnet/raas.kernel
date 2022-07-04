@@ -394,7 +394,10 @@ abstract class CustomField extends SOME
             return null;
         }
         $this->prefetchIfNotExists();
-        $value = static::$cache[$this->Owner->id][$this->id][$index];
+        $value = null;
+        if (isset(static::$cache[$this->Owner->id][$this->id][$index])) {
+            $value = static::$cache[$this->Owner->id][$this->id][$index];
+        }
         switch ($this->datatype) {
             case 'image':
             case 'file':
@@ -429,7 +432,10 @@ abstract class CustomField extends SOME
             return $this->getValue();
         }
         $this->prefetchIfNotExists();
-        $values = static::$cache[$this->Owner->id][$this->id];
+        $values = null;
+        if (isset(static::$cache[$this->Owner->id][$this->id])) {
+            $values = static::$cache[$this->Owner->id][$this->id];
+        }
         switch ($this->datatype) {
             case 'image':
             case 'file':
@@ -919,7 +925,8 @@ abstract class CustomField extends SOME
                 array_filter(
                     $sqlResult,
                     function ($x) use ($pid) {
-                        return ($x['pid'] == $pid) || (!$x['pid'] && !$pid);
+                        $originalPid = isset($x['pid']) ? $x['pid'] : null;
+                        return ($originalPid == $pid) || (!$originalPid && !$pid);
                     }
                 )
             );
@@ -1046,7 +1053,9 @@ abstract class CustomField extends SOME
         if (!trim($this->source)) {
             return [];
         }
-        if (static::$sourceCache[$this->id]) {
+        if (isset(static::$sourceCache[$this->id]) &&
+            static::$sourceCache[$this->id]
+        ) {
             return static::$sourceCache[$this->id];
         }
         $result = [];
@@ -1152,7 +1161,9 @@ abstract class CustomField extends SOME
         } else {
             $args[0]['where'] = (array)$args[0]['where'];
         }
-        if ($classname = static::$references['parent']['classname']) {
+        if (isset(static::$references['parent']['classname']) &&
+            ($classname = static::$references['parent']['classname'])
+        ) {
             $args[0]['where'][] = "classname = '" . static::$SQL->real_escape_string($classname) . "'";
         }
         return call_user_func_array('parent::getSet', $args);

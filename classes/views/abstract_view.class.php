@@ -173,7 +173,7 @@ abstract class Abstract_View extends Singleton implements IAbstract_Context_View
     {
         $localError = [];
         $key = 'PHP_VERSION_INCOMPATIBLE';
-        if ($IN[$key]) {
+        if (isset($IN[$key])) {
             $localError[] = [
                 'name' => $key,
                 'value' => $IN[$key],

@@ -196,9 +196,12 @@ class View_Web extends Abstract_View implements IContext_View_Web
                 return $this->$var;
                 break;
             case 'availableThemes':
-                $dir = (array)@File::scandir(
-                    $this->application->baseDir . '/themes'
-                );
+                $dir = [];
+                if (is_dir($this->application->baseDir . '/themes')) {
+                    $dir = (array)@File::scandir(
+                        $this->application->baseDir . '/themes'
+                    );
+                }
                 $temp = ['/' => $this->_('DEFAULT_THEME')];
                 foreach ($dir as $row) {
                     $filename = $this->application->baseDir . '/themes/'
@@ -401,7 +404,7 @@ class View_Web extends Abstract_View implements IContext_View_Web
      */
     public function debugShowException(\Exception $e)
     {
-        $text .= $e->getMessage() . $e->getTraceAsString();
+        $text = $e->getMessage() . $e->getTraceAsString();
         return $text;
     }
 

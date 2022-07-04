@@ -27,16 +27,19 @@ class Process extends SOME
             'id' => getmypid(),
             'post_date' => date('Y-m-d H:i:s'),
         ];
-        if ($_SERVER['REQUEST_URI']) {
-            $sqlArr['query'] = $_SERVER['REQUEST_SCHEME'] . '://'
+        if (isset($_SERVER['REQUEST_URI'])) {
+            $sqlArr['query'] = 'http' . ((isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 'on')) ? 's' : '') . '://'
                 . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
             $sqlArr['user_agent'] = $_SERVER['HTTP_USER_AGENT'];
             $sqlArr['ip'] = $_SERVER['REMOTE_ADDR'];
         } else {
             $sqlArr['query'] = implode(" ", $GLOBALS['argv']);
         }
+        try {
+            static::_SQL()->add(static::_tablename(), $sqlArr);
+        } catch (Exception $e) {
+        }
         $process = new static($sqlArr);
-        $process->commit();
         return $process;
     }
 
@@ -105,6 +108,7 @@ class Process extends SOME
         $set = static::getSet();
         foreach ($set as $item) {
             $tasks[trim($item->id)]['process'] = $item;
+            $tasks[trim($item->id)]['time'] = time() - strtotime($item->post_date);
         }
         $tasks = array_filter($tasks, function ($x) {
             return stristr($x['file'], 'php') || $x['process'];
@@ -133,7 +137,7 @@ class Process extends SOME
         static::_SQL()->update(
             Crontab::_tablename(),
             "pid = " . (int)$id,
-            ['pid' => 0, 'start_time' => '0000-00-00 00:00:00'],
+            ['pid' => 0, 'start_time' => '0000-00-00 00:00:00']
         );
 
         $process = new static($id);

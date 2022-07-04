@@ -11,7 +11,7 @@
   <b><?php echo YOUR_IP?>:</b>
   <?php
   echo $ip;
-  if ($proxy && ($proxy != $ip)) {
+  if (isset($proxy) && $proxy && ($proxy != $ip)) {
       echo ' (<b>' . PROXY . ':</b> ' . $proxy . ')';
   }
   ?>

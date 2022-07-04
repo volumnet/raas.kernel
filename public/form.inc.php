@@ -6,6 +6,9 @@ $_RAASForm_Attrs = function(\RAAS\FormElement $FormElement, $additional = array(
             unset($arr[$key]);
         } else {
             if (in_array($key, array('class', 'data-role'))) {
+                if (!isset($arr[$key])) {
+                    $arr[$key] = '';
+                }
                 $arr[$key] .= ' ' . $val;
             } else {
                 $arr[$key] = $val;
@@ -29,13 +32,13 @@ $_RAASForm_Attrs = function(\RAAS\FormElement $FormElement, $additional = array(
     if ($FormElement->type == 'password') {
         unset($arr['confirm']);
     }
-    if (!$arr['disabled']) {
+    if (!isset($arr['disabled']) || !$arr['disabled']) {
         unset($arr['disabled']);
     }
-    if (!$arr['readonly']) {
+    if (!isset($arr['readonly']) || !$arr['readonly']) {
         unset($arr['readonly']);
     }
-    if ($arr['required']) {
+    if (isset($arr['required']) && $arr['required']) {
         $arr['data-required'] = 'required';
     }
     unset($arr['required']); // временно
@@ -46,7 +49,7 @@ $_RAASForm_Attrs = function(\RAAS\FormElement $FormElement, $additional = array(
     return $text;
 };
 
-$_RAASForm_Form_Plain = function(\RAAS\FieldCollection $fields) use (&$_RAASForm_Form_Plain, &$_RAASForm_Attrs) {
+$_RAASForm_Form_Plain = function(\RAAS\FieldCollection $fields) use (&$_RAASForm_Form_Plain2, &$_RAASForm_Attrs) {
     ?>
     <div class="form-horizontal">
       <?php
@@ -64,12 +67,16 @@ $_RAASForm_Form_Plain = function(\RAAS\FieldCollection $fields) use (&$_RAASForm
           } elseif ($row instanceof \RAAS\Field) {
               $_RAASForm_Field($row);
           } else {
-              $_RAASForm_Form_Plain($row->children);
+              $_RAASForm_Form_Plain2($row->children);
           }
       }
       ?>
     </div>
     <?php
+};
+
+$_RAASForm_Form_Plain2 = function(\RAAS\FieldCollection $fields) use (&$_RAASForm_Form_Plain, &$_RAASForm_Attrs) {
+    return $_RAASForm_Form_Plain($fields);
 };
 
 $_RAASForm_Form_Tabbed = function(\RAAS\FieldCollection $fields) use (&$_RAASForm_Form_Tabbed, &$_RAASForm_Form_Plain, &$_RAASForm_Attrs) {

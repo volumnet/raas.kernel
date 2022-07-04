@@ -81,9 +81,9 @@ class ProcessesTable extends Table
                 'time' => [
                     'caption' => $this->view->_('TIME'),
                     'callback' => function ($item) {
-                        if ($item['time']) {
+                        if (isset($item['time'])) {
                             $text = '<span' . (!$item['process'] ? ' class="muted"' : '') . ' style="white-space: nowrap">
-                                       ' . htmlspecialchars($item['time']) . 's
+                                       ' . htmlspecialchars($item['time']) . '
                                      </span>';
                             return $text;
                         }
@@ -96,7 +96,7 @@ class ProcessesTable extends Table
                         if ($process = $item['process']) {
                             $t = strtotime($process->post_date);
                             $text .= '<div>'
-                                  .     date('Y-m-d H:i:s', $t) . ' (' . (time() - $t) . 's)'
+                                  .     date('Y-m-d H:i:s', $t)
                                   .     ': ';
                             if (stristr($process->query, '://')) {
                                 $text .= '<a href="' . htmlspecialchars($process->query) . '" target="_blank">'

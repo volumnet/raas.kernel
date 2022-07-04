@@ -179,7 +179,7 @@ abstract class Access
     }
 
 
-    final private function _rights()
+    private function _rights()
     {
         if (($this->Owner instanceof User) &&
             $this->Owner->rights[$this->Context->mid] &&
@@ -263,7 +263,7 @@ abstract class Access
     }
 
 
-    final private function flush()
+    private function flush()
     {
         if ($this->Owner instanceof User) {
             static::flushRights($this->Owner);

@@ -1,9 +1,9 @@
-<?php 
-if ($firstUser) { 
+<?php
+if (isset($firstUser) && $firstUser) {
     ?>
     <div class="alert"><?php echo FIRST_USER?></div>
 <?php } else { ?>
     <p><?php HAVETO_AUTHORIZE?></p>
-    <?php 
-    } 
+    <?php
+    }
 include $VIEW->tmp('/form.tmp.php');

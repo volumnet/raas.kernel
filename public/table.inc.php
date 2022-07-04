@@ -2,6 +2,9 @@
 $_RAASTable_Attrs = function(\RAAS\TableElement $TableElement, $additional = array()) {
     $arr = (array)$TableElement->attrs;
     if ($TableElement instanceof \RAAS\Table) {
+        if (!isset($arr['class'])) {
+            $arr['class'] = '';
+        }
         $arr['class'] .= ' table table-striped';
     }
     foreach ((array)$additional as $key => $val) {

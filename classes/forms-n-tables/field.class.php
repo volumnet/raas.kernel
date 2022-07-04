@@ -513,11 +513,12 @@ class Field extends OptionContainer
                 $children = null;
                 if (($level === null) || ($level > 0)) {
                     if (!$childrenN) {
-                        $tmp_ch = (array)$classname::_children($key);
+                        $tmp_ch = (array)$classname::_children();
                         if ($tmp_ch = array_filter($tmp_ch, function ($x) use ($classname) {
                             return $x['classname'] == $classname;
                         })) {
-                            $childrenN = array_shift(array_keys($tmp_ch));
+                            $tmpChKeys = array_keys($tmp_ch);
+                            $childrenN = array_shift($tmpChKeys);
                         }
                     }
                     if ($childrenN && $row->$childrenN && is_array($row->$childrenN)) {

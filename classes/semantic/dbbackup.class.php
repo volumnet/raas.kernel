@@ -72,13 +72,13 @@ class DBBackup extends Backup
                 "-- \n" .
                 "-- Table structure: " . $tablename . "\n" .
                 "-- \n" .
-                "DROP TABLE IF EXISTS " . $tablename . ";\n"
+                "DROP TABLE IF EXISTS `" . $tablename . "`;\n"
             );
 
-            $sqlQuery = "SHOW CREATE TABLE " . $tablename;
+            $sqlQuery = "SHOW CREATE TABLE `" . $tablename . "`";
             $sqlResult = Application::i()->SQL->getline($sqlQuery);
             fwrite($fp, $sqlResult['Create Table'] . ";");
-            $sqlQuery = "SELECT * FROM " . $tablename;
+            $sqlQuery = "SELECT * FROM `" . $tablename . "`";
             $sqlResult = Application::i()->SQL->get($sqlQuery);
             $sqlQuery = "";
 

@@ -182,7 +182,7 @@ $_RAASForm_Control = function (
                 echo $_RAASForm_Checkbox($field->children);
             } else {
                 $attrs['value'] = 1;
-                if ($field->Form->DATA[$field->name]) {
+                if (isset($field->Form->DATA[$field->name]) && $field->Form->DATA[$field->name]) {
                     $attrs['checked'] = 'checked';
                 }
                 ?>
@@ -235,7 +235,7 @@ $_RAASForm_Control = function (
             $attrs = [];
             $fieldType = $field->type ?: 'text';
             $itemArr = $field->getArrayCopy();
-            $childrenArr = $itemArr['children'];
+            $childrenArr = isset($itemArr['children']) ? $itemArr['children'] : null;
 
             if (!$field->type) {
                 $attrs['type'] = 'text';
@@ -265,7 +265,7 @@ $_RAASForm_Control = function (
                 <?php
             } else {
                 ?>
-                <raas-field-<?php echo htmlspecialchars($fieldType)?> <?php echo $_RAASForm_Attrs($field, array_merge($attrs, [':value' => json_encode($field->Form->DATA[$field->name]), ':source' => $childrenArr ? json_encode($childrenArr) : false]))?>></raas-field-<?php echo htmlspecialchars($fieldType)?>>
+                <raas-field-<?php echo htmlspecialchars($fieldType)?> <?php echo $_RAASForm_Attrs($field, array_merge($attrs, [':value' => json_encode(isset($field->Form->DATA[$field->name]) ? $field->Form->DATA[$field->name] : null), ':source' => $childrenArr ? json_encode($childrenArr) : false]))?>></raas-field-<?php echo htmlspecialchars($fieldType)?>>
                 <?php
             }
             break;

@@ -47,7 +47,7 @@ function getMenu(array $menu)
                     continue;
                 }
             }
-            if ($row['submenu']) {
+            if (isset($row['submenu'])) {
                 $row['submenu'] = getMenu($row['submenu']);
             }
             $result[] = $row;
