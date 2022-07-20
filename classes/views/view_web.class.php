@@ -24,6 +24,8 @@ use SOME\File;
  */
 class View_Web extends Abstract_View implements IContext_View_Web
 {
+    use WidgetTrait;
+
     /**
      * Признак определения мобильных браузеров по регулярным выражениям в USER-AGENT
      */

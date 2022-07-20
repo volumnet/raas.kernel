@@ -7,5 +7,15 @@ import RAASField from 'cms/application/fields/raas-field.vue.js';
 
 export default {
     mixins: [RAASField],
+    data: function () {
+        return {
+            pValue: this.value.replace(' ', 'T'),
+        };
+    },
+    watch: {
+        value: function () {
+            this.pValue = this.value.replace(' ', 'T');
+        },
+    },
 }
 </script>

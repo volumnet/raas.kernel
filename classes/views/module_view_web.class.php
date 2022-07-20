@@ -14,6 +14,8 @@ namespace RAAS;
  */
 class Module_View_Web extends Abstract_Module_View implements IRightsContext_View_Web
 {
+    use WidgetTrait;
+
     /**
      * Экземпляр класса
      * @var \RAAS\Module_View_Web

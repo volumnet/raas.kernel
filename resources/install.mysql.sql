@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS {$DBPREFIX$}crontab_logs (
   KEY (attachment_id)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Crontab logs';
 
-CREATE TABLE IF NOT EXISTS {$DBPREFIX$}groups (
+CREATE TABLE IF NOT EXISTS `{$DBPREFIX$}groups` (
   id smallint(5) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID#',
   pid smallint(5) unsigned NOT NULL DEFAULT '0' COMMENT 'Parent group ID#',
   `name` varchar(255) NOT NULL DEFAULT '' COMMENT 'Name',

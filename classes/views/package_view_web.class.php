@@ -14,6 +14,8 @@ namespace RAAS;
  */
 class Package_View_Web extends Abstract_Package_View implements IRightsContext_View_Web
 {
+    use WidgetTrait;
+
     /**
      * Экземпляр класса
      * @var \RAAS\Package_View_Web

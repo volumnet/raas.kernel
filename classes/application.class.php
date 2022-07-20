@@ -367,6 +367,7 @@ final class Application extends Singleton implements IContext
         foreach ($eTrace as $i => $trace) {
             if (isset($trace['file']) &&
                 stristr($trace['file'], 'eval') &&
+                isset($_SESSION['EVAL_DEBUG']) &&
                 $_SESSION['EVAL_DEBUG']
             ) {
                 $newMessage = $_SESSION['EVAL_DEBUG'] . ':' . $trace['line']
