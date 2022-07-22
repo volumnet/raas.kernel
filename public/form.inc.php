@@ -49,7 +49,7 @@ $_RAASForm_Attrs = function(\RAAS\FormElement $FormElement, $additional = array(
     return $text;
 };
 
-$_RAASForm_Form_Plain = function(\RAAS\FieldCollection $fields) use (&$_RAASForm_Form_Plain2, &$_RAASForm_Attrs) {
+$_RAASForm_Form_Plain = function(\RAAS\FieldCollection $fields) use (&$_RAASForm_Form_Plain, &$_RAASForm_Form_Plain2, &$_RAASForm_Attrs) {
     ?>
     <div class="form-horizontal">
       <?php

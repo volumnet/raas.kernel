@@ -30,8 +30,8 @@ class Process extends SOME
         if (isset($_SERVER['REQUEST_URI'])) {
             $sqlArr['query'] = 'http' . ((isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 'on')) ? 's' : '') . '://'
                 . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-            $sqlArr['user_agent'] = $_SERVER['HTTP_USER_AGENT'];
-            $sqlArr['ip'] = $_SERVER['REMOTE_ADDR'];
+            $sqlArr['user_agent'] = trim($_SERVER['HTTP_USER_AGENT']);
+            $sqlArr['ip'] = trim($_SERVER['REMOTE_ADDR']);
         } else {
             $sqlArr['query'] = implode(" ", $GLOBALS['argv']);
         }
