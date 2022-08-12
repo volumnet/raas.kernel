@@ -1,10 +1,14 @@
 <?php
+/**
+ * Форма прав доступа
+ */
 namespace RAAS\General;
 
 use RAAS\Application;
+use RAAS\Form;
 use RAAS\User;
 
-class EditRightsForm extends \RAAS\Form
+class EditRightsForm extends Form
 {
     protected $_view;
 
@@ -23,26 +27,33 @@ class EditRightsForm extends \RAAS\Form
 
     public function __construct(array $params = array())
     {
-        $view = $this->view;
-        $t = $this;
         unset($params['view']);
-        $Item = isset($params['Item']) ? $params['Item'] : null;
-        $Context = isset($params['Context']) ? $params['Context'] : null;
+        $item = isset($params['Item']) ? $params['Item'] : null;
+        $context = isset($params['Context']) ? $params['Context'] : null;
 
-        if ($Item instanceof User) {
-            $name = $Item->full_name ? $Item->full_name : $Item->login;
+        if ($item instanceof User) {
+            $name = $item->full_name ? $item->full_name : $item->login;
         } else {
-            $name = $Item->name;
+            $name = $item->name;
         }
 
-        $defaultParams = array(
+        $defaultParams = [
             'caption' => Application::i()->view->_('EDIT_RIGHTS') . ': ' . htmlspecialchars($name),
-            'import' => function($Form) use ($params) { return $params['DATA']; },
-            'commit' => function($Form) use ($params, $Context, $Item) { $Item->access($Context)->setRights($params['rights']); },
-            'children' => array(
-                array('name' => 'rights', 'template' => str_replace('.', '/', $Context->mid) . '/rights.inc.tmp.php', 'import' => 'is_null', 'export' => 'is_null')
-            )
-        );
+            'import' => function ($form) use ($params) {
+                return $params['DATA'];
+            },
+            'commit' => function ($form) use ($params, $context, $item) {
+                $item->access($context)->setRights($params['rights']);
+            },
+            'children' => [
+                [
+                    'name' => 'rights',
+                    'template' => str_replace('.', '/', $context->mid) . '/rights.inc.tmp.php',
+                    'import' => 'is_null',
+                    'export' => 'is_null'
+                ],
+            ],
+        ];
         $arr = array_merge($defaultParams, $params);
         parent::__construct($arr);
     }

@@ -10,6 +10,7 @@ use RAAS\FormTab;
 use RAAS\Field;
 use RAAS\Option;
 use RAAS\Group;
+use RAAS\Level;
 
 class EditUserForm extends Form
 {
