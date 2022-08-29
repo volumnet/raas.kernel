@@ -9,7 +9,7 @@ export default {
     mixins: [RAASField],
     data: function () {
         return {
-            pValue: this.value.replace(' ', 'T'),
+            pValue: this.value && this.value.replace(' ', 'T'),
         };
     },
     watch: {

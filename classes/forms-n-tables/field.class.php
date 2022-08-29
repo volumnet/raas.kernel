@@ -315,7 +315,11 @@ class Field extends OptionContainer
      */
     public function _isFilled($val = null)
     {
-        if (trim($val) === '') {
+        if (is_scalar($val)) {
+            if (trim($val) === '') {
+                return false;
+            }
+        } elseif (!$val) {
             return false;
         }
         switch ($this->datatype) {
@@ -353,7 +357,11 @@ class Field extends OptionContainer
      */
     public function _validate($val = null)
     {
-        if (trim($val) === '') {
+        if (is_scalar($val)) {
+            if (trim($val) === '') {
+                return true;
+            }
+        } else {
             return true;
         }
         if ($this->pattern) {
