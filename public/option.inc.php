@@ -7,10 +7,10 @@ $_RAASForm_Option = function(\RAAS\Option $Option, $level = 0) use ($_RAASForm_O
             if ($Option->Field->{'data-raas-multiselect'}) {
                 $selected = in_array($Option->value, (array)$Option->Form->DATA[$Option->Field->name]);
             } else {
-                $selected = ($Option->value == $Option->Field->value);
+                $selected = (trim($Option->value) === trim($Option->Field->value));
             }
         } else {
-            $selected = ($Option->value == $Option->Form->DATA[$Option->Field->name]);
+            $selected = (trim($Option->value) === trim($Option->Form->DATA[$Option->Field->name]));
         }
     }
     if ($selected) {
@@ -18,6 +18,6 @@ $_RAASForm_Option = function(\RAAS\Option $Option, $level = 0) use ($_RAASForm_O
     }
     ?>
     <option<?php echo $_RAASForm_Attrs($Option, $attrs)?>><?php echo str_repeat('&nbsp;', $level * 3) . htmlspecialchars($Option->caption)?></option>
-    <?php 
+    <?php
     $_RAASForm_Options($Option->children, $level + 1);
 };

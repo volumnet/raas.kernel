@@ -2,7 +2,7 @@
 $_RAASForm_Attrs = function(\RAAS\FormElement $FormElement, $additional = array()) {
     $arr = (array)$FormElement->attrs;
     foreach ((array)$additional as $key => $val) {
-        if (($val === false) || (in_array($key, array('checked', 'selected')) && !$val)) {
+        if (($val === false) || (in_array($key, array('checked', 'selected', 'multiple', 'required')) && !$val)) {
             unset($arr[$key]);
         } else {
             if (in_array($key, array('class', 'data-role'))) {
@@ -35,8 +35,14 @@ $_RAASForm_Attrs = function(\RAAS\FormElement $FormElement, $additional = array(
     if (!isset($arr['disabled']) || !$arr['disabled']) {
         unset($arr['disabled']);
     }
+    if (!isset($arr['selected']) || !$arr['selected']) {
+        unset($arr['selected']);
+    }
     if (!isset($arr['readonly']) || !$arr['readonly']) {
         unset($arr['readonly']);
+    }
+    if (!isset($arr['multiple']) || !$arr['multiple']) {
+        unset($arr['multiple']);
     }
     if (isset($arr['required']) && $arr['required']) {
         $arr['data-required'] = 'required';

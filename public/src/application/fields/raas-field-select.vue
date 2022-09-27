@@ -1,7 +1,7 @@
 <template>
   <select v-bind="$attrs" v-on="inputListeners" :value="pValue">
-    <option v-if="placeholder" value="">
-      {{placeholder}}
+    <option v-if="placeholder || !required" value="">
+      {{placeholder || '--'}}
     </option>
     <option :value="option.value" v-bind="option" v-for="option in flatSource">
       <template v-for="n in option.level">
