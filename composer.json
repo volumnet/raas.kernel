@@ -1,7 +1,7 @@
 {
     "name": "volumnet/raas.kernel",
-    "description": "RAAS v4.3.4 Remote Automated Assistant",
-    "version": "4.3.4",
+    "description": "RAAS v4.3.5 Remote Automated Assistant",
+    "version": "4.3.5",
     "license": "GPL-3.0-or-later",
     "minimum-stability": "dev",
     "prefer-stable": true,
