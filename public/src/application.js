@@ -6,11 +6,11 @@
 import 'spectrum-colorpicker/spectrum.css'
 import 'bootstrap-multiselect/dist/css/bootstrap-multiselect.css'
 import 'codemirror/lib/codemirror.css'
-import 'jquery-ui-timepicker-addon/dist/jquery-ui-timepicker-addon.css'
+// import 'jquery-ui-timepicker-addon/dist/jquery-ui-timepicker-addon.css'
 
 import 'jquery-form'
 import './libs/bootstrap.js'
-import 'jquery.scrollto'
+// import 'jquery.scrollto'
 import queryString from 'query-string';
 window.queryString = queryString;
 
@@ -52,10 +52,10 @@ import RAAS_repo from './libs/raas.repo.js';
 import RAASInitInputs from './libs/raas.init-inputs.js';
 import RAAS_queryString from './libs/raas.query-string.js';
 
-import YmapPlugin from 'vue-yandex-maps';
+// import YmapPlugin from 'vue-yandex-maps';
 
 
-Vue.use(YmapPlugin, window.ymapSettings);
+// Vue.use(YmapPlugin, window.ymapSettings);
 
 jQuery(function ($) {
     $.fn.extend({
@@ -68,12 +68,12 @@ jQuery(function ($) {
         RAASInitInputs,
     });
     $.extend({ RAAS_queryString });
-    let lang = $('html').attr('lang') || 'ru';
-    if (lang == 'en') {
-        lang = '';
-    }
-    $.datepicker.setDefaults($.datepicker.regional[lang]);
-    $.timepicker.setDefaults($.timepicker.regional[lang]);
+    // let lang = $('html').attr('lang') || 'ru';
+    // if (lang == 'en') {
+    //     lang = '';
+    // }
+    // $.datepicker.setDefaults($.datepicker.regional[lang]);
+    // $.timepicker.setDefaults($.timepicker.regional[lang]);
 });
 
 window.registeredRAASComponents = {};

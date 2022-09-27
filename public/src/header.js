@@ -9,10 +9,10 @@ import Cookie from 'expose-loader?exposes[]=Cookie!js-cookie';
 import numTxt from 'cms/application/_libs/num-txt.js';
 import formatPrice from 'cms/application/_libs/format-price.js';
 
-import 'jquery-ui/ui/widgets/datepicker.js';
-import 'jquery-ui/ui/i18n/datepicker-ru.js';
-import 'jquery-ui-timepicker-addon';
-import 'jquery-ui-timepicker-addon/dist/i18n/jquery-ui-timepicker-ru.js';
+// import 'jquery-ui/ui/widgets/datepicker.js';
+// import 'jquery-ui/ui/i18n/datepicker-ru.js';
+// import 'jquery-ui-timepicker-addon';
+// import 'jquery-ui-timepicker-addon/dist/i18n/jquery-ui-timepicker-ru.js';
 
 import raasIconComponents from './_blocks/raas-icon';
 import menuLeftComponents from './_blocks/menu-left';
