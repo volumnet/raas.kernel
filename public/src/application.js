@@ -10,7 +10,7 @@ import 'codemirror/lib/codemirror.css'
 
 import 'jquery-form'
 import './libs/bootstrap.js'
-// import 'jquery.scrollto'
+import 'jquery.scrollto'
 import queryString from 'query-string';
 window.queryString = queryString;
 
@@ -115,8 +115,8 @@ jQuery(document).ready(function($) {
         window.history.pushState({}, document.title, url);
     });
     
-    $.datepicker.setDefaults({ dateFormat: 'yy-mm-dd' });
-    $.timepicker.setDefaults({ dateFormat: 'yy-mm-dd', timeFormat: 'hh:mm', separator: ' ' });
+    // $.datepicker.setDefaults({ dateFormat: 'yy-mm-dd' });
+    // $.timepicker.setDefaults({ dateFormat: 'yy-mm-dd', timeFormat: 'hh:mm', separator: ' ' });
     
     $('body').RAASInitInputs();
     $(':reset').click(function() { document.location.reload(); return false; });

@@ -161,6 +161,7 @@ $_RAASForm_Control = function (
                 $attrs['accept'] = 'image/jpeg,image/png,image/gif,image/webp,image/svg+xml';
             }
             if ($field->multiple) {
+                $attrs['multiple'] = false;
                 ?>
                 <div data-role="raas-repo-block">
                   <div data-role="raas-repo-container">
@@ -169,7 +170,7 @@ $_RAASForm_Control = function (
                     </div>
                   </div>
                   <div data-role="raas-repo">
-                    <input<?php echo $_RAASForm_Attrs($field, array_merge($attrs, ['disabled' => 'disabled']))?> />
+                    <input<?php echo $_RAASForm_Attrs($field, array_merge($attrs, ['disabled' => 'disabled', 'multiple' => false]))?> />
                   </div>
                 </div>
             <?php } else { ?>

@@ -866,8 +866,11 @@ final class Application extends Singleton implements IContext
             if (!$smtpHost && $_SERVER['HTTP_HOST']) {
                 $smtpHost = $_SERVER['HTTP_HOST'];
             }
-            if ($smtpEncryption == 'ssl') {
+            if (($smtpEncryption == 'ssl') && !stristr($smtpHost, '//')) {
                 $smtpHost = 'ssl://' . $smtpHost;
+            }
+            if (substr($smtpHost, 0, 2) == '//') {
+                $smtpHost = substr($smtpHost, 2);
             }
             if (!$smtpPort) {
                 $smtpPort = ($smtpEncryption == 'ssl') ? 465 : 25;

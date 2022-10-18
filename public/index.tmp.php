@@ -233,11 +233,11 @@ if ($USER) {
     ], (array)$VIEW->head_js), 'beforeApp');
     AssetManager::requestJS(array_merge([
         '/vendor/ckeditor/ckeditor/ckeditor.js',
-        $VIEW->publicURL . '/ckeditor.config.js',
-        '/js/ckeditor.config.js',
         '/js/raas.config.js',
-        '/vendor/ckeditor/ckeditor/adapters/jquery.js',
         $VIEW->publicURL . '/application.js', // Здесь, потому что последующие скрипты должны отрабатывать после подключения Vue
+        $VIEW->publicURL . '/ckeditor.config.js', // 2022-09-29, AVS: Эти и далее здесь, потому что адаптеры должны включаться после подключения CKEditor
+        '/js/ckeditor.config.js',
+        '/vendor/ckeditor/ckeditor/adapters/jquery.js',
     ], (array)$VIEW->js));
     echo AssetManager::getRequestedCSS();
     echo AssetManager::getRequestedJS('beforeApp');

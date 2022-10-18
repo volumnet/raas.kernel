@@ -89,7 +89,8 @@ export default function(params) {
         return false;
     });
 
-    $repoContainer.sortable({ axis: 'y', 'handle': params.repoMove, containment: $(this) });
+    let axis = $repoContainer.attr('data-axis');
+    $repoContainer.sortable({ axis: axis ? (axis == 'both' ? '' : axis) : 'y', 'handle': params.repoMove, containment: $(this) });
 
 
     checkRequired();
