@@ -8,12 +8,15 @@
  */
 namespace RAAS;
 
+use ArrayObject;
+use SOME\Pages;
+
 /**
  * Класс таблицы
  * @package RAAS
  * @property-read Table $Table Возвращает текущую таблицу
  * @property array $Set Массив данных для отображения
- * @property \SOME\Pages $Pages Объект постраничной разбивки
+ * @property Pages $Pages Объект постраничной разбивки
  * @property string $sortVar Переменная для сортировки
  * @property string $orderVar Переменная для типа упорядочения (по возрастанию/по убыванию)
  * @property string $pagesVar Переменная страниц
@@ -23,7 +26,7 @@ namespace RAAS;
  * @property bool $header Отображать заголовок
  * @property bool $emptyHeader Отображать заголовок при отсутствии строк
  * @property ColumnCollection $columns Массив колонок
- * @property-read array(Rows[]) $rows Строки таблицы
+ * @property-read [Rows[]] $rows Строки таблицы
  */
 class Table extends TableElement
 {
@@ -35,7 +38,7 @@ class Table extends TableElement
 
     /**
      * Объект постраничной разбивки
-     * @var \SOME\Pages
+     * @var Pages
      */
     protected $Pages;
 
@@ -109,7 +112,7 @@ class Table extends TableElement
                 return $this->Set;
                 break;
             case 'rows':
-                $Set = array();
+                $Set = [];
                 if ($this->Set) {
                     for ($i = 0; $i < count((array)$this->Set); $i++) {
                         $row = $this->Set[$i];
@@ -139,34 +142,41 @@ class Table extends TableElement
                 }
                 break;
             case 'order':
-                if (in_array((int)$val, array(Column::SORT_ASC, Column::SORT_DESC))) {
+                if (in_array((int)$val, [Column::SORT_ASC, Column::SORT_DESC])) {
                     $this->$var = (int)$val;
                 }
+                break;
             case 'Set':
-                if ($val instanceof \ArrayObject) {
+                if ($val instanceof ArrayObject) {
                     $this->$var = (array)$val;
                 } elseif (is_array($val)) {
-                    $this->$var = new \ArrayObject($val);
+                    $this->$var = new ArrayObject($val);
                 }
                 break;
             case 'Pages':
-                if ($val instanceof \SOME\Pages) {
+                if ($val instanceof Pages) {
                     $this->$var = $val;
                 }
                 break;
-            case 'sortVar': case 'orderVar': case 'pagesVar': case 'emptyString':
+            case 'sortVar':
+            case 'orderVar':
+            case 'pagesVar':
+            case 'emptyString':
                 $this->$var = (string)$val;
                 break;
-            case 'emptyHeader': case 'header':
+            case 'emptyHeader':
+            case 'header':
                 $this->$var = (bool)$val;
                 break;
             case 'columns':
                 $this->$var->Parent = $this;
-                if ($val instanceof \RAAS\ColumnCollection) {
+                if ($val instanceof ColumnCollection) {
                     $this->$var = $val;
-                } elseif (($val instanceof \ArrayObject) || is_array($val)) {
+                } elseif (($val instanceof ArrayObject) || is_array($val)) {
                     foreach ((array)$val as $key => $row) {
-                        $row = new Column($row);
+                        if (!($row instanceof Column)) {
+                            $row = new Column($row);
+                        }
                         $row->Parent = $this;
                         $this->columns[$key] = $row;
                     }
@@ -180,13 +190,13 @@ class Table extends TableElement
 
     /**
      * Конструктор класса
-     * @param array([[имя параметра] => mixed]) $params массив дополнительных свойств, доступных для установки
+     * @param array $params массив дополнительных свойств, доступных для установки
      */
-    public function __construct(array $params = array())
+    public function __construct(array $params = [])
     {
         $this->columns = new ColumnCollection();
         $this->columns->Parent = $this;
-        $this->Set = new \ArrayObject();
+        $this->Set = new ArrayObject();
         parent::__construct($params);
     }
 }

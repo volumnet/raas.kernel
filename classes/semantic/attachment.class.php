@@ -17,12 +17,10 @@ use RAAS\IContext;
  * @property-read string $dirURL URL папки, где размещается файл
  * @property-read string $ext Расширение реального файла
  * @property-read string $fileURL URL файла
- * @property-read string $tnURL URL стандартного эскиза, описанного около
- *     квадрата
+ * @property-read string $tnURL URL стандартного эскиза, описанного около квадрата
  * @property-read string $smallURL URL стандартного эскиза, вписанного в квадрат
  * @property-read string $file Путь к файлу
- * @property-read string $tn Путь к стандартному эскизу, описанному около
- *     квадрата
+ * @property-read string $tn Путь к стандартному эскизу, описанному около квадрата
  * @property-read string $small Путь к стандартному эскизу, вписанному в квадрат
  * @property SOME $parent Родительский объект
  */
@@ -108,7 +106,6 @@ class Attachment extends SOME
                 if (!$this->image) {
                     return false;
                 }
-                $pathinfo = pathinfo($this->realname);
                 return $this->dirpath . '/' .
                     pathinfo($this->realname, PATHINFO_FILENAME) . '_tn.jpg';
                 break;
@@ -116,7 +113,6 @@ class Attachment extends SOME
                 if (!$this->image) {
                     return false;
                 }
-                $pathinfo = pathinfo($this->realname);
                 return $this->dirpath . '/' .
                     pathinfo($this->realname, PATHINFO_FILENAME) . '_small.' .
                     $this->ext;
@@ -182,21 +178,15 @@ class Attachment extends SOME
             unlink($this->dirpath . '/' . $this->realname);
         }
         if ($this->image) {
-            $tnpath = $this->dirpath . '/' .
-                pathinfo($this->realname, PATHINFO_FILENAME) . '_tn.jpg';
-            $smallpath = $this->dirpath . '/' .
-                pathinfo($this->realname, PATHINFO_FILENAME) . '_small.' .
-                pathinfo($this->realname, PATHINFO_EXTENSION);
-            if (is_file($tnpath)) {
-                unlink($tnpath);
+            if (is_file($this->tn)) {
+                unlink($this->tn);
             }
-            if (is_file($smallpath)) {
-                unlink($smallpath);
+            if (is_file($this->small)) {
+                unlink($this->small);
             }
-            $temp = pathinfo($this->realname);
-            $temp = glob($this->dirpath . '/' . $temp['filename'] . '.*.' .
-                $temp['extension']);
-            foreach ($temp as $val) {
+            $pathinfo = pathinfo($this->realname);
+            $glob = glob($this->dirpath . '/' . $pathinfo['filename'] . '.*.' . $pathinfo['extension']);
+            foreach ($glob as $val) {
                 if (is_file($val)) {
                     unlink($val);
                 }
@@ -265,26 +255,13 @@ class Attachment extends SOME
     public function createThumbnail()
     {
         if (is_file($this->file) && $this->image) {
-            Thumbnail::make(
-                $this->file,
-                $this->tn,
-                $this->tnsize ? $this->tnsize : self::tnsize,
-                -1,
-                Thumbnail::THUMBNAIL_CROP,
-                true
-            );
-            if ($this->tn) {
+            $tnSize = $this->tnsize ?: self::tnsize;
+            Thumbnail::make($this->file, $this->tn, $tnSize, -1, Thumbnail::THUMBNAIL_CROP, true);
+            if (is_file($this->tn)) {
                 chmod($this->tn, 0777);
             }
-            Thumbnail::make(
-                $this->file,
-                $this->small,
-                $this->tnsize ? $this->tnsize : self::tnsize,
-                -1,
-                Thumbnail::THUMBNAIL_FRAME,
-                true
-            );
-            if ($this->small) {
+            Thumbnail::make($this->file, $this->small, $tnSize, -1, Thumbnail::THUMBNAIL_FRAME, true);
+            if (is_file($this->small)) {
                 chmod($this->small, 0777);
             }
         }
@@ -395,8 +372,7 @@ class Attachment extends SOME
      */
     protected function getUniqueFilename($ignoreExtension = true)
     {
-        // 2020-03-10, AVS: Заменил pathinfo, т.к. некорректно работает
-        // с русскими буквами
+        // 2020-03-10, AVS: Заменил pathinfo, т.к. некорректно работает с русскими буквами
         if ($this->realname) {
             $initialFilename = $this->realname;
         } else {

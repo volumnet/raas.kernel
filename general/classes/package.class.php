@@ -1,6 +1,10 @@
 <?php
+/**
+ * Пакета "Главная"
+ */
 namespace RAAS\General;
 
+use SOME\Pages;
 use RAAS\Application as Application;
 use RAAS\DBBackup;
 use RAAS\FilesBackup;
@@ -10,6 +14,9 @@ use RAAS\IContext as IContext;
 use RAAS\Level as Level;
 use RAAS\User as User;
 
+/**
+ * Класс пакета "Главная"
+ */
 class Package extends \RAAS\Package
 {
     /**
@@ -53,18 +60,32 @@ class Package extends \RAAS\Package
     }
 
 
-    public function admin_users_showlist(Group $Group, array $IN)
+    /**
+     * Возвращает данные по списку пользователей
+     * @param Group $group Группа для фильтрации
+     * @param array $in <pre><code>[
+     *     'page' =>? int Номер страницы постраничной разбивки,
+     *     'search_string' =>? string Поисковая строка,
+     *     'group_only' =>? bool Искать только по группе,
+     *     'sort' =>? string Поле для сортировки,
+     *     'order' =>? 'asc'|'desc' Направление сортировки
+     * ]</code></pre> Входные данные
+     */
+    public function admin_users_showlist(Group $group, array $in)
     {
-        $Pages = new \SOME\Pages((isset($IN['page']) ? $IN['page'] : 1), Application::i()->registryGet('rowsPerPage'));
-        $from = $where = array();
-        if (isset($IN['search_string'])) {
-            $where[] = array("(login LIKE :search_string OR CONCAT(last_name, ' ', first_name, ' ', second_name) LIKE :search_string)", array(':search_string' => "%" . $this->SQL->escape_like($IN['search_string']) . "%"));
+        $pages = new Pages((isset($in['page']) ? $in['page'] : 1), Application::i()->registryGet('rowsPerPage'));
+        $from = $where = [];
+        if (isset($in['search_string'])) {
+            $where[] = [
+                "(login LIKE :search_string OR CONCAT(last_name, ' ', first_name, ' ', second_name) LIKE :search_string)",
+                [':search_string' => "%" . $this->SQL->escape_like($in['search_string']) . "%"]
+            ];
         }
-        if ($Group->id && (!isset($IN['search_string']) || isset($IN['group_only']))) {
+        if ($group->id && (!isset($in['search_string']) || isset($in['group_only']))) {
             $from[] = User::_dbprefix() . "users_groups_assoc AS tUGA ON tUGA.uid = User.id";
-            $where[] = "tUGA.gid = " . (int)$Group->id;
+            $where[] = "tUGA.gid = " . (int)$group->id;
         }
-        switch (isset($IN['sort']) ? $IN['sort'] : null) {
+        switch (isset($in['sort']) ? $in['sort'] : null) {
             case 'email':
             case 'last_name':
                 $sort = "User." . $_GET['sort'];
@@ -73,31 +94,40 @@ class Package extends \RAAS\Package
                 $sort = "User.login";
                 break;
         }
-        if (strtolower(isset($IN['order']) ? $IN['order'] : null) == 'desc') {
+        if (strtolower(isset($in['order']) ? $in['order'] : null) == 'desc') {
             $order = 'DESC';
         } else {
             $order = 'ASC';
         }
-        $Set = User::getSet(array('from' => $from, 'where' => $where, 'orderBy' => $sort . " " . $order), $Pages);
+        $set = User::getSet(['from' => $from, 'where' => $where, 'orderBy' => $sort . " " . $order], $pages);
 
-        $GSet = $Group->getChildSet('children');
-        return array('Set' => $Set, 'Pages' => $Pages, 'GSet' => $GSet);
+        $gSet = $group->getChildSet('children');
+        return ['Set' => $set, 'Pages' => $pages, 'GSet' => $gSet];
     }
 
 
-    public function checkLoginExists($login, $id = 0)
+    /**
+     * Проверяет, существует ли пользователь с таким именем
+     * @param string $login Логин для поиска
+     * @param int $ignoreId Игнорировать ID# (для поиска пользователей кроме текущего)
+     * @return bool
+     */
+    public function checkLoginExists($login, $ignoreId = 0)
     {
-        $SQL_query = "SELECT COUNT(*) FROM " . User::_tablename() . " WHERE login = ?";
-        $SQL_bind = array($login);
-        if ($id) {
-            $SQL_query .= " AND id != ?";
-            $SQL_bind[] = (int)$id;
+        $sqlQuery = "SELECT COUNT(*) FROM " . User::_tablename() . " WHERE login = ?";
+        $sqlBind = [$login];
+        if ($ignoreId) {
+            $sqlQuery .= " AND id != ?";
+            $sqlBind[] = (int)$ignoreId;
         }
-        $SQL_result = $this->SQL->getvalue(array($SQL_query, $SQL_bind));
-        return (bool)$SQL_result;
+        $sqlResult = $this->SQL->getvalue([$sqlQuery, $sqlBind]);
+        return (bool)$sqlResult;
     }
 
 
+    /**
+     * Генерирует в stdout бэкап SQL-базы в виде дампа
+     */
     public function backupSQL()
     {
         $tmpname = tempnam(sys_get_temp_dir(), '');
@@ -111,6 +141,9 @@ class Package extends \RAAS\Package
         exit;
     }
 
+    /**
+     * Генерирует в stdout бэкап файлов
+     */
     public function backupFiles()
     {
         $tmpname = tempnam(sys_get_temp_dir(), '');
