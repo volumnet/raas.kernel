@@ -1,18 +1,19 @@
 <?php
+/**
+ * Абстрактный контроллер пакета "Главная"
+ */
 namespace RAAS\General;
-use \RAAS\User as User;
-use \RAAS\Group as Group;
-use \RAAS\Level as Level;
-use \RAAS\Redirector as Redirector;
-use \RAAS\Application as Application;
-use \RAAS\Update as Update;
-use \RAAS\IContext as IContext;
-use \RAAS\IRightsContext as IRightsContext;
-use \RAAS\Form as Form;
-use \RAAS\Field as Field;
-use \RAAS\Option as Option;
-use \RAAS\FormTab as FormTab;
 
+use RAAS\Application;
+use RAAS\IContext;
+use RAAS\IRightsContext;
+use RAAS\Form;
+use RAAS\Module;
+use RAAS\Package;
+
+/**
+ * Класс абстрактного контроллера пакета "Главная"
+ */
 abstract class Abstract_Controller extends \RAAS\Abstract_Package_Controller
 {
     protected static $instance;
@@ -22,19 +23,19 @@ abstract class Abstract_Controller extends \RAAS\Abstract_Package_Controller
         if (($this->mode == 'admin') && $this->model->user->adminRights) {
             $this->admin();
         } elseif ($this->mode == 'manual') {
-
         } elseif ($this->mode == 'set_package') {
-
         } elseif ($this->mode == 'set_language') {
-
         } elseif ($this->action == 'edit') {
             $this->edit();
-        } elseif (!in_array($this->mode, array('set_package', 'set_language'))) {
+        } elseif (!in_array($this->mode, ['set_package', 'set_language'])) {
             $this->main();
         }
     }
 
-    private function admin()
+    /**
+     * Раздел администрирования
+     */
+    protected function admin()
     {
         if (($this->sub == 'users') && $this->model->user->canAdminUsers) {
             parent::execute();
@@ -53,10 +54,19 @@ abstract class Abstract_Controller extends \RAAS\Abstract_Package_Controller
         }
     }
 
+
+    /**
+     * Получает контекст
+     * @return IContext
+     */
     public function getContext($safe = true)
     {
         $Context = null;
-        if (isset($this->nav['mid']) && $this->nav['mid'] && (!$safe || ($this->nav['mid'] != '/')) && ($c = $this->application->getContext($this->nav['mid']))) {
+        if (isset($this->nav['mid']) &&
+            $this->nav['mid'] &&
+            (!$safe || ($this->nav['mid'] != '/')) &&
+            ($c = $this->application->getContext($this->nav['mid']))
+        ) {
             $Context = $c;
         } elseif (!$safe) {
             $Context = $this->application;
@@ -64,70 +74,102 @@ abstract class Abstract_Controller extends \RAAS\Abstract_Package_Controller
         return $Context;
     }
 
-    private function edit()
+
+    /**
+     * Редактирование текущего профиля
+     */
+    protected function edit()
     {
         $t = $this;
-        $CONTENT = array();
+        $CONTENT = [];
         foreach ($this->view->availableLanguages as $key => $val) {
-            $CONTENT['languages'][] = array('value' => $key, 'caption' => $val);
+            $CONTENT['languages'][] = ['value' => $key, 'caption' => $val];
         }
-        $Form = new Form(array(
+        $Form = new Form([
             'caption' => htmlspecialchars($this->model->user->full_name ? $this->model->user->full_name : $this->model->user->login),
             'Item' => $this->model->user,
-            'children' => array(
-                array('name' => 'login', 'caption' => $this->view->_('LOGIN'), 'readonly' => 'readonly', 'export' => 'is_null'),
-                array(
+            'children' => [
+                [
+                    'name' => 'login',
+                    'caption' => $this->view->_('LOGIN'),
+                    'readonly' => 'readonly',
+                    'export' => 'is_null',
+                ],
+                [
                     'type' => 'password',
                     'name' => 'password',
                     'caption' => $this->view->_('PASSWORD'),
                     'confirm' => true,
-                    'export' => function($Field) use ($t) {
-                        if ($_POST[$Field->name]) {
-                            $Field->Form->Item->password_md5 = $t->application->md5It(trim($_POST[$Field->name]));
+                    'export' => function ($field) use ($t) {
+                        if ($_POST[$field->name]) {
+                            $field->Form->Item->password_md5 = $t->application->md5It(trim($_POST[$field->name]));
                         }
-                    }
-                ),
-                array('type' => 'email', 'name' => 'email', 'caption' => $this->view->_('EMAIL')),
-                array('name' => 'last_name', 'caption' => $this->view->_('LAST_NAME')),
-                array('name' => 'first_name', 'caption' => $this->view->_('FIRST_NAME')),
-                array('name' => 'second_name', 'caption' => $this->view->_('SECOND_NAME')),
-                array(
+                    },
+                ],
+                [
+                    'type' => 'email',
+                    'name' => 'email',
+                    'caption' => $this->view->_('EMAIL'),
+                ],
+                [
+                    'name' => 'last_name',
+                    'caption' => $this->view->_('LAST_NAME'),
+                ],
+                [
+                    'name' => 'first_name',
+                    'caption' => $this->view->_('FIRST_NAME')
+                ],
+                [
+                    'name' => 'second_name',
+                    'caption' => $this->view->_('SECOND_NAME')
+                ],
+                [
                     'type' => 'select',
                     'name' => 'lang',
                     'caption' => $this->view->_('LANGUAGE'),
                     'children' => $CONTENT['languages'],
                     'default' => $this->view->language,
-                    'import' => function($Field) use ($t) { return $Field->Form->Item->preferences[$Field->name]; },
-                    'export' => function($Field) use ($t) {
-                        $preferences = $Field->Form->Item->preferences;
-                        if (isset($_POST[$Field->name])) {
-                            $preferences['lang'] = $_POST[$Field->name];
+                    'import' => function ($field) {
+                        return $field->Form->Item->preferences[$field->name];
+                    },
+                    'export' => function ($field) {
+                        $preferences = $field->Form->Item->preferences;
+                        if (isset($_POST[$field->name])) {
+                            $preferences['lang'] = $_POST[$field->name];
                         }
-                        $Field->Form->Item->preferences = $preferences;
+                        $field->Form->Item->preferences = $preferences;
                     }
-                )
-            )
-        ));
+                ]
+            ],
+        ]);
         ViewSub_Users::i()->edit_user($Form->process());
     }
 
+
+    /**
+     * Страница приветствия
+     */
     protected function main()
     {
-        $OUT = array();
-        $OUT['CONTENT']['H'] = date('H');
+        $out = [];
+        $out['CONTENT']['H'] = date('H');
 
-        $OUT['CONTENT']['ip'] = $_SERVER['REMOTE_ADDR'];
-        $OUT['CONTENT']['serverIP'] = $_SERVER['SERVER_ADDR'];
-        $OUT['CONTENT']['NAME'] = Application::i()->versionName;
+        $out['CONTENT']['ip'] = $_SERVER['REMOTE_ADDR'];
+        $out['CONTENT']['serverIP'] = $_SERVER['SERVER_ADDR'];
+        $out['CONTENT']['NAME'] = Application::i()->versionName;
         if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-            $OUT['CONTENT']['proxy'] = $_SERVER['HTTP_X_FORWARDED_FOR'];
+            $out['CONTENT']['proxy'] = $_SERVER['HTTP_X_FORWARDED_FOR'];
         }
-        $this->view->main($OUT);
+        $this->view->main($out);
     }
 
+
+    /**
+     * Получает URL контекста
+     */
     public function getContextURL(IRightsContext $Context)
     {
-        if (($Context instanceof \RAAS\Package) ||  ($Context instanceof \RAAS\Module)) {
+        if (($Context instanceof Package) ||  ($Context instanceof Module)) {
             return '&mid=' . $Context->mid;
         } else {
             return '';

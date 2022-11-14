@@ -27,10 +27,6 @@ class Controller_Web extends Abstract_Controller
     {
         if (get_class($this) == __CLASS__) {
             $this->view = View_Web::i();
-
-            if (isset($_COOKIE['p'])) {
-                $this->packageName = strtolower($_COOKIE['p']);
-            }
         }
         parent::init();
     }

@@ -369,11 +369,7 @@ abstract class Package extends Singleton implements IRightsContext
     public function setEntitiesPriority($classname, array $priorities = [])
     {
         foreach ($priorities as $key => $val) {
-            $this->SQL->update(
-                $classname::_tablename(),
-                "id = " . (int)$key,
-                ['priority' => (int)$val]
-            );
+            $this->SQL->update($classname::_tablename(), "id = " . (int)$key, ['priority' => (int)$val]);
         }
     }
 }

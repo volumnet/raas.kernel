@@ -53,7 +53,6 @@ abstract class Abstract_Package_Controller extends Singleton implements IAbstrac
             case 'view':
                 return $this->view;
                 break;
-
             case 'url':
                 return '?p=' . $this->model->alias;
                 break;
@@ -73,11 +72,7 @@ abstract class Abstract_Package_Controller extends Singleton implements IAbstrac
             $classname = Namespaces::getClass($this->parent->view);
             $NS = Namespaces::getNS($this);
             $classname = $NS . '\\' . $classname;
-            if (class_exists($classname)) {
-                $this->view = $classname::i();
-            } else {
-                throw new Exception($this->application->view->_('INVALID_VIEW_FOR_PACKAGE'));
-            }
+            $this->view = $classname::i();
         }
     }
 
@@ -96,7 +91,7 @@ abstract class Abstract_Package_Controller extends Singleton implements IAbstrac
     protected function execute()
     {
         if ($this->sub) {
-            $NS = \SOME\Namespaces::getNS($this);
+            $NS = Namespaces::getNS($this);
             $classname = $NS . '\\Sub_' . ucfirst($this->sub);
             if (class_exists($classname)) {
                 return $classname::i()->run();

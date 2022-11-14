@@ -1,20 +1,21 @@
 <?php
+/**
+ * Представление подмодуля "Пользователи"
+ */
 namespace RAAS\General;
-use \RAAS\User as User;
-use \RAAS\Group as Group;
-use \RAAS\Level as Level;
-use \RAAS\IContext as IContext;
-use \RAAS\IRightsContext as IRightsContext;
-use \RAAS\Table as Table;
-use \RAAS\Column as Column;
-use \RAAS\Row as Row;
-use \RAAS\View_StdSub as View_StdSub;
 
+use RAAS\User;
+use RAAS\Group;
+use RAAS\IRightsContext;
+
+/**
+ * Класс представления подмодуля "Пользователи"
+ */
 class ViewSub_Users extends \RAAS\Abstract_Sub_View
 {
     protected static $instance;
-    
-    
+
+
     public function __get($var)
     {
         switch ($var) {
@@ -27,196 +28,220 @@ class ViewSub_Users extends \RAAS\Abstract_Sub_View
         }
     }
 
-    
-    public function edit_user(array $IN = array())
+
+    public function edit_user(array $in = [])
     {
         if ($this->sub == 'users') {
-            $this->path[] = array('name' => $this->_('USERS_AND_GROUPS'), 'href' => $this->url);
+            $this->path[] = ['name' => $this->_('USERS_AND_GROUPS'), 'href' => $this->url];
             $this->submenu = $this->getGroupsMenu(new Group(), new Group());
         }
-        $this->stdView->stdEdit($IN, ($IN['Item']->id && $this->application->user->root) ? 'getUserContextMenu' : '');
+        $this->stdView->stdEdit($in, ($in['Item']->id && $this->application->user->root) ? 'getUserContextMenu' : '');
     }
-    
-    
-    public function edit_group(array $IN = array())
-    {
-        $this->getGroupsPath($IN['Item']);
-        $this->submenu = $this->getGroupsMenu(new Group(), $IN['Item']->parent);
-        $this->stdView->stdEdit($IN, 'getGroupContextMenu');
-    }
-    
 
-    public function user_rights(array $IN = array())
+
+    public function edit_group(array $in = [])
     {
-        $this->path[] = array('name' => $this->_('USERS_AND_GROUPS'), 'href' => $this->url);
-        $this->path[] = array(
-            'name' => htmlspecialchars($IN['Item']->full_name ? $IN['Item']->full_name : $IN['Item']->login), 
-            'href' => $this->url . '&action=edit_user&id=' . (int)$IN['Item']->id . '#rights'
-        );
+        $this->getGroupsPath($in['Item']);
+        $this->submenu = $this->getGroupsMenu(new Group(), $in['Item']->parent);
+        $this->stdView->stdEdit($in, 'getGroupContextMenu');
+    }
+
+
+    public function user_rights(array $in = [])
+    {
+        $this->path[] = ['name' => $this->_('USERS_AND_GROUPS'), 'href' => $this->url];
+        $this->path[] = [
+            'name' => htmlspecialchars($in['Item']->full_name ? $in['Item']->full_name : $in['Item']->login),
+            'href' => $this->url . '&action=edit_user&id=' . (int)$in['Item']->id . '#rights'
+        ];
         $this->submenu = $this->getGroupsMenu(new Group(), new Group());
-        $this->contextmenu = $this->getUserRightsContextMenu($IN['Item'], $IN['Context']);
-        $this->stdView->stdEdit($IN);
+        $this->contextmenu = $this->getUserRightsContextMenu($in['Item'], $in['Context']);
+        $this->stdView->stdEdit($in);
    }
-    
 
-    public function group_rights(array $IN = array())
+
+    public function group_rights(array $in = [])
     {
-        $this->getGroupsPath($IN['Item']);
-        $this->path[] = array('name' => htmlspecialchars($IN['Item']->name), 'href' => $this->url . '&action=edit_group&id=' . (int)$IN['Item']->id . '#rights');
-        $this->submenu = $this->getGroupsMenu(new Group(), $IN['Item']->parent);
-        $this->contextmenu = $this->getGroupRightsContextMenu($IN['Item'], $IN['Context']);
-        $this->stdView->stdEdit($IN);
+        $this->getGroupsPath($in['Item']);
+        $this->path[] = [
+            'name' => htmlspecialchars($in['Item']->name),
+            'href' => $this->url . '&action=edit_group&id=' . (int)$in['Item']->id . '#rights'
+        ];
+        $this->submenu = $this->getGroupsMenu(new Group(), $in['Item']->parent);
+        $this->contextmenu = $this->getGroupRightsContextMenu($in['Item'], $in['Context']);
+        $this->stdView->stdEdit($in);
     }
 
 
-    public function showlist(array $IN = array())
+    public function showlist(array $in = [])
     {
         $view = $this;
-        $IN['UsersTable'] = new UsersTable(array(
-            'Group' => $IN['Group'], 
-            'Set' => $IN['CONTENT']['Set'], 
-            'Pages' => $IN['CONTENT']['Pages'], 
-            'sort' => $IN['CONTENT']['sort'], 
-            'order' => $IN['CONTENT']['order']
-        ));
+        $in['UsersTable'] = new UsersTable([
+            'Group' => $in['Group'],
+            'Set' => $in['CONTENT']['Set'],
+            'Pages' => $in['CONTENT']['Pages'],
+            'sort' => $in['CONTENT']['sort'],
+            'order' => $in['CONTENT']['order']
+        ]);
 
-        $IN['GroupsTable'] = new GroupsTable(array('Set' => $IN['CONTENT']['GSet']));
+        $in['GroupsTable'] = new GroupsTable(['Set' => $in['CONTENT']['GSet']]);
 
-        $this->assignVars($IN);
-        $this->getGroupsPath($IN['Group']);
-        $this->submenu = $this->getGroupsMenu(new Group(), $IN['Group']);
-        $this->contextmenu[] = array(
-            'href' => $this->url . '&action=edit_user' . ((int)$IN['Group']->id ? '&pid=' . (int)$IN['Group']->id : ''), 
+        $this->assignVars($in);
+        $this->getGroupsPath($in['Group']);
+        $this->submenu = $this->getGroupsMenu(new Group(), $in['Group']);
+        $this->contextmenu[] = [
+            'href' => $this->url . '&action=edit_user' . ((int)$in['Group']->id ? '&pid=' . (int)$in['Group']->id : ''),
             'name' => $this->_('ADD_USER2'),
             'icon' => 'plus'
-        );
-        $this->contextmenu[] = array(
-            'href' => $this->url . '&action=edit_group' . ((int)$IN['Group']->id ? '&pid=' . (int)$IN['Group']->id : ''), 
+        ];
+        $this->contextmenu[] = [
+            'href' => $this->url . '&action=edit_group' . ((int)$in['Group']->id ? '&pid=' . (int)$in['Group']->id : ''),
             'name' => $this->_('ADD_GROUP2'),
             'icon' => 'plus'
-        );
-        if ($IN['Group']->id) {
-            $this->contextmenu[] = array(
-                'href' => $this->url . '&action=edit_group&id=' . (int)$IN['Group']->id, 'name' => $this->_('EDIT_GROUP2'), 'icon' => 'edit'
-            );
-            $this->contextmenu[] = array(
-                'href' => $this->url . '&action=delete_group&id=' . (int)$IN['Group']->id, 
+        ];
+        if ($in['Group']->id) {
+            $this->contextmenu[] = [
+                'href' => $this->url . '&action=edit_group&id=' . (int)$in['Group']->id,
+                'name' => $this->_('EDIT_GROUP2'),
+                'icon' => 'edit'
+            ];
+            $this->contextmenu[] = [
+                'href' => $this->url . '&action=delete_group&id=' . (int)$in['Group']->id,
                 'name' => $this->_('DELETE_GROUP'),
-                'icon' => 'remove', 
+                'icon' => 'remove',
                 'onclick' => "return confirm('" . $this->_('DELETE_GROUP_TEXT') . "')"
-            );
+            ];
         }
-        $this->title = $IN['Group']->id ? htmlspecialchars($IN['Group']->name) : $this->_('USERS_AND_GROUPS');
+        $this->title = $in['Group']->id ? htmlspecialchars($in['Group']->name) : $this->_('USERS_AND_GROUPS');
         $this->template = 'admin_users_showlist';
     }
-    
-    
-    public function getUserContextMenu(User $Item, Group $Group = null) 
+
+
+    public function getUserContextMenu(User $item, Group $group = null)
     {
-        $arr = array();
-        if ($Item->id) {
+        $arr = [];
+        if ($item->id) {
             $edit = ($this->action == 'edit_user');
             $edit2 = ($this->action == 'edit');
             if (!$edit && !$edit2) {
-                $arr[] = array('href' => $this->url . '&action=edit_user&id=' . (int)$Item->id, 'name' => $this->_('EDIT'), 'icon' => 'edit');
+                $arr[] = [
+                    'href' => $this->url . '&action=edit_user&id=' . (int)$item->id,
+                    'name' => $this->_('EDIT'),
+                    'icon' => 'edit'
+                ];
             }
-            if (isset($Group->id) && $Group->id) {
-                if (in_array($Group->id, $Item->groups_ids)) {
-                    $arr[] = array(
-                        'href' => $this->url . '&action=del_group&id=' . (int)$Item->id . '&gid=' . (int)$Group->id . ($edit ? '' : '&back=1'), 
-                        'name' => $this->_('DELETE_FROM_GROUP'), 
+            if (isset($group->id) && $group->id) {
+                if (in_array($group->id, $item->groups_ids)) {
+                    $arr[] = [
+                        'href' => $this->url . '&action=del_group&id=' . (int)$item->id
+                            . '&gid=' . (int)$group->id . ($edit ? '' : '&back=1'),
+                        'name' => $this->_('DELETE_FROM_GROUP'),
                         'icon' => 'remove-circle'
-                    );
+                    ];
                 } else {
-                    $arr[] = array(
-                        'href' => $this->url . '&action=add_group&id=' . (int)$Item->id . '&gid=' . (int)$Group->id . ($edit ? '' : '&back=1'), 
-                        'name' => $this->_('ADD_TO_GROUP'), 
+                    $arr[] = [
+                        'href' => $this->url . '&action=add_group&id=' . (int)$item->id
+                            . '&gid=' . (int)$group->id . ($edit ? '' : '&back=1'),
+                        'name' => $this->_('ADD_TO_GROUP'),
                         'icon' => 'ok-circle'
-                    );
+                    ];
                 }
             }
-            if ($Item->id != $this->application->user->id) {
-                $arr[] = array(
-                    'href' => $this->url . '&action=delete_user&id=' . (int)$Item->id . ($edit ? '' : '&back=1'), 
-                    'name' => $this->_('DELETE'), 
-                    'icon' => 'remove', 
+            if ($item->id != $this->application->user->id) {
+                $arr[] = [
+                    'href' => $this->url . '&action=delete_user&id=' . (int)$item->id . ($edit ? '' : '&back=1'),
+                    'name' => $this->_('DELETE'),
+                    'icon' => 'remove',
                     'onclick' => 'return confirm(\'' . $this->_('DELETE_USER_TEXT') . '\')'
-                  );
+                  ];
             }
         }
         return $arr;
     }
-    
 
-    public function getGroupContextMenu(Group $Item)
+
+    public function getGroupContextMenu(Group $item)
     {
-        return $this->stdView->stdContextMenu($Item, 0, 0, 'edit_group', '', 'delete_group');
+        return $this->stdView->stdContextMenu($item, 0, 0, 'edit_group', '', 'delete_group');
     }
-    
 
-    public function getUserRightsContextMenu(User $Item, IRightsContext $Context)
+
+    public function getUserRightsContextMenu(User $item, IRightsContext $Context)
     {
-        $arr = array();
-        if ($Item->id && $Context->hasRights && ($Item->id != $this->application->user->id)) {
+        $arr = [];
+        if ($item->id && $Context->hasRights && ($item->id != $this->application->user->id)) {
             $edit = ($this->action == 'user_rights');
             if (!$edit) {
-                $arr[] = array(
-                    'name' => $this->_('EDIT_RIGHTS'), 'href' => $this->url . $this->getContextURL($Context) . '&action=user_rights&id=' . (int)$Item->id, 'icon' => 'lock'
-                );
+                $arr[] = [
+                    'name' => $this->_('EDIT_RIGHTS'),
+                    'href' => $this->url . $this->getContextURL($Context) . '&action=user_rights&id=' . (int)$item->id,
+                    'icon' => 'lock'
+                ];
             }
-            if ($Item->access($Context)->selfRights) {
-                $arr[] = array(
-                    'name' => $this->_('DELETE_RIGHTS'), 
-                    'href' => $this->url . $this->getContextURL($Context) . '&action=delete_user_rights&id=' . (int)$Item->id . ($edit ? '' : '&back=1'),
+            if ($item->access($Context)->selfRights) {
+                $arr[] = [
+                    'name' => $this->_('DELETE_RIGHTS'),
+                    'href' => $this->url . $this->getContextURL($Context)
+                        . '&action=delete_user_rights&id=' . (int)$item->id . ($edit ? '' : '&back=1'),
                     'icon' => 'remove',
                     'onclick' => 'return confirm(\'' . $this->_('DELETE_RIGHTS_TEXT') . '\')'
-                );
+                ];
             }
         }
         return $arr;
     }
-    
 
-    public function getGroupRightsContextMenu(Group $Item, IRightsContext $Context)
+
+    public function getGroupRightsContextMenu(Group $item, IRightsContext $Context)
     {
-        $arr = array();
+        $arr = [];
         if ($Context->hasRights) {
             $edit = ($this->action == 'group_rights');
             if (!$edit) {
-                $arr[] = array(
-                    'name' => $this->_('EDIT_RIGHTS'), 'href' => $this->url . $this->getContextURL($Context) . '&action=group_rights&id=' . (int)$Item->id, 'icon' => 'lock'
-                );
+                $arr[] = [
+                    'name' => $this->_('EDIT_RIGHTS'),
+                    'href' => $this->url . $this->getContextURL($Context) . '&action=group_rights&id=' . (int)$item->id,
+                    'icon' => 'lock',
+                ];
             }
-            if ($Item->access($Context)->selfRights) {
-                $arr[] = array(
-                    'name' => $this->_('DELETE_RIGHTS'), 
-                    'href' => $this->url . $this->getContextURL($Context) . '&action=delete_group_rights&id=' . (int)$Item->id . ($edit ? '' : '&back=1'),
+            if ($item->access($Context)->selfRights) {
+                $arr[] = [
+                    'name' => $this->_('DELETE_RIGHTS'),
+                    'href' => $this->url . $this->getContextURL($Context)
+                        . '&action=delete_group_rights&id=' . (int)$item->id . ($edit ? '' : '&back=1'),
                     'icon' => 'remove',
                     'onclick' => 'return confirm(\'' . $this->_('DELETE_RIGHTS_TEXT') . '\')'
-                );
+                ];
             }
         }
         return $arr;
     }
 
 
-    private function getGroupsMenu(Group $node, Group $current)
+    protected function getGroupsMenu(Group $node, Group $current)
     {
-        $submenu = array();
+        $submenu = [];
         foreach ($node->children as $row) {
-            $submenu[] = array('name' => htmlspecialchars($row->name), 'href' => $this->url . '&id=' . (int)$row->id, 'submenu' => $this->getGroupsMenu($row, $current));
+            $submenu[] = [
+                'name' => htmlspecialchars($row->name),
+                'href' => $this->url . '&id=' . (int)$row->id,
+                'submenu' => $this->getGroupsMenu($row, $current)
+            ];
         }
         return $submenu;
     }
-    
 
-    private function getGroupsPath(Group $Group)
+
+    protected function getGroupsPath(Group $group)
     {
-        if ($Group->id || $Group->pid) {
-            $this->path[] = array('name' => $this->_('USERS_AND_GROUPS'), 'href' => $this->url . '#groups');
-            if ($Group->parents) {
-                foreach ($Group->parents as $row) {
-                    $this->path[] = array('name' => htmlspecialchars($row->name), 'href' => $this->url . '&id=' . (int)$row->id . '#groups');
+        if ($group->id || $group->pid) {
+            $this->path[] = ['name' => $this->_('USERS_AND_GROUPS'), 'href' => $this->url . '#groups'];
+            if ($group->parents) {
+                foreach ($group->parents as $row) {
+                    $this->path[] = [
+                        'name' => htmlspecialchars($row->name),
+                        'href' => $this->url . '&id=' . (int)$row->id . '#groups'
+                    ];
                 }
             }
         }

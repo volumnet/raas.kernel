@@ -5,6 +5,7 @@
 namespace RAAS\General;
 
 use RAAS\Abstract_Sub_Controller;
+use RAAS\Application;
 use RAAS\User;
 use RAAS\Group;
 use RAAS\Redirector;
@@ -47,6 +48,9 @@ class Sub_Users extends Abstract_Sub_Controller
                 break;
             case 'delete_user':
                 $item = new User((int)$this->id);
+                if ($item->id == Application::i()->user->id) {
+                    exit; // Не должен иметь возможность сам себя удалить
+                }
                 StdSub::delete(
                     $item,
                     $this->url,
@@ -124,7 +128,7 @@ class Sub_Users extends Abstract_Sub_Controller
     /**
      * Редактирование пользователя
      */
-    private function editUser()
+    protected function editUser()
     {
         $item = new User((int)$this->id);
         $form = new EditUserForm(['Item' => $item]);
@@ -135,7 +139,7 @@ class Sub_Users extends Abstract_Sub_Controller
     /**
      * Редактирование группы
      */
-    private function editGroup()
+    protected function editGroup()
     {
         $item = new Group((int)$this->id);
         if (!$item->id) {
@@ -149,7 +153,7 @@ class Sub_Users extends Abstract_Sub_Controller
     /**
      * Права пользователя
      */
-    private function userRights()
+    protected function userRights()
     {
         $context = $this->getContext();
         $item = new User((int)$this->id);
@@ -174,7 +178,7 @@ class Sub_Users extends Abstract_Sub_Controller
     /**
      * Права группы
      */
-    private function groupRights()
+    protected function groupRights()
     {
         $context = $this->getContext();
         $item = new Group((int)$this->id);
@@ -199,7 +203,7 @@ class Sub_Users extends Abstract_Sub_Controller
     /**
      * Отображение списка пользователей
      */
-    private function showlist()
+    protected function showlist()
     {
         $group = new Group($this->id);
         $content = $this->model->admin_users_showlist($group, $this->nav);

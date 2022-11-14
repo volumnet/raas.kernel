@@ -8,11 +8,11 @@
  */
 namespace RAAS;
 
+use RecursiveIteratorIterator;
+use RecursiveDirectoryIterator;
 use ReflectionClass;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
-use RecursiveIteratorIterator;
-use RecursiveDirectoryIterator;
 use SOME\DB;
 use SOME\File;
 use SOME\Namespaces;
@@ -27,13 +27,9 @@ use SOME\SOME;
  * @property Module $activeModule активный модуль
  * @property IContext $context активный модуль или пакет
  * @property-read string $configFile путь к файлу системных настроек
- * @property-read array<string> $availableDatabases массив названий доступных
- *                                                  СУБД в виде
+ * @property-read string[] $availableDatabases массив названий доступных СУБД в виде
  *                                                  'alias' => 'Название СУБД'
  * @property-read bool $debug режим отладки
- * @property-read array<Exception> $exceptions массив исключений
- * @property-read array<\Exception> $sqlExceptions массив исключений
- *                                                 по SQL-запросам
  * @property User $user активный пользователь системы
  * @property-read DB $SQL подключение к базе данных
  * @property-read string $DSN строка подключения к базе данных
@@ -70,18 +66,6 @@ final class Application extends Singleton implements IContext
      * @var array
      */
     private $config = [];
-
-    /**
-     * Массив системных исключений
-     * @var array
-     */
-    private $exceptions = [];
-
-    /**
-     * Массив исключений при работе с базой данных
-     * @var array
-     */
-    private $sqlExceptions = [];
 
     /**
      * Экземпляр подключения к базе данных
@@ -258,8 +242,6 @@ final class Application extends Singleton implements IContext
                 break;
             case 'packages':
             case 'activePackage':
-            case 'exceptions':
-            case 'sqlExceptions':
             case 'SQL':
             case 'user':
                 return $this->$var;
@@ -329,7 +311,7 @@ final class Application extends Singleton implements IContext
 
         $classname = ('RAAS\\Controller_' . ucfirst($controller));
         if (!class_exists($classname)) {
-            $classname = 'RAAS\\Controller_' . ucfirst('web');
+            $classname = 'RAAS\\Controller_Web';
         }
 
         $this->controller = $classname::i();
@@ -339,7 +321,7 @@ final class Application extends Singleton implements IContext
 
      /**
      * Обработчик ошибок
-     * @param Exception|int либо исключение (если передается исключение),
+     * @param \Exception|int либо исключение (если передается исключение),
      *                      либо внутренний номер ошибки
      *                      (если передается ошибка)
      * @param string текстовое описание ошибки (если передается ошибка)
@@ -376,9 +358,6 @@ final class Application extends Singleton implements IContext
                 break;
             }
         }
-        if (count($this->exceptions) < 10) {
-            $this->exceptions[] = $e;
-        }
         if (!$this->prod) {
             echo '<pre class="error">' .
                     $e->getMessage() .
@@ -392,54 +371,14 @@ final class Application extends Singleton implements IContext
 
 
     /**
-     * Обработчик исключений при работе с базой данных
-     * @param \Exception $e исключение
-     */
-    public function sqlErrorHandler(\Exception $e)
-    {
-        throw $e;
-    }
-
-
-    /**
-     * Обработчик запросов
-     * @param string $query текст запроса
-     *                      (возможно, с заменителями для подстановок)
-     * @param array $bind массив подстановок
-     *                    (ассоциированный или индексированный)
-     * @param float $time время выполнения запроса
-     */
-    public function queryHandler($query = '', $bind = [], $time = 0)
-    {
-    }
-
-
-    /**
      * Инициализация базы данных
      * @return bool true, если подключение прошло успешно,
      *              false в противном случае
      */
     public function initDB()
     {
-        if (!trim($this->DSN) ||
-            !trim($this->config['dbuser']) ||
-            !trim($this->config['dbname'])
-        ) {
-            return false;
-        }
-        try {
-            $this->SQL = new DB(
-                $this->DSN,
-                $this->config['dbuser'],
-                $this->config['dbpass'],
-                'utf8',
-                [$this, 'sqlErrorHandler'],
-                [$this, 'queryHandler']
-            );
-            return (!$this->sqlExceptions);
-        } catch (\Exception $e) {
-            return false;
-        }
+        $this->SQL = new DB($this->DSN, $this->config['dbuser'], $this->config['dbpass'], 'utf8');
+        return true;
     }
 
 
@@ -591,6 +530,11 @@ final class Application extends Singleton implements IContext
     }
 
 
+    /**
+     * Готовит SQL-запрос, заменяя переменную префикса {$DBPREFIX} на реальный префикс
+     * @param string $sqlQuery Шаблон запроса
+     * @return string
+     */
     public function prepareSQL($sqlQuery)
     {
         $sqlQuery = strtr($sqlQuery, [
@@ -623,8 +567,7 @@ final class Application extends Singleton implements IContext
         }
 
         // Ищем среди карты классов
-        $classMapFile = $this->baseDir
-                      . '/vendor/composer/autoload_classmap.php';
+        $classMapFile = $this->baseDir . '/vendor/composer/autoload_classmap.php';
         if (is_file($classMapFile)) {
             $classnames = include $classMapFile;
             $classnames = array_keys((array)$classnames);
@@ -685,20 +628,15 @@ final class Application extends Singleton implements IContext
      */
     public function md5It($string)
     {
-        return md5(
-            $string .
-            md5($string . Application::generalSalt) .
-            Application::generalSalt
-        );
+        return md5($string . md5($string . Application::generalSalt) . Application::generalSalt);
     }
 
 
     /**
      * Получение контекста по строке mid
      * @param string $mid Строка вида "/", "Пакет" или "Пакет.Модуль"
-     * @param bool $treatSlashAsApplication при установке в true
-     *                                      по строке "/" возвращает приложение,
-     *                                      в противном случае корневой пакет
+     * @param bool $treatSlashAsApplication при установке в true по строке "/" возвращает приложение,
+     *     в противном случае корневой пакет
      * @return IContext контекст
      */
     public function getContext($mid = '', $treatSlashAsApplication = false)

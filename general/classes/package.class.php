@@ -5,14 +5,11 @@
 namespace RAAS\General;
 
 use SOME\Pages;
-use RAAS\Application as Application;
+use RAAS\Application;
 use RAAS\DBBackup;
 use RAAS\FilesBackup;
-use RAAS\Group as Group;
-use RAAS\IRightsContext as IRightsContext;
-use RAAS\IContext as IContext;
-use RAAS\Level as Level;
-use RAAS\User as User;
+use RAAS\Group;
+use RAAS\User;
 
 /**
  * Класс пакета "Главная"

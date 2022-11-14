@@ -35,48 +35,6 @@ abstract class Abstract_Controller extends Singleton implements IAbstract_Contex
     protected $view;
 
     /**
-     * Режим работы (обычный, админка, справка и т.д.)
-     * @var string|null null, если обычный
-     */
-    protected $mode = '';
-
-    /**
-     * Идентификатор активного пакета
-     * @var string|null null, если general
-     */
-    protected $packageName = '';
-
-    /**
-     * Идентификатор активного модуля
-     * @var string|null null, если нет
-     */
-    protected $moduleName = '';
-
-    /**
-     * Идентификатор активного подмодуля
-     * @var string|null null, если нет
-     */
-    protected $sub = '';
-
-    /**
-     * Идентификатор действия
-     * @var string|null null, если нет
-     */
-    protected $action = '';
-
-    /**
-     * Идентификатор активного объекта
-     * @var int|null null, если нет
-     */
-    protected $id = 0;
-
-    /**
-     * Массив прочих навигационных параметров
-     * @var array
-     */
-    protected $nav = [];
-
-    /**
      * Экземпляр класса
      * @var Abstract_Controller
      */
@@ -96,14 +54,38 @@ abstract class Abstract_Controller extends Singleton implements IAbstract_Contex
             case 'context':
                 return Application::i()->context->controller;
                 break;
-            case 'mode':
             case 'packageName':
+                $packageName = '';
+                if (isset($_GET['p'])) {
+                    $packageName = strtolower(trim($_GET['p']));
+                } elseif (isset($_COOKIE['p'])) {
+                    $packageName = strtolower(trim($_COOKIE['p']));
+                }
+                if ($packageName == '/') {
+                    $packageName = '';
+                }
+                return $packageName;
+                break;
             case 'moduleName':
+                $moduleName = '';
+                if (isset($_GET['m'])) {
+                    $moduleName = strtolower(trim($_GET['m']));
+                }
+                if ($moduleName == '/') {
+                    $moduleName = '';
+                }
+                return $moduleName;
+                break;
             case 'sub':
             case 'action':
+            case 'mode':
+                return isset($_GET[$var]) ? strtolower(trim($_GET[$var])) : '';
+                break;
             case 'id':
+                return isset($_GET['id']) ? (int)$_GET['id'] : 0;
+                break;
             case 'nav':
-                return $this->$var;
+                return $_GET;
                 break;
         }
     }
@@ -117,32 +99,6 @@ abstract class Abstract_Controller extends Singleton implements IAbstract_Contex
         if (!$this->view) {
             exit;
         }
-        if (isset($_GET['mode'])) {
-            $this->mode = strtolower(trim($_GET['mode']));
-        }
-        if (isset($_GET['p'])) {
-            $this->packageName = strtolower(trim($_GET['p']));
-        }
-        if ($this->packageName == '/') {
-            $this->packageName = '';
-        }
-        if (isset($_GET['m'])) {
-            $this->moduleName = strtolower(trim($_GET['m']));
-        }
-        if ($this->moduleName == '/') {
-            $this->moduleName = '';
-        }
-        if (isset($_GET['sub'])) {
-            $this->sub = strtolower(trim($_GET['sub']));
-        }
-        if (isset($_GET['action'])) {
-            $this->action = strtolower(trim($_GET['action']));
-        }
-        if (isset($_GET['id'])) {
-            $this->id = (int)$_GET['id'];
-        }
-        $nav = $_GET;
-        $this->nav = $nav;
     }
 
 

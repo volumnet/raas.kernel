@@ -35,10 +35,20 @@ abstract class Abstract_Controller_Cron extends Abstract_Controller
 
     protected static $instance;
 
+    public function __get($var)
+    {
+        switch ($var) {
+            case 'nav':
+                return $GLOBALS['argv'];
+                break;
+            default:
+                return parent::__get($var);
+                break;
+        }
+    }
+
     protected function init()
     {
-        $nav = $GLOBALS['argv'];
-        $this->nav = $nav;
     }
 
 
