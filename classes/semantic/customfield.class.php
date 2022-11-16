@@ -1015,7 +1015,7 @@ abstract class CustomField extends SOME
      */
     protected function getCaption($key = '')
     {
-        if (!$key) {
+        if (trim($key) === '') {
             return null;
         }
         if (!static::$sourceAssocCache[$this->id]) {

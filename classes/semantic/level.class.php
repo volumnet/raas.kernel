@@ -1,10 +1,10 @@
-<?php 
+<?php
 namespace RAAS;
 class Level extends \SOME\SOME
 {
     const GRANT_ALL = -1;
     const REVOKE_ALL = -2;
-    
+
     protected static $tablename = 'levels';
     protected static $defaultOrderBy = "priority";
     protected static $aiPriority = true;
@@ -23,19 +23,19 @@ class Level extends \SOME\SOME
                 break;
         }
     }
-    
+
     public function commit()
     {
         $this->access = @json_encode($this->meta['rights']);
         Access::flushRights();
         parent::commit();
     }
-    
+
     protected function _Context()
     {
         return Application::i()->getContext($this->m);
     }
-    
+
     protected function _rights()
     {
         return @json_decode($this->access, true);
