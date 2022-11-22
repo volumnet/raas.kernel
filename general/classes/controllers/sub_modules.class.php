@@ -5,6 +5,7 @@ use SOME\HTTP;
 use RAAS\Abstract_Sub_Controller;
 use RAAS\Application;
 use RAAS\Form;
+use RAAS\FieldContainer;
 use RAAS\IRightsContext;
 use RAAS\Level;
 use RAAS\Module;
@@ -186,16 +187,26 @@ class Sub_Modules extends Abstract_Sub_Controller
                 } else {
                     foreach ($Form->children as $row) {
                         if ($f = $row->import) {
-                            $DATA[$row->name] = $f($row);
+                            if ($row instanceof FieldContainer) {
+                                $DATA = array_merge($DATA, $f($row));
+                            } else {
+                                $DATA[$row->name] = $f($row);
+                            }
                         } else {
-                            $DATA[$row->name] = $Context->registryGet($row->name);
-                            if ($row->name == 'installDate') {
-                                $DATA[$row->name] = date(
-                                    $Context->view->_('DATEFORMAT'),
-                                    strtotime($DATA[$row->name])
-                                );
-                            } elseif ($row->name == 'isActive') {
-                                $DATA[$row->name] = (int)$DATA[$row->name];
+                            if ($row instanceof FieldContainer) {
+                                foreach ($row->children as $child) {
+                                    $DATA[$child->name] = $Context->registryGet($child->name);
+                                }
+                            } else {
+                                $DATA[$row->name] = $Context->registryGet($row->name);
+                                if ($row->name == 'installDate') {
+                                    $DATA[$row->name] = date(
+                                        $Context->view->_('DATEFORMAT'),
+                                        strtotime($DATA[$row->name])
+                                    );
+                                } elseif ($row->name == 'isActive') {
+                                    $DATA[$row->name] = (int)$DATA[$row->name];
+                                }
                             }
                         }
                     }
