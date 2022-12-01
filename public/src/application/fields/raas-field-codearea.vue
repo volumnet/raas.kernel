@@ -13,7 +13,11 @@ export default {
         }
     },
     mounted() {
-        CodeMirror.fromTextArea(this.$el, this.codeAreaConfig);
+        const cm = CodeMirror.fromTextArea(this.$el, this.codeAreaConfig);
+        cm.on('change', () => {
+            this.pValue = cm.getValue();
+            this.$emit('input', this.pValue);
+        });
     },
     computed: {
         codeAreaConfig() {
@@ -25,6 +29,12 @@ export default {
                 enterMode: "keep", 
                 tabMode: "shift", 
                 tabSize: 2,
+                extraKeys: {
+                    Tab: function (cm) {
+                        var spaces = Array(cm.getOption('indentUnit') + 1).join(' ');
+                        cm.replaceSelection(spaces);
+                    },
+                },
             };
             if (this.dataMime) {
                 result['mode'] = this.dataMime;

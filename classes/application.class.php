@@ -111,6 +111,7 @@ final class Application extends Singleton implements IContext
         'dbprefix',
         'loginType',
         'prod',
+        'crossDomainSession',
     ];
 
     /**
@@ -299,14 +300,23 @@ final class Application extends Singleton implements IContext
      */
     public function run($controller = 'web')
     {
-        ob_start();
-        $_SESSION['KCFINDER']['uploadURL'] = '/files/common/';
         $this->startMicrotime = microtime(true);
-
         mb_internal_encoding('UTF-8');
-        session_start();
-        $_SESSION['RAAS_STARTED'] = microtime(true);
         $this->getConfig();
+        if ($this->config['crossDomainSession'] && ($domainL2 = $this->getCookieDomainL2())) {
+            $sessionCookieParams = session_get_cookie_params();
+            session_set_cookie_params(
+                $sessionCookieParams['lifetime'],
+                $sessionCookieParams['path'],
+                $domainL2,
+                $sessionCookieParams['secure'],
+                $sessionCookieParams['httponly']
+            );
+        }
+        ob_start();
+        session_start();
+        $_SESSION['KCFINDER']['uploadURL'] = '/files/common/';
+        $_SESSION['RAAS_STARTED'] = $this->startMicrotime;
         set_error_handler([$this, 'errorHandler'], error_reporting());
 
         $classname = ('RAAS\\Controller_' . ucfirst($controller));
@@ -890,6 +900,36 @@ final class Application extends Singleton implements IContext
 
 
     /**
+     * Получает домен второго уровня
+     * @return string
+     */
+    public function getCookieDomainL2()
+    {
+        $domainL2 = explode('.', $_SERVER['HTTP_HOST']);
+        $domainL2 = array_slice($domainL2, -2);
+        if (count($domainL2) == 2) {
+            $domainL2 = '.' . implode('.', $domainL2);
+        } else {
+            $domainL2 = null;
+        }
+        return $domainL2;
+    }
+
+
+    /**
+     * Определяет, является ли ключ Cookie кроссдоменным
+     */
+    public function isCrossDomainCookie($var)
+    {
+        $subdomainRx = $this->registryGet('subdomainCookies');
+        if ($subdomainRx) {
+            $subdomainRx = '/' . $subdomainRx . '/umis';
+        }
+        return $subdomainRx && preg_match($subdomainRx, $var);
+    }
+
+
+    /**
      * Сохраняет cookie в зависимости от настроек, устанавливает переменную
      *     $_COOKIE[$var]. Не-строковые переменные кодируются в json_encode.
      *     Если $val == null, удаляет cookie.
@@ -900,17 +940,7 @@ final class Application extends Singleton implements IContext
     public function setcookie($var, $val)
     {
         $lifetime = $this->registryGet('cookieLifetime') * 86400;
-        $subdomainRx = $this->registryGet('subdomainCookies');
-        if ($subdomainRx) {
-            $subdomainRx = '/' . $this->registryGet('subdomainCookies') . '/umis';
-        }
-        $domainL2 = explode('.', $_SERVER['HTTP_HOST']);
-        $domainL2 = array_slice($domainL2, -2);
-        if (count($domainL2) == 2) {
-            $domainL2 = '.' . implode('.', $domainL2);
-        } else {
-            $domainL2 = null;
-        }
+        $domainL2 = $this->getCookieDomainL2();
         if ($val === null) {
             unset($_COOKIE[$var]);
             setcookie($var, '', time() - $lifetime, '/', '');
@@ -923,7 +953,7 @@ final class Application extends Singleton implements IContext
             $val = json_encode($val);
         }
         $_COOKIE[$var] = $val;
-        if ($domainL2 && $subdomainRx && preg_match($subdomainRx, $var)) {
+        if ($domainL2 && $this->isCrossDomainCookie($var)) {
             setcookie($var, '', time() - $lifetime, '/', '');
             setcookie($var, $val, time() + $lifetime, '/', $domainL2);
         } else {

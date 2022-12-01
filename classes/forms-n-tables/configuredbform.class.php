@@ -167,6 +167,13 @@ class ConfigureDBForm extends Form
                     'export' => 'boolval',
                     'default' => Application::i()->prod
                 ],
+                [
+                    'type' => 'checkbox',
+                    'name' => 'crossDomainSession',
+                    'caption' => $this->view->_('CROSSDOMAIN_SESSION'),
+                    'export' => 'boolval',
+                    'default' => Application::i()->crossDomainSession
+                ],
             ]
         ];
         $arr = array_merge($defaultParams, $params);
