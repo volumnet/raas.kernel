@@ -37,6 +37,9 @@ class CronCommand extends Command
             ]);
         }
         foreach ($tasks as $task) {
+            if (count($tasks) > 1) {
+                $this->controller->doLog('Task #' . $task->id . ' ' . $task->name . ' started');
+            }
             $task->process($this->controller, $timestamp);
         }
     }

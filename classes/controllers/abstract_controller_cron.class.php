@@ -25,7 +25,7 @@ abstract class Abstract_Controller_Cron extends Abstract_Controller
      * Время начала работы
      * @var int
      */
-    protected $st;
+    public $st;
 
     /**
      * Кодировка по умолчанию
