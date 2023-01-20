@@ -174,6 +174,16 @@ class Attachment extends SOME
      */
     protected function deleteFile()
     {
+        // 2022-12-27, AVS: сделал дополнительную проверку на существование других вложений, ссылающихся на данный файл
+        // Если они обнаружены, файл не удаляется
+        // (хотя такого быть не должно, практика показывает что такое встречается)
+        $sqlQuery = "SELECT COUNT(*) FROM " . static::_tablename() . " WHERE realname = ? AND id != ?";
+        $sqlBind = [$this->realname, $this->id];
+        $sqlResult = (int)static::_SQL()->getvalue([$sqlQuery, $sqlBind]);
+        if ($sqlResult > 0) {
+            return;
+        }
+
         if (is_file($this->dirpath . '/' . $this->realname)) {
             unlink($this->dirpath . '/' . $this->realname);
         }

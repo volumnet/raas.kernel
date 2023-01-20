@@ -104,7 +104,7 @@ class Sub_UserLog extends Abstract_Sub_Controller
             $_GET['page'] ?: 1,
             Application::i()->registryGet('rowsPerPage')
         );
-        $set = UserLog::getSet($dateFrom, $dateTo, $filters, $pages);
+        $set = UserLog::getSet($dateFrom, $dateTo, $filters);
 
         $usersIds = array_map(function ($x) {
             return (int)$x->uid;
@@ -142,6 +142,8 @@ class Sub_UserLog extends Abstract_Sub_Controller
             return trim($x->actionName);
         }, $set)));
         $OUT['actions'] = $actions;
+
+        $set = SOME::getArraySet($set, $pages);
 
         $OUT['Set'] = $set;
         $OUT['Pages'] = $pages;

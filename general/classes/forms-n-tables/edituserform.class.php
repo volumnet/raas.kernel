@@ -172,7 +172,7 @@ class EditUserForm extends Form
                     ]
                 ]
             ]);
-            if (Application::i()->user->id != $Form->Item->id) {
+            if (Application::i()->user->id != ($this->Item->id ?? 0)) {
                 // Права доступа
                 $defaultParams['children']['rights'] = new FormTab([
                     'name' => 'rights',

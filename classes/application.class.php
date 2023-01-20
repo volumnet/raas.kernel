@@ -624,7 +624,7 @@ final class Application extends Singleton implements IContext
         });
         foreach ((array)$packages as $package) {
             $classname = 'RAAS\\' . ucfirst($package) . '\\Package';
-            if (!$this->packages[$package] && class_exists($classname)) {
+            if (!($this->packages[$package] ?? null) && class_exists($classname)) {
                 $this->packages[$package] = $classname::i();
             }
         }
@@ -681,7 +681,11 @@ final class Application extends Singleton implements IContext
             // @include $this->configFile;
             @eval('?>' . file_get_contents($this->configFile));
             foreach (self::$configVars as $var) {
-                $this->config[$var] = $$var;
+                if (isset($$var)) {
+                    $this->config[$var] = $$var;
+                } else {
+                    $this->config[$var] = null;
+                }
             }
         }
     }

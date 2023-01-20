@@ -249,7 +249,12 @@ if ($USER) {
   <body class="body">
     <div id="raas-app">
       <raas-app v-bind="$data" :fixed-header="fixedHeader">
-        <template>
+        <?php if ($SUBTITLE) { ?>
+            <template v-slot:subtitle>
+              <?php echo $SUBTITLE?>
+            </template>
+        <?php } ?>
+        <template v-slot:default>
           <?php
           if ($TEMPLATE) {
               include $VIEW->tmp($TEMPLATE);

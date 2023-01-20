@@ -122,7 +122,7 @@ abstract class HTMLElement
      */
     public function getArrayCopy($extended = false)
     {
-        $result = [];
+        $result = ['@type' => static::class];
         $attrs = array_map(function ($x) {
             return $this->asJSONValue($x);
         }, (array)$this->attrs);

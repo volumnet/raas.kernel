@@ -2,7 +2,6 @@
 .errors {
     position: relative;
     padding: $alert-padding-y $alert-dismissible-padding-r $alert-padding-y $alert-padding-x;
-    margin-bottom: $alert-margin-bottom;
     border: $alert-border-width solid transparent;
     @include border-radius($alert-border-radius);
     $alert-background: shift-color($danger, $alert-bg-scale);

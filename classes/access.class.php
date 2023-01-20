@@ -182,7 +182,8 @@ abstract class Access
     private function _rights()
     {
         if (($this->Owner instanceof User) &&
-            $this->Owner->rights[$this->Context->mid] &&
+            $this->Owner->rights &&
+            isset($this->Owner->rights[$this->Context->mid]) &&
             $this->Owner->rights[$this->Context->mid]
         ) {
             $this->rights = $this->Owner->rights[$this->Context->mid]['rights'];

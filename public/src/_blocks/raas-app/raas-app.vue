@@ -4,119 +4,40 @@
 @import 'app/application/bootstrap-fix.scss';
 @import 'app/application/fa-fix.scss';
 
-// @import "bootstrap/scss/_reboot.scss"; 
-// @import "bootstrap/scss/_root.scss";
-// @import "bootstrap/scss/_grid.scss";  
-// @import "bootstrap/scss/_type.scss";  
-// @import 'bootstrap/scss/_buttons.scss';
-// @import 'bootstrap/scss/_forms.scss';
-
-// p {
-//     margin-bottom: 10px;
-// }
-// .form-horizontal {
-//     .control-group {
-//         display: flex;
-//         align-items: center;
-//         margin: -1rem -.5rem;
-//         > * {
-//             padding: 1rem .5rem;
-//         }
-//     }
-//     .control-label {
-//         width: 200px;
-//         text-align: right;
-//     }
-//     .controls {
-//         > * {
-//             display: inline-block;
-//             vertical-align: middle;
-//         }
-//         .form-control, select {
-//             width: auto;
-//         }
-//         &:first-child {
-//             margin-left: 200px;
-//         }
-//     }
-// }
-// textarea:not([class]), 
-// input[type="text"]:not([class]), 
-// input[type="password"]:not([class]), 
-// input[type="datetime"]:not([class]), 
-// input[type="datetime-local"]:not([class]), 
-// input[type="date"]:not([class]), 
-// input[type="month"]:not([class]), 
-// input[type="time"]:not([class]), 
-// input[type="week"]:not([class]), 
-// input[type="number"]:not([class]), 
-// input[type="email"]:not([class]), 
-// input[type="url"]:not([class]), 
-// input[type="search"]:not([class]), 
-// input[type="tel"]:not([class]), 
-// input[type="color"]:not([class]), 
-// .uneditable-input {
-//     @extend .form-control;
-// }
-// select:not([class]) {
-//     @extend .form-select;
-// }
-// .btn {
-//     &:not(.btn-primary):not(.btn-secondary):not(.btn-info):not(.btn-warning):not(.btn-danger):not(.btn-error) {
-//         @extend .btn-outline-secondary;
-//     }
-// }
-// .text-error {
-//     @extend .text-danger;
-// }
 .body {
-    $self: &;
     &__background-holder {
         @include gradient-y(#08f, #8cf);
         min-height: 100vh;
         width: 100%;
-        display: block;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
         position: relative;
         overflow: hidden;
     }
     &__row {
-        width: 100%;
-        position: relative;
-        box-sizing: border-box;
-    }
-    &__container {
-        box-sizing: border-box;
         display: flex;
-        margin: 0 auto;
-        width: 100%;
-        > * {
-            box-sizing: border-box;
-            @include viewport-up('lg') {
-                padding: 0 1rem;
-            }
-            @include viewport-down('md') {
-                padding: 0 1rem;
-            }
-        }
+        gap: 2rem;
+        padding-inline: 1rem;
+        box-sizing: border-box;
     }
+    
     &__header-outer {
         @media screen {
             min-height: 41px;
         }
+        @media print {
+            display: none;
+        }
     }
     &__header {
         $header: &;
+        padding-inline: 2rem;
         z-index: 2;
         background: darken($gray-900, 10%);
         color: white;
-        // @media screen {
-        //     @include viewport-down('md') {
-        //         display: flex;
-        //         align-items: center;
-        //         margin: 0 auto;
-        //         position: relative;
-        //     }
-        // }
+        align-items: center;
+        justify-content: space-between;
         &_fixed {
             @media screen {
                 position: fixed;
@@ -133,21 +54,6 @@
         }
         * {
           box-sizing: border-box;
-        }
-        @media print {
-            display: none;
-        }
-    }
-    &__container_header {
-        justify-content: space-between;
-        @include viewport-up('md') {
-            padding: 0 1rem;
-        }
-        @include viewport-down('sm') {
-            padding: 0;
-            > * {
-                padding: 0;
-            }
         }
     }
     &__menu-packages {
@@ -173,63 +79,45 @@
             display: none;
         }
     }
-    &__main {
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-        @include viewport-up('md') {
-            padding: 0 1rem;
-        }
-    }
-    &__row_content {
-        flex-grow: 1;
+
+    &__row_main {
         padding-bottom: 1rem;
+        // flex-grow: 1;
     }
-    &__container_content {
-        flex-direction: column;
-        min-height: calc(100vh - 41px - 1rem);
-        #{$self}__main:only-child & {
-            min-height: calc(100vh - 1rem);
-        }
-        @include viewport-up('md') {
-            padding: 2rem 1rem;
-            background: white;
-        }
-        @include viewport-down('sm') {
-            padding: 1rem 0;
-            background: rgba(white, .975);
-        }
-    }
-    &__left, &__right {
-        $width: 320px;
-        width: $width;
-        flex-shrink: 0;
-        @include viewport-up('lg') {
-            // width: 25%;
-            & + #{$self}__content {
-                width: calc(100% - #{$width});
+    &__main {
+        display: grid;
+        overflow: hidden;
+        padding: 2rem;
+        gap: 1rem;
+        flex-grow: 1;
+        background: white;
+        @media screen {
+            @include viewport-up('lg') {
+                grid-template-columns: 320px 1fr;
             }
         }
-        @include viewport-down('md') {
+    }
+    &__left {
+        box-sizing: border-box;
+        @include print-or-down('md') {
             display: none;
         }
-        @media print {
-            display: none;
-        }
+    }
+    &__menu-left {
+        box-sizing: border-box;
     }
     &__content {
         display: flex;
         flex-direction: column;
-        flex-grow: 1;
-        width: 100%;
-        padding: 0 1rem;
+        align-items: stretch;
+        gap: 1rem;
         overflow: hidden;
-        &-outer {
-            display: flex;
-            flex-grow: 1;
+        &:not(&_sided) {
+            @include viewport-up('lg') {
+                grid-column: span 2;
+            }
         }
         &-inner {
-            width: 100%;
             overflow: auto;
         }
     }
@@ -237,15 +125,6 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        margin-bottom: 1rem;
-        flex-shrink: 0;
-    }
-    &__breadcrumb {
-        flex-grow: 1;
-        flex-shrink: 0;
-    }
-    &__menu-management {
-        flex-shrink: 0;
     }
     &__title {
         text-shadow: 1px 1px 0 silver;
@@ -268,24 +147,14 @@
     &__subtitle {
         color: $gray-500;
         font-size: 12px;
-        margin: 0 0 1rem;
-        flex-shrink: 0;
-    }
-    &__content-inner {
-        flex-grow: 1;
     }
     &__footer {
-        background: white;
         border-top: 1px solid #ddd;
-        padding: 1rem 1rem 0;
+        padding-top: 1rem;
         font-size: 9px;
         text-align: center;
-        flex-shrink: 0;
-    }
-    &__container_footer {
-        flex-direction: column;
-        > * {
-            padding: .25rem 0;
+        @include viewport-up('lg') {
+            grid-column: span 2;
         }
     }
 }
@@ -294,66 +163,45 @@
 <template>
   <div class="body__background-holder">
     <div class="body__header-outer" v-if="hasActivePackage">
-      <header class="body__header" :class="{ 'body__header_fixed': fixedHeader, 'body__header_active': fixedHeaderActive }">
-        <div class="body__row body__row_header">
-          <div class="body__container body__container_header">
-            <div class="body__menu-packages">
-              <menu-packages :menu="packagesMenu"></menu-packages>
-            </div>
-            <div class="body__menu-main">
-              <menu-main :menu="mainMenu"></menu-main>
-            </div>
-            <div class="body__menu-user">
-              <menu-user :user="user" :available-languages="availableLanguages" v-if="user"></menu-user>
-            </div>
-            <div class="body__menu-mobile">
-              <menu-mobile :main-menu="mainMenu" :left-menu="leftMenu" :user="user" :available-languages="availableLanguages" :packages-menu="packagesMenu"></menu-mobile>
-            </div>
-          </div>
-        </div>
+      <header class="body__header body__row body__row_header" ref="header" :class="{ 'body__header_fixed': fixedHeader, 'body__header_active': fixedHeaderActive }">
+        <menu-packages class="body__menu-packages" :menu="packagesMenu"></menu-packages>
+        <menu-main class="body__menu-main" :menu="mainMenu"></menu-main>
+        <menu-user class="body__menu-user" :user="user" :available-languages="availableLanguages" v-if="user"></menu-user>
+        <menu-mobile class="body__menu-mobile" :main-menu="mainMenu" :left-menu="leftMenu" :user="user" :available-languages="availableLanguages" :packages-menu="packagesMenu"></menu-mobile>
       </header>
     </div>
-    <div class="body__main">
-      <div class="body__row body__row_content">
-        <div class="body__container body__container_content">
-          <main class="body__content-outer">
-            <aside class="body__left" v-if="leftMenu">
-              <menu-left :menu="leftMenu"></menu-left>
-            </aside>
-            <article class="body__content">
-              <div class="body__breadcrumbs" v-if="breadcrumbs && breadcrumbs.length">
-                <raas-breadcrumbs :menu="breadcrumbs"></raas-breadcrumbs>
-              </div>
-              <div class="body__content-header">
-                <h1 class="body__title">{{ title }}</h1>
-                <div class="body__menu-management" v-if="managementMenu && managementMenu.length">
-                  <menu-management :menu="managementMenu"></menu-management>
-                </div>
-              </div>
-              <div class="body__subtitle" v-if="subtitle" v-html="subtitle"></div>
-              <div class="body__errors" v-if="errors && errors.length">
-                <raas-errors :errors="errors" @close="errors = []"></raas-errors>
-              </div>
-              <div class="body__content-inner">
-                <slot></slot>
-              </div>
-            </article>
-          </main>
-          <footer class="body__footer">
-            <div class="body__version">
-              {{ versionName }}:
-              {{ translations.CORPORATE_RESOURCE_MANAGEMENT }}
-            </div>
-            <div class="body__copyrights">
-              {{ translations.COPYRIGHT }} Ⓒ
-              <a href="https://www.volumnet.ru/" target="_blank">
-                Volume Networks
-              </a>,
-              {{ year }}. {{ translations.ALL_RIGHTS_RESERVED }}.
-            </div>
-          </footer>
-        </div>
-      </div>
+    <div class="body__row body__row_main">
+      <main class="body__main">
+        <aside class="body__left" ref="leftPane">
+          <menu-left class="body__menu-left" ref="leftPaneFloat" v-if="leftMenu" :menu="leftMenu" :style="{ marginTop: floatingMenuMargin + 'px' }"></menu-left>
+        </aside>
+        <article class="body__content" :class="{ 'body__content_sided': !!leftMenu }">
+          <raas-breadcrumbs class="body__breadcrumbs" v-if="breadcrumbs && breadcrumbs.length" :menu="breadcrumbs"></raas-breadcrumbs>
+          <div class="body__content-header">
+            <h1 class="body__title">{{ title }}</h1>
+            <menu-management class="body__menu-management" v-if="managementMenu && managementMenu.length" :menu="managementMenu"></menu-management>
+          </div>
+          <div class="body__subtitle" v-if="$slots.subtitle">
+            <slot name="subtitle"></slot>
+          </div>
+          <raas-errors class="body__errors" v-if="errors && errors.length" :errors="errors" @close="errors = []"></raas-errors>
+          <div class="body__content-inner">
+            <slot name="default"></slot>
+          </div>
+        </article>
+        <footer class="body__footer">
+          <div class="body__version">
+            {{ versionName + ': ' + translations.CORPORATE_RESOURCE_MANAGEMENT }}
+          </div>
+          <div class="body__copyrights">
+            {{ translations.COPYRIGHT }} Ⓒ
+            <a href="https://www.volumnet.ru/" target="_blank">
+              Volume Networks
+            </a>,
+            {{ year }}. {{ translations.ALL_RIGHTS_RESERVED }}.
+          </div>
+        </footer>
+      </main>
     </div>
   </div>  
 </template>
@@ -510,6 +358,111 @@ export default {
             type: Number,
             required: false,
         },
-    }
+    },
+    data() {
+        return {
+            leftPaneTop: 0, // Вертикальное смещение левой колонки относительно верха документа
+            floatingMenuMargin: 0, // Margin плавающего меню от верха
+        };
+    },
+    mounted() {
+        this.leftPaneTop = $(this.$refs.leftPane).offset() && $(this.$refs.leftPane).offset().top; // Здесь, потому что нужно задать до отображения для формирования CSS-классов
+        this.setFloatingMenuMargin(); // Так, потому что требуется рекурсия от текущего положения
+    },
+    methods: {
+        /**
+         * Устанавливает отступ плавающего меню от верха левой колонки
+         */
+        setFloatingMenuMargin() {
+            if (this.$root.windowWidth <= this.$root.mediaTypes.lg) {
+                this.floatingMenuMargin = 0;
+            }
+            if (this.floatingMenuTopEdge < this.floatingMenuTop) { 
+                this.floatingMenuMargin = this.floatingMenuMarginByTop;
+            } else if (this.floatingMenuBottomEdge > this.floatingMenuBottom) {
+                this.floatingMenuMargin = Math.min(this.floatingMenuMarginByTop, this.floatingMenuMarginByBottom);
+            }
+        },
+    },
+    computed: {
+        /**
+         * Высота левой колонки
+         * @return {Number}
+         */
+        leftPaneHeight() {
+            return (this.$root.scrollTop >= 0) && $(this.$refs.leftPane).height(); // scrollTop для привязки к скроллингу
+        },
+        /**
+         * Высота плавающего меню
+         * @return {Number}
+         */
+        floatingMenuHeight() {
+            return (this.$root.scrollTop >= 0) && (this.$refs.leftPaneFloat ? $(this.$refs.leftPaneFloat.$el).outerHeight() : 0); // scrollTop для привязки к скроллингу
+        },
+        /**
+         * Вертикальное смещение верха плавающего меню относительно верха документа
+         * @return {Number}
+         */
+        floatingMenuTop() {
+            return this.leftPaneTop + this.floatingMenuMargin;
+        },
+        /**
+         * Вертикальное смещение низа плавающего меню относительно верха документа
+         * @return {Number}
+         */
+        floatingMenuBottom() {
+            return this.floatingMenuTop + this.floatingMenuHeight;
+        },
+        /**
+         * Максимальное смещение плавающего меню в левой колонке (когда упрётся в низ колонки)
+         * @return {Number} [description]
+         */
+        maxFloatingMenuMargin() {
+            return this.leftPaneHeight - this.floatingMenuHeight;
+        },
+        /**
+         * Отступ плавающего меню по его верхней границе
+         * @return {Number}
+         */
+        floatingMenuMarginByTop() {
+            let margin = this.floatingMenuTopEdge - this.leftPaneTop;
+            margin = Math.max(0, margin);
+            margin = Math.min(margin, this.maxFloatingMenuMargin);
+            return margin;
+        },
+        /**
+         * Верхняя граница экрана, от которой откладываем плавающее меню
+         * @return {Number}
+         */
+        floatingMenuTopEdge() {
+            let result = this.$root.scrollTop + 16;
+            if (this.fixedHeaderActive) {
+                result += $(this.$refs.header).outerHeight();
+            }
+            return result;
+        },
+        /**
+         * Нижняя граница экрана, от которой откладываем плавающее меню
+         * @return {Number}
+         */
+        floatingMenuBottomEdge() {
+            return this.$root.windowBottomPosition - 32;
+        },
+        /**
+         * Отступ плавающего меню по его верхней границе
+         * @return {Number}
+         */
+        floatingMenuMarginByBottom() {
+            let margin = this.floatingMenuBottomEdge - this.leftPaneTop - this.floatingMenuHeight;
+            margin = Math.max(0, margin);
+            margin = Math.min(margin, this.maxFloatingMenuMargin);
+            return margin;
+        },
+    },
+    watch: {
+        '$root.scrollTop': function () {
+            this.setFloatingMenuMargin();
+        },
+    },
 }
 </script>

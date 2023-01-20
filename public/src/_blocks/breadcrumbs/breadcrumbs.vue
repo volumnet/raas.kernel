@@ -1,7 +1,7 @@
 <style lang="scss" scoped>
 .breadcrumbs {
     display: block;
-    margin: 0 0 1rem;
+    margin: 0;
     background: $gray-100;
     border-radius: $border-radius;
     padding: 0.5rem 1rem;
