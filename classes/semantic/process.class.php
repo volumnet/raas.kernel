@@ -111,7 +111,7 @@ class Process extends SOME
             $tasks[trim($item->id)]['time'] = time() - strtotime($item->post_date);
         }
         $tasks = array_filter($tasks, function ($x) {
-            return stristr($x['file'], 'php') || $x['process'];
+            return stristr($x['file'], 'php') || ($x['process'] ?? false);
         });
 
         return $tasks;

@@ -245,6 +245,7 @@ final class Application extends Singleton implements IContext
             case 'activePackage':
             case 'SQL':
             case 'user':
+            case 'startMicrotime':
                 return $this->$var;
                 break;
             case 'debug':

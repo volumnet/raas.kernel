@@ -413,6 +413,12 @@ class View_Web extends Abstract_View implements IContext_View_Web
 
     public function tmp($file)
     {
+        // 2023-01-31, AVS: сделал замену, чтобы не ломалось при передаче реального файла
+        $file = str_replace('\\', '/', $file);
+        // 2023-01-31, AVS: сделал заглушку, чтобы сразу возвращался реальный файл
+        if (is_file($file)) {
+            return $file;
+        }
         $temp = explode('/', ltrim($file, '/'));
         if (count($temp) >= 3) {
             $p = ($temp[0] == '.' ? '/' : $temp[0]);

@@ -188,7 +188,6 @@ if (Application::i()->activePackage) {
     }
 }
 
-
 $raasApplicationData = [
     'packagesMenu' => $packagesMenu,
     'mainMenu' => getMenu($MENU),
@@ -277,3 +276,4 @@ if ($USER) {
     </script>
   </body>
 </html>
+<!-- <?php echo (float)(microtime(1) - Application::i()->startMicrotime)?>  -->

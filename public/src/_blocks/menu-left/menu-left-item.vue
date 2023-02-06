@@ -12,11 +12,11 @@
         line-height: 24px;
         @include gradient-y($gray-200, transparent);
         border-radius: 5px;
-        padding: .33rem .75rem;
+        padding: .33rem .75rem .33rem 1rem;
     }
     &_inner {
         font-size: 12px;
-        padding-left: 22px;
+        padding-left: 20px;
         line-height: 20px; 
     }
     &_level_1 {
@@ -26,8 +26,8 @@
 }
 .menu-left__children-trigger {
     position: absolute;
-    left: 2px;
-    top: 6px;
+    left: 1px;
+    margin-top: 6px;
     @include center-alignment(10px, 10px);
     border: none;
     color: #aaa;

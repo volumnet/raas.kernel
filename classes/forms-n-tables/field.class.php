@@ -615,10 +615,10 @@ class Field extends OptionContainer
                 break;
             default:
                 $Item = $this->Form->Item;
-                if (is_array($_POST[$this->name])) {
+                if (is_array($_POST[$this->name] ?? null)) {
                     $Item->{$this->name} = array_values(array_unique(array_map($f, $_POST[$this->name])));
                 } else {
-                    $Item->{$this->name} = call_user_func($f, $_POST[$this->name]);
+                    $Item->{$this->name} = call_user_func($f, $_POST[$this->name] ?? '');
                 }
                 break;
         }

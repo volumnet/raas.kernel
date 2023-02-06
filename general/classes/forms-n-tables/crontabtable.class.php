@@ -120,7 +120,7 @@ class CrontabTable extends Table
                     }
                 ],
                 ' ' => [
-                    'callback' => function ($item, $i) use ($ctxMenu, $params) {
+                    'callback' => function ($item, $i) use ($params) {
                         return rowContextMenu(
                             $this->view->getCrontabContextMenu(
                                 $item,

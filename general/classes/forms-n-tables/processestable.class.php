@@ -66,8 +66,8 @@ class ProcessesTable extends Table
                         $val = '';
                         if (isset($item['mem%'])) {
                             $val = $item['mem%'] . '%';
-                        } elseif ($item['mem%'] || $item['mem']) {
-                            $val = number_format($item['mem%'], 0, '.', ' ')
+                        } elseif (($item['mem%'] ?? false) || ($item['mem'] ?? false)) {
+                            $val = number_format($item['mem%'] ?? 0, 0, '.', ' ')
                                  . $this->view->_('FILESIZE_KBYTES');
                         }
                         if ($val) {

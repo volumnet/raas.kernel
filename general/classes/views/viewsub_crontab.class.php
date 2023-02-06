@@ -107,7 +107,7 @@ class ViewSub_Crontab extends \RAAS\Abstract_Sub_View
     {
         $arr = [];
         if ($item->id) {
-            $view = (($this->action == '') && $this->nav['id']);
+            $view = (($this->action == '') && ($this->nav['id'] ?? false));
             $edit = ($this->action == 'edit');
             $t = strtotime($item->start_time);
             if (!$view) {

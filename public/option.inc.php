@@ -10,7 +10,7 @@ $_RAASForm_Option = function(\RAAS\Option $Option, $level = 0) use ($_RAASForm_O
                 $selected = (trim($Option->value) === trim($Option->Field->value));
             }
         } else {
-            $selected = (trim($Option->value) === trim($Option->Form->DATA[$Option->Field->name]));
+            $selected = (trim($Option->value) === trim($Option->Form->DATA[$Option->Field->name] ?? ''));
         }
     }
     if ($selected) {
