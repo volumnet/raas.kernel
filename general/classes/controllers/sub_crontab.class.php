@@ -107,7 +107,7 @@ class Sub_Crontab extends Abstract_Sub_Controller
     private function edit()
     {
         $item = new Crontab((int)$this->id);
-        $command = $_GET['command'];
+        $command = $_GET['command'] ?? '';
         $form = new EditCrontabForm(['Item' => $item, 'command' => $command]);
         $this->view->edit($form->process());
     }

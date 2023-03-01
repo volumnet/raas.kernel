@@ -131,18 +131,18 @@ class EditCrontabForm extends Form
                         } elseif (preg_match('/\\*(\\/(\\d+))?/umi', $item->minutes, $regs) &&
                             ($item->hours == '*')
                         ) {
-                            if (in_array($regs[2], ['', '1', '5'])) {
+                            if (in_array($regs[2] ?? '', ['', '1', '5'])) {
                                 return '5m';
-                            } elseif (in_array($regs[2], ['10', '15', '20', '30'])) {
-                                return $regs[2] . 'm';
+                            } elseif (in_array($regs[2] ?? '', ['10', '15', '20', '30'])) {
+                                return ($regs[2] ?? '') . 'm';
                             }
                         } elseif (($item->minutes == '0') &&
                             preg_match('/\\*(\\/(\\d+))?/umi', $item->hours, $regs)
                         ) {
-                            if (in_array($regs[2], ['', '1'])) {
+                            if (in_array($regs[2] ?? '', ['', '1'])) {
                                 return '1h';
-                            } elseif (in_array($regs[2], ['2', '3', '6', '8', '12'])) {
-                                return $regs[2] . 'h';
+                            } elseif (in_array($regs[2] ?? '', ['2', '3', '6', '8', '12'])) {
+                                return ($regs[2] ?? '') . 'h';
                             }
                         } elseif (($item->minutes == '0') &&
                             ($item->hours == '0')
@@ -259,7 +259,7 @@ class EditCrontabForm extends Form
                         $item = $field->Form->Item;
                         $itemArgs = $item->arguments;
                         $arg = $commandData['args'][$i];
-                        $itemArg = $itemArgs[$i];
+                        $itemArg = $itemArgs[$i] ?? '';
                         if ($arg['type'] == 'checkbox') {
                             $itemArg = $itemArg ? 1 : -1;
                         }

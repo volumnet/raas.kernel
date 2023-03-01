@@ -106,8 +106,10 @@ abstract class Abstract_View extends Singleton implements IAbstract_Context_View
     {
         mb_internal_encoding('UTF-8');
         if (!$this->language) {
-            preg_match('/\w+/i', $_SERVER['HTTP_ACCEPT_LANGUAGE'], $regs);
-            $this->loadLanguage($regs[0]);
+            preg_match('/\w+/i', ($_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? ''), $regs);
+            if (isset($regs[0])) {
+                $this->loadLanguage($regs[0]);
+            }
         }
         if (!$this->language) {
             $this->loadLanguage(static::default_language);
