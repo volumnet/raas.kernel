@@ -194,11 +194,13 @@ class Attachment extends SOME
             if (is_file($this->small)) {
                 unlink($this->small);
             }
-            $pathinfo = pathinfo($this->realname);
-            $glob = glob($this->dirpath . '/' . $pathinfo['filename'] . '.*.' . $pathinfo['extension']);
-            foreach ($glob as $val) {
-                if (is_file($val)) {
-                    unlink($val);
+            if ($this->realname) {
+                $pathinfo = pathinfo($this->realname);
+                $glob = glob($this->dirpath . '/' . $pathinfo['filename'] . '.*.' . $pathinfo['extension']);
+                foreach ($glob as $val) {
+                    if (is_file($val)) {
+                        unlink($val);
+                    }
                 }
             }
         }

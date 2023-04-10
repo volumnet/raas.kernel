@@ -310,9 +310,9 @@ class Form extends FieldContainer
             $this->DATA = $this->importDefault();
         }
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $this->DATA['@oncommit'] = $_POST['@oncommit'];
+            $this->DATA['@oncommit'] = $_POST['@oncommit'] ?? null;
         } else {
-            $this->DATA['@oncommit'] = isset($_COOKIE['RAASForm@oncommit']) ? $_COOKIE['RAASForm@oncommit'] : null;
+            $this->DATA['@oncommit'] = $_COOKIE['RAASForm@oncommit'] ?? null;
         }
         $OUT = array();
         $OUT['Form'] = $this;

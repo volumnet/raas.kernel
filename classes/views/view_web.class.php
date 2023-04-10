@@ -461,7 +461,7 @@ class View_Web extends Abstract_View implements IContext_View_Web
             }
             if (isset($row, $row['href']) && $row && $row['href']) {
                 $A = $this->nav;
-                $B = parse_url($row['href']);
+                $B = parse_url($row['href'] ?? '');
                 parse_str(isset($B['query']) ? $B['query'] : '', $temp);
                 $B = $temp;
                 if (!isset($A['p'])) {
@@ -471,8 +471,8 @@ class View_Web extends Abstract_View implements IContext_View_Web
                     $B['p'] = $this->application->activePackage->alias;
                 }
                 unset($temp);
-                $AmB = array_diff_assoc($A, $B);
-                $BmA = array_diff_assoc($B, $A);
+                $AmB = @array_diff_assoc($A, $B); // т.к. сравнивает построчно, а массивы могут иметь размерность более 1
+                $BmA = @array_diff_assoc($B, $A); // т.к. сравнивает построчно, а массивы могут иметь размерность более 1
                 if (isset($row['active']) && ($row['active'] !== null)) {
                     $row['active'] = (bool)$row['active'];
                 } elseif (!$BmA) {

@@ -261,7 +261,11 @@ class EditCrontabForm extends Form
                         $arg = $commandData['args'][$i];
                         $itemArg = $itemArgs[$i] ?? '';
                         if ($arg['type'] == 'checkbox') {
-                            $itemArg = $itemArg ? 1 : -1;
+                            if ($itemArg !== '') {
+                                $itemArg = $itemArg ? 1 : -1;
+                            } else {
+                                $itemArg = $arg['default'] ? 1 : -1;
+                            }
                         }
                         return $itemArg;
                     },

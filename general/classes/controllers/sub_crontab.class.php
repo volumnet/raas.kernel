@@ -50,11 +50,20 @@ class Sub_Crontab extends Abstract_Sub_Controller
                 $item = new Crontab((int)$this->id);
                 if ($item->id) {
                     $phpCommand = Application::i()->registryGet('php_command') ?: 'php';
+                    $cronExists = is_file(Application::i()->baseDir . '/cron/cron.php');
                     if (stristr(PHP_OS, 'win')) {
-                        $cmd = 'START /D "' . Application::i()->baseDir . '/cron" ' . $phpCommand . ' cron.php master ' . (int)$item->id;
+                        if ($cronExists) {
+                            $cmd = 'START /D "' . Application::i()->baseDir . '/cron" ' . $phpCommand . ' cron.php master ' . (int)$item->id;
+                        } else {
+                            $cmd = 'START /D "' . Application::i()->baseDir . '" ' . $phpCommand . ' index.php master ' . (int)$item->id;
+                        }
                         pclose(popen($cmd, 'r'));
                     } else {
-                        $cmd = 'cd "' . Application::i()->baseDir . '/cron" && ' . $phpCommand . ' cron.php master ' . (int)$item->id . ' > /dev/null 2>&1 & echo $!';
+                        if ($cronExists) {
+                            $cmd = 'cd "' . Application::i()->baseDir . '/cron" && ' . $phpCommand . ' cron.php master ' . (int)$item->id . ' > /dev/null 2>&1 & echo $!';
+                        } else {
+                            $cmd = 'cd "' . Application::i()->baseDir . '" && ' . $phpCommand . ' index.php master ' . (int)$item->id . ' > /dev/null 2>&1 & echo $!';
+                        }
                         exec($cmd);
                     }
                     sleep(1);
@@ -168,7 +177,7 @@ class Sub_Crontab extends Abstract_Sub_Controller
     private function showTask(Crontab $task)
     {
         $pages = new Pages(
-            $_GET['page'] ?: 1,
+            (($_GET['page'] ?? 1) ?: 1),
             Application::i()->registryGet('rowsPerPage')
         );
         $set = CrontabLog::getSet([

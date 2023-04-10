@@ -596,7 +596,7 @@ abstract class CustomField extends SOME
             return null;
         }
         $this->prefetchIfNotExists();
-        if (static::$cache[$this->Owner->id][$this->id]) {
+        if (static::$cache[$this->Owner->id][$this->id] ?? false) {
             // 2021-01-12, AVS: исправил, иначе каждый раз при одной записи
             // выдает 0 и перезаписывает множественное поле в один индекс
             return max(array_keys(static::$cache[$this->Owner->id][$this->id])) + 1;
@@ -1018,7 +1018,7 @@ abstract class CustomField extends SOME
         if (trim($key) === '') {
             return null;
         }
-        if (!static::$sourceAssocCache[$this->id]) {
+        if (!(static::$sourceAssocCache[$this->id] ?? false)) {
             $this->stdSource; // Вызовем для формирования ассоциативного массива
         }
         $result = static::$sourceAssocCache[$this->id][$key];

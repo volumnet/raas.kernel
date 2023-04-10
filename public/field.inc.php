@@ -253,7 +253,7 @@ $_RAASForm_Control = function (
                 ?>
                 <div data-role="raas-repo-block">
                   <div data-role="raas-repo-container">
-                    <?php foreach ((array)$field->Form->DATA[$field->name] as $key => $val) { ?>
+                    <?php foreach ((array)($field->Form->DATA[$field->name] ?? []) as $key => $val) { ?>
                         <div data-role="raas-repo-element">
                           <raas-field-<?php echo htmlspecialchars($fieldType)?> <?php echo $_RAASForm_Attrs($field, array_merge($attrs, [':value' => json_encode($val), ':source' => $childrenArr ? json_encode($childrenArr) : false]))?>></raas-field-<?php echo htmlspecialchars($fieldType)?>>
                         </div>
