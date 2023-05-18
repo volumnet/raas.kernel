@@ -61,6 +61,9 @@ class Updater
         if (version_compare($v, '4.2.94') < 0) {
             $this->update20220608();
         }
+        if (version_compare($v, '4.3.19') < 0) {
+            $this->update20230503();
+        }
         return true;
     }
 
@@ -227,6 +230,25 @@ class Updater
                           PRIMARY KEY (id),
                           INDEX (post_date)
                         ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Processes';";
+            $this->SQL->query($sqlQuery);
+        }
+    }
+
+
+    /**
+     * Добавляет индекс на поле realname таблицы attachments
+     */
+    public function update20230503()
+    {
+        $sqlQuery = "SELECT COUNT(*)
+                       FROM information_schema.statistics
+                      WHERE TABLE_SCHEMA = ?
+                        AND table_name = 'attachments'
+                        AND index_name = 'realname'";
+        $sqlBind = [Application::i()->dbname];
+        $sqlResult = $this->SQL->getvalue([$sqlQuery, $sqlBind]);
+        if (!$sqlResult) {
+            $sqlQuery = "ALTER TABLE attachments ADD INDEX realname (realname(32))";
             $this->SQL->query($sqlQuery);
         }
     }

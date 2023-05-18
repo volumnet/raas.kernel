@@ -47,9 +47,9 @@
 
 <template>
   <li :class="liClasses">
-    <button v-if="item.submenu && item.submenu.length && (level >= $root.config.shownLevel)" class="menu-left__children-trigger" :class="{ 'menu-left__children-trigger_unfolded': unfolded }" @click="unfolded = !unfolded"></button>
-    <menu-left-link :item="item" :level="level"></menu-left-link>
-    <menu-left-list v-if="item.submenu && item.submenu.length" :menu="item.submenu" :level="level + 1" :unfolded="(level < $root.config.shownLevel) || unfolded"></menu-left-list>
+    <button v-if="(realItem.submenu && realItem.submenu.length && (level >= $root.config.shownLevel))" class="menu-left__children-trigger" :class="{ 'menu-left__children-trigger_unfolded': unfolded }" @click="clickFold()"></button>
+    <menu-left-link :item="realItem" :level="level"></menu-left-link>
+    <menu-left-list v-if="realItem.submenu && realItem.submenu.length" :menu="realItem.submenu" :level="level + 1" :unfolded="(level < $root.config.shownLevel) || unfolded"></menu-left-list>
   </li>
 </template>
 
@@ -78,8 +78,29 @@ export default {
     },
     data() {
         return {
-            unfolded: this.item.active,
+            realItem: JSON.parse(JSON.stringify(this.item)), // Реальный пункт (чтобы можно было менять)
+            unfolded: this.item.active, // Пункт развернут
         }
+    },
+    methods: {
+        /**
+         * Клик по плюсу-минусу
+         * @return {[type]} [description]
+         */
+        clickFold() {
+            this.unfolded = !this.unfolded;
+            if (this.realItem['data-ajax-submenu-url']) {
+                const url = '/admin/ajax.php' + this.realItem['data-ajax-submenu-url'];
+                this.$root.api(url).then((response) => {
+                    // console.log(JSON.stringify(this.realItem));
+                    delete this.realItem['data-ajax-submenu-url'];
+                    if (response.menu) {
+                        this.realItem.submenu = response.menu;
+                    }
+                    // console.log(JSON.stringify(this.realItem));
+                });
+            }
+        },
     },
     computed: {
         /**
@@ -99,6 +120,11 @@ export default {
             result['menu-left__item_level_' + this.level] = true;
             return result;
         }
-    }
+    },
+    watch: {
+        item() { // 2023-04-12, AVS: чтобы подразделы обновлялись динамически
+            this.realItem = this.item;
+        },
+    },
 }
 </script>

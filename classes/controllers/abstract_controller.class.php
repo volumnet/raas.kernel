@@ -428,7 +428,6 @@ abstract class Abstract_Controller extends Singleton implements IAbstract_Contex
             [
                 'name' => 'subdomainCookies',
                 'caption' => $this->view->_('SUBDOMAIN_COOKIES'),
-                'children' => $CONTENT['subdomainCookies'],
                 'data-hint' => $this->view->_('SUBDOMAIN_COOKIES_HINT'),
             ],
             [

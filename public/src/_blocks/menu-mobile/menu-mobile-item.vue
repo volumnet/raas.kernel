@@ -36,9 +36,9 @@
 
 <template>
   <div :class="liClasses">
-    <menu-mobile-link :item="item" :level="level" @open="listActive = true"></menu-mobile-link>
-    <button type="button" class="menu-mobile__children-trigger" v-if="item.submenu && item.submenu.length" @click="listActive = true"></button>
-    <menu-mobile-list v-if="item.submenu && item.submenu.length" :item="item" :level="level + 1" :active="listActive" @back="listActive = false" @close="listActive = false; $emit('close')"></menu-mobile-list>
+    <menu-mobile-link :item="realItem" :level="level" @open="listActive = true"></menu-mobile-link>
+    <button type="button" class="menu-mobile__children-trigger" v-if="realItem.submenu && realItem.submenu.length" @click="clickActivate()"></button>
+    <menu-mobile-list v-if="realItem.submenu && realItem.submenu.length" :item="realItem" :level="level + 1" :active="listActive" @back="listActive = false" @close="listActive = false; $emit('close')"></menu-mobile-list>
   </div>
 </template>
 
@@ -67,8 +67,29 @@ export default {
     },
     data() {
         return {
+            realItem: JSON.parse(JSON.stringify(this.item)), // Реальный пункт (чтобы можно было менять)
             listActive: false, // Список активен
         };
+    },
+    methods: {
+        /**
+         * Клик внутрь элемента
+         * @return {[type]} [description]
+         */
+        clickActivate() {
+            this.listActive = true;
+            if (this.realItem['data-ajax-submenu-url']) {
+                const url = '/admin/ajax.php' + this.realItem['data-ajax-submenu-url'];
+                this.$root.api(url).then((response) => {
+                    // console.log(JSON.stringify(this.realItem));
+                    delete this.realItem['data-ajax-submenu-url'];
+                    if (response.menu) {
+                        this.realItem.submenu = response.menu;
+                    }
+                    // console.log(JSON.stringify(this.realItem));
+                });
+            }
+        },
     },
     computed: {
         /**
@@ -93,6 +114,11 @@ export default {
             }
             return result;
         }
-    }
+    },
+    watch: {
+        item() { // 2023-04-12, AVS: чтобы подразделы обновлялись динамически
+            this.realItem = this.item;
+        },
+    },
 }
 </script>

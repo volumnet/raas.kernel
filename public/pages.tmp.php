@@ -6,7 +6,7 @@ if ($Pages->pages > 1) {
         $pagesVar = 'page';
     }
     $pattern_active = '<li class="active"><span>{text}</span></li>';
-    $pattern = '<li><a href="' . \SOME\HTTP::queryString($pagesVar . '={link}') . ($pagesHash ? '#' . $pagesHash : '') . '">{text}</a></li>';
+    $pattern = '<li><a href="' . \SOME\HTTP::queryString($pagesVar . '={link}') . (($pagesHash ?? '') ? '#' . $pagesHash : '') . '">{text}</a></li>';
 
     if ($Pages->page > 1) {
         $pages_list[] = strtr($pattern, array(urlencode('{link}') => $Pages->page - 1, '{text}' => '«'));

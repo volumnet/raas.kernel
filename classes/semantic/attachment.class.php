@@ -162,10 +162,74 @@ class Attachment extends SOME
     }
 
 
-    public static function delete(SOME $Item)
+    public static function batchDelete(array $items)
     {
-        $Item->deleteFile();
-        parent::delete($Item);
+        static::batchDeleteFiles($items);
+        parent::batchDelete($items);
+    }
+
+
+    /**
+     * Проверяет, есть ли другие вложения, использующие те же файлы
+     * @param self[] $items Вложения для удаления
+     * @return bool
+     */
+    public static function checkSharedFiles(array $items): bool
+    {
+        if (!$items) {
+            return false;
+        }
+        $sqlQuery = "SELECT COUNT(*)
+                       FROM " . static::_tablename()
+                  . " WHERE realname IN (" . implode(", ", array_fill(0, count($items), "?")) . ")
+                        AND id NOT IN (" . implode(", ", array_fill(0, count($items), "?")) . ")";
+        $sqlBind = array_merge(
+            array_map(function ($x) {
+                return $x->realname;
+            }, $items),
+            array_map(function ($x) {
+                return (int)$x->id;
+            }, $items)
+        );
+        $sqlResult = (int)static::_SQL()->getvalue([$sqlQuery, $sqlBind]);
+        return ($sqlResult > 0);
+    }
+
+
+    /**
+     * Удаляет файлы у группы вложений
+     * @param self[] $items Вложения для удаления
+     */
+    public static function batchDeleteFiles(array $items)
+    {
+        // 2022-12-27, AVS: сделал дополнительную проверку на существование других вложений, ссылающихся на данный файл
+        // Если они обнаружены, файл не удаляется
+        // (хотя такого быть не должно, практика показывает что такое встречается)
+        if (static::checkSharedFiles($items) > 0) {
+            return;
+        }
+        foreach ($items as $item) {
+            if (is_file($item->dirpath . '/' . $item->realname)) {
+                unlink($item->dirpath . '/' . $item->realname);
+            }
+            if ($item->image) {
+                if (is_file($item->tn)) {
+                    unlink($item->tn);
+                }
+                if (is_file($item->small)) {
+                    unlink($item->small);
+                }
+                if ($item->realname) {
+                    $pathinfo = pathinfo($item->realname);
+                    $glob = glob($item->dirpath . '/' . $pathinfo['filename'] . '.*.' . $pathinfo['extension']);
+                    foreach ($glob as $val) {
+                        if (is_file($val)) {
+                            unlink($val);
+                        }
+                    }
+                }
+            }
+        }
     }
 
 
@@ -174,36 +238,7 @@ class Attachment extends SOME
      */
     protected function deleteFile()
     {
-        // 2022-12-27, AVS: сделал дополнительную проверку на существование других вложений, ссылающихся на данный файл
-        // Если они обнаружены, файл не удаляется
-        // (хотя такого быть не должно, практика показывает что такое встречается)
-        $sqlQuery = "SELECT COUNT(*) FROM " . static::_tablename() . " WHERE realname = ? AND id != ?";
-        $sqlBind = [$this->realname, $this->id];
-        $sqlResult = (int)static::_SQL()->getvalue([$sqlQuery, $sqlBind]);
-        if ($sqlResult > 0) {
-            return;
-        }
-
-        if (is_file($this->dirpath . '/' . $this->realname)) {
-            unlink($this->dirpath . '/' . $this->realname);
-        }
-        if ($this->image) {
-            if (is_file($this->tn)) {
-                unlink($this->tn);
-            }
-            if (is_file($this->small)) {
-                unlink($this->small);
-            }
-            if ($this->realname) {
-                $pathinfo = pathinfo($this->realname);
-                $glob = glob($this->dirpath . '/' . $pathinfo['filename'] . '.*.' . $pathinfo['extension']);
-                foreach ($glob as $val) {
-                    if (is_file($val)) {
-                        unlink($val);
-                    }
-                }
-            }
-        }
+        static::batchDeleteFiles([$this]);
     }
 
 
@@ -385,11 +420,12 @@ class Attachment extends SOME
     protected function getUniqueFilename($ignoreExtension = true)
     {
         // 2020-03-10, AVS: Заменил pathinfo, т.к. некорректно работает с русскими буквами
-        if ($this->realname) {
-            $initialFilename = $this->realname;
-        } else {
+        // 2023-05-02, AVS: убрал $initialFilename = $this->realname, т.к. иначе проблематично поменять имя уже загруженного файла
+        // if ($this->realname) {
+        //     $initialFilename = $this->realname;
+        // } else {
             $initialFilename = $this->filename;
-        }
+        // }
         $filenameWOext = preg_replace('/\\.\\w+$/umi', '', $initialFilename);
         $filename = Text::beautify($filenameWOext);
         $ext = Text::beautify(pathinfo($this->filename, PATHINFO_EXTENSION));
