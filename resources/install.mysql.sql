@@ -9,7 +9,8 @@ CREATE TABLE IF NOT EXISTS {$DBPREFIX$}attachments (
   PRIMARY KEY (id),
   KEY classname (classname,pid),
   KEY classname_2 (classname),
-  KEY pid (pid)
+  KEY pid (pid),
+  INDEX realname (realname(32))
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Attachments';
 
 CREATE TABLE IF NOT EXISTS {$DBPREFIX$}crontab (

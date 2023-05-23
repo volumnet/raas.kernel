@@ -240,16 +240,18 @@ class Updater
      */
     public function update20230503()
     {
-        $sqlQuery = "SELECT COUNT(*)
-                       FROM information_schema.statistics
-                      WHERE TABLE_SCHEMA = ?
-                        AND table_name = 'attachments'
-                        AND index_name = 'realname'";
-        $sqlBind = [Application::i()->dbname];
-        $sqlResult = $this->SQL->getvalue([$sqlQuery, $sqlBind]);
-        if (!$sqlResult) {
-            $sqlQuery = "ALTER TABLE attachments ADD INDEX realname (realname(32))";
-            $this->SQL->query($sqlQuery);
+        if (in_array(SOME::_dbprefix() . "attachments", $this->tables)) {
+            $sqlQuery = "SELECT COUNT(*)
+                           FROM information_schema.statistics
+                          WHERE TABLE_SCHEMA = ?
+                            AND table_name = 'attachments'
+                            AND index_name = 'realname'";
+            $sqlBind = [Application::i()->dbname];
+            $sqlResult = $this->SQL->getvalue([$sqlQuery, $sqlBind]);
+            if (!$sqlResult) {
+                $sqlQuery = "ALTER TABLE attachments ADD INDEX realname (realname(32))";
+                $this->SQL->query($sqlQuery);
+            }
         }
     }
 }
