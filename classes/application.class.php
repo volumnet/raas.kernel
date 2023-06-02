@@ -783,7 +783,7 @@ final class Application extends Singleton implements IContext
         }
 
         if (!$from) {
-            $from = $this->user->name;
+            $from = $this->user ? $this->user->name : '';
         }
         if (is_array($subject)) {
             $subject[1] = array_merge($_SERVER, (array)$subject[1]);

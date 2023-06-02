@@ -804,13 +804,15 @@ abstract class CustomField extends SOME
         $csv = new CSV($text);
         $data = [];
 
-        $currentStep = array_shift(array_keys(array_filter($csv->data[0], 'trim')));
+        $steps = array_keys(array_filter($csv->data[0] ?? [], 'trim'));
+        $currentStep = array_shift($steps);
         $backtrace = [[$currentStep, &$data]];
         $last = null;
 
         for ($i = 0; $i < count($csv->data); $i++) {
             $row = $csv->data[$i];
-            $step = array_shift(array_keys(array_filter($row, 'trim')));
+            $steps = array_keys(array_filter($row, 'trim'));
+            $step = array_shift($steps);
 
             if ($step != $currentStep) {
                 for ($j = 0; ($j < count($backtrace)) && ($backtrace[$j][0] <= $step); $j++) {
