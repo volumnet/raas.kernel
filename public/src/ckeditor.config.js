@@ -23,6 +23,9 @@ window.ckEditorConfig = {
     filebrowserUploadUrl: '/vendor/sunhater/kcfinder/upload.php?type=file',
     filebrowserImageUploadUrl: '/vendor/sunhater/kcfinder/upload.php?type=image',
     filebrowserFlashUploadUrl: '/vendor/sunhater/kcfinder/upload.php?type=file',
+
+
+    iframe_attributes: {},
     
     toolbar: [
         { 
