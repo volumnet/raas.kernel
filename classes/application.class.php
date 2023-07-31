@@ -620,9 +620,12 @@ final class Application extends Singleton implements IContext
         }
 
         // Старый вариант - для совместимости
-        $packages = @File::scandir($this->baseDir . '/modules', function ($x) {
-            return $x[0] != '.' && is_dir($this->baseDir . '/modules/' . $x);
-        });
+        $packages = [];
+        if (is_dir($this->baseDir . '/modules')) {
+            $packages = @File::scandir($this->baseDir . '/modules', function ($x) {
+                return $x[0] != '.' && is_dir($this->baseDir . '/modules/' . $x);
+            });
+        }
         foreach ((array)$packages as $package) {
             $classname = 'RAAS\\' . ucfirst($package) . '\\Package';
             if (!($this->packages[$package] ?? null) && class_exists($classname)) {

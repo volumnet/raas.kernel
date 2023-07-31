@@ -1,45 +1,4 @@
-// import 'jquery-ui/themes/base/all.css'
-// // import 'jquery-ui/jquery-ui.structure.css'
-// // import 'jquery-ui/jquery-ui.theme.css'
-// import 'jquery-ui-timepicker-addon/dist/jquery-ui-timepicker-addon.css'
 
-import 'spectrum-colorpicker/spectrum.css'
-import 'bootstrap-multiselect/dist/css/bootstrap-multiselect.css'
-import 'codemirror/lib/codemirror.css'
-// import 'jquery-ui-timepicker-addon/dist/jquery-ui-timepicker-addon.css'
-
-import 'jquery-form'
-import './libs/bootstrap.js'
-import 'jquery.scrollto'
-import queryString from 'query-string';
-window.queryString = queryString;
-
-import 'jquery-ui'
-import 'jquery-ui/themes/base/all.css';
-import 'jquery-ui/ui/widgets/sortable.js';
-import 'jquery-ui/ui/widgets/resizable.js';
-import 'jquery-ui/ui/widgets/draggable.js';
-import 'jquery-ui/ui/widgets/slider.js';
-import 'jquery-ui/ui/widgets/autocomplete.js';
-
-import 'spectrum-colorpicker';
-import './libs/context.js';
-
-import 'bootstrap-multiselect';
-import CodeMirror from 'codemirror';
-window.CodeMirror = CodeMirror;
-import 'codemirror/mode/xml/xml.js';
-import 'codemirror/mode/javascript/javascript.js';
-import 'codemirror/mode/css/css.js';
-import 'codemirror/mode/htmlmixed/htmlmixed.js';
-import 'codemirror/mode/clike/clike.js';
-import 'codemirror/mode/php/php.js';
-// import 'jquery.event.swipe'
-import 'inputmask/dist/jquery.inputmask.js'
-// import 'bootstrap-2.3.2/css/bootstrap.css'
-
-import Vue from 'vue/dist/vue.js'
-window.Vue = Vue;
 // import Cookie from 'expose-loader?exposes[]=Cookie!js-cookie'
 import App from './application/app.vue';
 
@@ -79,12 +38,12 @@ jQuery(function ($) {
 window.registeredRAASComponents = {};
 for (const componentURN in window.raasComponents) {
     const component = raasComponents[componentURN];
-    window.registeredRAASComponents[componentURN] = Vue.component(componentURN, component);
+    window.registeredRAASComponents[componentURN] = window.Vue.component(componentURN, component);
 }
 
 jQuery(document).ready(function($) {
     context.init({ preventDoubleContext: false });
-    window.app = new Vue(App);
+    window.app = new window.Vue(App);
 
     var hash = document.location.hash;
     if (hash) {

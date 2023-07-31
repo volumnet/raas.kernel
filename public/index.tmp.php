@@ -25,7 +25,7 @@ function getMenu(array $menu)
     if ($menu) {
         foreach ($menu as $row) {
             // Проверка прав доступа
-            $href = $row['href'];
+            $href = $row['href'] ?? $row['data-href'] ?? '';
             $href = parse_url($href, PHP_URL_QUERY);
             parse_str($href, $href);
             if (isset(
@@ -43,7 +43,7 @@ function getMenu(array $menu)
                 $ctx = Application::i()->context;
             }
             if ($access = $ctx->access()) {
-                if (!$access->A($row['href'])) {
+                if (!$access->A($row['href'] ?? $row['data-href'] ?? '')) {
                     continue;
                 }
             }
@@ -233,7 +233,6 @@ if ($USER) {
     AssetManager::requestJS(array_merge([
         '/vendor/ckeditor/ckeditor/ckeditor.js',
         '/js/raas.config.js',
-        $VIEW->publicURL . '/application.js', // Здесь, потому что последующие скрипты должны отрабатывать после подключения Vue
         $VIEW->publicURL . '/ckeditor.config.js', // 2022-09-29, AVS: Эти и далее здесь, потому что адаптеры должны включаться после подключения CKEditor
         '/js/ckeditor.config.js',
         '/vendor/ckeditor/ckeditor/adapters/jquery.js',
@@ -242,6 +241,7 @@ if ($USER) {
     echo AssetManager::getRequestedJS('beforeApp');
     echo AssetManager::getRequestedCSS('custom');
     echo AssetManager::getRequestedJS('custom');
+    AssetManager::requestJS($VIEW->publicURL . '/application.js'); // Здесь, потому что последующие скрипты должны отрабатывать после подключения Vue
     echo AssetManager::getRequestedJS();
     ?>
   </head>
