@@ -1,12 +1,10 @@
 <?php
 /**
  * Файл web-контроллера модуля RAAS
- * @package RAAS
- * @version 4.1
- * @author Alex V. Surnin <info@volumnet.ru>
- * @copyright 2012, Volume Networks
  */
 namespace RAAS;
+
+use RAAS\General\Package as GeneralPackage;
 
 /**
  * Класс web-контроллера модуля RAAS
@@ -16,7 +14,7 @@ class Controller_Web extends Abstract_Controller
 {
     /**
      * Экземпляр класса
-     * @var \RAAS\Controller_Web
+     * @var Controller_Web
      */
     protected static $instance;
 
@@ -204,11 +202,15 @@ class Controller_Web extends Abstract_Controller
             $this->logout();
             return;
         } elseif (!in_array($this->mode, ['admin', 'manual'])) {
-            if ($this->packageName && isset($this->model->packages[$this->packageName]) && ($pack = $this->model->packages[$this->packageName])) {
+            if ($this->packageName && isset($this->model->packages[$this->packageName]) &&
+                ($pack = $this->model->packages[$this->packageName])
+            ) {
                 if ($pack->registryGet('isActive') && $pack->isCompatible) {
                     if ($this->model->user->access($pack)->canDo) {
                         $this->model->activePackage = $pack;
-                        if ($this->moduleName && isset($pack->modules[$this->moduleName]) && ($mod = $pack->modules[$this->moduleName])) {
+                        if ($this->moduleName && isset($pack->modules[$this->moduleName]) &&
+                            ($mod = $pack->modules[$this->moduleName])
+                        ) {
                             if ($mod->registryGet('isActive') && $mod->isCompatible) {
                                 if ($this->model->user->access($mod)->canDo) {
                                     $this->model->activePackage->activeModule = $mod;
@@ -220,12 +222,16 @@ class Controller_Web extends Abstract_Controller
             }
         }
 
-        $Context = $this->model->activeModule ? $this->model->activeModule : $this->model->activePackage;
-        if (!$this->model->user->access($Context)->canDo($this->sub, $this->action, $this->id)) {
-            $this->id = null;
-            $this->action = null;
-            if (!$this->model->user->access($Context)->canDo($this->sub)) {
-                $this->sub = null;
+        $context = $this->model->activeModule ? $this->model->activeModule : $this->model->activePackage;
+        if (!$this->model->user->access($context)->canDo($this->sub, $this->action, $this->id)) {
+            if ($context instanceof GeneralPackage) {
+                $this->id = null;
+                $this->action = null;
+                if (!$this->model->user->access($context)->canDo($this->sub)) {
+                    $this->sub = null;
+                }
+            } else {
+                exit; // 2023-08-03, AVS: чтобы не было накладки по другим параметрам
             }
         }
 
@@ -242,7 +248,7 @@ class Controller_Web extends Abstract_Controller
             } elseif ($this->mode == 'set_theme') {
                 $this->set_theme();
             } else {
-                $Context->run();
+                $context->run();
             }
         }
     }

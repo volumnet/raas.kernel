@@ -29,14 +29,14 @@ function getMenu(array $menu)
             $href = parse_url($href, PHP_URL_QUERY);
             parse_str($href, $href);
             if (isset(
-                $_GET['p'],
-                $_GET['m'],
-                Application::i()->packages[$_GET['p']]->modules[$_GET['m']]
+                $href['p'],
+                $href['m'],
+                Application::i()->packages[$href['p']]->modules[$href['m']]
             )) {
-                $ctx = Application::i()->packages[$_GET['p']]->modules[$_GET['m']];
+                $ctx = Application::i()->packages[$href['p']]->modules[$href['m']];
             } elseif (isset(
-                $_GET['p'],
-                Application::i()->packages[$_GET['p']]
+                $href['p'],
+                Application::i()->packages[$href['p']]
             )) {
                 $ctx = Application::i()->activePackage;
             } else {

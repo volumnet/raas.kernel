@@ -82,7 +82,14 @@ abstract class Abstract_Controller extends Singleton implements IAbstract_Contex
                 return isset($_GET[$var]) ? strtolower(trim($_GET[$var])) : '';
                 break;
             case 'id':
-                return isset($_GET['id']) ? (int)$_GET['id'] : 0;
+                if (isset($_GET['id'])) {
+                    if (is_array($_GET['id'])) {
+                        return array_map('intval', $_GET['id']);
+                    } else {
+                        return (int)$_GET['id'];
+                    }
+                }
+                return 0;
                 break;
             case 'nav':
                 return $_GET;
