@@ -304,7 +304,7 @@ final class Application extends Singleton implements IContext
         $this->startMicrotime = microtime(true);
         mb_internal_encoding('UTF-8');
         $this->getConfig();
-        if ($this->config['crossDomainSession'] && ($domainL2 = $this->getCookieDomainL2())) {
+        if (($this->config['crossDomainSession'] ?? null) && ($domainL2 = $this->getCookieDomainL2())) {
             $sessionCookieParams = session_get_cookie_params();
             session_set_cookie_params(
                 $sessionCookieParams['lifetime'],
