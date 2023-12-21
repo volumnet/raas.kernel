@@ -7,6 +7,36 @@ namespace RAAS;
 class SQLSourceStrategyTest extends BaseTest
 {
     /**
+     * Тестируем парсинг с нулевым значением, плоский список (2023-12-21)
+     */
+    public function testParse20231221()
+    {
+        $sqlQuery = "CREATE TEMPORARY TABLE IF NOT EXISTS tmp_testparsesql (
+                        value VARCHAR(255) NOT NULL DEFAULT '',
+                        name VARCHAR(255) NOT NULL DEFAULT ''
+                    );";
+        Application::i()->SQL->query($sqlQuery);
+        Application::i()->SQL->add('tmp_testparsesql', [
+            ['value' => '0', 'name' => 'Default'],
+            ['value' => 'other', 'name' => 'Other'],
+        ]);
+
+
+        $source = "SELECT value AS val, name FROM tmp_testparsesql";
+
+        $result = SQLSourceStrategy::i()->parse($source);
+        $expected = [
+            '0' => ['name' => 'Default'],
+            'other' => ['name' => 'Other'],
+        ];
+
+        $this->assertEquals($expected, $result);
+
+        $sqlQuery = "DROP TABLE IF EXISTS tmp_testparsesql";
+        Application::i()->SQL->query($sqlQuery);
+    }
+
+    /**
      * Тестирует разбор
      */
     public function testParse()

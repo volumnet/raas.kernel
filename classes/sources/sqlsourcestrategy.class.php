@@ -39,15 +39,18 @@ class SQLSourceStrategy extends SourceStrategy
                     $val = array_shift($sqlRowValues);
                 }
                 $val = trim($val);
-                if (trim($sqlRow['val'] ?? '')) {
+                $allowRecursive = isset($sqlRow['pid']);
+                if (trim($sqlRow['val'] ?? '') !== '') {
                     $key = $sqlRow['val'];
                 } else {
                     $key = $val;
                 }
                 $key = trim($key);
                 $result[$key] = ['name' => $val];
-                if ($temp = $this->parse($sqlResult, $key)) {
-                    $result[$key]['children'] = $temp;
+                if ($allowRecursive) {
+                    if ($temp = $this->parse($sqlResult, $key)) {
+                        $result[$key]['children'] = $temp;
+                    }
                 }
             }
         }
