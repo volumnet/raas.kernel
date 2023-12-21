@@ -11,7 +11,7 @@ abstract class DatatypeStrategy extends AbstractStrategy
 {
     protected static $registeredStrategies = [];
 
-    public static function spawn(string $key = null): self
+    public static function spawn(string $key = null): AbstractStrategy
     {
         if (!$key || !isset(static::$registeredStrategies[$key])) {
             $key = 'text';
