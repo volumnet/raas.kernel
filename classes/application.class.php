@@ -302,6 +302,8 @@ final class Application extends Singleton implements IContext
     public function run($controller = 'web')
     {
         $this->startMicrotime = microtime(true);
+        $this->registerDatatypes();
+        $this->registerSources();
         mb_internal_encoding('UTF-8');
         $this->getConfig();
         if (($this->config['crossDomainSession'] ?? null) && ($domainL2 = $this->getCookieDomainL2())) {
@@ -973,5 +975,50 @@ final class Application extends Singleton implements IContext
             setcookie($var, $val, time() + $lifetime, '/', '');
         }
         return $val;
+    }
+
+
+    /**
+     * Регистрирует стратегии типов данных
+     */
+    public function registerDatatypes()
+    {
+        TextDatatypeStrategy::register('text');
+        ColorDatatypeStrategy::register('color');
+        DateDatatypeStrategy::register('date');
+        DateTimeDatatypeStrategy::register('datetime');
+        DateTimeDatatypeStrategy::register('datetime-local');
+        EmailDatatypeStrategy::register('email');
+        NumberDatatypeStrategy::register('number');
+        RangeDatatypeStrategy::register('range');
+        TelDatatypeStrategy::register('tel');
+        TimeDatatypeStrategy::register('time');
+        UrlDatatypeStrategy::register('url');
+        MonthDatatypeStrategy::register('month');
+        YearDatatypeStrategy::register('year');
+        WeekDatatypeStrategy::register('week');
+        PasswordDatatypeStrategy::register('password');
+        CheckboxDatatypeStrategy::register('checkbox');
+        RadioDatatypeStrategy::register('radio');
+        FileDatatypeStrategy::register('file');
+        ImageDatatypeStrategy::register('image');
+        SelectDatatypeStrategy::register('select');
+        TextareaDatatypeStrategy::register('textarea');
+        HtmlAreaDatatypeStrategy::register('htmlarea');
+        CodeAreaDatatypeStrategy::register('codearea');
+    }
+
+
+    /**
+     * Регистрирует стратегии источников
+     */
+    public function registerSources()
+    {
+        CSVSourceStrategy::register('csv');
+        INISourceStrategy::register('ini');
+        SQLSourceStrategy::register('sql');
+        XMLSourceStrategy::register('xml');
+        PHPSourceStrategy::register('php');
+        DictionarySourceStrategy::register('dictionary');
     }
 }

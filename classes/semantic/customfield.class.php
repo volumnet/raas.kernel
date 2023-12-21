@@ -4,8 +4,8 @@
  */
 namespace RAAS;
 
-use SimpleXMLElement;
-use SOME\CSV;
+use Exception;
+use InvalidArgumentException;
 use SOME\SOME;
 use SOME\Text;
 
@@ -13,13 +13,18 @@ use SOME\Text;
  * Класс пользовательского поля
  *
  * <pre>Предустановленные типы:
- * [Стандартный источник] => array<
+ * <Стандартный источник> => array<
  *     string[] Значение пункта => [
  *         'name' => string Подпись пункта,
- *         'children' =>? [Стандартный источник]
+ *         'children' =>? <Стандартный источник>
  *     ]
- * ></pre>
- * @property-read SOME|null $Owner Сущность, к которому относится поле с данными
+ * >,
+ * <ФАЙЛ> => [
+ *     'tmp_name' => string Путь к файлу,
+ *     'name' => string Названия файлов,
+ *     'type' => string MIME-типы файлов,
+ * ]</pre>
+ * @property SOME|null $Owner Сущность, к которому относится поле с данными
  * @property-read Field $Field Поле для RAAS-формы
  * @property-read bool $inherited Наследуемое поле
  * @property-read array $stdSource Стандартный источник
@@ -29,12 +34,12 @@ abstract class CustomField extends SOME
     /**
      * Таблица данных
      */
-    const data_table = '';
+    const DATA_TABLE = '';
 
     /**
      * Класс справочника
      */
-    const DictionaryClass = '';
+    const DICTIONARY_CLASS = '';
 
     /**
      * Кэш значений
@@ -111,14 +116,7 @@ abstract class CustomField extends SOME
      * Типы источников данных
      * @var string[]
      */
-    public static $sourceTypes = [
-        'dictionary',
-        'ini',
-        'csv',
-        'xml',
-        'sql',
-        'php'
-    ];
+    public static $sourceTypes = ['dictionary', 'ini', 'csv', 'xml', 'sql', 'php'];
 
 
     public function __get($var)
@@ -127,126 +125,84 @@ abstract class CustomField extends SOME
             case 'Owner':
                 return $this->Owner;
                 break;
+            case 'datatypeStrategy':
+                return DatatypeStrategy::spawn($this->datatype);
+                break;
+            case 'sourceStrategy':
+                try {
+                    return SourceStrategy::spawn($this->source_type);
+                } catch (Exception $e) {
+                }
+                return null;
+                break;
             case 'Field':
-                $t = $this;
-                $f = new Field();
-                $f->type = $this->datatype;
+                $result = new Field();
+                $result->type = $this->datatype;
                 foreach (['placeholder', 'pattern'] as $key) {
                     if ((string)$this->$key !== '') {
-                        $f->$key = (string)$this->$key;
+                        $result->$key = (string)$this->$key;
                     }
                 }
-                foreach (['required', 'maxlength', 'multiple'] as $key) {
+                foreach (['maxlength'] as $key) {
                     if ((int)$this->$key) {
-                        $f->$key = (int)$this->$key;
+                        $result->$key = (int)$this->$key;
+                    }
+                }
+                foreach (['required', 'multiple'] as $key) {
+                    if ((int)$this->$key) {
+                        $result->$key = (bool)(int)$this->$key;
                     }
                 }
                 foreach (['min_val', 'max_val', 'step'] as $key) {
                     if ((float)$this->$key) {
-                        $f->{str_replace('_val', '', $key)} = (float)$this->$key;
+                        $result->{str_replace('_val', '', $key)} = (float)$this->$key;
                     }
                 }
-                $f->name = $this->urn;
-                $f->caption = $this->name;
-                $f->children = $this->_getFieldChildren(
-                    (array)$this->_stdSource(),
-                    $f
-                );
-                $f->export = 'is_null';
-                $f->import = function ($Field) use ($t) {
-                    return $t->getValues();
+                $result->name = $this->urn;
+                $result->caption = $this->name;
+                $result->children = $this->_getFieldChildren((array)$this->_stdSource(), $result);
+                $result->export = 'is_null';
+                $result->import = function (Field $field) {
+                    return $this->getValues();
                 };
-                // 2015-07-06, AVS: добавил && (!$t->multiple || $t->required),
-                // чтобы автоматом не подставлял первое попавшееся
-                // во множественном
-                if (!in_array($t->datatype, ['image', 'file']) &&
-                    (!$t->multiple || $t->required)
-                ) {
-                    $f->default = $t->defval;
-                }
-                if (in_array($t->datatype, ['image', 'file']) &&
-                    $t->getValue()->id
-                ) {
-                    //$f->required = false;
-                }
-                $f->meta['CustomField'] = $t;
-                $f->oncommit = function ($Field) use ($t) {
-                    switch ($t->datatype) {
-                        case 'file':
-                        case 'image':
-                            $t->deleteValues();
-                            if ($Field->multiple) {
-                                foreach ($_FILES[$Field->name]['tmp_name'] as $key => $val) {
-                                    if (is_uploaded_file($_FILES[$Field->name]['tmp_name'][$key]) &&
-                                        $t->validate($_FILES[$Field->name]['tmp_name'][$key])
-                                    ) {
-                                        $att = new Attachment();
-                                        $att->upload = $_FILES[$Field->name]['tmp_name'][$key];
-                                        $att->filename = $_FILES[$Field->name]['name'][$key];
-                                        $att->mime = $_FILES[$Field->name]['type'][$key];
-                                        $att->parent = $t;
-                                        if ($t->datatype == 'image') {
-                                            $att->image = 1;
-                                            if ($temp = (int)Application::i()->context->registryGet('maxsize')) {
-                                                $att->maxWidth = $att->maxHeight = $temp;
-                                            }
-                                            if ($temp = (int)Application::i()->context->registryGet('tnsize')) {
-                                                $att->tnsize = $temp;
-                                            }
-                                        }
-                                        $att->commit();
-                                        $t->addValue($att->id);
-                                    }
-                                    unset($att);
-                                }
-                            } else {
-                                if (is_uploaded_file($_FILES[$Field->name]['tmp_name']) &&
-                                    $t->validate($_FILES[$Field->name]['tmp_name'])
-                                ) {
-                                    $att = new Attachment((int)$t2['attachment']);
-                                    $att->upload = $_FILES[$Field->name]['tmp_name'];
-                                    $att->filename = $_FILES[$Field->name]['name'];
-                                    $att->mime = $_FILES[$Field->name]['type'];
-                                    $att->parent = $t;
-                                    if ($t->datatype == 'image') {
-                                        $att->image = 1;
-                                        if ($temp = (int)Application::i()->context->registryGet('maxsize')) {
-                                            $att->maxWidth = $att->maxHeight = $temp;
-                                        }
-                                        if ($temp = (int)Application::i()->context->registryGet('tnsize')) {
-                                            $att->tnsize = $temp;
-                                        }
-                                    }
-                                    $att->commit();
-                                    $t->addValue($att->id);
-                                }
-                                unset($att);
+                $result->isMediaFilled = function (Field $field) {
+                    return $this->isMediaFilled();
+                };
+                if ($this->datatypeStrategy->isMedia()) {
+                    if ($this->source) {
+                        $accept = explode(',', trim(mb_strtolower($this->source)));
+                        $accept = array_map(function ($x) {
+                            $y = trim($x);
+                            if (($y[0] != '.') && !stristr($y, '/')) {
+                                $y = '.' . $y;
                             }
-                            $t->clearLostAttachments();
-                            break;
-                        default:
-                            $t->deleteValues();
-                            if (isset($_POST[$Field->name])) {
-                                foreach ((array)$_POST[$Field->name] as $val) {
-                                    $t->addValue($val);
-                                }
-                            }
-                            break;
+                            return $y;
+                        }, $accept);
+                        $accept = implode(',', $accept);
+                        $result->accept = $accept;
                     }
+                } else {
+                    // 2015-07-06, AVS: добавил && (!$this->multiple || $this->required),
+                    // чтобы автоматом не подставлял первое попавшееся
+                    // во множественном
+                    if (!$this->multiple || $this->required) {
+                        $result->default = $this->defval;
+                    }
+                }
+                $result->meta['CustomField'] = $this;
+                $result->oncommit = function (Field $field) {
+                    return $this->oncommit($field);
                 };
-                return $f;
+                return $result;
                 break;
             case 'inherited':
                 if ($this->Owner) {
                     $sqlQuery = "SELECT MIN(inherited)
-                                   FROM " . static::$dbprefix . static::data_table . "
+                                   FROM " . static::$dbprefix . static::DATA_TABLE . "
                                   WHERE pid = ?
                                     AND fid = ?";
                     $sqlBind = [(int)$this->Owner->id, (int)$this->id];
-                    return (bool)(int)static::$SQL->getvalue([
-                        $sqlQuery,
-                        $sqlBind
-                    ]);
+                    return (bool)(int)static::$SQL->getvalue([$sqlQuery, $sqlBind]);
                 }
                 return false;
                 break;
@@ -257,16 +213,118 @@ abstract class CustomField extends SOME
     }
 
 
+    public function __set($var, $val)
+    {
+        switch ($var) {
+            case 'Owner':
+                if ($val instanceof SOME) {
+                    $this->Owner = $val;
+                }
+                break;
+            default:
+                return parent::__set($var, $val);
+                break;
+        }
+    }
+
+
+    /**
+     * Проверяет предзаполненность медиа-поля
+     * @return bool
+     */
+    public function isMediaFilled(): bool
+    {
+        if (!$this->datatypeStrategy->isMedia()) {
+            return false;
+        }
+        $filesData = $this->datatypeStrategy->getFilesData($this, true, true);
+        foreach ($filesData as $fileData) {
+            if ((int)($fileData['meta']['attachment'] ?? 0)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    /**
+     * Создает либо обрабатывает существующее вложение для сущности
+     * @param array $fileData <pre><code>[
+     *     'tmp_name' => string Путь к файлу,
+     *     'name' => string Название файла,
+     *     'type' => string MIME-тип файла
+     * ]</code></pre>
+     * @return Attachment|null
+     */
+    public function processAttachment(array $fileData)
+    {
+        if ($this->datatypeStrategy->isFileLoaded($fileData['tmp_name'] ?? '', Application::i()->debug)) {
+            $attachment = new Attachment();
+
+            $attachment->upload = $fileData['tmp_name'];
+            if (!is_uploaded_file($fileData['tmp_name'])) {
+                $attachment->copy = true;
+            }
+            $attachment->filename = $fileData['name'];
+            $attachment->parent = $this;
+            $attachment->mime = $fileData['type'];
+            if ($this->datatype == 'image') {
+                $attachment->image = 1;
+                if ($maxSize = (int)Application::i()->context->registryGet('maxsize')) {
+                    $attachment->maxWidth = $attachment->maxHeight = $maxSize;
+                }
+                if ($tnSize = (int)Application::i()->context->registryGet('tnsize')) {
+                    $attachment->tnsize = $tnSize;
+                }
+            }
+            $attachment->commit();
+            return $attachment;
+        }
+        return null;
+    }
+
+
+    public function oncommit(Field $field)
+    {
+        $this->deleteValues();
+        if ($this->datatypeStrategy->isMedia()) {
+            $filesData = $this->datatypeStrategy->getFilesData($this, true, true);
+            foreach ($filesData as $key => $fileData) {
+                // 2017-09-05, AVS: убрал создание attachment'а по ID#, чтобы не было конфликтов
+                // в случае дублирования материалов с одним attachment'ом
+                // с текущего момента каждый новый загруженный файл - это новый attachment
+                $attachment = $this->processAttachment($fileData);
+                $oldAttachmentId = (int)($fileData['meta']['attachment'] ?? null);
+                if (!$attachment && $oldAttachmentId) {
+                    $attachment = new Attachment($oldAttachmentId);
+                }
+                if ($attachment && $attachment->id) {
+                    $value = $this->datatypeStrategy->export($attachment);
+                    if ($value !== null) {
+                        $this->addValue($value);
+                    }
+                }
+            }
+            $this->clearLostAttachments();
+        } else {
+            $postData = $this->datatypeStrategy->getPostData($this, true);
+            foreach ($postData as $key => $value) {
+                $value = $this->datatypeStrategy->export($value);
+                if ($value !== null) {
+                    $this->addValue($value);
+                }
+            }
+        }
+    }
+
+
     /**
      * Предполучение значений для кэша
      * @param int[]|SOME[] $parents Родительские объекты
      * @param int[]|self[] $fields Поля
      */
-    public static function prefetch(
-        array $parents = [],
-        array $fields = [],
-        $forceUpdate = false
-    ) {
+    public static function prefetch(array $parents = [], array $fields = [])
+    {
         if (!$parents && !$fields) {
             return;
         }
@@ -283,7 +341,7 @@ abstract class CustomField extends SOME
             return (int)$x;
         }, $fields);
         $sqlQuery = "SELECT pid, fid, fii, value
-                       FROM " . static::$dbprefix . static::data_table;
+                       FROM " . static::$dbprefix . static::DATA_TABLE;
         $sqlWhere = [];
         if ($parentsIds) {
             $sqlWhere[] = "pid IN (" . implode(", ", $parentsIds) . ")";
@@ -325,6 +383,9 @@ abstract class CustomField extends SOME
     public static function clearCache()
     {
         static::$cache = [];
+        static::$sourceCache = [];
+        static::$sourceAssocCache = [];
+        static::$sourceAssocCacheReverse = [];
     }
 
 
@@ -338,7 +399,7 @@ abstract class CustomField extends SOME
             $this->urn = Text::beautify($this->name);
         }
         if (!$this->classname) {
-            $this->classname = static::$references['parent']['classname'];
+            $this->classname = static::$references['parent']['classname'] ?? SOME::class;
         }
         $sqlQuery = "SELECT COUNT(*)
                        FROM " . static::_tablename() . "
@@ -347,13 +408,7 @@ abstract class CustomField extends SOME
                         AND pid = ?
                         AND id != ?";
         while (in_array($this->urn, ['name', 'description']) ||
-            (int)static::$SQL->getvalue([
-                $sqlQuery,
-                $this->urn,
-                $this->classname,
-                (int)$this->pid,
-                (int)$this->id
-            ])
+            (int)static::$SQL->getvalue([$sqlQuery, $this->urn, $this->classname, (int)$this->pid, (int)$this->id])
         ) {
             $this->urn = '_' . $this->urn . '_';
         }
@@ -366,20 +421,25 @@ abstract class CustomField extends SOME
      * @param mixed $val Значение для проверки
      * @return bool
      */
-    public function isFilled($val)
+    public function isFilled($value)
     {
-        return $this->Field->_isFilled($val);
+        return $this->datatypeStrategy->isFilled($value, Application::i()->debug);
     }
 
 
     /**
      * Проверяет, корректно ли заполнено поле
+     * !!! ВАЖНО: 2023-12-01 изменен интерфейс для медиа-полей: $value должно быть типа <ФАЙЛ>
      * @param mixed $val Значение для проверки
      * @return bool
      */
-    public function validate($val)
+    public function validate($value)
     {
-        return $this->Field->_validate($val);
+        try {
+            return $this->datatypeStrategy->validate($value, $this->Field);
+        } catch (Exception $e) {
+            return false;
+        }
     }
 
 
@@ -388,9 +448,9 @@ abstract class CustomField extends SOME
      * @param int $index Индекс (начиная с 0)
      * @return mixed
      */
-    public function getValue($index = 0)
+    public function getRawValue($index = 0)
     {
-        if (!$this->Owner || !static::data_table) {
+        if (!$this->Owner || !static::DATA_TABLE) {
             return null;
         }
         $this->prefetchIfNotExists();
@@ -398,76 +458,68 @@ abstract class CustomField extends SOME
         if (isset(static::$cache[$this->Owner->id][$this->id][$index])) {
             $value = static::$cache[$this->Owner->id][$this->id][$index];
         }
-        switch ($this->datatype) {
-            case 'image':
-            case 'file':
-                $att = new Attachment((int)$value);
-                return $att;
-                break;
-            case 'number':
-                return str_replace(',', '.', (float)$value);
-                break;
-            case 'datetime':
-            case 'datetime-local':
-                $value = str_replace(' ', 'T', $value);
-                break;
-        }
         return $value;
     }
 
 
     /**
-     * Возвращает значение (значения) поля
-     * @param bool $forceArray Представить в виде массива,
-     *                         даже если значение одно
-     * @return mixed Значение поля, если оно одно и не установлен $forceArray,
-     *               массив значений в противном случае
+     * Возвращает первично обработанное значение по индексу
+     * @param int $index Индекс (начиная с 0)
+     * @return mixed
      */
-    public function getValues($forceArray = false)
+    public function getValue($index = 0)
     {
-        if (!$this->Owner || !static::data_table) {
+        if (!$this->Owner || !static::DATA_TABLE) {
+            return null;
+        }
+        $value = $this->getRawValue($index);
+        $result = $this->datatypeStrategy->import($value);
+        return $result;
+    }
+
+
+    /**
+     * Возвращает сырое значение (значения) поля
+     * @param bool $forceArray Представить в виде массива, даже если значение одно
+     * @return mixed Значение поля, если поле одиночное и не установлен $forceArray, массив значений в противном случае
+     */
+    public function getRawValues($forceArray = false)
+    {
+        if (!$this->Owner || !static::DATA_TABLE) {
             return null;
         }
         if (!$this->multiple && !$forceArray) {
-            return $this->getValue();
+            return $this->getRawValue();
         }
         $this->prefetchIfNotExists();
         $values = null;
         if (isset(static::$cache[$this->Owner->id][$this->id])) {
             $values = static::$cache[$this->Owner->id][$this->id];
         }
-        switch ($this->datatype) {
-            case 'image':
-            case 'file':
-                $values = array_map(
-                    function ($x) {
-                        return new Attachment((int)$x);
-                    },
-                    $values
-                );
-                break;
-            case 'number':
-                return array_map(
-                    function ($x) {
-                        return str_replace(',', '.', $x);
-                    },
-                    (array)$values
-                );
-                break;
-            case 'datetime':
-            case 'datetime-local':
-                $values = array_map(
-                    function ($x) {
-                        return str_replace(' ', 'T', $x);
-                    },
-                    (array)$values
-                );
-                break;
-        }
         if ($forceArray) {
             $values = (array)$values;
-            // 2022-01-26, AVS: Если хотим получить массив, то принудительно приводим к массиву, иначе возникают ошибки во многих местах
+            // 2022-01-26, AVS: Если хотим получить массив, то принудительно приводим к массиву,
+            // иначе возникают ошибки во многих местах
         }
+        return $values;
+    }
+
+
+    /**
+     * Возвращает значение (значения) поля
+     * @param bool $forceArray Представить в виде массива, даже если значение одно
+     * @return mixed Значение поля, если поле одиночное и не установлен $forceArray, массив значений в противном случае
+     */
+    public function getValues($forceArray = false)
+    {
+        if (!$this->Owner || !static::DATA_TABLE) {
+            return null;
+        }
+        if (!$this->multiple && !$forceArray) {
+            return $this->getValue();
+        }
+        $values = $this->getRawValues($forceArray);
+        $values = $this->datatypeStrategy->batchImport((array)$values);
         return $values;
     }
 
@@ -477,30 +529,19 @@ abstract class CustomField extends SOME
      * @param mixed $x "Сырое" значение (используется первое текущее, если null)
      * @return mixed
      */
-    public function doRich($x = null)
+    public function doRich($value = null)
     {
-        if ($x === null) {
-            $x = $this->getValue();
+        if ($value === null) {
+            $value = $this->getValue();
         }
-        switch ($this->datatype) {
-            case 'datetime':
-            case 'datetime-local':
-                $x = str_replace('T', ' ', $x);
-                break;
-            case 'number':
-                return str_replace(',', '.', (float)$x);
-                break;
-            case 'checkbox':
-            case 'radio':
-            case 'select':
-                if ($this->multiple || ($this->datatype != 'checkbox')) {
-                    $x = $this->getCaption($x);
-                } else {
-                    $x = (bool)$x;
-                }
-                break;
+        if ($this->sourceStrategy) {
+            $result = $this->getCaption($value);
+        } elseif (($this->datatype == 'checkbox') && !$this->multiple) {
+            $result = (bool)$value;
+        } else {
+            $result = $value;
         }
-        return $x;
+        return $result;
     }
 
 
@@ -521,18 +562,17 @@ abstract class CustomField extends SOME
      * Возвращает человеко-понятное значение (значения) поля
      * @param bool $forceArray Представить в виде массива,
      *                         даже если значение одно
-     * @return mixed Значение поля, если оно одно и не установлен $forceArray,
-     *               массив значений в противном случае
+     * @return mixed Значение поля, если поле одиночное и не установлен $forceArray, массив значений в противном случае
      */
     public function getRichValues($forceArray = false)
     {
+        if (!$this->multiple && !$forceArray) {
+            return $this->getRichValue();
+        }
         $values = $this->getValues(true);
         $result = array_map(function ($x) {
             return $this->doRich($x);
         }, $values);
-        if ((count($result) == 1) && !$forceArray) {
-            $result = array_shift($result);
-        }
         return $result;
     }
 
@@ -544,45 +584,33 @@ abstract class CustomField extends SOME
      */
     public function getRichString($separator = ', ')
     {
-        $richValues = array_map(function ($x) {
-            if (is_object($x)) {
-                return $x->name;
+        $richValues = $this->getRichValues(true);
+        $result = [];
+        foreach ($richValues as $richValue) {
+            if (is_object($richValue)) {
+                $result[] = $richValue->name;
             } else {
-                return $x;
+                $result[] = $richValue;
             }
-        }, $this->getRichValues(true));
-        $result = implode($separator, $richValues);
+        }
+        $result = implode($separator, $result);
         return $result;
     }
 
 
     /**
-     * Возвращает "сырое"" значение из человеко-понятного
+     * Возвращает "сырое" значение из человеко-понятного
      * @param mixed $x Человеко-понятное значение
      * @return mixed
      */
-    public function fromRich($x = null)
+    public function fromRich($value = null)
     {
-        switch ($this->datatype) {
-            case 'datetime':
-            case 'datetime-local':
-                $x = str_replace('T', ' ', $x);
-                $x = date('Y-m-d H:i:s', strtotime($x));
-                break;
-            case 'number':
-                return str_replace(',', '.', (float)$x);
-                break;
-            case 'checkbox':
-            case 'radio':
-            case 'select':
-                if ($this->multiple || ($this->datatype != 'checkbox')) {
-                    $x = $this->getFromCaption($x);
-                } else {
-                    $x = (bool)$x;
-                }
-                break;
+        if ($this->sourceStrategy) {
+            return $this->getFromCaption($value);
+        } elseif (($this->datatype == 'checkbox') && !$this->multiple) {
+            return (bool)$value;
         }
-        return $x;
+        return $value;
     }
 
 
@@ -592,7 +620,7 @@ abstract class CustomField extends SOME
      */
     public function countValues()
     {
-        if (!$this->Owner || !static::data_table) {
+        if (!$this->Owner || !static::DATA_TABLE) {
             return null;
         }
         $this->prefetchIfNotExists();
@@ -614,16 +642,7 @@ abstract class CustomField extends SOME
      */
     public function setValue($value, $index = 0)
     {
-        switch ($this->datatype) {
-            case 'number':
-                $value = (float)str_replace(',', '.', (float)$value);
-                break;
-            case 'datetime':
-            case 'datetime-local':
-                $value = str_replace('T', ' ', $value);
-                break;
-        }
-        if (!$this->Owner || !static::data_table) {
+        if (!$this->Owner || !static::DATA_TABLE) {
             return null;
         }
         $this->prefetchIfNotExists();
@@ -633,7 +652,7 @@ abstract class CustomField extends SOME
             'fii' => (int)$index,
             'value' => $value
         ];
-        static::$SQL->add(static::$dbprefix . static::data_table, $arr);
+        static::$SQL->add(static::$dbprefix . static::DATA_TABLE, $arr);
         static::$cache[trim($this->Owner->id)][trim($this->id)][trim($index)] = $value;
         return $value;
     }
@@ -648,7 +667,7 @@ abstract class CustomField extends SOME
      */
     public function addValue($value, $index = null)
     {
-        if (!$this->Owner || !static::data_table) {
+        if (!$this->Owner || !static::DATA_TABLE) {
             return null;
         }
         $sqlBind = [(int)$this->Owner->id, (int)$this->id, (int)$index];
@@ -657,14 +676,9 @@ abstract class CustomField extends SOME
         } else {
             $this->prefetchIfNotExists();
             if (isset(static::$cache[$this->Owner->id][$this->id])) {
-                array_splice(
-                    static::$cache[$this->Owner->id][$this->id],
-                    $index,
-                    0,
-                    [null]
-                );
+                array_splice(static::$cache[$this->Owner->id][$this->id], $index, 0, [null]);
             }
-            $sqlQuery = "UPDATE " . static::$dbprefix . static::data_table . "
+            $sqlQuery = "UPDATE " . static::$dbprefix . static::DATA_TABLE . "
                             SET fii = fii + 1
                           WHERE pid = ?
                             AND fid = ?
@@ -682,17 +696,17 @@ abstract class CustomField extends SOME
      */
     public function deleteValue($index = 0)
     {
-        if (!$this->Owner || !static::data_table) {
+        if (!$this->Owner || !static::DATA_TABLE) {
             return null;
         }
         $this->prefetchIfNotExists();
-        $sqlQuery = "DELETE FROM " . static::$dbprefix . static::data_table . "
+        $sqlQuery = "DELETE FROM " . static::$dbprefix . static::DATA_TABLE . "
                       WHERE pid = ?
                         AND fid = ?
                         AND fii = ?";
         $sqlBind = [(int)$this->Owner->id, (int)$this->id, (int)$index];
         static::$SQL->query([$sqlQuery, $sqlBind]);
-        $sqlQuery = "UPDATE " . static::$dbprefix . static::data_table . "
+        $sqlQuery = "UPDATE " . static::$dbprefix . static::DATA_TABLE . "
                         SET fii = fii - 1
                       WHERE pid = ?
                         AND fid = ?
@@ -700,11 +714,7 @@ abstract class CustomField extends SOME
                    ORDER BY fii ASC";
         static::$SQL->query([$sqlQuery, $sqlBind]);
         if (isset(static::$cache[$this->Owner->id][$this->id])) {
-            array_splice(
-                static::$cache[$this->Owner->id][$this->id],
-                $index,
-                1
-            );
+            array_splice(static::$cache[$this->Owner->id][$this->id], $index, 1);
         }
     }
 
@@ -714,10 +724,10 @@ abstract class CustomField extends SOME
      */
     public function deleteValues()
     {
-        if (!$this->Owner || !static::data_table) {
+        if (!$this->Owner || !static::DATA_TABLE) {
             return null;
         }
-        $sqlQuery = "DELETE FROM " . static::$dbprefix . static::data_table . "
+        $sqlQuery = "DELETE FROM " . static::$dbprefix . static::DATA_TABLE . "
                       WHERE pid = ?
                         AND fid = ?";
         $sqlBind = [(int)$this->Owner->id, (int)$this->id];
@@ -734,23 +744,23 @@ abstract class CustomField extends SOME
      */
     public function clearLostAttachments()
     {
-        if (in_array($this->datatype, ['file', 'image'])) {
+        if ($this->datatypeStrategy->isMedia()) {
             $sqlQuery = "SELECT value
-                           FROM " . static::$dbprefix . static::data_table . "
+                           FROM " . static::$dbprefix . static::DATA_TABLE . "
                           WHERE fid = " . (int)$this->id;
-            $sqlResult = array_filter(static::$SQL->getcol($sqlQuery), 'intval');
+            $sqlResult = static::$SQL->getcol($sqlQuery);
+            $affectedIds = $this->datatypeStrategy->batchImportAttachmentsIds($sqlResult);
+
             $sqlQuery = "SELECT *
                            FROM " . Attachment::_tablename() . "
                           WHERE classname = '" . self::$SQL->real_escape_string(get_class($this)) . "'
                             AND pid = " . (int)$this->id;
-            if ($sqlResult) {
-                $sqlQuery .= " AND id NOT IN (" . implode(", ", $sqlResult) . ")";
+            if ($affectedIds) {
+                $sqlQuery .= " AND id NOT IN (" . implode(", ", $affectedIds) . ")";
             }
             $sqlResult = Attachment::getSQLSet($sqlQuery);
             if ($sqlResult) {
-                foreach ($sqlResult as $row) {
-                    Attachment::delete($row);
-                }
+                Attachment::batchDelete($sqlResult);
             }
         }
     }
@@ -761,252 +771,33 @@ abstract class CustomField extends SOME
      */
     public function inheritValues()
     {
-        $sqlQuery = "UPDATE " . static::$dbprefix . static::data_table . "
+        $sqlQuery = "UPDATE " . static::$dbprefix . static::DATA_TABLE . "
                         SET inherited = 1
                       WHERE pid = ?
                         AND fid = ?";
         $sqlBind = [(int)$this->Owner->id, (int)$this->id];
         static::$SQL->query([$sqlQuery, $sqlBind]);
 
-        if ($this->Owner->all_children_ids &&
-            is_array($this->Owner->all_children_ids)
-        ) {
-            if ($temp = array_values(array_map('intval', array_filter(
-                $this->Owner->all_children_ids,
-                'intval'
-            )))) {
-                $sqlQuery = "DELETE FROM " . static::$dbprefix . static::data_table . "
+        if ($this->Owner->all_children_ids && is_array($this->Owner->all_children_ids)) {
+            if ($temp = array_values(array_map('intval', array_filter($this->Owner->all_children_ids, 'intval')))) {
+                $sqlQuery = "DELETE FROM " . static::$dbprefix . static::DATA_TABLE . "
                               WHERE fid = " . (int)$this->id . "
                                 AND pid IN (" . implode(", ", $temp) . ")";
                 static::$SQL->query($sqlQuery);
 
                 $classname = get_class($this->Owner);
-                $sqlQuery = "INSERT INTO " . static::$dbprefix . static::data_table . " (pid, fid, fii, value, inherited)
-                             SELECT tP.id AS pid, tD.fid, tD.fii, tD.value, tD.inherited
+
+                $sqlQuery = "SELECT tP.id AS pid, tD.fid, tD.fii, tD.value, tD.inherited
                                FROM " . $classname::_tablename() . " AS tP
-                               JOIN " . static::$dbprefix . static::data_table . " AS tD
+                               JOIN " . static::$dbprefix . static::DATA_TABLE . " AS tD
                               WHERE tD.pid = " . (int)$this->Owner->id . "
                                 AND fid = " . (int)$this->id . "
                                 AND tP.id IN (" . implode(", ", $temp) . ")";
-                static::$SQL->query($sqlQuery);
+                $sqlResult = static::$SQL->get($sqlQuery);
+
+                static::$SQL->add(static::$dbprefix . static::DATA_TABLE, $sqlResult);
             }
         }
-    }
-
-
-    /**
-     * Разбирает CSV-текст источника в стандартный источник
-     * @param string $text Текст для разбора
-     * @return array <pre>[Стандартный источник]</pre>
-     */
-    protected static function parseCSV($text)
-    {
-        $csv = new CSV($text);
-        $data = [];
-
-        $steps = array_keys(array_filter($csv->data[0] ?? [], 'trim'));
-        $currentStep = array_shift($steps);
-        $backtrace = [[$currentStep, &$data]];
-        $last = null;
-
-        for ($i = 0; $i < count($csv->data); $i++) {
-            $row = $csv->data[$i];
-            $steps = array_keys(array_filter($row, 'trim'));
-            $step = array_shift($steps);
-
-            if ($step != $currentStep) {
-                for ($j = 0; ($j < count($backtrace)) && ($backtrace[$j][0] <= $step); $j++) {
-                }
-                if ($j >= count($backtrace)) {
-                    $last['children'] = [];
-                    $backtrace[] = [$step, &$last['children']];
-                } else {
-                    $backtrace = array_slice($backtrace, 0, $j);
-                }
-                $currentStep = $step;
-            }
-            $row = array_slice($row, $currentStep);
-
-            $val = trim(isset($row[0]) ? $row[0] : '');
-            $key = trim(isset($row[1]) && $row[1] ? $row[1] : $row[0]);
-            $backtrace[count($backtrace) - 1][1][$key] = ['name' => $val];
-            $last =& $backtrace[count($backtrace) - 1][1][$key];
-        }
-
-        return $data;
-    }
-
-
-    /**
-     * Разбирает INI-текст источника в стандартный источник
-     * @param string $text Текст для разбора
-     * @return array <pre>[Стандартный источник]</pre>
-     */
-    protected static function parseINI($text)
-    {
-        $ini = @parse_ini_string($text);
-        $data = [];
-        foreach ($ini as $key => $val) {
-            $data[trim($key)] = ['name' => trim($val)];
-        }
-        return $data;
-    }
-
-
-    /**
-     * Разбирает XML-текст источника в стандартный источник
-     * @param string $text Текст для разбора
-     * @return array <pre>[Стандартный источник]</pre>
-     */
-    protected static function parseXML($text)
-    {
-        $data = [];
-        if ($text instanceof SimpleXMLElement) {
-            $sxe = $text;
-        } else {
-            try {
-                $sxe = new SimpleXMLElement((string)$text);
-            } catch (Exception $e) {
-                try {
-                    $sxe = new SimpleXMLElement(
-                        '<dictionary>' . $text . '</dictionary>'
-                    );
-                } catch (Exception $e) {
-                }
-            }
-        }
-        if ($sxe) {
-            foreach ($sxe->children() as $row) {
-                if (isset($row['title']) && trim($row['title'])) {
-                    $val = $row['title'];
-                } elseif (isset($row['name']) && trim($row['name'])) {
-                    $val = $row['name'];
-                } else {
-                    $val = $row->getName();
-                }
-                $val = trim($val);
-                if (isset($row['value']) && trim($row['value'])) {
-                    $key = $row['value'];
-                } elseif (isset($row['id']) && trim($row['id'])) {
-                    $key = $row['id'];
-                } else {
-                    $key = $val;
-                }
-                $key = trim($key);
-                $data[$key] = ['name' => $val];
-                if ($temp = static::parseXML($row)) {
-                    $data[$key]['children'] = $temp;
-                }
-            }
-        }
-        return $data;
-    }
-
-
-    /**
-     * Разбирает результат SQL-запроса источника в стандартный источник
-     * @param string $text Текст запроса
-     * @param int $pid Фильтрация по родительскому ID#
-     *     (для внутреннего использования)
-     * @return array <pre>[Стандартный источник]</pre>
-     */
-    protected static function parseSQL($text, $pid = 0)
-    {
-        $data = [];
-        if (is_array($text)) {
-            $sqlResult = $text;
-        } else {
-            $rx = '/(INSERT )|(UPDATE )|(DELETE )|(FILE )|(CREATE )|(ALTER )|(INDEX )|(DROP )|(REPLACE )/i';
-            if (preg_match($rx, $text)) {
-                return $data;
-            }
-            $sqlResult = static::$SQL->get((string)$text);
-        }
-        if ($sqlResult) {
-            $rawData = array_values(
-                array_filter(
-                    $sqlResult,
-                    function ($x) use ($pid) {
-                        $originalPid = isset($x['pid']) ? $x['pid'] : null;
-                        return ($originalPid == $pid) || (!$originalPid && !$pid);
-                    }
-                )
-            );
-            foreach ($rawData as $row) {
-                if (isset($row['name']) && trim($row['name'])) {
-                    $val = $row['name'];
-                } else {
-                    $val = array_shift(array_values($row));
-                }
-                $val = trim($val);
-                if (isset($row['val']) && trim($row['val'])) {
-                    $key = $row['val'];
-                } else {
-                    $key = $val;
-                }
-                $key = trim($key);
-                $data[$key] = ['name' => $val];
-                if ($temp = static::parseSQL($sqlResult, $key)) {
-                    $data[$key]['children'] = $temp;
-                }
-            }
-        }
-        return $data;
-    }
-
-
-    /**
-     * Разбирает результат выполнения PHP-кода источника в стандартный источник
-     * @param string $text PHP-код для выполнения
-     * @return array <pre>[Стандартный источник]</pre>
-     */
-    protected static function parsePHP($text)
-    {
-        $data = [];
-        if (is_array($text)) {
-            $result = $text;
-        } else {
-            $result = @eval($text . ' ;');
-        }
-        if ($result) {
-            foreach ((array)$result as $key => $arr) {
-                $key = trim($key);
-                if (is_array($arr)) {
-                    $data[$key] = [];
-                    if (isset($arr['name'])) {
-                        $data[$key]['name'] = $arr['name'];
-                    }
-                    if (isset($arr['children']) &&
-                        ($temp = static::parsePHP($arr['children']))
-                    ) {
-                        $data[$key]['children'] = $temp;
-                    }
-                } else {
-                    $data[$key] = ['name' => trim($arr)];
-                }
-            }
-        }
-        return $data;
-    }
-
-
-    /**
-     * Разбирает дерево справочника источника в стандартный источник
-     * @param Dictionary $dictionary Справочник для разбора
-     * @return array <pre>[Стандартный источник]</pre>
-     */
-    protected static function parseDictionary(Dictionary $dictionary)
-    {
-        $data = [];
-        foreach ($dictionary->children as $row) {
-            $key = $row->urn;
-            $val = $row->name;
-            $data[$key] = ['name' => $val];
-            if ($temp = static::parseDictionary($row)) {
-                $data[$key]['children'] = $temp;
-            }
-        }
-        return $data;
     }
 
 
@@ -1020,10 +811,10 @@ abstract class CustomField extends SOME
         if (trim($key) === '') {
             return null;
         }
-        if (!(static::$sourceAssocCache[$this->id] ?? false)) {
+        if (!$this->id || !(static::$sourceAssocCache[$this->id] ?? false)) {
             $this->stdSource; // Вызовем для формирования ассоциативного массива
         }
-        $result = static::$sourceAssocCache[$this->id][$key];
+        $result = static::$sourceAssocCache[$this->id][$key] ?? $key;
         return $result;
     }
 
@@ -1038,52 +829,35 @@ abstract class CustomField extends SOME
         if (!$val) {
             return null;
         }
-        if (!static::$sourceAssocCacheReverse[$this->id]) {
+        if (!(static::$sourceAssocCacheReverse[$this->id] ?? null)) {
             $this->stdSource; // Вызовем для формирования ассоциативного массива
         }
-        $result = static::$sourceAssocCacheReverse[$this->id][mb_strtolower(trim($val))];
+        $result = static::$sourceAssocCacheReverse[$this->id][mb_strtolower(trim($val))] ?? null;
         return $result;
     }
 
 
     /**
      * Возвращает стандартный источник поля
-     * @return array <pre>[Стандартный источник]</pre>
+     * @return array <pre><Стандартный источник></pre>
      */
     protected function _stdSource()
     {
-        if (!trim($this->source)) {
+        if (!$this->source_type || !trim($this->source)) {
             return [];
         }
-        if (isset(static::$sourceCache[$this->id]) &&
-            static::$sourceCache[$this->id]
-        ) {
+        if ($this->id && isset(static::$sourceCache[$this->id]) && static::$sourceCache[$this->id]) {
             return static::$sourceCache[$this->id];
         }
         $result = [];
-        switch ($this->source_type) {
-            case 'csv':
-                $result = (array)static::parseCSV($this->source);
-                break;
-            case 'ini':
-                $result = (array)static::parseINI($this->source);
-                break;
-            case 'xml':
-                $result = (array)static::parseXML($this->source);
-                break;
-            case 'sql':
-                $result = (array)static::parseSQL($this->source);
-                break;
-            case 'php':
-                $result = (array)static::parsePHP($this->source);
-                break;
-            case 'dictionary':
-                $classname = static::DictionaryClass;
-                $result = (array)static::parseDictionary(
-                    new $classname((int)$this->source)
-                );
-                break;
+
+        $source = $this->source;
+        if ($this->source_type == 'dictionary') {
+            $classname = static::DICTIONARY_CLASS;
+            $source = new $classname((int)$source);
         }
+        $result = $this->sourceStrategy->parse($source);
+
         static::$sourceCache[trim($this->id)] = $result;
         static::$sourceAssocCache[trim($this->id)] = $this->getSourceAssoc($result);
         static::$sourceAssocCacheReverse[trim($this->id)] = [];
@@ -1116,7 +890,7 @@ abstract class CustomField extends SOME
 
     /**
      * Возвращает набор опций для формы RAAS
-     * @param array $stdSource <pre>[Стандартный источник]</pre> Источник поля
+     * @param array $stdSource <pre><Стандартный источник></pre> Источник поля
      * @param Field $parentField Родительское поле для опций
      * @return OptionCollection
      */
@@ -1143,10 +917,7 @@ abstract class CustomField extends SOME
             ]);
             if (isset($val['children'])) {
                 $level++;
-                $Option->children = $this->_getFieldChildren(
-                    $val['children'],
-                    $parentField
-                );
+                $Option->children = $this->_getFieldChildren($val['children'], $parentField);
                 $level--;
             }
             $options[] = $Option;
@@ -1174,23 +945,43 @@ abstract class CustomField extends SOME
 
     public function reorder()
     {
-        list($step, $where, $priorityN) = func_get_args();
-        $where = (array)$where;
+        $args = func_get_args();
+        $step = $args[0] ?? 0;
+        $where = (array)($args[1] ?? []);
+        $priorityN = trim($args[2] ?? '');
         $where[] = "classname = '" . static::$SQL->real_escape_string($this->classname) . "'";
-        $where = array_map(
-            function ($x) {
-                return "(" . $x . ")";
-            },
-            $where
-        );
+        $where = array_map(function ($x) {
+            return "(" . $x . ")";
+        }, $where);
         $where = implode(" AND ", $where);
         parent::reorder($step, $where, $priorityN);
     }
 
 
+    /**
+     * Меняет значение свойства "обязательно для заполнения"
+     */
+    public function required()
+    {
+        $this->required = (int)!(bool)$this->required;
+        $this->commit();
+    }
+
+
     public static function delete(SOME $object)
     {
-        $object->deleteValues();
+        $sqlQuery = "DELETE FROM " . static::$dbprefix . static::DATA_TABLE . "
+                      WHERE fid = ?";
+        $sqlBind = [(int)$object->id];
+        static::$SQL->query([$sqlQuery, $sqlBind]);
+        foreach (static::$cache as $ownerId => $ownerFields) {
+            if (isset(static::$cache[$ownerId][$object->id])) {
+                unset(static::$cache[$ownerId][$object->id]);
+            }
+        }
+        if ($object->datatypeStrategy->isMedia()) {
+            $object->clearLostAttachments();
+        }
         parent::delete($object);
     }
 }

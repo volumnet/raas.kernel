@@ -205,7 +205,7 @@ class Attachment extends SOME
         // 2022-12-27, AVS: сделал дополнительную проверку на существование других вложений, ссылающихся на данный файл
         // Если они обнаружены, файл не удаляется
         // (хотя такого быть не должно, практика показывает что такое встречается)
-        if (static::checkSharedFiles($items) > 0) {
+        if (static::checkSharedFiles($items)) {
             return;
         }
         foreach ($items as $item) {

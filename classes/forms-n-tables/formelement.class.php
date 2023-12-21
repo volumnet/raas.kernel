@@ -38,9 +38,11 @@ abstract class FormElement extends HTMLElement
 
     public function __get($var)
     {
-        switch($var) {
+        switch ($var) {
             case 'Form':
-                return $this->Parent->__get('Form');
+                if ($this->Parent) {
+                    return $this->Parent->__get('Form');
+                }
                 break;
             default:
                 return parent::__get($var);
@@ -50,7 +52,12 @@ abstract class FormElement extends HTMLElement
 
     public function __set($var, $val)
     {
-        switch ($var){
+        switch ($var) {
+            case 'Form':
+                if ($val instanceof FormElement) {
+                    $this->Parent = $val;
+                }
+                break;
             case 'Parent':
                 if ($val instanceof FormElement) {
                     $this->$var = $val;
@@ -79,7 +86,6 @@ abstract class FormElement extends HTMLElement
                 parent::__set($var, $val);
                 break;
         }
-
     }
 
 

@@ -137,6 +137,8 @@ abstract class Package extends Singleton implements IRightsContext
 
     public function init()
     {
+        $this->registerDatatypes();
+        $this->registerSources();
         spl_autoload_register([$this, 'autoload']);
         if ($this->SQL) {
             $this->install();

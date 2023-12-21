@@ -5,6 +5,16 @@
  * @version 4.2
  * @author Alex V. Surnin <info@volumnet.ru>
  * @copyright 2013, Volume Networks
+ *
+ * <pre><code>
+ * Предустановленные типы:
+ *
+ * <ОШИБКА> => [
+ *     'name' => string Код ошибки,
+ *     'value' => string Имя поля,
+ *     'description' => string Текстовое описание ошибки
+ * ]
+ * </code></pre>
  */
 namespace RAAS;
 
@@ -16,21 +26,32 @@ use SOME\SOME;
  * @property mixed $default значение по умолчанию
  * @property-read bool $isFilled заполнено ли поле
  * @property-read bool|array $validate проверка на правильность заполнения поля - true в случае успешной проверки,
- *                           в случае неуспешной - для multiple - массив числовых индексов ошибочных полей (с нуля), для остальных - false
+ *     в случае неуспешной - для multiple - массив числовых индексов ошибочных полей (с нуля), для остальных - false
  * @property-read bool $matchConfirm совпадают ли пароли с подтверждениями (для не паролей - всегда true)
  * @property-read bool $required поле обязательно для заполнения
  * @property-read bool $multiple поле допускает множественные значения
- * @property callable $check Кастомизированный метод проверки ошибок. Возвращает array массив ошибок формата метода getErrors - см. описание там
- * @property callable $export Кастомизированный метод назначения переменной для сохранения.
- * @property callable $import Кастомизированный метод импорта переменной.
- * @property callable $oncommit Кастомизированный метод, вызываемый после коммита формы.
- * @property-write OptionCollection|array|string|null $children либо наследуемое значение для установки поля $children, либо массив "$x" в формате аргументов
- *                                                    метода parseSet(
- *                                                               $x['Set'], $x['name'], $x['level'], $x['children'], $x['additional'], $x['useOptionGroups']
- *                                                           ) - см. описание там
+ * @property callable $check <pre><code>function (self $field): array<<ОШИБКА>></code></pre>
+ *     Кастомизированный метод проверки ошибок
+ * @property callable $export <pre><code>function (self $field): void</code></pre>
+ *     Кастомизированный метод назначения переменной для сохранения.
+ * @property callable $import <pre><code>function (self $field): mixed</code></pre>
+ *     Кастомизированный метод импорта переменной.
+ * @property callable $oncommit <pre><code>function (self $field): void</code></pre>
+ *     Кастомизированный метод, вызываемый после коммита формы.
+ * @property-write OptionCollection|array|string|null $children либо наследуемое значение для установки поля $children,
+ *     либо массив "$x" в формате аргументов метода
+ *     parseSet($x['Set'], $x['name'], $x['level'], $x['children'], $x['additional'], $x['useOptionGroups']) -
+ *     см. описание там
  * @property string $errorEmptyString Идентификатор строки перевода "Необходимо заполнить поле %s"
  * @property string $errorInvalidString Идентификатор строки перевода "Поле %s заполнено неправильно"
+ * @property string $errorEmptyFileString Идентификатор строки перевода "Необходимо загрузить файл %s"
+ * @property string $errorInvalidFileString Идентификатор строки перевода "Файл %s недопустимого формата"
+ * @property string $errorInvalidFileWithExtensionsString Идентификатор строки перевода "Файл %s недопустимого формата. Допустимые форматы: %s"
+ * @property string $errorInvalidImageString Идентификатор строки перевода "Некорректный формат изображения. Доступные форматы: GIF, JPG, PNG"
  * @property string $errorDoesntMatch Идентификатор строки перевода "Пароль и его подтверждение не совпадают"
+ * @property string $datatypeStrategyURN URN стратегии типа данных
+ * @property callable $isMediaFilled <pre><code>function (self $field): bool</code></pre>
+ *     Кастомизированный метод проверки заполненности медиа-поля
  */
 class Field extends OptionContainer
 {
@@ -92,6 +113,18 @@ class Field extends OptionContainer
     protected $errorInvalidFileString = '';
 
     /**
+     * Идентификатор строки перевода "Файл %s недопустимого формата. Допустимые форматы: %s"
+     * @var string
+     */
+    protected $errorInvalidFileWithExtensionsString = '';
+
+    /**
+     * Идентификатор строки перевода "Некорректный формат изображения. Доступные форматы: GIF, JPG, PNG"
+     * @var string
+     */
+    protected $errorInvalidImageString = '';
+
+    /**
      * Идентификатор строки перевода "Пароль и его подтверждение не совпадают"
      * @var string
      */
@@ -99,84 +132,131 @@ class Field extends OptionContainer
 
     /**
      * Кастомизированный метод проверки ошибок
-     * @var callable
+     * @var callable <pre><code>function (self $field): array<<ОШИБКА>></code></pre>
      */
     protected $check;
 
     /**
      * Кастомизированный метод назначения переменной для сохранения
-     * @var callable
+     * @var callable <pre><code>function (self $field): void</code></pre>
      */
     protected $export;
 
     /**
      * Кастомизированный метод импорта переменной
-     * @var callable
+     * @var callable <pre><code>function (self $field): mixed</code></pre>
      */
     protected $import;
+
+    /**
+     * URN стратегии типа данных (если пусто, то совпадает с типом)
+     * @var string
+     */
+    protected $datatypeStrategyURN;
+
+    /**
+     * Кастомизированный метод проверки заполненности медиа-поля
+     * @var callable <pre><code>function (self $field): bool</code></pre>
+     */
+    protected $isMediaFilled;
 
     public function __get($var)
     {
         switch ($var) {
             case 'isFilled':
-                switch ($this->type) {
-                    case 'file':
-                    case 'image':
-                        $val = isset($_FILES[$this->name]['tmp_name']) ? $_FILES[$this->name]['tmp_name'] : null;
-                        break;
-                    default:
-                        $val = isset($_POST[$this->name]) ? $_POST[$this->name] : null;
-                        break;
-                }
-                if ($this->multiple) {
-                    $row = $this;
-                    return (bool)array_filter(array_map(function ($x) use ($row) {
-                        return $row->_isFilled($x);
-                    }, (array)$val), 'intval');
+                $datatypeStrategy = $this->datatypeStrategy;
+                if ($this->datatypeStrategy->isMedia()) {
+                    $filesArr = $this->datatypeStrategy->getFilesData($this, true);
+                    foreach ($filesArr as $fileEntry) {
+                        if ($datatypeStrategy->isFilled($fileEntry['tmp_name'] ?? null, Application::i()->debug)) {
+                            return true;
+                        }
+                    }
+                    if ($mediaFilledFunction = $this->isMediaFilled) {
+                        $mediaFilled = $mediaFilledFunction($this);
+                    } else {
+                        $mediaFilled = $this->isMediaFilledDefault();
+                    }
+                    if ($mediaFilled) {
+                        return true;
+                    }
                 } else {
-                    return $this->_isFilled($val);
+                    $postArr = $this->datatypeStrategy->getPostData($this, true);
+                    foreach ($postArr as $value) {
+                        if ($datatypeStrategy->isFilled($value)) {
+                            return true;
+                        }
+                    }
                 }
+                return false;
                 break;
             case 'matchConfirm':
                 if ($this->type != 'password') {
                     return true;
                 }
-                if ($val === null) {
-                    $val = isset($_POST[$this->name]) ? $_POST[$this->name] : null;
-                }
-                $conf = isset($_POST[$this->name . '@confirm']) ? $_POST[$this->name . '@confirm'] : null;
+                // 2023-11-30, AVS:
+                // Нельзя просто делать clone $this, т.к. ArrayObject'ы, через которые задаются свойства, привяжутся
+                // к обоим объектам, и попытка поменять имя у второго поменяет его у первого
+                $confirmField = new static([
+                    'datatype' => $this->datatype,
+                    'name' => $this->name . '@confirm',
+                ]);
+
+                $val = $this->datatypeStrategy->getPostData($this);
+                $conf = $this->datatypeStrategy->getPostData($confirmField);
                 return $val == $conf;
                 break;
             case 'validate':
-                switch ($this->type) {
-                    case 'file':
-                    case 'image':
-                        $val = isset($_FILES[$this->name]['tmp_name']) ? $_FILES[$this->name]['tmp_name'] : null;
-                        break;
-                    default:
-                        $val = isset($_POST[$this->name]) ? $_POST[$this->name] : null;
-                        break;
+                if ($this->datatypeStrategy->isMedia()) {
+                    $value = $this->datatypeStrategy->getFilesData($this, (bool)$this->multiple);
+                } else {
+                    $value = $this->datatypeStrategy->getPostData($this, (bool)$this->multiple);
                 }
                 if ($this->multiple) {
-                    $row = $this;
-                    $v = array_filter(array_map(function ($x) use ($row) {
-                        return !$row->_validate($x);
-                    }, (array)$val), 'intval');
-                    return $v ? array_keys($v) : true;
+                    $incorrectValues = array_filter(array_map(function ($x) {
+                        try {
+                            return !$this->datatypeStrategy->validate($x, $this);
+                        } catch (DatatypeInvalidValueException $e) {
+                            return true;
+                        }
+                    }, $value));
+                    if ($incorrectValues) {
+                        $incorrectIndexes = array_keys($incorrectValues);
+                        return $incorrectIndexes;
+                    } else {
+                        return true;
+                    }
                 } else {
-                    return $this->_validate($val);
+                    try {
+                        return $this->datatypeStrategy->validate($value, $this);
+                    } catch (DatatypeInvalidValueException $e) {
+                        return false;
+                    }
                 }
                 break;
             case 'multiple':
             case 'required':
-                return (isset($this->attrs[$var]) && $this->attrs[$var]);
+                return (bool)($this->attrs[$var] ?? false);
                 break;
             case 'errorEmptyString':
             case 'errorInvalidString':
             case 'errorEmptyFileString':
             case 'errorInvalidFileString':
+            case 'errorInvalidFileWithExtensionsString':
+            case 'errorInvalidImageString':
             case 'errorDoesntMatch':
-                return (string)($this->$var ? $this->$var : $this->Parent->__get($var));
+                if ($val = $this->$var) {
+                    return $val;
+                }
+                if ($this->Parent) {
+                    return $this->Parent->__get($var);
+                }
+                break;
+            case 'datatypeStrategyURN':
+                return (string)$this->$var;
+                break;
+            case 'datatypeStrategy':
+                return DatatypeStrategy::spawn($this->datatypeStrategyURN ?: $this->type);
                 break;
             default:
                 return parent::__get($var);
@@ -189,14 +269,15 @@ class Field extends OptionContainer
         switch ($var) {
             case 'children':
                 if (is_array($val) && isset($val['Set']) && is_array($val['Set'])) {
-                    $Set = $val['Set'];
-                    $nameN = isset($val['name']) ? (string)$val['name'] : 'name';
-                    $level = isset($val['level']) ? (int)$val['level'] : null;
-                    $childrenN = isset($val['children']) ? (string)$val['children'] : null;
-                    $additionalF = isset($val['additional']) && is_callable($val['additional']) ? $val['additional'] : null;
-                    $useOptionGroups = isset($val['useOptionGroups']) && $val['useOptionGroups'] ? $val['useOptionGroups'] : false;
-                    $filter = isset($val['filter']) && is_callable($val['filter']) ? $val['filter'] : null;
-                    $this->children = $this->parseSet($Set, $nameN, $level, $childrenN, $additionalF, $useOptionGroups, $filter);
+                    $this->children = $this->parseSet(
+                        $val['Set'],
+                        (string)($val['name'] ?? 'name'),
+                        isset($val['level']) ? (int)$val['level'] : null,
+                        isset($val['children']) ? (string)$val['children'] : null,
+                        is_callable($val['additional'] ?? null) ? $val['additional'] : null,
+                        (bool)($val['useOptionGroups'] ?? false),
+                        is_callable($val['filter'] ?? null) ? $val['filter'] : null
+                    );
                 } else {
                     parent::__set($var, $val);
                 }
@@ -205,6 +286,7 @@ class Field extends OptionContainer
             case 'export':
             case 'import':
             case 'oncommit':
+            case 'isMediaFilled':
                 if (is_callable($val)) {
                     $this->$var = $val;
                 }
@@ -213,7 +295,10 @@ class Field extends OptionContainer
             case 'errorInvalidString':
             case 'errorEmptyFileString':
             case 'errorInvalidFileString':
+            case 'errorInvalidFileWithExtensionsString':
+            case 'errorInvalidImageString':
             case 'errorDoesntMatch':
+            case 'datatypeStrategyURN':
                 $this->$var = (string)$val;
                 break;
             case 'default':
@@ -227,81 +312,123 @@ class Field extends OptionContainer
 
 
     /**
+     * Стандартная функция, определяющая, заполнено ли медиа-поле ранее
+     * @return bool
+     */
+    public function isMediaFilledDefault(): bool
+    {
+        if (!$this->datatypeStrategy->isMedia()) {
+            return false;
+        }
+        $item = $this->Form ? $this->Form->Item : null;
+        if (!($item instanceof SOME)) {
+            return false;
+        }
+        $attachmentVar = $this->meta['attachmentVar'] ?? 'attachments';
+
+        $attachment = null;
+        if ($item->$attachmentVar) {
+            $attachment = $item->$attachmentVar;
+            if (is_array($attachment)) {
+                $attachment = $attachment[0];
+            }
+        }
+        return ($attachment instanceof Attachment) && $attachment->id;
+    }
+
+
+    /**
      * Проверка ошибок
-     * @return array массив ошибок вида ['name' => 'код ошибки', 'value' => 'имя поля', 'description' => 'текстовое описание ошибки'];
+     * @return array <pre><code>array<[
+     *     'name' => string Код ошибки,
+     *     'value' => string Имя поля,
+     *     'description' => string Текстовое описание ошибки
+     * ]></code></pre> массив ошибок;
      */
     public function getErrors()
     {
         $localError = [];
         if (!$this->isFilled) {
             if ($this->required) {
-                if (!(in_array($this->type, ['file', 'image']) && isset($this->Form->Item) && ($this->Form->Item instanceof SOME) && $this->Form->Item->__id())) {
-                    if (in_array($this->type, ['file', 'image'])) {
-                        $localError[] = [
-                            'name' => 'MISSED',
-                            'value' => $this->name,
-                            'description' => sprintf(
-                                $this->view->_(
-                                    $this->__get('errorEmptyFileString')
-                                ),
-                                $this->caption
-                            )
-                        ];
+                if (!($this->datatypeStrategy->isMedia() &&
+                    isset($this->Form->Item) &&
+                    ($this->Form->Item instanceof SOME) &&
+                    $this->Form->Item->__id()
+                )) {
+                    if ($this->datatypeStrategy->isMedia()) {
+                        $errMsgKey = 'errorEmptyFileString';
                     } else {
-                        $localError[] = [
-                            'name' => 'MISSED',
-                            'value' => $this->name,
-                            'description' => sprintf(
-                                $this->view->_(
-                                    $this->__get('errorEmptyString')
-                                ),
-                                $this->caption
-                            )
-                        ];
+                        $errMsgKey = 'errorEmptyString';
                     }
+                    $errMsgKey = $this->__get($errMsgKey);
+                    $errMsg = $this->view->_($errMsgKey);
+                    $errMsg = sprintf($errMsg, $this->caption);
+                    $localError[] = ['name' => 'MISSED', 'value' => $this->name, 'description' => $errMsg];
                 }
             }
         } elseif ($this->confirm && !$this->matchConfirm) {
-            $localError[] = [
-                'name' => 'INVALID',
-                'value' => $this->name,
-                'description' => sprintf(
-                    $this->view->_(
-                        $this->__get('errorDoesntMatch')
-                    ),
-                    $this->caption
-                )
-            ];
+            $errMsgKey = $this->__get('errorDoesntMatch');
+            $errMsg = $this->view->_($errMsgKey);
+            $errMsg = sprintf($errMsg, $this->caption);
+            $localError[] = ['name' => 'INVALID', 'value' => $this->name, 'description' => $errMsg];
         } else {
-            $v = $this->validate;
-            if ($v !== true) {
-                if (in_array($this->type, ['file', 'image'])) {
-                    $e = [
-                        'name' => 'INVALID',
-                        'value' => $this->name,
-                        'description' => sprintf(
-                            $this->view->_(
-                                $this->__get('errorInvalidFileString')
-                            ),
-                            $this->caption
-                        )
-                    ];
-                } else {
-                    $e = [
-                        'name' => 'INVALID',
-                        'value' => $this->name,
-                        'description' => sprintf(
-                            $this->view->_(
-                                $this->__get('errorInvalidString')
-                            ),
-                            $this->caption
-                        )
-                    ];
+            $allowableTypes = [];
+            if ($this->datatypeStrategy->isMedia()) {
+                $values = $this->datatypeStrategy->getFilesData($this, true);
+            } else {
+                $values = $this->datatypeStrategy->getPostData($this, true);
+            }
+            foreach ($values as $key => $value) {
+                $errMsgKey = null;
+                try {
+                    $this->datatypeStrategy->validate($value, $this);
+                } catch (DatatypeImageTypeMismatchException $e) {
+                    $errMsgKey = 'errorInvalidImageString';
+                } catch (DatatypeFileTypeMismatchException $e) {
+                    if ($this->accept) {
+                        $allowableTypes = explode(',', $this->accept);
+                        $allowableTypes = array_map(function ($x) {
+                            $y = trim($x);
+                            if ($y[0] == '.') {
+                                $y = mb_substr($y, 1);
+                            }
+                            $y = mb_strtoupper($y);
+                            return $y;
+                        }, $allowableTypes);
+                        $errMsgKey = 'errorInvalidFileWithExtensionsString';
+                    } else {
+                        $errMsgKey = 'errorInvalidFileString';
+                    }
+                } catch (DatatypeInvalidValueException $e) {
+                    $errMsgKey = 'errorInvalidString';
                 }
-                if ($this->multiple) {
-                    $e['indexes'] = $v;
+                if ($errMsgKey) {
+                    if (!isset($localError[$errMsgKey])) {
+                        $errMsgKeyString = $this->__get($errMsgKey);
+                        $errMsg = $this->view->_($errMsgKeyString);
+                        if ($allowableTypes) {
+                            $errMsg = sprintf($errMsg, $this->caption, implode(', ', $allowableTypes));
+                        } else {
+                            $errMsg = sprintf($errMsg, $this->caption);
+                        }
+                        $error = ['name' => 'INVALID', 'value' => $this->name, 'description' => $errMsg];
+                    }
+                    if ($this->multiple) {
+                        $error['indexes'][$key] = $key;
+                    }
+                    $localError[$errMsgKey] = $error;
                 }
-                $localError[] = $e;
+            }
+
+            if ($localError) {
+                $localError = array_map(function ($error) {
+                    $result = $error;
+                    if ($result['indexes'] ?? null) {
+                        $result['indexes'] = array_values($result['indexes']);
+                    }
+                    return $result;
+                }, $localError);
+                $localError = array_values($localError);
             }
         }
         return $localError;
@@ -310,143 +437,31 @@ class Field extends OptionContainer
 
     /**
      * Проверка заполненности значения согласно установленному типу данных
-     * @param string $val Значение для проверки
+     * @param mixed $value Значение для проверки
      * @return bool true, если значение признано заполненным, false в противном случае
+     * @deprecated 2023-11-28, AVS: Использовать $this->datatypeStrategy->isFilled
      */
-    public function _isFilled($val = null)
+    public function _isFilled($value = null): bool
     {
-        if (is_scalar($val)) {
-            if (trim($val) === '') {
-                return false;
-            }
-        } elseif (!$val) {
-            return false;
-        }
-        switch ($this->datatype) {
-            case 'date':
-                return ($val != '0000-00-00');
-                break;
-            case 'datetime':
-            case 'datetime-local':
-                return !preg_match('/^0000-00-00( |T)00:00(:00(\\.00)?)?$/i', $val);
-                break;
-            case 'month':
-                return ($val != '0000-00');
-                break;
-            case 'week':
-                return ($val != '0000-W00');
-                break;
-            case 'image':
-            case 'file':
-                return is_uploaded_file($val);
-                break;
-            case 'number':
-                return (float)str_replace(',', '.', $val);
-                break;
-            default:
-                return true;
-                break;
-        }
+        return $this->datatypeStrategy->isFilled($value, Application::i()->debug);
     }
 
 
     /**
      * Проверка корректности значения согласно установленному типу данных
-     * @param string $val Значение для проверки
+     * @param mixed $value Значение для проверки
      * @return bool true, если значение признано корректным, false в противном случае
+     * @deprecated 2023-11-28, AVS: Использовать $this->datatypeStrategy->validate
      */
-    public function _validate($val = null)
+    public function _validate($value = null)
     {
-        if (is_scalar($val)) {
-            if (trim($val) === '') {
-                return true;
+        try {
+            if ($this->datatypeStrategy->isMedia()) {
+                $value = ['tmp_name' => $value];
             }
-        } else {
-            return true;
-        }
-        if ($this->pattern) {
-            if (!preg_match('/' . $this->pattern . '/umi', $val)) {
-                return false;
-            }
-        }
-        switch ($this->type) {
-            case 'color':
-                return (bool)preg_match('/^(#[0-9A-F]{3})|(#[0-9A-F]{6})|#[0-9A-F]{8}$/i', $val);
-                break;
-            case 'date':
-                return $this->checkDate($val);
-                break;
-            case 'datetime':
-            case 'datetime-local':
-                if (!preg_match('/^(.*?)( |T)(.*?)$/i', $val, $regs)) {
-                    return false;
-                }
-                if (!$this->checkDate($regs[1])) {
-                    return false;
-                }
-                if (!$this->checkTime($regs[3])) {
-                    return false;
-                }
-                return true;
-                break;
-            case 'email':
-                return (bool)filter_var($val, FILTER_VALIDATE_EMAIL);
-                break;
-            case 'number':
-            case 'range':
-                $val = str_replace(',', '.', (float)$val);
-                if (!is_numeric($val)) {
-                    return false;
-                } elseif ($this->min_val && ($val < $this->min_val)) {
-                    return false;
-                } elseif ($this->max_val && ($val > $this->max_val)) {
-                    return false;
-                }
-                return true;
-                break;
-            case 'time':
-                return $this->checkTime($val);
-                break;
-            case 'url':
-                return (bool)filter_var($val, FILTER_VALIDATE_URL);
-                break;
-            case 'month':
-                return $this->checkDate($val . '-01');
-                break;
-            case 'week':
-                return (bool)preg_match('/^\\d{4}-W\\d{2}$/i', $val);
-                break;
-            case 'image':
-                if ($val) {
-                    $type = @getimagesize($val);
-                    if (in_array($type[2], [
-                        IMAGETYPE_GIF,
-                        IMAGETYPE_PNG,
-                        IMAGETYPE_JPEG,
-                        IMAGETYPE_WEBP,
-                    ])) {
-                        return true;
-                    } else {
-                        $mime = mime_content_type($val);
-                        if (stristr($mime, 'svg')) {
-                            return true;
-                        }
-                    }
-                    return false;
-                }
-                if ($val && !in_array($type[2], [
-                    IMAGETYPE_GIF,
-                    IMAGETYPE_PNG,
-                    IMAGETYPE_JPEG,
-                    IMAGETYPE_WEBP,
-                ])) {
-                    return false;
-                }
-                return true;
-                break;
-            default:
-                return true;
-                break;
+            return $this->datatypeStrategy->validate($value, $this);
+        } catch (DatatypeInvalidValueException $e) {
+            return false;
         }
     }
 
@@ -455,16 +470,11 @@ class Field extends OptionContainer
      * Проверяет на корректность дату
      * @param string $date Дата в формате ДД.ММ.ГГГГ
      * @return bool
+     * @deprecated 2023-11-28, AVS: Использовать DateTimeDatatypeStrategy::checkDate
      */
-    public function checkDate($date)
+    public function checkDate(string $date): bool
     {
-        if (!preg_match('/^(\\d{4})-(\\d{2})-(\\d{2})$/mi', $date, $regs)) {
-            return false;
-        }
-        if (!checkdate((int)$regs[2], (int)$regs[3], (int)$regs[1])) {
-            return false;
-        }
-        return true;
+        return DateTimeDatatypeStrategy::checkDate($date);
     }
 
 
@@ -472,46 +482,38 @@ class Field extends OptionContainer
      * Проверяет на корректность дату
      * @param string $time Время в формате ЧЧ:ММ:(СС(.МММ)?)?
      * @return bool
+     * @deprecated 2023-11-28, AVS: Использовать DateTimeDatatypeStrategy::checkTime
      */
-    public function checkTime($time)
+    public function checkTime(string $time): bool
     {
-        if (!preg_match('/^(\\d{2}):(\\d{2})(:(\\d{2})(\\.\\d+)?)?$/mi', $time, $regs)) {
-            return false;
-        }
-        if ((int)$regs[1] > 23) {
-            return false;
-        }
-        if ((int)$regs[2] > 59) {
-            return false;
-        }
-        if ((int)$regs[4] > 59) {
-            return false;
-        }
-        return true;
+        return DateTimeDatatypeStrategy::checkTime($time);
     }
+
 
 
     /**
      * Обработка массива SOME объектов
-     * @param [[SOME]] массив объектов для обработки
+     * @param SOME[] массив объектов для обработки
      * @param string $nameN имя свойства, где хранится наименование объекта
      * @param int|null $levelN уровень обработки дочерних элементов, null - не ограничено
      * @param string|null $childrenN свойство, где хранятся дочерние элементы, null - определить автоматически
-     * @param callable|null $additionalF - Функция, которой передается на вход объект, на выходе дополнительные атрибуты для элемента в виде
-     *                                     'имя атрибута' => 'значение атрибута'. NULL - не обрабатывать дополнительные значения
-     * @param bool $useOptionGroups - Если установлен в TRUE, каждая опция, содержащая дочерние, будет представлена как OptGroup, если FALSE - то как Option
-     * @param callable|null $filter - Функция для фильтрации элементов - принимает в качестве единственного аргумента SOME-объект для фильтрации,
-     *                                Возвращает TRUE, если элемент удовлетворяет критерию фильтрации или FALSE в противном случае. NULL - не фильтровать.
+     * @param callable|null $additionalF - Функция, которой передается на вход объект, на выходе дополнительные атрибуты
+     *     для элемента в виде 'имя атрибута' => 'значение атрибута'. NULL - не обрабатывать дополнительные значения
+     * @param bool $useOptionGroups - Если установлен в TRUE, каждая опция, содержащая дочерние,
+     *     будет представлена как OptGroup, если FALSE - то как Option
+     * @param callable|null $filter - Функция для фильтрации элементов - принимает в качестве единственного аргумента
+     *     SOME-объект для фильтрации. Возвращает TRUE, если элемент удовлетворяет критерию фильтрации,
+     *     или FALSE в противном случае. NULL - не фильтровать.
      * @return [[Option]] массив опций
      */
-    protected function parseSet(
+    public function parseSet(
         array $Set = [],
-        $nameN = 'name',
-        $level = null,
-        $childrenN = null,
-        $additionalF = null,
-        $useOptionGroups = false,
-        $filter = null
+        string $nameN = 'name',
+        int $level = null,
+        string $childrenN = null,
+        callable $additionalF = null,
+        bool $useOptionGroups = false,
+        callable $filter = null
     ) {
         $options = new OptionCollection();
         $options->Parent = $this;
@@ -519,13 +521,14 @@ class Field extends OptionContainer
             if ($row instanceof SOME) {
                 $classname = get_class($row);
                 $children = null;
-                if (($level === null) || ($level > 0)) {
+                if (($level === null) || ($level > 1)) {
                     if (!$childrenN) {
-                        $tmp_ch = (array)$classname::_children();
-                        if ($tmp_ch = array_filter($tmp_ch, function ($x) use ($classname) {
+                        $tmpCh = (array)$classname::_children();
+                        $tmpCh = array_filter($tmpCh, function ($x) use ($classname) {
                             return $x['classname'] == $classname;
-                        })) {
-                            $tmpChKeys = array_keys($tmp_ch);
+                        });
+                        if ($tmpCh) {
+                            $tmpChKeys = array_keys($tmpCh);
                             $childrenN = array_shift($tmpChKeys);
                         }
                     }
@@ -534,20 +537,25 @@ class Field extends OptionContainer
                         if ($filter) {
                             $children = array_filter($children, $filter);
                         }
-                        $children = $this->parseSet($children, $nameN, $level === null ? $level : $level - 1, $childrenN, $additionalF, $useOptionGroups, $filter);
+                        $children = $this->parseSet(
+                            $children,
+                            $nameN,
+                            ($level === null) ? $level : ($level - 1),
+                            $childrenN,
+                            $additionalF,
+                            $useOptionGroups,
+                            $filter
+                        );
                     }
                 }
 
                 $idN = $classname::_idN();
                 if ($useOptionGroups && $children) {
-                    $optionClassName = 'RAAS\OptGroup';
+                    $optionClassName = OptGroup::class;
                 } else {
-                    $optionClassName = 'RAAS\Option';
+                    $optionClassName = Option::class;
                 }
-                $Option = new $optionClassName([
-                    'value' => (string)$row->$idN,
-                    'caption' => (string)$row->$nameN
-                ]);
+                $Option = new $optionClassName(['value' => (string)$row->$idN, 'caption' => (string)$row->$nameN]);
                 if ($additionalF) {
                     $add = $additionalF($row);
                     foreach ($add as $key => $val) {
@@ -563,66 +571,35 @@ class Field extends OptionContainer
         return $options;
     }
 
+
     /**
      * Экспорт значения
      */
     public function exportDefault()
     {
-        switch ($this->type) {
-            case 'date':
-                $f = function ($x) {
-                    return strtotime($x) > 0 ? date('Y-m-d', strtotime($x)) : '0000-00-00';
-                };
-                break;
-            case 'datetime':
-            case 'datetime-local':
-                $f = function ($x) {
-                    return strtotime(str_replace('T', ' ', $x)) > 0 ? date('Y-m-d H:i:s', strtotime(str_replace('T', ' ', $x))) : '0000-00-00 00:00:00';
-                };
-                break;
-            case 'year':
-                $f = 'intval';
-                break;
-            case 'number':
-            case 'range':
-                $f = function ($x) {
-                    return floatval(str_replace(',', '.', $x));
-                };
-                break;
-            case 'time':
-                $f = function ($x) {
-                    return strtotime($x) > 0 ? date('H:i:s', strtotime($x)) : '00:00:00';
-                };
-                break;
-            case 'month':
-                $f = function ($x) {
-                    return strtotime($x . '-01') > 0 ? date('Y-m-d', strtotime($x . '-01')) : '0000-00-00';
-                };
-                break;
-            case 'checkbox':
-                $f = $this->multiple ? 'trim' : 'intval';
-                break;
-            case 'image':
-            case 'file':
-                break;
-            default:
-                $f = 'trim';
-                break;
+        if ($this->datatypeStrategy->isMedia()) {
+            return;
         }
-        switch ($this->type) {
-            case 'file':
-            case 'image':
-                break;
-            default:
-                $Item = $this->Form->Item;
-                if (is_array($_POST[$this->name] ?? null)) {
-                    $Item->{$this->name} = array_values(array_unique(array_map($f, $_POST[$this->name])));
-                } else {
-                    $Item->{$this->name} = call_user_func($f, $_POST[$this->name] ?? '');
-                }
-                break;
+        $Item = $this->Form->Item;
+        $value = $this->datatypeStrategy->getPostData($this);
+        if (is_array($value)) {
+            $valueToSet = array_map(function ($x) {
+                return $this->datatypeStrategy->export($x);
+            }, $value);
+            $valueToSet = array_filter($valueToSet, function ($x) {
+                return $x !== null;
+            });
+            if (!$valueToSet) {
+                $valueToSet = null;
+            }
+        } else {
+            $valueToSet = $this->datatypeStrategy->export($value);
+        }
+        if ($valueToSet !== null) {
+            $Item->{$this->name} = $valueToSet;
         }
     }
+
 
     /**
      * Импорт значения
@@ -630,91 +607,88 @@ class Field extends OptionContainer
      */
     public function importDefault()
     {
-        switch ($this->type) {
-            case 'file':
-            case 'image':
-                break;
-            case 'date':
-                $x = $this->Form->Item->{$this->name};
-                if (strtotime($x) > 0) {
-                    return date('Y-m-d', strtotime($x));
-                }
-                break;
-            case 'time':
-                $x = $this->Form->Item->{$this->name};
-                if (strtotime($x) > 0) {
-                    return date('H:i', strtotime($x));
-                }
-                return '';
-                break;
-            case 'datetime':
-            case 'datetime-local':
-                $x = $this->Form->Item->{$this->name};
-                if (strtotime($x) > 0) {
-                    return date('Y-m-d H:i', strtotime($x));
-                }
-                return '';
-                break;
-            case 'number':
-                $x = (float)$this->Form->Item->{$this->name};
-                $x = str_replace(',', '.', $x);
-                return $x;
-                break;
-            default:
-                return $this->Form->Item->{$this->name};
-                break;
+        if ($this->datatypeStrategy->isMedia()) {
+            return;
         }
+        $value = $this->Form->Item->{$this->name};
+        if (is_array($value)) {
+            $result = array_map(function ($x) {
+                return $this->datatypeStrategy->import($x);
+            }, $value);
+            $result = array_filter($result, function ($x) {
+                return $x !== null;
+            });
+            if (!$result) {
+                $result = null;
+            }
+        } else {
+            $result = $this->datatypeStrategy->import($value);
+        }
+        return $result;
     }
+
+
+    /**
+     * Создает либо обрабатывает существующее вложение для сущности
+     * @param array $fileData <pre><code>[
+     *     'tmp_name' => string Путь к файлу,
+     *     'name' => string Название файла,
+     *     'type' => string MIME-тип файла
+     * ]</code></pre>
+     * @param SOME $entity Сущность, для которой создается вложение
+     * @return Attachment|null
+     */
+    protected function processAttachment(array $fileData, SOME $entity)
+    {
+        if ($this->datatypeStrategy->isFileLoaded($fileData['tmp_name'], Application::i()->debug)) {
+            $attachmentVar = $this->meta['attachmentVar'] ?? 'attachments';
+            $attachment = null;
+            if (!$this->multiple && $entity->$attachmentVar) {
+                $attachment = $entity->$attachmentVar;
+                if (is_array($attachment)) {
+                    $attachment = $attachment[0];
+                }
+            }
+            if (!$attachment || !($attachment instanceof Attachment)) {
+                $attachment = new Attachment();
+            }
+            $attachment->upload = $fileData['tmp_name'];
+            if (!is_uploaded_file($fileData['tmp_name'])) {
+                $attachment->copy = true;
+            }
+            $attachment->filename = $fileData['name'];
+            $attachment->parent = $entity;
+            $attachment->mime = $fileData['type'];
+            $attachment->image = ($this->type == 'image');
+            $attachment->commit();
+            return $attachment;
+        }
+        return null;
+    }
+
 
     /**
      * Функция, выполняемая после коммита полей
      */
     public function oncommitDefault()
     {
-        if (in_array($this->type, ['image', 'file'])) {
-            $Item = $this->Form->Item;
-            $Field = $this;
-            $f = function ($x) use ($Item, $Field) {
-                if (is_uploaded_file($x['tmp_name'])) {
-                    $var = isset($Field->meta['attachmentVar']) ? $Field->meta['attachmentVar'] : 'attachments';
-                    if (!$Field->multiple && $Item->$var) {
-                        $a = $Item->$var;
-                        if (is_array($a)) {
-                            $a = $a[0];
-                        }
-                    } else {
-                        $a = new Attachment();
-                    }
-                    $a->upload = $x['tmp_name'];
-                    $a->filename = $x['name'];
-                    $a->parent = $Item;
-                    $a->mime = $x['type'];
-                    $a->image = ($Field->type == 'image');
-                    $a->commit();
-                    return $a->id;
-                }
-                return null;
-            };
-            if (is_array($_FILES[$this->name]['tmp_name'])) {
-                $arr = [];
-                foreach ($_FILES[$this->name]['tmp_name'] as $key => $val) {
-                    if (is_uploaded_file($_FILES[$this->name]['tmp_name'][$key])) {
-                        $arr[] = [
-                            'name' => $_FILES[$this->name]['name'][$key],
-                            'tmp_name' => $_FILES[$this->name]['tmp_name'][$key],
-                            'type' => $_FILES[$this->name]['type'][$key]
-                        ];
-                    }
-                }
-                if ($v = array_filter(array_map($f, $arr))) {
-                    $Item->{$this->name} = $v;
-                }
-            } else {
-                if ($v = call_user_func($f, $_FILES[$this->name])) {
-                    $Item->{$this->name} = $v;
-                }
-            }
-            $Item->commit();
+        if (!$this->datatypeStrategy->isMedia()) {
+            return;
         }
+        $item = $this->Form->Item;
+        $values = [];
+        $filesData = $this->datatypeStrategy->getFilesData($this, true);
+        foreach ($filesData as $fileData) {
+            $attachment = $this->processAttachment($fileData, $item);
+            if ($attachment) {
+                $values[] = $this->datatypeStrategy->export($attachment);
+            }
+        }
+        if ($this->multiple) {
+            $item->{$this->name} = $values;
+        } elseif ($values) {
+            $item->{$this->name} = $values[0];
+        }
+        $item->commit();
     }
 }

@@ -19,6 +19,8 @@ namespace RAAS;
  * @property string $errorInvalidString Идентификатор строки перевода "Поле %s заполнено неправильно"
  * @property string $errorEmptyFileString Идентификатор строки перевода "Необходимо загрузить файл %s"
  * @property string $errorInvalidFileString Идентификатор строки перевода "Файл %s недопустимого формата"
+ * @property string $errorInvalidFileWithExtensionsString Идентификатор строки перевода "Файл %s недопустимого формата. Допустимые форматы: %s"
+ * @property string $errorInvalidImageString Идентификатор строки перевода "Некорректный формат изображения. Доступные форматы: GIF, JPG, PNG"
  * @property string $errorDoesntMatch Идентификатор строки перевода "Пароль и его подтверждение не совпадают"
  */
 class FieldContainer extends FormElement
@@ -77,6 +79,18 @@ class FieldContainer extends FormElement
     protected $errorInvalidFileString = '';
 
     /**
+     * Идентификатор строки перевода "Файл %s недопустимого формата. Допустимые форматы: %s"
+     * @var string
+     */
+    protected $errorInvalidFileWithExtensionsString = '';
+
+    /**
+     * Идентификатор строки перевода "Некорректный формат изображения. Доступные форматы: GIF, JPG, PNG"
+     * @var string
+     */
+    protected $errorInvalidImageString = '';
+
+    /**
      * Идентификатор строки перевода "Пароль и его подтверждение не совпадают"
      * @var string
      */
@@ -97,8 +111,10 @@ class FieldContainer extends FormElement
             case 'errorInvalidString':
             case 'errorEmptyFileString':
             case 'errorInvalidFileString':
+            case 'errorInvalidFileWithExtensionsString':
+            case 'errorInvalidImageString':
             case 'errorHasntUploadedString':
-                            $this->$var = (string)$val;
+                $this->$var = (string)$val;
                 break;
             default:
                 parent::__set($var, $val);
@@ -113,6 +129,8 @@ class FieldContainer extends FormElement
             case 'errorInvalidString':
             case 'errorEmptyFileString':
             case 'errorInvalidFileString':
+            case 'errorInvalidFileWithExtensionsString':
+            case 'errorInvalidImageString':
             case 'errorDoesntMatch':
                 return (string)($this->$var ? $this->$var : $this->Parent->__get($var));
                 break;

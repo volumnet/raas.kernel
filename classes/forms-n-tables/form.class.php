@@ -14,7 +14,7 @@ use SOME\SOME;
  * Класс формы
  * @package RAAS
  * @property-read Form $Form Возвращает текущую форму
- * @property \SOME\SOME $Item Объект для сохранения
+ * @property SOME $Item Объект для сохранения
  * @property string $selfUrl Шаблон адреса текущего документа для sprintf с подстановкой %s - ID текущего документа
  * @property string $parentUrl Шаблон адреса родительского документа для sprintf с подстановкой %s - ID родительского документа
  * @property string $newUrl Шаблон адреса нового документа для sprintf с подстановкой %s - ID родительского документа
@@ -44,7 +44,7 @@ class Form extends FieldContainer
 
     /**
      * Объект для сохранения
-     * @var \SOME\SOME|null
+     * @var SOME|null
      */
     protected $Item = null;
 
@@ -129,6 +129,18 @@ class Form extends FieldContainer
     protected $errorInvalidFileString = 'ERR_CUSTOM_FILE_INVALID';
 
     /**
+     * Идентификатор строки перевода "Файл %s недопустимого формата. Допустимые форматы: %s"
+     * @var string
+     */
+    protected $errorInvalidFileWithExtensionsString = 'ERR_CUSTOM_FILE_INVALID_WITH_TYPES';
+
+    /**
+     * Идентификатор строки перевода "Некорректный формат изображения. Доступные форматы: GIF, JPG, PNG"
+     * @var string
+     */
+    protected $errorInvalidImageString = 'ERR_INVALID_IMAGE_FORMAT';
+
+    /**
      * Идентификатор строки перевода "Пароль и его подтверждение не совпадают"
      * @var string
      */
@@ -206,7 +218,7 @@ class Form extends FieldContainer
     {
         switch ($var) {
             case 'Item':
-                if ($val instanceof \SOME\SOME) {
+                if ($val instanceof SOME) {
                     $this->Item = $val;
                 } elseif (is_string($val)) {
                     $this->$var = new $val(isset($_GET['id']) && (int)$_GET['id'] ? (int)$_GET['id'] : null);

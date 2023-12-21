@@ -1,18 +1,75 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<phpunit colors="true" bootstrap="./bootstrap.php">
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" colors="true" bootstrap="./bootstrap.php" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
+  <coverage includeUncoveredFiles="false">
+    <include>
+      <directory suffix=".php">../classes</directory>
+      <directory suffix=".php">../general</directory>
+    </include>
+    <report>
+      <html outputDirectory="coverage"/>
+    </report>
+  </coverage>
   <testsuites>
+    <testsuite name="fields">
+      <file>src/datatypes/DatatypeStrategyTest.php</file>
+      <file>src/datatypes/ColorDatatypeStrategyTest.php</file>
+      <file>src/datatypes/EmailDatatypeStrategyTest.php</file>
+      <file>src/datatypes/UrlDatatypeStrategyTest.php</file>
+      <file>src/datatypes/DateTimeDatatypeStrategyTest.php</file>
+      <file>src/datatypes/TimeDatatypeStrategyTest.php</file>
+      <file>src/datatypes/DateDatatypeStrategyTest.php</file>
+      <file>src/datatypes/MonthDatatypeStrategyTest.php</file>
+      <file>src/datatypes/YearDatatypeStrategyTest.php</file>
+      <file>src/datatypes/WeekDatatypeStrategyTest.php</file>
+      <file>src/datatypes/FileDatatypeStrategyTest.php</file>
+      <file>src/datatypes/ImageDatatypeStrategyTest.php</file>
+      <file>src/datatypes/NumberDatatypeStrategyTest.php</file>
+      <file>src/datatypes/CheckboxDatatypeStrategyTest.php</file>
+      <file>src/sources/CSVSourceStrategyTest.php</file>
+      <file>src/sources/DictionarySourceStrategyTest.php</file>
+      <file>src/sources/INISourceStrategyTest.php</file>
+      <file>src/sources/PHPSourceStrategyTest.php</file>
+      <file>src/sources/SQLSourceStrategyTest.php</file>
+      <file>src/sources/XMLSourceStrategyTest.php</file>
+      <file>src/forms-n-tables/FieldTest.php</file>
+      <file>src/semantic/CustomFieldTest.php</file>
+    </testsuite>
     <testsuite name="HTMLRenderer">
       <file>src/views/renderers/HTMLRendererTest.php</file>
     </testsuite>
+    <testsuite name="Field">
+      <file>src/forms-n-tables/FieldTest.php</file>
+    </testsuite>
+    <testsuite name="CustomField">
+      <file>src/semantic/CustomFieldTest.php</file>
+    </testsuite>
+    <testsuite name="Dictionary">
+      <file>src/semantic/DictionaryTest.php</file>
+    </testsuite>
+    <testsuite name="SourceStrategy">
+      <file>src/sources/CSVSourceStrategyTest.php</file>
+      <file>src/sources/DictionarySourceStrategyTest.php</file>
+      <file>src/sources/INISourceStrategyTest.php</file>
+      <file>src/sources/PHPSourceStrategyTest.php</file>
+      <file>src/sources/SQLSourceStrategyTest.php</file>
+      <file>src/sources/XMLSourceStrategyTest.php</file>
+    </testsuite>
+    <testsuite name="DatatypeStrategy">
+      <file>src/datatypes/DatatypeStrategyTest.php</file>
+      <file>src/datatypes/ColorDatatypeStrategyTest.php</file>
+      <file>src/datatypes/EmailDatatypeStrategyTest.php</file>
+      <file>src/datatypes/UrlDatatypeStrategyTest.php</file>
+      <file>src/datatypes/DateTimeDatatypeStrategyTest.php</file>
+      <file>src/datatypes/TimeDatatypeStrategyTest.php</file>
+      <file>src/datatypes/DateDatatypeStrategyTest.php</file>
+      <file>src/datatypes/MonthDatatypeStrategyTest.php</file>
+      <file>src/datatypes/YearDatatypeStrategyTest.php</file>
+      <file>src/datatypes/WeekDatatypeStrategyTest.php</file>
+      <file>src/datatypes/FileDatatypeStrategyTest.php</file>
+      <file>src/datatypes/ImageDatatypeStrategyTest.php</file>
+      <file>src/datatypes/NumberDatatypeStrategyTest.php</file>
+      <file>src/datatypes/CheckboxDatatypeStrategyTest.php</file>
+    </testsuite>
   </testsuites>
-  <filter>
-    <whitelist addUncoveredFilesFromWhitelist="false">
-      <directory suffix=".php">../classes</directory> 
-      <directory suffix=".php">../general</directory> 
-    </whitelist>
-  </filter>
-  <logging>
-    <log type="coverage-html" target="coverage" />
-  </logging>
+  <logging/>
 </phpunit>

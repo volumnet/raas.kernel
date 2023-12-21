@@ -1,8 +1,9 @@
 <style lang="scss" scoped>
 .menu-left__link {
+    $self: &;
     display: block;
-    &_active {
-        color: black;
+    #{$self}&_active {
+        color: black !important;
     }
 }
 .menu-left__counter {

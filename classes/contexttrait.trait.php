@@ -150,4 +150,19 @@ trait ContextTrait
                 break;
         }
     }
+
+
+    /**
+     * Регистрирует стратегии типов данных
+     */
+    public function registerDatatypes()
+    {
+    }
+
+    /**
+     * Регистрирует стратегии источников
+     */
+    public function registerSources()
+    {
+    }
 }

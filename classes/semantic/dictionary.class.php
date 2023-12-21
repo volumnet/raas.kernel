@@ -1,20 +1,47 @@
 <?php
+/**
+ * Абстрактный справочник
+ */
 namespace RAAS;
 
-abstract class Dictionary extends \SOME\SOME
+use Exception;
+use SimpleXMLElement;
+use SOME\CSV;
+use SOME\SOME;
+
+/**
+ * Класс абстрактного справочника
+ * @property-read self $parent Родительский справочник
+ * @property-read self[] $children Дочерние справочники
+ * @property-read self[] $parents Цепочка родительских справочников
+ */
+abstract class Dictionary extends SOME
 {
     protected static $tablename = '';
+
     protected static $defaultOrderBy = "priority";
-    protected static $cognizableVars = array();
 
-    protected static $references = array('parent' => array('FK' => 'pid', 'classname' => 'RAAS\\Dictionary', 'cascade' => true));
-    protected static $parents = array('parents' => 'parent');
-    protected static $children = array('children' => array('classname' => 'RAAS\\Dictionary', 'FK' => 'pid'));
-    protected static $links = array();
+    protected static $cognizableVars = [];
 
-    public static $ordersBy = array('id' => 'ID', 'urn' => 'URN', 'name' => 'NAME', 'priority' => 'MANUAL');
+    protected static $parents = ['parents' => 'parent'];
 
-    public static $availableExtensions = array('csv', 'ini', 'xml', 'sql');
+    protected static $children = []; // Переопределяется методом _children()
+
+    protected static $references = []; // Переопределяется методом _references()
+
+    protected static $links = [];
+
+    /**
+     * Доступные сортировки
+     * @var array <pre><code>array<string[] Значение сортировки => string Ключ названия сортировки></code></pre>
+     */
+    public static $ordersBy = ['id' => 'ID', 'urn' => 'URN', 'name' => 'NAME', 'priority' => 'MANUAL'];
+
+    /**
+     * Доступные расширения для загрузки
+     * @var string[]
+     */
+    public static $availableExtensions = ['csv', 'ini', 'xml', 'sql'];
 
     public function commit()
     {
@@ -28,100 +55,76 @@ abstract class Dictionary extends \SOME\SOME
         }
     }
 
-    public function parseCSV($text)
+
+    /**
+     * Разбирает стандартный источник
+     * @param array $source <pre><code>array<string[] Значение => [
+     *     'name' => string Заголовок,
+     *     'children' =>? (рекурсивно)
+     * ]></code></pre> источник
+     */
+    public function parseStdSource(array $source)
     {
-        $csv = new \SOME\CSV($text);
-        $currentStep = array_shift(array_keys(array_filter($csv->data[0], 'trim')));
-        $backtrace = array(array($currentStep, $this));
-        $last = null;
-
-        for ($i = 0; $i < count($csv->data); $i++) {
-            $row = $csv->data[$i];
-            $step = array_shift(array_keys(array_filter($row, 'trim')));
-
-            if ($step != $currentStep) {
-                for ($j = 0; ($j < count($backtrace)) && ($backtrace[$j][0] <= $step); $j++);
-                if ($j >= count($backtrace)) {
-                    $backtrace[] = array($step, $last);
-                } else {
-                    $backtrace = array_slice($backtrace, 0, $j);
-                }
-                $currentStep = $step;
-            }
-            $row = array_slice($row, $currentStep);
-
-            $val = trim(isset($row[0]) && trim($row[0]) ? $row[0] : '');
-            $key = trim(isset($row[1]) && trim($row[1]) ? $row[1] : '');
-            $last = self::exportByNameURN($val, $key, $backtrace[count($backtrace) - 1][1]);
-        }
-    }
-
-
-    public function parseINI($text)
-    {
-        $ini = parse_ini_string($text);
-        foreach ($ini as $key => $val) {
-            $last = self::exportByNameURN(trim($val), trim($key), $this);
-        }
-    }
-
-
-    public function parseXML($text)
-    {
-        if ($text instanceof \SimpleXMLElement) {
-            $sxe = $text;
-        } else {
-            try {
-                $sxe = new \SimpleXMLElement((string)$text);
-            } catch (\Exception $e) {
-                try {
-                    $sxe = new \SimpleXMLElement('<dictionary>' . $text . '</dictionary>');
-                } catch (\Exception $e) {}
-            }
-        }
-        if ($sxe) {
-            foreach ($sxe->children() as $row) {
-                $val = trim(isset($row['title']) && trim($row['title']) ? $row['title'] : (isset($row['name']) && trim($row['name']) ? $row['name'] : $row->getName()));
-                $key = trim(isset($row['value']) && trim($row['value']) ? $row['value'] : (isset($row['id']) && trim($row['id']) ? $row['id'] : $val));
-                $last = self::exportByNameURN($val, $key, $this);
-                if (count($row->children())) {
-                    $last->parseXML($row);
-                }
+        foreach ($source as $value => $entryData) {
+            $child = self::exportByNameURN($entryData['name'] ?? $value, $value, $this);
+            if (is_array($entryData['children'] ?? null)) {
+                $child->parseStdSource($entryData['children']);
             }
         }
     }
 
 
-    public function parseSQL($text, $pid = 0)
+    /**
+     * Разбирает CSV-текст
+     * @param string $source CSV-текст
+     * @deprecated
+     */
+    public function parseCSV(string $source)
     {
-        if (is_array($text)) {
-            $SQL_result = $text;
-        } else {
-            if (preg_match('/(INSERT )|(UPDATE )|(DELETE )|(FILE )|(CREATE )|(ALTER )|(INDEX )|(DROP )|(REPLACE )/i', $text)) {
-                return;
-            }
-            $SQL_result = self::$SQL->get((string)$text);
-        }
-        if ($SQL_result) {
-            $rawData = array_values(array_filter(
-                $SQL_result,
-                function ($x) use ($pid) {
-                    return $x["pid"] == $pid;
-                }
-            ));
-            foreach ($rawData as $row) {
-                $val = trim(isset($row['name']) && trim($row['name']) ? $row['name'] : array_shift(array_values($row)));
-                $key = trim(isset($row['val']) && trim($row['val']) ? $row['val'] : $val);
-                $last = self::exportByNameURN($val, $key, $this);
-                $last->parseSQL($SQL_result, $key);
-            }
-        }
+        $stdSource = CSVSourceStrategy::i()->parse($source);
+        $this->parseStdSource($stdSource);
     }
 
 
-    protected static function exportByNameURN($name, $urn = null, self $Parent = null)
+    /**
+     * Разбирает INI-текст
+     * @param string $source INI-текст
+     * @deprecated
+     */
+    public function parseINI(string $source)
     {
-        if ($Item = static::importByLike($urn, $name, $Parent)) {
+        $stdSource = INISourceStrategy::i()->parse($source);
+        $this->parseStdSource($stdSource);
+    }
+
+
+    /**
+     * Разбирает XML-текст
+     * @param string $source XML-текст
+     * @deprecated
+     */
+    public function parseXML(string $source)
+    {
+        $stdSource = XMLSourceStrategy::i()->parse($source);
+        $this->parseStdSource($stdSource);
+    }
+
+
+    /**
+     * Разбирает SQL-запрос
+     * @param string $source SQL-запрос
+     * @deprecated
+     */
+    public function parseSQL(string $source)
+    {
+        $stdSource = SQLSourceStrategy::i()->parse($source);
+        $this->parseStdSource($stdSource);
+    }
+
+
+    protected static function exportByNameURN($name, $urn = null, self $parent = null)
+    {
+        if ($Item = static::importByLike($urn, $name, $parent)) {
             if ($name && ($Item->name != $name)) {
                 $Item->name = $name;
                 $Item->commit();
@@ -132,28 +135,41 @@ abstract class Dictionary extends \SOME\SOME
             if ($urn) {
                 $Item->urn = $urn;
             }
-            $Item->pid = $Parent->id;
+            $Item->pid = $parent->id;
             $Item->commit();
         }
         return $Item;
     }
 
 
-    protected static function importByLike($urn = null, $name = null, self $Parent)
+    protected static function importByLike($urn = null, $name = null, self $parent)
     {
         if (!$urn && !$name) {
             return null;
         }
-        $SQL_query = "SELECT * FROM " . static::_tablename() . " WHERE pid = " . (int)$Parent->id;
+        $sqlQuery = "SELECT * FROM " . static::_tablename() . " WHERE pid = " . (int)$parent->id;
         if ($urn) {
-            $SQL_query .= " AND urn = '" . self::$SQL->real_escape_string($urn) . "'";
+            $sqlQuery .= " AND urn = '" . self::$SQL->real_escape_string($urn) . "'";
         } elseif ($name) {
-            $SQL_query .= " AND name = '" . self::$SQL->real_escape_string($name) . "'";
+            $sqlQuery .= " AND name = '" . self::$SQL->real_escape_string($name) . "'";
         }
-        $SQL_result = self::$SQL->getline($SQL_query);
-        if ($SQL_result) {
-            return new static($SQL_result);
+        $sqlResult = self::$SQL->getline($sqlQuery);
+        if ($sqlResult) {
+            return new static($sqlResult);
         }
     }
 
+
+    public static function _references($key = null)
+    {
+        $references = ['parent' => ['FK' => 'pid', 'classname' => static::class, 'cascade' => true]];
+        return $key ? $references[$key] : $references;
+    }
+
+
+    public static function _children($key = null)
+    {
+        $children = ['children' => ['classname' => static::class, 'FK' => 'pid']];
+        return $key ? $children[$key] : $children;
+    }
 }
