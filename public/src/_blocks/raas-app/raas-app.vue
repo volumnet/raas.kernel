@@ -196,7 +196,7 @@
           <div class="body__copyrights">
             {{ translations.COPYRIGHT }} Ⓒ
             <a href="https://www.volumnet.ru/" target="_blank">
-              Volume Networks
+              {{ translations.VOLUME_NETWORKS }}
             </a>,
             {{ year }}. {{ translations.ALL_RIGHTS_RESERVED }}.
           </div>

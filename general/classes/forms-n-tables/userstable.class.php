@@ -41,6 +41,15 @@ class UsersTable extends Table
                        '</a>';
             }
         ];
+        $columns['email'] = [
+            'caption' => $this->view->_('EMAIL'),
+            'sortable' => Column::SORTABLE_REVERSABLE,
+            'callback' => function ($row) use ($view) {
+                return '<a href="' . $view->url . '&action=edit_user&id=' . (int)$row->id . '">' .
+                          htmlspecialchars($row->email) .
+                       '</a>';
+            }
+        ];
         $columns['last_name'] = [
             'caption' => $this->view->_('FULL_NAME'),
             'sortable' => Column::SORTABLE_REVERSABLE,

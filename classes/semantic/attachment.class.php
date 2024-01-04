@@ -2,6 +2,8 @@
 /**
  * Вложение
  */
+declare(strict_types=1);
+
 namespace RAAS;
 
 use SOME\Namespaces;
@@ -67,7 +69,7 @@ class Attachment extends SOME
                 return $this->model->filesURL;
                 break;
             case 'ext':
-                return pathinfo($this->realname, PATHINFO_EXTENSION);
+                return pathinfo((string)$this->realname, PATHINFO_EXTENSION);
                 break;
             case 'fileURL':
                 if (!$this->realname) {
@@ -83,7 +85,7 @@ class Attachment extends SOME
                     return $this->fileURL;
                 }
                 return $this->dirURL . '/' .
-                    pathinfo($this->realname, PATHINFO_FILENAME) . '_tn.jpg';
+                    pathinfo((string)$this->realname, PATHINFO_FILENAME) . '_tn.jpg';
                 break;
             case 'smallURL':
                 if (!$this->image) {
@@ -93,7 +95,7 @@ class Attachment extends SOME
                     return $this->fileURL;
                 }
                 return $this->dirURL . '/' .
-                    pathinfo($this->realname, PATHINFO_FILENAME) . '_small.' .
+                    pathinfo((string)$this->realname, PATHINFO_FILENAME) . '_small.' .
                     $this->ext;
                 break;
             case 'file':
@@ -107,14 +109,14 @@ class Attachment extends SOME
                     return false;
                 }
                 return $this->dirpath . '/' .
-                    pathinfo($this->realname, PATHINFO_FILENAME) . '_tn.jpg';
+                    pathinfo((string)$this->realname, PATHINFO_FILENAME) . '_tn.jpg';
                 break;
             case 'small':
                 if (!$this->image) {
                     return false;
                 }
                 return $this->dirpath . '/' .
-                    pathinfo($this->realname, PATHINFO_FILENAME) . '_small.' .
+                    pathinfo((string)$this->realname, PATHINFO_FILENAME) . '_small.' .
                     $this->ext;
                 break;
             default:
@@ -220,7 +222,7 @@ class Attachment extends SOME
                     unlink($item->small);
                 }
                 if ($item->realname) {
-                    $pathinfo = pathinfo($item->realname);
+                    $pathinfo = pathinfo((string)$item->realname);
                     $glob = glob($item->dirpath . '/' . $pathinfo['filename'] . '.*.' . $pathinfo['extension']);
                     foreach ($glob as $val) {
                         if (is_file($val)) {
@@ -333,7 +335,7 @@ class Attachment extends SOME
             if ($row->image) {
                 if ($row->tn && !is_file($row->tn)) {
                     $old_file = Application::i()->filesDir . '/' .
-                        pathinfo($row->realname, PATHINFO_FILENAME) . '_tn.jpg';
+                        pathinfo((string)$row->realname, PATHINFO_FILENAME) . '_tn.jpg';
                     if (is_file($old_file)) {
                         rename($old_file, $row->tn);
                     } else {
@@ -342,7 +344,7 @@ class Attachment extends SOME
                 }
                 if ($row->small && !is_file($row->small)) {
                     $old_file = Application::i()->filesDir . '/' .
-                        pathinfo($row->realname, PATHINFO_FILENAME) .
+                        pathinfo((string)$row->realname, PATHINFO_FILENAME) .
                         '_small.' . $row->ext;
                     if (is_file($old_file)) {
                         rename($old_file, $row->small);
@@ -428,7 +430,7 @@ class Attachment extends SOME
         // }
         $filenameWOext = preg_replace('/\\.\\w+$/umi', '', $initialFilename);
         $filename = Text::beautify($filenameWOext);
-        $ext = Text::beautify(pathinfo($this->filename, PATHINFO_EXTENSION));
+        $ext = Text::beautify(pathinfo((string)$this->filename, PATHINFO_EXTENSION));
         for ($i = 0; glob($this->dirpath . '/' . $filename . '.' . ($ignoreExtension ? '*' : $ext)); $i++) {
             $filename = Application::i()->getNewURN($filename, !$i);
         }
@@ -453,8 +455,8 @@ class Attachment extends SOME
     ) {
         $att = new static();
         $basename = basename($filename);
-        $basenameWOExt = pathinfo($filename, PATHINFO_FILENAME);
-        $oldExt = pathinfo($filename, PATHINFO_EXTENSION);
+        $basenameWOExt = pathinfo((string)$filename, PATHINFO_FILENAME);
+        $oldExt = pathinfo((string)$filename, PATHINFO_EXTENSION);
         if (!is_file($filename)) {
             $text = file_get_contents($filename);
             if (!$text) {

@@ -2,7 +2,7 @@
 .menu-left__link {
     $self: &;
     display: block;
-    #{$self}&_active {
+    &#{$self}_active {
         color: black !important;
     }
 }

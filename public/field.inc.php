@@ -210,7 +210,7 @@ $_RAASForm_Control = function (
                 ?>
                 <div data-role="raas-repo-block">
                   <div data-role="raas-repo-container">
-                    <?php foreach ((array)$field->Form->DATA[$field->name] as $key => $val) {
+                    <?php foreach ((array)($field->Form->DATA[$field->name] ?? []) as $key => $val) {
                         $field->value = $val; ?>
                         <div data-role="raas-repo-element">
                           <select<?php echo $_RAASForm_Attrs($field, $attrs)?>>

@@ -2,6 +2,8 @@
 /**
  * Рендерер HTML
  */
+declare(strict_types=1);
+
 namespace RAAS;
 
 /**
@@ -29,7 +31,7 @@ class HTMLRenderer
      * ></pre>
      * @return string
      */
-    public function getAttributesString(array $attrs = [])
+    public function getAttributesString(array $attrs = []): string
     {
         $result = '';
         foreach ($attrs as $attrKey => $attrVal) {
@@ -45,13 +47,13 @@ class HTMLRenderer
             if ($attrVal === null) {
                 continue;
             }
-            $attrText = ' ' . htmlspecialchars($attrKey);
-            if (trim($attrVal) !== '') {
-                $attrText .= '="' . htmlspecialchars($attrVal) . '"';
+            $attrText = ' ' . htmlspecialchars((string)$attrKey);
+            if (trim((string)$attrVal) !== '') {
+                $attrText .= '="' . htmlspecialchars((string)$attrVal) . '"';
             }
             $result .= $attrText;
         }
-        $result = trim($result);
+        $result = trim((string)$result);
         return $result;
     }
 
@@ -66,9 +68,9 @@ class HTMLRenderer
      *     если элемент самозакрывающийся
      * @return string
      */
-    public function getElement($name, array $attrs = [], $content = '')
+    public function getElement($name, array $attrs = [], $content = ''): string
     {
-        $result = '<' . htmlspecialchars($name);
+        $result = '<' . htmlspecialchars((string)$name);
         $attributesString = $this->getAttributesString($attrs);
         if ($attributesString) {
             $result .= ' ' . $attributesString;
@@ -78,7 +80,7 @@ class HTMLRenderer
         ) {
             $result .= ' />';
         } else {
-            $result .= '>' . $content . '</' . htmlspecialchars($name) . '>';
+            $result .= '>' . $content . '</' . htmlspecialchars((string)$name) . '>';
         }
         return $result;
     }
@@ -145,7 +147,7 @@ class HTMLRenderer
     {
         $result = [];
         if (!is_array($value)) {
-            $value = array_filter(explode(' ', trim($value)), 'trim');
+            $value = array_filter(explode(' ', trim((string)$value)), 'trim');
             $value = array_values($value);
         }
         foreach ($value as $key => $val) {
@@ -156,7 +158,7 @@ class HTMLRenderer
                 $className = $key;
                 $classValue = $val;
             }
-            $className = trim($className);
+            $className = trim((string)$className);
             $classValue = (bool)$classValue;
             if ($className !== '') {
                 $result[$className] = $classValue;
@@ -179,7 +181,7 @@ class HTMLRenderer
         $result = [];
         foreach ($value as $key => $val) {
             if ($val) {
-                $result[$key] = trim($key);
+                $result[$key] = trim((string)$key);
             }
         }
         return implode(' ', $result);
@@ -196,7 +198,7 @@ class HTMLRenderer
      *     string[] Имя свойства => string Значение
      * ></pre>
      */
-    public function parseCSSStyles($value)
+    public function parseCSSStyles($value): array
     {
         $result = [];
         if (!is_array($value)) {
@@ -204,14 +206,16 @@ class HTMLRenderer
         }
         foreach ($value as $key => $val) {
             if (is_numeric($key)) {
-                list($cssProp, $cssValue) = explode(':', $val);
+                $valArr = explode(':', $val);
+                $cssProp = $valArr[0] ?? null;
+                $cssValue = $valArr[1] ?? null;
             } else {
                 $cssProp = $key;
                 $cssValue = $val;
             }
-            $cssProp = trim($cssProp, ' :;');
+            $cssProp = trim((string)$cssProp, ' :;');
             if (!is_bool($cssValue)) {
-                $cssValue = trim($cssValue, ' :;');
+                $cssValue = trim((string)$cssValue, ' :;');
             }
             if (($cssProp !== '') && ($cssValue !== '')) {
                 $result[$cssProp] = $cssValue;
@@ -234,10 +238,10 @@ class HTMLRenderer
         $value = $this->parseCSSStyles($value);
         $result = [];
         foreach ($value as $key => $val) {
-            $val = trim($val);
+            $val = trim((string)$val);
             if ($val !== '') {
-                $val = trim($key) . ': ' . trim($val);
-                $result[trim($val)] = trim($val);
+                $val = trim((string)$key) . ': ' . trim((string)$val);
+                $result[trim((string)$val)] = trim((string)$val);
             }
         }
         return implode('; ', $result);

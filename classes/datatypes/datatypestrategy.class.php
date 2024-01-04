@@ -2,6 +2,8 @@
 /**
  * Стратегия типа данных
  */
+declare(strict_types=1);
+
 namespace RAAS;
 
 use InvalidArgumentException;
@@ -62,7 +64,7 @@ abstract class DatatypeStrategy extends AbstractStrategy
     public function isFilled($value): bool
     {
         if (is_scalar($value)) {
-            if (trim($value) === '') {
+            if (trim((string)$value) === '') {
                 return false;
             }
         } elseif (!$value) {
@@ -81,7 +83,7 @@ abstract class DatatypeStrategy extends AbstractStrategy
      */
     public function validate($value, Field $field = null): bool
     {
-        if (!is_scalar($value) || (trim($value) === '')) {
+        if (!is_scalar($value) || (trim((string)$value) === '')) {
             return true;
         }
         if ($field && $field->pattern) {
@@ -100,7 +102,7 @@ abstract class DatatypeStrategy extends AbstractStrategy
      */
     public function export($value)
     {
-        return trim($value);
+        return trim((string)$value);
     }
 
 

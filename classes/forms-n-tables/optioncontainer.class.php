@@ -18,7 +18,7 @@ class OptionContainer extends FormElement
 	/**
      * Тип поля $children
      */
-    const childrenType = 'RAAS\OptionCollection';
+    const CHILDREN_TYPE = 'RAAS\OptionCollection';
 
     public function __get($var)
     {

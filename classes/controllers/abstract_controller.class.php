@@ -305,6 +305,12 @@ abstract class Abstract_Controller extends Singleton implements IAbstract_Contex
                     'confirm' => true
                 ],
                 [
+                    'name' => 'email',
+                    'type' => 'email',
+                    'required' => 'required',
+                    'caption' => $this->view->_('EMAIL')
+                ],
+                [
                     'type' => 'checkbox',
                     'name' => 'save_password',
                     'caption' => $this->view->_('REMEMBER_PASSWORD'),

@@ -25,7 +25,7 @@ abstract class HTMLElement
      * Тип поля $children
      * Должен наследоваться от \ArrayObject
      */
-    const childrenType = '\ArrayObject';
+    const CHILDREN_TYPE = '\ArrayObject';
 
     /**
      * Человеко-читаемое название элемента

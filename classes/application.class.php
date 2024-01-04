@@ -6,6 +6,8 @@
  * @author Alex V. Surnin <info@volumnet.ru>
  * @copyright 2011, Volume Networks
  */
+declare(strict_types=1);
+
 namespace RAAS;
 
 use RecursiveIteratorIterator;
@@ -320,7 +322,6 @@ final class Application extends Singleton implements IContext
         session_start();
         $_SESSION['KCFINDER']['uploadURL'] = '/files/common/';
         $_SESSION['RAAS_STARTED'] = $this->startMicrotime;
-        set_error_handler([$this, 'errorHandler'], error_reporting());
 
         $classname = ('RAAS\\Controller_' . ucfirst($controller));
         if (!class_exists($classname)) {
@@ -343,6 +344,7 @@ final class Application extends Singleton implements IContext
      * @param array контекст ошибки (переменные окружения,
      *              если передается ошибка)
      * @return Exception возвращает ошибку в виде исключения
+     * @deprecated 2024-01-03 Не нужно, пусть будет стандартный вывод ошибок
      */
     public function errorHandler()
     {
@@ -771,7 +773,7 @@ final class Application extends Singleton implements IContext
         $debugMode = false
     ) {
         $toArr = (array)$toArr;
-        $realFromEmail = trim($this->registryGet('email_from'));
+        $realFromEmail = trim((string)$this->registryGet('email_from'));
         if (!$realFromEmail && $_SERVER['HTTP_HOST']) {
             $realFromEmail = 'info@' . $_SERVER['HTTP_HOST'];
         }

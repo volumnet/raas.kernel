@@ -1,20 +1,20 @@
 <?php
 /**
  * Файл класса коллекции полей
- * @package RAAS
- * @version 4.2
- * @author Alex V. Surnin <info@volumnet.ru>
- * @copyright 2013, Volume Networks
- */       
+ */
+declare(strict_types=1);
+
 namespace RAAS;
+
+use ArrayObject;
 
 /**
  * Класс коллекции полей
  * @package RAAS
  * @property-read Form $Form Рабочая форма
  * @property FormElement $Parent Родительский элемент
- */       
-class FieldCollection extends \ArrayObject
+ */
+class FieldCollection extends ArrayObject
 {
     /**
      * Родительский элемент
@@ -24,7 +24,7 @@ class FieldCollection extends \ArrayObject
 
     public function __get($var)
     {
-        switch($var) {
+        switch ($var) {
             case 'Form':
                 return $this->Parent->__get('Form');
                 break;
@@ -38,16 +38,17 @@ class FieldCollection extends \ArrayObject
 
     public function __set($var, $val)
     {
-        switch ($var){
+        switch ($var) {
             case 'Parent':
                 if ($val instanceof FormElement) {
                     $this->$var = $val;
                 }
                 break;
         }
-
     }
 
+
+    #[\ReturnTypeWillChange]
     public function append($val)
     {
         if ($val = $this->checkval($val)) {
@@ -55,16 +56,19 @@ class FieldCollection extends \ArrayObject
         }
     }
 
-    public function offsetSet($index, $val) 
+
+    #[\ReturnTypeWillChange]
+    public function offsetSet($index, $val)
     {
         if ($val = $this->checkval($val)) {
             parent::offsetSet($index, $val);
         }
     }
 
-    protected function checkval($val) 
+
+    protected function checkval($val)
     {
-        if (($val instanceof \ArrayObject) || is_array($val)) {
+        if (($val instanceof ArrayObject) || is_array($val)) {
             $val = new Field((array)$val);
         }
         if (($val instanceof Field) || ($val instanceof FieldContainer)) {

@@ -1,16 +1,13 @@
 <?php
 /**
  * Файл класса контейнера полей
- * @package RAAS
- * @version 4.2
- * @author Alex V. Surnin <info@volumnet.ru>
- * @copyright 2013, Volume Networks
  */
+declare(strict_types=1);
+
 namespace RAAS;
 
 /**
  * Класс контейнера полей
- * @package RAAS
  * @property callable $check Кастомизированный метод проверки ошибок. Возвращает array массив ошибок формата метода Field::getErrors - см. описание там
  * @property callable $export Кастомизированный метод назначения переменных для сохранения.
  * @property callable $import Кастомизированный метод импорта переменных.
@@ -28,7 +25,7 @@ class FieldContainer extends FormElement
     /**
      * Тип поля $children
      */
-    const childrenType = 'RAAS\FieldCollection';
+    const CHILDREN_TYPE = 'RAAS\FieldCollection';
 
     /**
      * Кастомизированный метод проверки ошибок
@@ -189,12 +186,14 @@ class FieldContainer extends FormElement
         } elseif ($this->Form->Item && $this->Form->Item->__id()) {
             foreach ($this->children as $row) {
                 if ($row instanceof Field) {
-                    if ($f = $row->import) {
-                        // 2019-10-24, AVS: поддержка полей с числовыми наименованиями
-                        $DATA[trim($row->name)] = call_user_func($f, $row);
-                    } else {
-                        // 2019-10-24, AVS: поддержка полей с числовыми наименованиями
-                        $DATA[trim($row->name)] = $row->importDefault();
+                    if ($row->name) {
+                        if ($f = $row->import) {
+                            // 2019-10-24, AVS: поддержка полей с числовыми наименованиями
+                            $DATA[trim($row->name)] = call_user_func($f, $row);
+                        } else {
+                            // 2019-10-24, AVS: поддержка полей с числовыми наименованиями
+                            $DATA[trim($row->name)] = $row->importDefault();
+                        }
                     }
                 } else {
                     if ($f = $row->import) {

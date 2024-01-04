@@ -2,6 +2,8 @@
 /**
  * Подмодуль пользователей
  */
+declare(strict_types=1);
+
 namespace RAAS\General;
 
 use RAAS\Abstract_Sub_Controller;

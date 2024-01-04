@@ -2,6 +2,8 @@
 /**
  * Файл модуля пользовательских логов
  */
+declare(strict_types=1);
+
 namespace RAAS\General;
 
 use SOME\SOME;
@@ -60,7 +62,7 @@ class Sub_UserLog extends Abstract_Sub_Controller
                 return in_array($x->uid, (array)$_GET['uid']);
             };
         }
-        if (trim($_GET['ip'] ?? null)) {
+        if (trim($_GET['ip'] ?? '')) {
             $OUT['DATA']['ip'] = trim($_GET['ip']);
             $filters[] = function ($x) {
                 return stristr($x->ip, trim($_GET['ip']));
@@ -90,7 +92,7 @@ class Sub_UserLog extends Abstract_Sub_Controller
                 return in_array($x->sub, (array)$_GET['filter_sub']);
             };
         }
-        if (trim($_GET['action_name'] ?? null)) {
+        if (trim($_GET['action_name'] ?? '')) {
             $OUT['DATA']['action_name'] = trim($_GET['action_name']);
             $filters[] = function ($x) {
                 return stristr($x->actionName, trim($_GET['action_name']));

@@ -2,6 +2,8 @@
 /**
  * Пользовательское поле
  */
+declare(strict_types=1);
+
 namespace RAAS;
 
 use Exception;
@@ -170,9 +172,9 @@ abstract class CustomField extends SOME
                 };
                 if ($this->datatypeStrategy->isMedia()) {
                     if ($this->source) {
-                        $accept = explode(',', trim(mb_strtolower($this->source)));
+                        $accept = explode(',', trim(mb_strtolower((string)$this->source)));
                         $accept = array_map(function ($x) {
-                            $y = trim($x);
+                            $y = trim((string)$x);
                             if (($y[0] != '.') && !stristr($y, '/')) {
                                 $y = '.' . $y;
                             }
@@ -355,7 +357,7 @@ abstract class CustomField extends SOME
         $sqlQuery .= " ORDER BY fii";
         $sqlResult = static::$SQL->get($sqlQuery);
         foreach ($sqlResult as $sqlRow) {
-            static::$cache[trim($sqlRow['pid'])][trim($sqlRow['fid'])][trim($sqlRow['fii'])] = $sqlRow['value'];
+            static::$cache[trim((string)$sqlRow['pid'])][trim((string)$sqlRow['fid'])][trim((string)$sqlRow['fii'])] = $sqlRow['value'];
         }
     }
 
@@ -653,7 +655,7 @@ abstract class CustomField extends SOME
             'value' => $value
         ];
         static::$SQL->add(static::$dbprefix . static::DATA_TABLE, $arr);
-        static::$cache[trim($this->Owner->id)][trim($this->id)][trim($index)] = $value;
+        static::$cache[trim((string)$this->Owner->id)][trim((string)$this->id)][trim((string)$index)] = $value;
         return $value;
     }
 
@@ -808,7 +810,7 @@ abstract class CustomField extends SOME
      */
     protected function getCaption($key = '')
     {
-        if (trim($key) === '') {
+        if (trim((string)$key) === '') {
             return null;
         }
         if (!$this->id || !(static::$sourceAssocCache[$this->id] ?? false)) {
@@ -832,7 +834,7 @@ abstract class CustomField extends SOME
         if (!(static::$sourceAssocCacheReverse[$this->id] ?? null)) {
             $this->stdSource; // Вызовем для формирования ассоциативного массива
         }
-        $result = static::$sourceAssocCacheReverse[$this->id][mb_strtolower(trim($val))] ?? null;
+        $result = static::$sourceAssocCacheReverse[$this->id][mb_strtolower(trim((string)$val))] ?? null;
         return $result;
     }
 
@@ -843,7 +845,7 @@ abstract class CustomField extends SOME
      */
     protected function _stdSource()
     {
-        if (!$this->source_type || !trim($this->source)) {
+        if (!$this->source_type || !trim((string)$this->source)) {
             return [];
         }
         if ($this->id && isset(static::$sourceCache[$this->id]) && static::$sourceCache[$this->id]) {
@@ -858,11 +860,11 @@ abstract class CustomField extends SOME
         }
         $result = $this->sourceStrategy->parse($source);
 
-        static::$sourceCache[trim($this->id)] = $result;
-        static::$sourceAssocCache[trim($this->id)] = $this->getSourceAssoc($result);
-        static::$sourceAssocCacheReverse[trim($this->id)] = [];
-        foreach (static::$sourceAssocCache[trim($this->id)] as $key => $val) {
-            static::$sourceAssocCacheReverse[trim($this->id)][trim(mb_strtolower($val))] = $key;
+        static::$sourceCache[trim((string)$this->id)] = $result;
+        static::$sourceAssocCache[trim((string)$this->id)] = $this->getSourceAssoc($result);
+        static::$sourceAssocCacheReverse[trim((string)$this->id)] = [];
+        foreach (static::$sourceAssocCache[trim((string)$this->id)] as $key => $val) {
+            static::$sourceAssocCacheReverse[trim((string)$this->id)][trim(mb_strtolower((string)$val))] = $key;
         }
         return $result;
     }

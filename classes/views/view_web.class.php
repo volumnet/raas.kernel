@@ -1,11 +1,9 @@
 <?php
 /**
  * Файл web-представления ядра RAAS
- * @package RAAS
- * @version 4.1
- * @author Alex V. Surnin <info@volumnet.ru>
- * @copyright 2012, Volume Networks
  */
+declare(strict_types=1);
+
 namespace RAAS;
 
 use SOME\File;

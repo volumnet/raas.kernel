@@ -2,6 +2,8 @@
 /**
  * Стратегия типа данных "Число"
  */
+declare(strict_types=1);
+
 namespace RAAS;
 
 class NumberDatatypeStrategy extends DatatypeStrategy
@@ -13,18 +15,18 @@ class NumberDatatypeStrategy extends DatatypeStrategy
         if (!DatatypeStrategy::isFilled($value)) {
             return false;
         }
-        return (float)str_replace(',', '.', $value);
+        return (bool)(float)str_replace(',', '.', $value ?: '');
     }
 
 
 
     public function validate($value, Field $field = null): bool
     {
-        if (!is_scalar($value) || (trim($value) === '')) {
+        if (!is_scalar($value) || (trim((string)$value) === '')) {
             return true;
         }
         DatatypeStrategy::validate($value, $field);
-        $value = str_replace(',', '.', $value);
+        $value = str_replace(',', '.', (string)$value ?: '');
         if (!is_numeric($value)) {
             throw new DatatypeInvalidValueException();
         } else {
@@ -43,12 +45,12 @@ class NumberDatatypeStrategy extends DatatypeStrategy
 
     public function export($value): float
     {
-        return (float)(str_replace(',', '.', $value));
+        return (float)(str_replace(',', '.', (string)$value ?: ''));
     }
 
 
     public function import($value): float
     {
-        return (float)(str_replace(',', '.', $value));
+        return (float)(str_replace(',', '.', (string)$value ?: ''));
     }
 }

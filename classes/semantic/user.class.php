@@ -2,6 +2,8 @@
 /**
  * Пользователь системы
  */
+declare(strict_types=1);
+
 namespace RAAS;
 
 use SOME\Namespaces;
@@ -232,13 +234,13 @@ class User extends SOME implements IOwner
     protected function _full_name()
     {
         $arr = [];
-        if (trim($this->last_name)) {
+        if (trim($this->last_name ?: '')) {
             $arr[] = trim($this->last_name);
         }
-        if (trim($this->first_name)) {
+        if (trim($this->first_name ?: '')) {
             $arr[] = trim($this->first_name);
         }
-        if (trim($this->second_name)) {
+        if (trim($this->second_name ?: '')) {
             $arr[] = trim($this->second_name);
         }
         return implode(' ', $arr);
@@ -308,7 +310,7 @@ class User extends SOME implements IOwner
      */
     protected function _rights()
     {
-        return @json_decode($this->cache_rights, true);
+        return @json_decode($this->cache_rights ?? '', true);
     }
 
 
@@ -318,6 +320,6 @@ class User extends SOME implements IOwner
      */
     protected function _preferences()
     {
-        return (array)@json_decode($this->prefs, true);
+        return (array)@json_decode($this->prefs ?? '', true);
     }
 }

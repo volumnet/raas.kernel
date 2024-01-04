@@ -2,6 +2,8 @@
 /**
  * Основной шаблон RAAS
  */
+declare(strict_types=1);
+
 use RAAS\Application;
 use RAAS\AssetManager;
 
@@ -18,7 +20,7 @@ use RAAS\AssetManager;
  * ]></pre> Меню для отображения
  * @return array Аналогичное меню
  */
-function getMenu(array $menu)
+function getMenu(array $menu): array
 {
     static $level = 0;
     $result = [];
@@ -26,7 +28,7 @@ function getMenu(array $menu)
         foreach ($menu as $row) {
             // Проверка прав доступа
             $href = $row['href'] ?? $row['data-href'] ?? '';
-            $href = parse_url($href, PHP_URL_QUERY);
+            $href = parse_url($href, PHP_URL_QUERY) ?: '';
             parse_str($href, $href);
             if (isset(
                 $href['p'],
@@ -52,8 +54,8 @@ function getMenu(array $menu)
             }
             $result[] = $row;
         }
-        return $result;
     }
+    return $result;
 }
 
 /**
@@ -190,8 +192,8 @@ if (Application::i()->activePackage) {
 
 $raasApplicationData = [
     'packagesMenu' => $packagesMenu,
-    'mainMenu' => getMenu($MENU),
-    'leftMenu' => getMenu($SUBMENU),
+    'mainMenu' => getMenu($MENU) ?: null,
+    'leftMenu' => getMenu($SUBMENU) ?: null,
     'translations' => $translations,
     'availableLanguages' => $VIEW->availableLanguages,
     'hasActivePackage' => (bool)$APPLICATION->activePackage,
@@ -276,4 +278,4 @@ if ($USER) {
     </script>
   </body>
 </html>
-<!-- <?php echo (float)(microtime(1) - Application::i()->startMicrotime)?>  -->
+<!-- <?php echo (float)(microtime(true) - Application::i()->startMicrotime)?>  -->

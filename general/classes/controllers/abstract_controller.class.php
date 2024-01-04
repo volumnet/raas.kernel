@@ -2,6 +2,8 @@
 /**
  * Абстрактный контроллер пакета "Главная"
  */
+declare(strict_types=1);
+
 namespace RAAS\General;
 
 use RAAS\Application;
@@ -10,6 +12,7 @@ use RAAS\IRightsContext;
 use RAAS\Form;
 use RAAS\Module;
 use RAAS\Package;
+use RAAS\User;
 
 /**
  * Класс абстрактного контроллера пакета "Главная"
@@ -109,7 +112,24 @@ abstract class Abstract_Controller extends \RAAS\Abstract_Package_Controller
                 [
                     'type' => 'email',
                     'name' => 'email',
+                    'required' => true,
                     'caption' => $this->view->_('EMAIL'),
+                    'check' => function ($field) {
+                        $localError = $field->getErrors();
+                        if (!$localError) {
+                            $sqlQuery = "SELECT COUNT(*) FROM " . User::_tablename() . " WHERE email = ? AND id != ?";
+                            $sqlBind = [$_POST[$field->name] ?? '', (int)$field->Form->Item->id];
+                            $sqlResult = (bool)(int)Application::i()->SQL->getvalue([$sqlQuery, $sqlBind]);
+                            if ($sqlResult) {
+                                $localError[] = [
+                                    'name' => 'INVALID',
+                                    'value' => $field->name,
+                                    'description' => $this->view->_('ERR_EMAIL_EXISTS')
+                                ];
+                            }
+                        }
+                        return $localError;
+                    }
                 ],
                 [
                     'name' => 'last_name',

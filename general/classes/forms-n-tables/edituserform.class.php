@@ -2,6 +2,8 @@
 /**
  * Форма редактирования пользователя
  */
+declare(strict_types=1);
+
 namespace RAAS\General;
 
 use RAAS\Application;
@@ -11,6 +13,7 @@ use RAAS\Field;
 use RAAS\Option;
 use RAAS\Group;
 use RAAS\Level;
+use RAAS\User;
 
 class EditUserForm extends Form
 {
@@ -101,7 +104,28 @@ class EditUserForm extends Form
         $formTab->children['email'] = new Field([
             'type' => 'email',
             'name' => 'email',
+            'required' => true,
             'caption' => $this->view->_('EMAIL'),
+            'check' => function ($field) {
+                $localError = $field->getErrors();
+                if (!$localError) {
+                    $sqlQuery = "SELECT COUNT(*) FROM " . User::_tablename() . " WHERE email = ?";
+                    $sqlBind = [$_POST[$field->name] ?? ''];
+                    if ($field->Form->Item && $field->Form->Item->id) {
+                        $sqlQuery .= " AND id != ?";
+                        $sqlBind[] = (int)$field->Form->Item->id;
+                    }
+                    $sqlResult = (bool)(int)Application::i()->SQL->getvalue([$sqlQuery, $sqlBind]);
+                    if ($sqlResult) {
+                        $localError[] = [
+                            'name' => 'INVALID',
+                            'value' => $field->name,
+                            'description' => $this->view->_('ERR_EMAIL_EXISTS')
+                        ];
+                    }
+                }
+                return $localError;
+            }
         ]);
         // ФИО
         $formTab->children['last_name'] = new Field([

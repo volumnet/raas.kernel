@@ -2,6 +2,8 @@
 /**
  * Пакета "Главная"
  */
+declare(strict_types=1);
+
 namespace RAAS\General;
 
 use SOME\Pages;
@@ -16,12 +18,6 @@ use RAAS\User;
  */
 class Package extends \RAAS\Package
 {
-    /**
-     * Критический размер запроса (чтобы влез в SQL), байт
-     * @deprecated
-     */
-    const dangerQuerySize = 100000;
-
     protected static $instance;
 
     public function __get($var)
@@ -91,7 +87,7 @@ class Package extends \RAAS\Package
                 $sort = "User.login";
                 break;
         }
-        if (strtolower(isset($in['order']) ? $in['order'] : null) == 'desc') {
+        if (strtolower($in['order'] ?? '') == 'desc') {
             $order = 'DESC';
         } else {
             $order = 'ASC';

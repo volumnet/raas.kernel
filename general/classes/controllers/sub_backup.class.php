@@ -2,6 +2,8 @@
 /**
  * Файл модуля резервного копирования
  */
+declare(strict_types=1);
+
 namespace RAAS\General;
 
 use SOME\Pages;
@@ -88,6 +90,7 @@ class Sub_Backup extends Abstract_Sub_Controller
                 header('Content-Type: text/plain;encoding=UTF-8');
                 header('Content-Disposition: attachment; filename="' . str_ireplace('.gz', '', $backup->filename) . '"');
                 echo $text;
+                exit;
                 break;
             case 'edit':
                 $this->edit();

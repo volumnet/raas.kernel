@@ -11,8 +11,8 @@ namespace RAAS;
 /**
  * Класс элемента формы
  * @package RAAS
- * @property-read {static::childrenType} $children Массив дочерних элементов
- * @property-write {static::childrenType} $children Массив дочерних элементов
+ * @property-read {static::CHILDREN_TYPE} $children Массив дочерних элементов
+ * @property-write {static::CHILDREN_TYPE} $children Массив дочерних элементов
  * @property-read Form $Form Рабочая форма
  * @property FormElement $Parent Родительский элемент
  */
@@ -22,11 +22,11 @@ abstract class FormElement extends HTMLElement
      * Тип поля $children
      * Должен наследоваться от \ArrayObject
      */
-    const childrenType = '\ArrayObject';
+    const CHILDREN_TYPE = '\ArrayObject';
 
     /**
      * Массив дочерних элементов
-     * @var {static::childrenType}
+     * @var {static::CHILDREN_TYPE}
      */
     protected $children;
 
@@ -64,7 +64,7 @@ abstract class FormElement extends HTMLElement
                 }
                 break;
             case 'children':
-                $classname = static::childrenType;
+                $classname = static::CHILDREN_TYPE;
                 $this->$var->Parent = $this;
                 if ($val instanceof $classname) {
                     $this->$var = $val;
@@ -95,7 +95,7 @@ abstract class FormElement extends HTMLElement
      */
     public function __construct(array $params = array())
     {
-        $classname = static::childrenType;
+        $classname = static::CHILDREN_TYPE;
         $this->children = new $classname();
         $this->children->Parent = $this;
         parent::__construct($params);

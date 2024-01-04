@@ -2,6 +2,8 @@
 /**
  * Стратегия типа данных "Флажок"
  */
+declare(strict_types=1);
+
 namespace RAAS;
 
 class CheckboxDatatypeStrategy extends DatatypeStrategy
@@ -10,6 +12,6 @@ class CheckboxDatatypeStrategy extends DatatypeStrategy
 
     public function export($value): string
     {
-        return trim($value);
+        return trim($value ?: '');
     }
 }

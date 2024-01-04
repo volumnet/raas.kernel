@@ -2,6 +2,8 @@
 /**
  * Абстрактный справочник
  */
+declare(strict_types=1);
+
 namespace RAAS;
 
 use Exception;
@@ -66,7 +68,7 @@ abstract class Dictionary extends SOME
     public function parseStdSource(array $source)
     {
         foreach ($source as $value => $entryData) {
-            $child = self::exportByNameURN($entryData['name'] ?? $value, $value, $this);
+            $child = self::exportByNameURN((string)($entryData['name'] ?? $value), (string)$value, $this);
             if (is_array($entryData['children'] ?? null)) {
                 $child->parseStdSource($entryData['children']);
             }
@@ -122,32 +124,49 @@ abstract class Dictionary extends SOME
     }
 
 
-    protected static function exportByNameURN($name, $urn = null, self $parent = null)
+    /**
+     * Сохраняет запись справочника по URN и заголовку
+     * @param string|null $name Заголовок записи
+     * @param string|null $urn URN записи
+     * @param self|null Родительская запись
+     * @return self
+     */
+    protected static function exportByNameURN(string $name, string $urn = null, self $parent = null): self
     {
-        if ($Item = static::importByLike($urn, $name, $parent)) {
-            if ($name && ($Item->name != $name)) {
-                $Item->name = $name;
-                $Item->commit();
+        if ($item = static::importByLike($urn, $name, $parent)) {
+            if ($name && ($item->name != $name)) {
+                $item->name = $name;
+                $item->commit();
             }
         } else {
-            $Item = new static();
-            $Item->name = $name;
+            $item = new static();
+            $item->name = $name;
             if ($urn) {
-                $Item->urn = $urn;
+                $item->urn = $urn;
             }
-            $Item->pid = $parent->id;
-            $Item->commit();
+            $item->pid = $parent->id;
+            $item->commit();
         }
-        return $Item;
+        return $item;
     }
 
 
-    protected static function importByLike($urn = null, $name = null, self $parent)
+    /**
+     * Получает запись справочника по соответствию URN, заголовка и родителя
+     * @param string|null $urn URN записи
+     * @param string|null $name Заголовок записи
+     * @param self|null Родительская запись
+     * @return self|null
+     */
+    protected static function importByLike(string $urn = null, string $name = null, self $parent = null)
     {
         if (!$urn && !$name) {
             return null;
         }
-        $sqlQuery = "SELECT * FROM " . static::_tablename() . " WHERE pid = " . (int)$parent->id;
+        $sqlQuery = "SELECT * FROM " . static::_tablename() . " WHERE 1";
+        if ($parent && $parent->id) {
+            $sqlQuery .= " AND pid = " . (int)$parent->id;
+        }
         if ($urn) {
             $sqlQuery .= " AND urn = '" . self::$SQL->real_escape_string($urn) . "'";
         } elseif ($name) {
