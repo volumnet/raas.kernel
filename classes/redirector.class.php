@@ -57,7 +57,7 @@ class Redirector
     private function setLocation($url)
     {
         if ($url[0] == '/') {
-            $url = 'http' . ($_SERVER['HTTPS'] == 'on' ? 's' : '') . '://' . $_SERVER["SERVER_NAME"] . $url;
+            $url = 'http' . (($_SERVER['HTTPS'] ?? '') == 'on' ? 's' : '') . '://' . ($_SERVER["SERVER_NAME"] ?? '') . $url;
         }
         header('Location: ' . $url);
         exit;

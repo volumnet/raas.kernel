@@ -1,31 +1,31 @@
 <?php
 /**
  * Файл абстрактного представления абстрактного подмодуля RAAS
- * @package RAAS
- * @version 4.1
- * @author Alex V. Surnin <info@volumnet.ru>
- * @copyright 2011, Volume Networks
- */       
+ */
+declare(strict_types=1);
+
 namespace RAAS;
+
+use SOME\Namespaces;
+use SOME\Singleton;
 
 /**
  * Класс абстрактного представления абстрактного подмодуля RAAS
- * @package RAAS
- * @property-read \RAAS\IRightsContext $module ссылка на экземпляр подмодуля
- * @property-read \RAAS\IRightsContext $model ссылка на экземпляр подмодуля
- * @property-read \RAAS\Abstract_Package_View $parent ссылка на экземпляр активного представления пакета
+ * @property-read IRightsContext $module ссылка на экземпляр подмодуля
+ * @property-read IRightsContext $model ссылка на экземпляр подмодуля
+ * @property-read Abstract_Package_View $parent ссылка на экземпляр активного представления пакета
  */       
-abstract class Abstract_Sub_View extends \SOME\Singleton
+abstract class Abstract_Sub_View extends Singleton
 {
     /**
      * Экземпляр класса
-     * @var \RAAS\Abstract_Sub_View     
+     * @var Abstract_Sub_View
      */         
     protected static $instance;
     
     /**
      * Экземпляр стандартного модуля представления
-     * @var \RAAS\View_StdSub
+     * @var View_StdSub
      */
     protected $_stdView;
     
@@ -34,14 +34,14 @@ abstract class Abstract_Sub_View extends \SOME\Singleton
         switch ($var) {
             // MVC
             case 'module':
-                $NSArray = \SOME\Namespaces::getNSArray($this);
+                $NSArray = Namespaces::getNSArray($this);
                 if (count($NSArray) >= 3) {
                     $classname = implode('\\', array_slice($NSArray, 0, 3)) . '\\Module';
                     return $classname::i();
                 }
                 break;
             case 'package':
-                $NSArray = \SOME\Namespaces::getNSArray($this);
+                $NSArray = Namespaces::getNSArray($this);
                 if (count($NSArray) >= 2) {
                     $classname = implode('\\', array_slice($NSArray, 0, 2)) . '\\Package';
                     return $classname::i();

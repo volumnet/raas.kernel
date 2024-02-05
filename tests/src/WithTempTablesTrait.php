@@ -8,6 +8,11 @@ trait WithTempTablesTrait
 {
     public static function setUpBeforeClass(): void
     {
+        static::setUpBeforeClassMethod();
+    }
+
+    public static function setUpBeforeClassMethod(): void
+    {
         $sqlQuery = "CREATE TEMPORARY TABLE IF NOT EXISTS tmp_entities (
                         id INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID#',
                         pid INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Parent ID#',

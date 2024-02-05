@@ -6,19 +6,20 @@ declare(strict_types=1);
 
 namespace RAAS;
 
+use ArrayObject;
 use SOME\File;
 
 /**
  * Класс web-представления ядра RAAS
  * @package RAAS
- * @property \ArrayObject Верхнее меню, пункты в виде array('name' => 'текст ссылки', ['href' => 'ссылка', ...прочие аттрибуты тега <a...></a>...])
- * @property \ArrayObject Левое меню, пункты в виде array('name' => 'текст ссылки', ['href' => 'ссылка', ...прочие аттрибуты тега <a...></a>...])
- * @property \ArrayObject Строка навигации, пункты в виде array('name' => 'текст ссылки', ['href' => 'ссылка', ...прочие аттрибуты тега <a...></a>...])
+ * @property ArrayObject Верхнее меню, пункты в виде array('name' => 'текст ссылки', ['href' => 'ссылка', ...прочие аттрибуты тега <a...></a>...])
+ * @property ArrayObject Левое меню, пункты в виде array('name' => 'текст ссылки', ['href' => 'ссылка', ...прочие аттрибуты тега <a...></a>...])
+ * @property ArrayObject Строка навигации, пункты в виде array('name' => 'текст ссылки', ['href' => 'ссылка', ...прочие аттрибуты тега <a...></a>...])
  * @property-read string themeDir путь к папке темы оформления
  * @property-read string themeURL URL папки с темой оформления
  * @property-read string templateType текущая группа шаблонов
  * @property-read string publicURL URL общей папки
- * @property-read \RAAS\IContext_View_Web $context представление текущего пакета/модуля
+ * @property-read IContext_View_Web $context представление текущего пакета/модуля
  */
 class View_Web extends Abstract_View implements IContext_View_Web
 {
@@ -37,13 +38,13 @@ class View_Web extends Abstract_View implements IContext_View_Web
 
     /**
      * Справочные данные
-     * @var \ArrayObject
+     * @var ArrayObject
      */
     protected $content;
 
     /**
      * Локальные (пользовательские) ошибки
-     * @var \ArrayObject
+     * @var ArrayObject
      */
     protected $localError;
 
@@ -67,43 +68,43 @@ class View_Web extends Abstract_View implements IContext_View_Web
 
     /**
      * Верхнее меню, пункты в виде array('name' => 'текст ссылки', ['href' => 'ссылка', ...прочие аттрибуты тега <a...></a>...])
-     * @var \ArrayObject
+     * @var ArrayObject
      */
     protected $menu;
 
     /**
      * Левое меню, пункты в виде array('name' => 'текст ссылки', ['href' => 'ссылка', ...прочие аттрибуты тега <a...></a>...])
-     * @var \ArrayObject
+     * @var ArrayObject
      */
     protected $submenu;
 
     /**
      * Контекстное меню страницы в виде array('name' => 'текст ссылки', ['href' => 'ссылка', ...прочие аттрибуты тега <a...></a>...])
-     * @var \ArrayObject
+     * @var ArrayObject
      */
     protected $contextmenu;
 
     /**
      * Строка навигации, пункты в виде array('name' => 'текст ссылки', ['href' => 'ссылка', ...прочие аттрибуты тега <a...></a>...])
-     * @var \ArrayObject
+     * @var ArrayObject
      */
     protected $path;
 
     /**
      * Набор подключаемых CSS-файлов
-     * @var \ArrayObject
+     * @var ArrayObject
      */
     protected $css;
 
     /**
      * Набор подключаемых JS-файлов после документа
-     * @var \ArrayObject
+     * @var ArrayObject
      */
     protected $js;
 
     /**
      * Набор подключаемых JS-файлов в шапке
-     * @var \ArrayObject
+     * @var ArrayObject
      */
     protected $head_js;
 
@@ -146,7 +147,7 @@ class View_Web extends Abstract_View implements IContext_View_Web
 
     /**
      * Экземпляр класса
-     * @var \RAAS\View_Web
+     * @var View_Web
      */
     protected static $instance;
 
@@ -252,12 +253,12 @@ class View_Web extends Abstract_View implements IContext_View_Web
     protected function init()
     {
         foreach (self::$arrayContainers as $key) {
-            $this->$key = new \ArrayObject();
+            $this->$key = new ArrayObject();
         }
-        $this->menu = new \ArrayObject();
-        $this->submenu = new \ArrayObject();
-        $this->contextmenu = new \ArrayObject();
-        $this->path = new \ArrayObject();
+        $this->menu = new ArrayObject();
+        $this->submenu = new ArrayObject();
+        $this->contextmenu = new ArrayObject();
+        $this->path = new ArrayObject();
         parent::init();
     }
 

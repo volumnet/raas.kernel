@@ -81,22 +81,20 @@ class Attachment extends SOME
                 if (!$this->image) {
                     return false;
                 }
-                if (stristr($this->mime, 'svg')) {
+                if (stristr((string)$this->mime, 'svg')) {
                     return $this->fileURL;
                 }
-                return $this->dirURL . '/' .
-                    pathinfo((string)$this->realname, PATHINFO_FILENAME) . '_tn.jpg';
+                return $this->dirURL . '/' . pathinfo((string)$this->realname, PATHINFO_FILENAME) . '_tn.jpg';
                 break;
             case 'smallURL':
                 if (!$this->image) {
                     return false;
                 }
-                if (stristr($this->mime, 'svg')) {
+                if (stristr((string)$this->mime, 'svg')) {
                     return $this->fileURL;
                 }
-                return $this->dirURL . '/' .
-                    pathinfo((string)$this->realname, PATHINFO_FILENAME) . '_small.' .
-                    $this->ext;
+                return $this->dirURL . '/' . pathinfo((string)$this->realname, PATHINFO_FILENAME) . '_small.'
+                    . $this->ext;
                 break;
             case 'file':
                 if (!$this->realname) {
@@ -108,8 +106,7 @@ class Attachment extends SOME
                 if (!$this->image) {
                     return false;
                 }
-                return $this->dirpath . '/' .
-                    pathinfo((string)$this->realname, PATHINFO_FILENAME) . '_tn.jpg';
+                return $this->dirpath . '/' . pathinfo((string)$this->realname, PATHINFO_FILENAME) . '_tn.jpg';
                 break;
             case 'small':
                 if (!$this->image) {
@@ -146,7 +143,7 @@ class Attachment extends SOME
     {
         if ($this->upload && is_file($this->upload)) {
             $this->deleteFile();
-            if ($this->image && !stristr($this->mime, 'svg')) {
+            if ($this->image && !stristr((string)$this->mime, 'svg')) {
                 $this->uploadImage();
                 $this->createThumbnail();
             } else {
@@ -276,7 +273,7 @@ class Attachment extends SOME
         $this->mime = image_type_to_mime_type($type[2]);
         // 2020-03-10, AVS: Заменил pathinfo, т.к. некорректно работает
         // с русскими буквами
-        $filenameWOext = preg_replace('/\\.\\w+$/umi', '', $this->filename);
+        $filenameWOext = preg_replace('/\\.\\w+$/umi', '', (string)$this->filename);
         $this->filename = $filenameWOext . '.' . $types[$type[2]];
         $this->realname = $this->getUniqueFilename();
         if (($this->maxWidth && ($this->maxWidth < $type[0])) ||
@@ -375,7 +372,7 @@ class Attachment extends SOME
                 $temp[] = preg_replace(
                     '/\\.\\w+$/umi',
                     '',
-                    realpath($row->file)
+                    realpath((string)$row->file)
                 );
             }
         }
@@ -385,7 +382,7 @@ class Attachment extends SOME
         $temp = array_map('realpath', $temp);
         $toDelete = [];
         foreach ($temp as $val) {
-            $file = preg_replace('/\\.\\w+$/umi', '', realpath($val));
+            $file = preg_replace('/\\.\\w+$/umi', '', realpath((string)$val));
             $file = preg_replace('/_(small|tn)$/umi', '', $file);
             if (!in_array($file, $Set)) {
                 $toDelete[] = $val;
@@ -426,7 +423,7 @@ class Attachment extends SOME
         // if ($this->realname) {
         //     $initialFilename = $this->realname;
         // } else {
-            $initialFilename = $this->filename;
+            $initialFilename = (string)$this->filename;
         // }
         $filenameWOext = preg_replace('/\\.\\w+$/umi', '', $initialFilename);
         $filename = Text::beautify($filenameWOext);
@@ -447,11 +444,11 @@ class Attachment extends SOME
      * @param string $mime MIME-тип вложения
      */
     public static function createFromFile(
-        $filename,
+        string $filename,
         SOME $parentField = null,
-        $maxSize = 1920,
-        $tnSize = 300,
-        $mime = 'application/octet-stream'
+        int $maxSize = 1920,
+        int $tnSize = 300,
+        string $mime = 'application/octet-stream'
     ) {
         $att = new static();
         $basename = basename($filename);
@@ -483,7 +480,7 @@ class Attachment extends SOME
             $att->maxWidth = $att->maxHeight = $maxSize;
             $att->tnsize = $tnSize;
         } else {
-            if ($newMime = @mime_content_type($filepath)) {
+            if ($newMime = @mime_content_type($filename)) {
                 $att->mime = $newMime;
             } else {
                 $att->mime = $mime;

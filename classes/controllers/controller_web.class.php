@@ -2,6 +2,8 @@
 /**
  * Файл web-контроллера модуля RAAS
  */
+declare(strict_types=1);
+
 namespace RAAS;
 
 use RAAS\General\Package as GeneralPackage;
@@ -37,9 +39,9 @@ class Controller_Web extends Abstract_Controller
     {
         if (parent::isFirst()) {
             $this->authSession(
-                trim($_POST['login']),
-                $this->model->md5It(trim($_POST['password'])),
-                (bool)$_POST['save_password']
+                trim($_POST['login'] ?? ''),
+                $this->model->md5It(trim($_POST['password'] ?? '')),
+                (bool)($_POST['save_password'] ?? false)
             );
             new Redirector();
         }
@@ -142,9 +144,9 @@ class Controller_Web extends Abstract_Controller
             },
             'commit' => function () use ($t) {
                 $t->authSession(
-                    trim($_POST['login']),
-                    $t->model->md5It(trim($_POST['password'])),
-                    (bool)$_POST['save_password']
+                    trim($_POST['login'] ?? ''),
+                    $t->model->md5It(trim($_POST['password'] ?? '')),
+                    (bool)($_POST['save_password'] ?? false)
                 );
                 new Redirector();
             },
@@ -159,7 +161,12 @@ class Controller_Web extends Abstract_Controller
                     'required' => 'required',
                     'caption' => $this->view->_('PASSWORD')
                 ],
-                ['type' => 'checkbox', 'name' => 'save_password', 'caption' => $this->view->_('REMEMBER_PASSWORD'), 'export' => 'intval']
+                [
+                    'type' => 'checkbox',
+                    'name' => 'save_password',
+                    'caption' => $this->view->_('REMEMBER_PASSWORD'),
+                    'export' => 'is_null'
+                ],
             ]
         ]);
         $this->view->login($Form->process());

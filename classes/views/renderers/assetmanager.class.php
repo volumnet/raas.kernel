@@ -55,7 +55,8 @@ class AssetManager
         } else {
             $filepath = trim($fileURL, '/');
         }
-        if (stristr($fileURL, '//') || ($isFile = is_file($filepath))) {
+        $isFile = is_file($filepath);
+        if (stristr($fileURL, '//') || $isFile) {
             if (!$ext) {
                 $ext = mb_strtolower(pathinfo($fileURL, PATHINFO_EXTENSION));
             }

@@ -6,9 +6,16 @@ namespace RAAS;
 
 use SOME\SOME;
 
-class CustomFieldTest extends BaseTest
+class CustomFieldTest extends BaseDBTest
 {
     use WithTempTablesTrait;
+
+    public static function setUpBeforeClass(): void
+    {
+        parent::setUpBeforeClass();
+        static::setUpBeforeClassMethod();
+    }
+
 
     /**
      * Проверка получения владельца

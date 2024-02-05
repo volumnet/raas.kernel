@@ -1,19 +1,17 @@
 <?php
 /**
  * Файл абстрактного представления ядра RAAS
- * @package RAAS
- * @version 4.1
- * @author Alex V. Surnin <info@volumnet.ru>
- * @copyright 2011, Volume Networks
  */
+declare(strict_types=1);
+
 namespace RAAS;
 
+use ArrayObject;
 use SOME\File;
 use SOME\Singleton;
 
 /**
  * Класс абстрактного представления ядра RAAS
- * @package RAAS
  * @property-read \RAAS\Application $model ссылка на экземпляр приложения
  * @property-read \RAAS\IAbstract_Context_View $context представление текущего пакета/модуля
  * @property-read array $translations массив переводов
@@ -31,7 +29,7 @@ abstract class Abstract_View extends Singleton implements IAbstract_Context_View
     /**
      * Язык по умолчанию
      */
-    const default_language = 'ru';
+    const DEFAULT_LANGUAGE = 'ru';
 
     /**
      * Код текущего языка
@@ -47,9 +45,19 @@ abstract class Abstract_View extends Singleton implements IAbstract_Context_View
 
     /**
      * Экземпляр класса
-     * @var \RAAS\Abstract_View
+     * @var Abstract_View
      */
     protected static $instance;
+
+    /**
+     * Строка навигации
+     * @var ArrayObject <pre><code>ArrayObject<[
+     *     'name' => string Текст ссылки,
+     *     'href' =>? string Ссылка,
+     *     string[] => mixed Прочие атрибуты тега a
+     * ]></code></pre>
+     */
+    protected $path;
 
     public function __get($var)
     {
@@ -80,6 +88,7 @@ abstract class Abstract_View extends Singleton implements IAbstract_Context_View
 
             case 'language':
             case 'translations':
+            case 'path':
                 return $this->$var;
                 break;
 
@@ -88,9 +97,7 @@ abstract class Abstract_View extends Singleton implements IAbstract_Context_View
                 $temp = [];
                 foreach ($dir as $row) {
                     $arr = parse_ini_file($this->languagesDir . '/' . $row);
-                    $temp[pathinfo($row, PATHINFO_FILENAME)] = isset($arr['__LANG'])
-                                                             ? $arr['__LANG']
-                                                             : '';
+                    $temp[pathinfo($row, PATHINFO_FILENAME)] = $arr['__LANG'] ?? '';
                 }
                 return $temp;
                 break;
@@ -112,8 +119,9 @@ abstract class Abstract_View extends Singleton implements IAbstract_Context_View
             }
         }
         if (!$this->language) {
-            $this->loadLanguage(static::default_language);
+            $this->loadLanguage(static::DEFAULT_LANGUAGE);
         }
+        $this->path = new ArrayObject();
     }
 
 

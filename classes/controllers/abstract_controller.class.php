@@ -1,11 +1,9 @@
 <?php
 /**
  * Файл абстрактного контроллера ядра RAAS
- * @package RAAS
- * @version 4.1
- * @author Alex V. Surnin <info@volumnet.ru>
- * @copyright 2011, Volume Networks
  */
+declare(strict_types=1);
+
 namespace RAAS;
 
 use SOME\Singleton;
@@ -314,7 +312,7 @@ abstract class Abstract_Controller extends Singleton implements IAbstract_Contex
                     'type' => 'checkbox',
                     'name' => 'save_password',
                     'caption' => $this->view->_('REMEMBER_PASSWORD'),
-                    'export' => 'intval'
+                    'export' => 'is_null'
                 ]
             ],
         ]);
@@ -530,7 +528,7 @@ abstract class Abstract_Controller extends Singleton implements IAbstract_Contex
                 }
             }
         }
-        if (!$_SERVER['PHP_AUTH_USER'] || !$_SERVER['PHP_AUTH_PW']) {
+        if (!($_SERVER['PHP_AUTH_USER'] ?? false) || !($_SERVER['PHP_AUTH_PW'] ?? false)) {
             $authStr = '';
             foreach (['HTTP_AUTHORIZATION', 'REMOTE_USER'] as $srvKey) {
                 if (isset($_SERVER[$srvKey])) {
@@ -549,11 +547,11 @@ abstract class Abstract_Controller extends Singleton implements IAbstract_Contex
             }
         }
         if (!(
-            $_SERVER['PHP_AUTH_USER'] &&
-            $_SERVER['PHP_AUTH_PW'] &&
+            ($_SERVER['PHP_AUTH_USER'] ?? false) &&
+            ($_SERVER['PHP_AUTH_PW'] ?? false) &&
             $this->model->user->auth(
-                trim($_SERVER['PHP_AUTH_USER']),
-                $this->model->md5It(trim($_SERVER['PHP_AUTH_PW']))
+                trim((string)$_SERVER['PHP_AUTH_USER']),
+                $this->model->md5It(trim((string)$_SERVER['PHP_AUTH_PW']))
             )
         )) {
             header('WWW-Authenticate: Basic realm="Restricted Area"');

@@ -68,7 +68,7 @@ class HTMLRenderer
      *     если элемент самозакрывающийся
      * @return string
      */
-    public function getElement($name, array $attrs = [], $content = ''): string
+    public function getElement(string $name, array $attrs = [], $content = ''): string
     {
         $result = '<' . htmlspecialchars((string)$name);
         $attributesString = $this->getAttributesString($attrs);
@@ -89,7 +89,7 @@ class HTMLRenderer
      * Возвращает HTML-код
      * @return string
      */
-    public function render($additionalData = [])
+    public function render(array $additionalData = []): string
     {
         return '';
     }
@@ -107,7 +107,7 @@ class HTMLRenderer
      *     string[] Наименование атрибута => mixed Значение
      * ></pre>
      */
-    public function mergeAttributes($attrs1 = [], $attrs2 = [])
+    public function mergeAttributes(array $attrs1 = [], array $attrs2 = []): array
     {
         $result = array_merge($attrs1, $attrs2);
         $attrsSet = [$attrs1, $attrs2];
@@ -143,7 +143,7 @@ class HTMLRenderer
      *     string[] Имя класса => bool Присутствие
      * ></pre>
      */
-    public function parseCSSClasses($value)
+    public function parseCSSClasses($value): array
     {
         $result = [];
         if (!is_array($value)) {
@@ -175,7 +175,7 @@ class HTMLRenderer
      * ></pre>
      * @return string
      */
-    public function joinCSSClasses($value)
+    public function joinCSSClasses($value): string
     {
         $value = $this->parseCSSClasses($value);
         $result = [];
@@ -233,7 +233,7 @@ class HTMLRenderer
      * ></pre>
      * @return string
      */
-    public function joinCSSStyles($value)
+    public function joinCSSStyles($value): string
     {
         $value = $this->parseCSSStyles($value);
         $result = [];

@@ -1,13 +1,15 @@
 <?php
 /**
- * Файл обновления системы
+ * Менеджер обновления системы
  */
+declare(strict_types=1);
+
 namespace RAAS;
 
 use SOME\SOME;
 
 /**
- * Класс обновления системы
+ * Класс менеджера обновления системы
  * @property-read string[] $tables Список таблиц базы данных
  */
 class Updater
@@ -42,7 +44,7 @@ class Updater
      */
     public function preInstall()
     {
-        $v = Application::i()->registryGet('baseVersion');
+        $v = (string)Application::i()->registryGet('baseVersion');
         if (version_compare($v, '4.2.28') < 0) {
             $this->update20200412();
         }

@@ -339,7 +339,7 @@ $_RAASForm_Field = function (Field $field) use (
     } else {
         ?>
         <div class="control-group<?php echo $err ? ' error' : ''?>">
-          <label class="control-label" for="<?php echo htmlspecialchars($field->name)?>">
+          <label class="control-label" for="<?php echo htmlspecialchars((string)$field->name)?>">
             <?php echo htmlspecialchars($field->caption ? $field->caption . ':' : '')?>
           </label>
           <div class="controls"><?php echo $_RAASForm_Control($field, false)?></div>

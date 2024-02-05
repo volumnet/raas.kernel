@@ -6,6 +6,8 @@
  * @author Alex V. Surnin <info@volumnet.ru>
  * @copyright 2013, Volume Networks
  */
+declare(strict_types=1);
+
 namespace RAAS;
 
 use SOME\SOME;

@@ -7,10 +7,10 @@ $_RAASForm_Option = function(\RAAS\Option $Option, $level = 0) use ($_RAASForm_O
             if ($Option->Field->{'data-raas-multiselect'}) {
                 $selected = in_array($Option->value, (array)$Option->Form->DATA[$Option->Field->name]);
             } else {
-                $selected = (trim($Option->value) === trim($Option->Field->value));
+                $selected = (trim((string)$Option->value) === trim((string)$Option->Field->value));
             }
         } else {
-            $selected = (trim($Option->value) === trim($Option->Form->DATA[$Option->Field->name] ?? ''));
+            $selected = (trim((string)$Option->value) === trim((string)($Option->Form->DATA[$Option->Field->name] ?? '')));
         }
     }
     if ($selected) {

@@ -1,22 +1,20 @@
 <?php
 /**
  * Файл абстрактного представления абстрактного пакета RAAS
- * @package RAAS
- * @version 4.1
- * @author Alex V. Surnin <info@volumnet.ru>
- * @copyright 2011, Volume Networks
  */
+declare(strict_types=1);
+
 namespace RAAS;
 
 use SOME\Namespaces;
+use SOME\Singleton;
 
 /**
  * Класс абстрактного представления абстрактного пакета RAAS
- * @package RAAS
- * @property-read \RAAS\Package $model ссылка на экземпляр пакета
- * @property-read \RAAS\Abstract_View $parent ссылка на экземпляр активного представления ядра
+ * @property-read Package $model ссылка на экземпляр пакета
+ * @property-read Abstract_View $parent ссылка на экземпляр активного представления ядра
  */
-abstract class Abstract_Package_View extends \SOME\Singleton implements IAbstract_Context_View
+abstract class Abstract_Package_View extends Singleton implements IAbstract_Context_View
 {
     /**
      * Массив переводов
@@ -26,7 +24,7 @@ abstract class Abstract_Package_View extends \SOME\Singleton implements IAbstrac
 
     /**
      * Экземпляр класса
-     * @var \RAAS\Abstract_Package_View
+     * @var Abstract_Package_View
      */
     protected static $instance;
 
@@ -108,8 +106,8 @@ abstract class Abstract_Package_View extends \SOME\Singleton implements IAbstrac
     }
 
 
-    public function assignVars(array $IN = array())
+    public function assignVars(array $in = [])
     {
-        return $this->parent->assignVars($IN);
+        return $this->parent->assignVars($in);
     }
 }

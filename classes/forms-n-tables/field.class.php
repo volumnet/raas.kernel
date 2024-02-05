@@ -16,6 +16,8 @@
  * ]
  * </code></pre>
  */
+declare(strict_types=1);
+
 namespace RAAS;
 
 use SOME\SOME;
