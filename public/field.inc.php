@@ -288,7 +288,7 @@ $_RAASForm_Field = function (Field $field) use (
             return $x['value'] == $field->name;
         }
     );
-    if (in_array($field->type, ['htmlarea', 'codearea'])) {
+    if (in_array($field->type, ['htmlarea', 'codearea', 'htmlcodearea'])) {
         ?>
         <div class="control-group control-group_full<?php echo $err ? ' error' : ''?>">
           <?php if ($field->caption) { ?>

@@ -26,6 +26,16 @@ class Package extends \RAAS\Package
             case 'baseDir':
                 return $this->application->systemDir . '/general';
                 break;
+            case 'baseFilesDir':
+                $dir = Application::i()->baseFilesDir . '/common';
+                if (!is_dir($dir)) {
+                    @mkdir($dir, 0777, true);
+                }
+                return $dir;
+                break;
+            case 'filesDir':
+                return $this->baseFilesDir;
+                break;
             case 'systemDir':
                 return $this->baseDir;
                 break;

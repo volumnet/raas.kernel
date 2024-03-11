@@ -11,6 +11,9 @@ import RAAS_repo from './libs/raas.repo.js';
 import RAASInitInputs from './libs/raas.init-inputs.js';
 import RAAS_queryString from './libs/raas.query-string.js';
 
+import CKEditor from '@ckeditor/ckeditor5-vue2';
+window.Vue.use( CKEditor );
+
 // import YmapPlugin from 'vue-yandex-maps';
 
 

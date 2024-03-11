@@ -964,6 +964,7 @@ final class Application extends Singleton implements IContext
         if (!is_scalar($val)) {
             $val = json_encode($val);
         }
+        $val = (string)$val;
         $_COOKIE[$var] = $val;
         if ($domainL2 && $this->isCrossDomainCookie($var)) {
             setcookie($var, '', time() - $lifetime, '/', '');

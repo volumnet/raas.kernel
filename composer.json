@@ -1,7 +1,7 @@
 {
     "name": "volumnet/raas.kernel",
-    "description": "RAAS v4.3.30 Remote Automated Assistant",
-    "version": "4.3.30",
+    "description": "RAAS v4.3.31 Remote Automated Assistant",
+    "version": "4.3.31",
     "license": "GPL-3.0-or-later",
     "minimum-stability": "dev",
     "prefer-stable": true,
@@ -22,6 +22,7 @@
         "phpmailer/phpmailer": "~6.1",
         "ckeditor/ckeditor": ">=4.13 <=4.22",
         "sunhater/kcfinder": "dev-master",
+        "edsdk/flmngr-server-php": "*",
         "phpdocumentor/reflection-docblock": "*"  
     },
     "require-dev": {

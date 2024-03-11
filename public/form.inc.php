@@ -16,7 +16,7 @@ $_RAASForm_Attrs = function(\RAAS\FormElement $FormElement, $additional = array(
         }
     }
     foreach ($arr as $key => $val) {
-        $arr[$key] = trim($val);
+        $arr[$key] = trim((string)$val);
     }
     if (!(isset($arr['id']) && $arr['id']) && !$FormElement->multiple && isset($arr['name']) && $arr['name']) {
         $arr['id'] = $arr['name'];

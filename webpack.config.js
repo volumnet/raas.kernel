@@ -6,8 +6,10 @@ const VueLoaderPlugin = require('vue-loader/lib/plugin');
 const webpack = require('webpack');
 const glob = require('glob');
 const path = require('path');
+const { styles } = require('@ckeditor/ckeditor5-dev-utils');
+const { CKEditorTranslationsPlugin } = require('@ckeditor/ckeditor5-dev-translations');
 
-module.exports = {
+const config = {
     mode: 'production',
     entry: {
         header: './public/src/header.js',
@@ -58,9 +60,39 @@ module.exports = {
         $: 'jquery',
         'window.jQuery': 'jquery',
     },
-    devtool: 'inline-source-map',
+    // devtool: 'inline-source-map',
     module: {
         rules: [
+            {
+                test: /ckeditor5-[^/\\]+[/\\]theme[/\\]icons[/\\][^/\\]+\.svg$/,
+                use: [ 'raw-loader' ]
+            },
+            {
+                test: /ckeditor5-[^/\\]+[/\\]theme[/\\].+\.css$/,
+                use: [
+                    {
+                        loader: 'style-loader',
+                        options: {
+                            injectType: 'singletonStyleTag',
+                            attributes: {
+                                'data-cke': true
+                            }
+                        }
+                    },
+                    'css-loader',
+                    {
+                        loader: 'postcss-loader',
+                        options: {
+                            postcssOptions: styles.getPostCssConfig( {
+                                themeImporter: {
+                                    themePath: require.resolve( '@ckeditor/ckeditor5-theme-lark' )
+                                },
+                                minify: true
+                            } )
+                        }
+                    }
+                ]
+            },
             {
                 test: /\.js$/,
                 use: 'babel-loader',
@@ -72,7 +104,7 @@ module.exports = {
                     // 'vue-style-loader',
                     // 'style-loader',
                     { loader: MiniCssExtractPlugin.loader },
-                    'css-loader',
+                    { loader: "css-loader", options: {url: false}, },
                     'stylus-loader'
                 ]
             },
@@ -82,7 +114,7 @@ module.exports = {
                     // 'vue-style-loader',
                     // 'style-loader',
                     { loader: MiniCssExtractPlugin.loader },
-                    'css-loader',
+                    { loader: "css-loader", options: {url: false}, },
                     // {
                     //   loader: 'postcss-loader', // Run postcss actions
                     //   options: {
@@ -102,11 +134,11 @@ module.exports = {
                 ]
             },
             {
-                test: /\.css$/,
+                test: { and: [ /\.css$/, { not: [/ckeditor5-/] } ] },
                 use: [
                     // 'style-loader',
                     { loader: MiniCssExtractPlugin.loader },
-                    'css-loader',
+                    { loader: "css-loader", options: {url: false}, },
                 ]
             },
             {
@@ -114,7 +146,7 @@ module.exports = {
                 loader: 'vue-loader'
             },
             {
-                test: /\.(png|svg|jpg|jpeg|gif)$/,
+                test: { and: [ /\.(png|svg|jpg|jpeg|gif)$/, { not: [/ckeditor5-/] } ] },
                 loader: 'file-loader',
                 options: { 
                     outputPath: './img', 
@@ -122,7 +154,7 @@ module.exports = {
                 }
             },
             {
-                test: /(\.(woff|woff2|eot|ttf|otf))|(font.*\.svg)$/,
+                test: { and: [ /(\.(woff|woff2|eot|ttf|otf))|(font.*\.svg)$/, { not: [/ckeditor5-/] } ] },
                 loader: 'file-loader',
                 options: { 
                     outputPath: './fonts', 
@@ -160,7 +192,24 @@ module.exports = {
             // 'window.jQuery': 'jquery',
         }),
         new VueLoaderPlugin(),
-        new FixStyleOnlyEntriesPlugin(),
+        // new FixStyleOnlyEntriesPlugin(),
         new MiniCssExtractPlugin({ filename: './[name].css' }),
+        new CKEditorTranslationsPlugin( {
+            language: 'en',
+            additionalLanguages: ['ru'],
+            buildAllTranslationsToSeparateFiles: true,
+        } ),
     ]
-}
+};
+
+module.exports = (env, argv) => {
+    if (argv.mode === 'development') {
+        config.devtool = 'inline-source-map';
+    }
+
+    if (argv.mode === 'production') {
+        //...
+    }
+
+    return config;
+};

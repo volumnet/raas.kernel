@@ -1,16 +1,11 @@
 <style lang="scss" scoped>
 .errors {
     position: relative;
-    padding: $alert-padding-y $alert-dismissible-padding-r $alert-padding-y $alert-padding-x;
-    border: $alert-border-width solid transparent;
-    @include border-radius($alert-border-radius);
-    $alert-background: shift-color($danger, $alert-bg-scale);
-    $alert-border: shift-color($danger, $alert-border-scale);
-    $alert-color: shift-color($danger, $alert-color-scale);
-    @if (contrast-ratio($alert-background, $alert-color) < $min-contrast-ratio) {
-        $alert-color: mix($danger, color-contrast($alert-background), abs($alert-color-scale));
-    }
-    @include alert-variant($alert-background, $alert-border, $alert-color);
+    padding: 1rem 3rem 1rem 1rem;
+    border: 1px solid mix(white, $danger, 70%);
+    border-radius: 0.25rem;
+    color: $danger;
+    background: mix(white, $danger, 80%);
     text-shadow: 0 1px 0 rgba(white, .5);
     &__title {
         font-size: 18px;
@@ -25,8 +20,8 @@
         text-shadow: 0 1px 0 white;
         opacity: 0.2;
         position: absolute;
-        top: $alert-padding-y;
-        right: ($alert-dismissible-padding-r / 2);
+        top: 1rem;
+        right: (3rem / 2);
         transform: translate(50%, 0);
         padding: 0;
         cursor: pointer;

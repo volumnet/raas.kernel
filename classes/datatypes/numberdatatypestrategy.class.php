@@ -15,7 +15,7 @@ class NumberDatatypeStrategy extends DatatypeStrategy
         if (!DatatypeStrategy::isFilled($value)) {
             return false;
         }
-        return (bool)(float)str_replace(',', '.', $value ?: '');
+        return (bool)(float)str_replace(',', '.', (string)($value ?: ''));
     }
 
 

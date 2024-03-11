@@ -197,6 +197,10 @@ $raasApplicationData = [
     'translations' => $translations,
     'availableLanguages' => $VIEW->availableLanguages,
     'hasActivePackage' => (bool)$APPLICATION->activePackage,
+    'filemanagerUploadURL' => '/files/'
+        . (($VIEW->packageName && ($VIEW->packageName != '/')) ? ($VIEW->packageName . '/') : '')
+        . 'common/',
+    'packageName' => $VIEW->packageName,
     'breadcrumbs' => getMenu($PATH),
     'title' => $TITLE,
     'subtitle' => $SUBTITLE,
@@ -232,13 +236,23 @@ if ($USER) {
     AssetManager::requestJS(array_merge([
         $VIEW->publicURL . '/header.js'
     ], (array)$VIEW->head_js), 'beforeApp');
-    AssetManager::requestJS(array_merge([
-        '/vendor/ckeditor/ckeditor/ckeditor.js',
+
+    if ($_GET['oldck'] ?? null) {
+        AssetManager::requestJS('/vendor/ckeditor/ckeditor/ckeditor.js');
+    } else {
+        AssetManager::requestJS($VIEW->publicURL . '/translations/' . $VIEW->language . '.js');
+    }
+    AssetManager::requestJS([
         '/js/raas.config.js',
         $VIEW->publicURL . '/ckeditor.config.js', // 2022-09-29, AVS: Эти и далее здесь, потому что адаптеры должны включаться после подключения CKEditor
         '/js/ckeditor.config.js',
-        '/vendor/ckeditor/ckeditor/adapters/jquery.js',
-    ], (array)$VIEW->js));
+    ]);
+    if ($_GET['oldck'] ?? null) {
+        AssetManager::requestJS([
+            '/vendor/ckeditor/ckeditor/adapters/jquery.js',
+        ]);
+    }
+    AssetManager::requestJS((array)$VIEW->js);
     echo AssetManager::getRequestedCSS();
     echo AssetManager::getRequestedJS('beforeApp');
     echo AssetManager::getRequestedCSS('custom');

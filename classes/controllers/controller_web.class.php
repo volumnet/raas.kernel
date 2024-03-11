@@ -6,6 +6,7 @@ declare(strict_types=1);
 
 namespace RAAS;
 
+use EdSDK\FlmngrServer\FlmngrServer;
 use RAAS\General\Package as GeneralPackage;
 
 /**
@@ -209,9 +210,7 @@ class Controller_Web extends Abstract_Controller
             $this->logout();
             return;
         } elseif (!in_array($this->mode, ['admin', 'manual'])) {
-            if ($this->packageName && isset($this->model->packages[$this->packageName]) &&
-                ($pack = $this->model->packages[$this->packageName])
-            ) {
+            if ($this->packageName && ($pack = ($this->model->packages[$this->packageName] ?? null))) {
                 if ($pack->registryGet('isActive') && $pack->isCompatible) {
                     if ($this->model->user->access($pack)->canDo) {
                         $this->model->activePackage = $pack;
@@ -226,6 +225,19 @@ class Controller_Web extends Abstract_Controller
                         }
                     }
                 }
+            }
+            if ($this->mode == 'flmngr') {
+                $dir = $this->model->activePackage->filesDir;
+                switch ($this->action) {
+                    case 'image':
+                        $dir .= '/image';
+                        break;
+                    default:
+                        $dir .= '/file';
+                        break;
+                }
+                FlmngrServer::flmngrRequest(['dirFiles' => $dir]);
+                exit;
             }
         }
 
