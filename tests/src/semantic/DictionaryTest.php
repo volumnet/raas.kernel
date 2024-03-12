@@ -6,11 +6,14 @@ namespace RAAS;
 
 use RAAS\CMS\Dictionary as CMSDictionary;
 
-class DictionaryTest extends BaseTest
+class DictionaryTest extends BaseDBTest
 {
+    public static $tables = ['cms_dictionaries'];
+
     protected function setUp(): void
     {
         $sqlQuery = "TRUNCATE TABLE cms_dictionaries";
+        Application::i()->SQL->query($sqlQuery);
         Application::i()->SQL->add('cms_dictionaries', ['id' => 1, 'name' => 'Test', 'urn' => 'test']);
     }
 

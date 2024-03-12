@@ -34,9 +34,7 @@
       <file>src/forms-n-tables/FieldTest.php</file>
       <file>src/views/renderers/HTMLRendererTest.php</file>
       <file>src/forms-n-tables/FieldTest.php</file>
-      <file>src/semantic/DictionaryTest.php</file>
       <file>src/sources/CSVSourceStrategyTest.php</file>
-      <file>src/sources/DictionarySourceStrategyTest.php</file>
       <file>src/sources/INISourceStrategyTest.php</file>
       <file>src/sources/PHPSourceStrategyTest.php</file>
       <file>src/sources/SQLSourceStrategyTest.php</file>
@@ -55,6 +53,9 @@
       <file>src/datatypes/ImageDatatypeStrategyTest.php</file>
       <file>src/datatypes/NumberDatatypeStrategyTest.php</file>
       <file>src/datatypes/CheckboxDatatypeStrategyTest.php</file>
+    </testsuite>
+    <testsuite name="Dictionary">
+      <file>src/semantic/DictionaryTest.php</file>
     </testsuite>
     <testsuite name="CustomField">
       <file>src/semantic/CustomFieldTest.php</file>

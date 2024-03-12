@@ -8,6 +8,8 @@ use SOME\SOME;
 
 class CustomFieldTest extends BaseDBTest
 {
+    public static $tables = ['attachments', 'cms_data'];
+
     use WithTempTablesTrait;
 
     public static function setUpBeforeClass(): void
