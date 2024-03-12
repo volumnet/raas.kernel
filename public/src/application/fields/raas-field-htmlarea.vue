@@ -9,16 +9,14 @@
 </style>
 
 <template>
-  <div v-if="ckVersion == 5">
+  <div>
     <ckeditor :editor="editor" :value="pValue" @input="pValue = $event; $emit('input', $event)" :config="ckEditorConfig"></ckeditor>
     <input type="hidden" :name="name" :value="beautifiedHTML">
   </div>
-  <textarea v-else v-bind="$attrs" :name="name" :value="pValue" @input="pValue = beautifyHTML($event.target.value); $emit('input', pValue);" :required="false" class="htmlarea"></textarea>
 </template>
 
 <script>
 import { ClassicEditor } from '@ckeditor/ckeditor5-editor-classic';
-// import CKEditor from '@ckeditor/ckeditor5-vue2';
 
 import { Essentials } from '@ckeditor/ckeditor5-essentials';
 import { Paragraph } from '@ckeditor/ckeditor5-paragraph';
@@ -60,9 +58,7 @@ export default {
     },
     methods: {
         checkCKEditor() {
-            if (this.ckVersion != 5) {
-                RAASFieldHTMLArea.methods.checkCKEditor.call(this)
-            }
+            // Пустое (должно переопределять стандартное)
         },
     },
     computed: {
@@ -72,67 +68,59 @@ export default {
         editor() {
             return ClassicEditor;
         },
-        ckVersion() {
-          return !!queryString.parse(window.location.search).oldck ? 4 : 5;
-        },
         ckEditorConfig() {
-            if (this.ckVersion == 5) {
-                return Object.assign({
-                    plugins: [ 
-                        SourceEditing, 
-                        Essentials, 
-                        Paragraph, 
-                        FindAndReplace, 
-                        SelectAll, 
-                        Image, 
-                        ImageToolbar, 
-                        ImageCaption, 
-                        ImageStyle, 
-                        ImageResize, 
-                        // ImageUpload,
-                        ImageInsert,
-                        LinkImage, 
-                        Table, 
-                        TableCellProperties, 
-                        TableProperties, 
-                        TableToolbar,
-                        HorizontalLine,
-                        SpecialCharacters, 
-                        SpecialCharactersEssentials,
-                        PageBreak,
-                        HtmlComment,
-                        HtmlEmbed,
-                        MediaEmbed,
-                        Link,
-                        Bold, 
-                        Italic, 
-                        Underline, 
-                        Strikethrough, 
-                        Subscript, 
-                        Superscript,
-                        RemoveFormat, 
-                        function(editor) {
-                            // Extend the editor schema and mark the "linkHref" model attribute as formatting.
-                            editor.model.schema.setAttributeProperties( 'linkHref', {
-                                isFormatting: true
-                            } );
-                        },
-                        List,
-                        Indent, 
-                        IndentBlock, 
-                        BlockQuote,
-                        Alignment,
-                        Font,
-                        Heading,
-                        GeneralHtmlSupport,
-                        ShowBlocks,
-                        Clipboard,
-                        Flmngr,
-                    ],
-                }, (window.ckEditor5Config || {}));
-            } else {
-                return window.ckEditorConfig || {};
-            }
+            return Object.assign({
+                plugins: [ 
+                    SourceEditing, 
+                    Essentials, 
+                    Paragraph, 
+                    FindAndReplace, 
+                    SelectAll, 
+                    Image, 
+                    ImageToolbar, 
+                    ImageCaption, 
+                    ImageStyle, 
+                    ImageResize, 
+                    ImageInsert,
+                    LinkImage, 
+                    Table, 
+                    TableCellProperties, 
+                    TableProperties, 
+                    TableToolbar,
+                    HorizontalLine,
+                    SpecialCharacters, 
+                    SpecialCharactersEssentials,
+                    PageBreak,
+                    HtmlComment,
+                    HtmlEmbed,
+                    MediaEmbed,
+                    Link,
+                    Bold, 
+                    Italic, 
+                    Underline, 
+                    Strikethrough, 
+                    Subscript, 
+                    Superscript,
+                    RemoveFormat, 
+                    function(editor) {
+                        // Extend the editor schema and mark the "linkHref" model attribute as formatting.
+                        editor.model.schema.setAttributeProperties( 'linkHref', {
+                            isFormatting: true
+                        } );
+                    },
+                    List,
+                    Indent, 
+                    IndentBlock, 
+                    BlockQuote,
+                    Alignment,
+                    Font,
+                    Heading,
+                    GeneralHtmlSupport,
+                    ShowBlocks,
+                    Clipboard,
+                    Flmngr,
+                ],
+            }, (window.ckEditor5Config || {}));
         },
     },
 }

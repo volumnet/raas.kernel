@@ -252,6 +252,9 @@ class UserLog
             mkdir($dir, 0777, true);
         }
         if (is_dir($dir)) {
+            if (!is_file($dir . '/.htaccess')) {
+                file_put_contents($dir . '/.htaccess', "Order deny,allow\nDeny from all");
+            }
             return $dir;
         }
         return null;

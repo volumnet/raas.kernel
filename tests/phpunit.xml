@@ -10,7 +10,7 @@
     </report>
   </coverage>
   <testsuites>
-    <testsuite name="fields">
+    <testsuite name="nodb">
       <file>src/datatypes/DatatypeStrategyTest.php</file>
       <file>src/datatypes/ColorDatatypeStrategyTest.php</file>
       <file>src/datatypes/EmailDatatypeStrategyTest.php</file>
@@ -32,43 +32,32 @@
       <file>src/sources/SQLSourceStrategyTest.php</file>
       <file>src/sources/XMLSourceStrategyTest.php</file>
       <file>src/forms-n-tables/FieldTest.php</file>
-      <file>src/semantic/CustomFieldTest.php</file>
-    </testsuite>
-    <testsuite name="HTMLRenderer">
       <file>src/views/renderers/HTMLRendererTest.php</file>
-    </testsuite>
-    <testsuite name="Field">
       <file>src/forms-n-tables/FieldTest.php</file>
+      <file>src/semantic/DictionaryTest.php</file>
+      <file>src/sources/CSVSourceStrategyTest.php</file>
+      <file>src/sources/DictionarySourceStrategyTest.php</file>
+      <file>src/sources/INISourceStrategyTest.php</file>
+      <file>src/sources/PHPSourceStrategyTest.php</file>
+      <file>src/sources/SQLSourceStrategyTest.php</file>
+      <file>src/sources/XMLSourceStrategyTest.php</file>
+      <file>src/datatypes/DatatypeStrategyTest.php</file>
+      <file>src/datatypes/ColorDatatypeStrategyTest.php</file>
+      <file>src/datatypes/EmailDatatypeStrategyTest.php</file>
+      <file>src/datatypes/UrlDatatypeStrategyTest.php</file>
+      <file>src/datatypes/DateTimeDatatypeStrategyTest.php</file>
+      <file>src/datatypes/TimeDatatypeStrategyTest.php</file>
+      <file>src/datatypes/DateDatatypeStrategyTest.php</file>
+      <file>src/datatypes/MonthDatatypeStrategyTest.php</file>
+      <file>src/datatypes/YearDatatypeStrategyTest.php</file>
+      <file>src/datatypes/WeekDatatypeStrategyTest.php</file>
+      <file>src/datatypes/FileDatatypeStrategyTest.php</file>
+      <file>src/datatypes/ImageDatatypeStrategyTest.php</file>
+      <file>src/datatypes/NumberDatatypeStrategyTest.php</file>
+      <file>src/datatypes/CheckboxDatatypeStrategyTest.php</file>
     </testsuite>
     <testsuite name="CustomField">
       <file>src/semantic/CustomFieldTest.php</file>
-    </testsuite>
-    <testsuite name="Dictionary">
-      <file>src/semantic/DictionaryTest.php</file>
-    </testsuite>
-    <testsuite name="SourceStrategy">
-      <file>src/sources/CSVSourceStrategyTest.php</file>
-      <file>src/sources/DictionarySourceStrategyTest.php</file>
-      <file>src/sources/INISourceStrategyTest.php</file>
-      <file>src/sources/PHPSourceStrategyTest.php</file>
-      <file>src/sources/SQLSourceStrategyTest.php</file>
-      <file>src/sources/XMLSourceStrategyTest.php</file>
-    </testsuite>
-    <testsuite name="DatatypeStrategy">
-      <file>src/datatypes/DatatypeStrategyTest.php</file>
-      <file>src/datatypes/ColorDatatypeStrategyTest.php</file>
-      <file>src/datatypes/EmailDatatypeStrategyTest.php</file>
-      <file>src/datatypes/UrlDatatypeStrategyTest.php</file>
-      <file>src/datatypes/DateTimeDatatypeStrategyTest.php</file>
-      <file>src/datatypes/TimeDatatypeStrategyTest.php</file>
-      <file>src/datatypes/DateDatatypeStrategyTest.php</file>
-      <file>src/datatypes/MonthDatatypeStrategyTest.php</file>
-      <file>src/datatypes/YearDatatypeStrategyTest.php</file>
-      <file>src/datatypes/WeekDatatypeStrategyTest.php</file>
-      <file>src/datatypes/FileDatatypeStrategyTest.php</file>
-      <file>src/datatypes/ImageDatatypeStrategyTest.php</file>
-      <file>src/datatypes/NumberDatatypeStrategyTest.php</file>
-      <file>src/datatypes/CheckboxDatatypeStrategyTest.php</file>
     </testsuite>
   </testsuites>
   <logging/>

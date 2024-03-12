@@ -231,27 +231,19 @@ if ($USER) {
     AssetManager::requestCSS(array_merge([
         $VIEW->publicURL . '/header.css',
         $VIEW->publicURL . '/application.css',
+        Application::i()->baseDir . '/css/ckeditor5.css',
         $VIEW->themeURL . ($VIEW->templateType ? '/' . $VIEW->templateType : '') . '/style.css',
     ], (array)$VIEW->css));
     AssetManager::requestJS(array_merge([
         $VIEW->publicURL . '/header.js'
     ], (array)$VIEW->head_js), 'beforeApp');
 
-    if ($_GET['oldck'] ?? null) {
-        AssetManager::requestJS('/vendor/ckeditor/ckeditor/ckeditor.js');
-    } else {
-        AssetManager::requestJS($VIEW->publicURL . '/translations/' . $VIEW->language . '.js');
-    }
     AssetManager::requestJS([
+        $VIEW->publicURL . '/translations/' . $VIEW->language . '.js',
         '/js/raas.config.js',
         $VIEW->publicURL . '/ckeditor.config.js', // 2022-09-29, AVS: Эти и далее здесь, потому что адаптеры должны включаться после подключения CKEditor
         '/js/ckeditor.config.js',
     ]);
-    if ($_GET['oldck'] ?? null) {
-        AssetManager::requestJS([
-            '/vendor/ckeditor/ckeditor/adapters/jquery.js',
-        ]);
-    }
     AssetManager::requestJS((array)$VIEW->js);
     echo AssetManager::getRequestedCSS();
     echo AssetManager::getRequestedJS('beforeApp');

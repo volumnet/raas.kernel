@@ -11,9 +11,7 @@ class DictionaryTest extends BaseTest
     protected function setUp(): void
     {
         $sqlQuery = "TRUNCATE TABLE cms_dictionaries";
-        Application::i()->SQL->query($sqlQuery);
-        $dictionary = new CMSDictionary(['id' => 1, 'name' => 'Test', 'urn' => 'test']);
-        $dictionary->commit();
+        Application::i()->SQL->add('cms_dictionaries', ['id' => 1, 'name' => 'Test', 'urn' => 'test']);
     }
 
 
