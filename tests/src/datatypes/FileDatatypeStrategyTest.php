@@ -22,6 +22,8 @@ use InvalidArgumentException;
  */
 class FileDatatypeStrategyTest extends AbstractDatatypeStrategyTest
 {
+    public static $tables = ['attachments'];
+
     /**
      * Провайдер данных для метода testGetFilesData
      * @return array <pre><code>[

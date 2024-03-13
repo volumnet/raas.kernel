@@ -4,6 +4,8 @@
  */
 namespace RAAS;
 
+use SOME\BaseTest;
+
 class XMLSourceStrategyTest extends BaseTest
 {
     /**

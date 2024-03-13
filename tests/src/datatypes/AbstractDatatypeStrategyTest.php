@@ -4,6 +4,8 @@
  */
 namespace RAAS;
 
+use SOME\BaseTest;
+
 abstract class AbstractDatatypeStrategyTest extends BaseTest
 {
     /**

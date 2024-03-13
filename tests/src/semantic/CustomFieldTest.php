@@ -4,9 +4,10 @@
  */
 namespace RAAS;
 
+use SOME\BaseTest;
 use SOME\SOME;
 
-class CustomFieldTest extends BaseDBTest
+class CustomFieldTest extends BaseTest
 {
     public static $tables = ['attachments', 'cms_data'];
 

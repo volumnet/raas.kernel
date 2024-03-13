@@ -4,6 +4,7 @@
  */
 namespace RAAS;
 
+use SOME\BaseTest;
 use SOME\SOME;
 
 class FieldTest extends BaseTest

@@ -4,9 +4,10 @@
  */
 namespace RAAS;
 
+use SOME\BaseTest;
 use RAAS\CMS\Dictionary as CMSDictionary;
 
-class DictionaryTest extends BaseDBTest
+class DictionaryTest extends BaseTest
 {
     public static $tables = ['cms_dictionaries'];
 

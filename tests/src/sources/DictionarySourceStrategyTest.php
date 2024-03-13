@@ -5,6 +5,7 @@
 namespace RAAS;
 
 use InvalidArgumentException;
+use SOME\BaseTest;
 
 class DictionarySourceStrategyTest extends BaseTest
 {
