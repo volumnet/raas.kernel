@@ -49,10 +49,12 @@
       <file>src/datatypes/MonthDatatypeStrategyTest.php</file>
       <file>src/datatypes/YearDatatypeStrategyTest.php</file>
       <file>src/datatypes/WeekDatatypeStrategyTest.php</file>
-      <file>src/datatypes/FileDatatypeStrategyTest.php</file>
       <file>src/datatypes/ImageDatatypeStrategyTest.php</file>
       <file>src/datatypes/NumberDatatypeStrategyTest.php</file>
       <file>src/datatypes/CheckboxDatatypeStrategyTest.php</file>
+    </testsuite>
+    <testsuite name="FileDatatypeStrategy">
+      <file>src/datatypes/FileDatatypeStrategyTest.php</file>
     </testsuite>
     <testsuite name="Dictionary">
       <file>src/semantic/DictionaryTest.php</file>
