@@ -6,6 +6,10 @@ namespace RAAS;
 
 use InvalidArgumentException;
 
+/**
+ * Тест для класса EmailDatatypeStrategy
+ * @covers \RAAS\EmailDatatypeStrategy
+ */
 class EmailDatatypeStrategyTest extends AbstractDatatypeStrategyTest
 {
     public function validateDataProvider(): array

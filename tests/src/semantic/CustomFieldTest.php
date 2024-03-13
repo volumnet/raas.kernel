@@ -7,6 +7,10 @@ namespace RAAS;
 use SOME\BaseTest;
 use SOME\SOME;
 
+/**
+ * Тест класса CustomField
+ * @covers \RAAS\CustomField
+ */
 class CustomFieldTest extends BaseTest
 {
     public static $tables = ['attachments', 'cms_data'];
@@ -1512,6 +1516,7 @@ class CustomFieldTest extends BaseTest
      */
     public function doRichDataProvider(): array
     {
+        static::installTables();
         $attachment = new Attachment(['id' => 123]);
         return [
             [
@@ -1763,6 +1768,7 @@ class CustomFieldTest extends BaseTest
      */
     public function fromRichDataProvider(): array
     {
+        static::installTables();
         $attachment = new Attachment(['id' => 123]);
         return [
             [

@@ -6,6 +6,10 @@ namespace RAAS;
 
 use SOME\BaseTest;
 
+/**
+ * Тест класса CSVSourceStrategy
+ * @covers \RAAS\CSVSourceStrategy
+ */
 class CSVSourceStrategyTest extends BaseTest
 {
     /**

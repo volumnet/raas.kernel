@@ -442,6 +442,7 @@ class Field extends OptionContainer
      * @param mixed $value Значение для проверки
      * @return bool true, если значение признано заполненным, false в противном случае
      * @deprecated 2023-11-28, AVS: Использовать $this->datatypeStrategy->isFilled
+     * @codeCoverageIgnore
      */
     public function _isFilled($value = null): bool
     {
@@ -454,6 +455,7 @@ class Field extends OptionContainer
      * @param mixed $value Значение для проверки
      * @return bool true, если значение признано корректным, false в противном случае
      * @deprecated 2023-11-28, AVS: Использовать $this->datatypeStrategy->validate
+     * @codeCoverageIgnore
      */
     public function _validate($value = null)
     {
@@ -473,6 +475,7 @@ class Field extends OptionContainer
      * @param string $date Дата в формате ДД.ММ.ГГГГ
      * @return bool
      * @deprecated 2023-11-28, AVS: Использовать DateTimeDatatypeStrategy::checkDate
+     * @codeCoverageIgnore
      */
     public function checkDate(string $date): bool
     {
@@ -485,6 +488,7 @@ class Field extends OptionContainer
      * @param string $time Время в формате ЧЧ:ММ:(СС(.МММ)?)?
      * @return bool
      * @deprecated 2023-11-28, AVS: Использовать DateTimeDatatypeStrategy::checkTime
+     * @codeCoverageIgnore
      */
     public function checkTime(string $time): bool
     {

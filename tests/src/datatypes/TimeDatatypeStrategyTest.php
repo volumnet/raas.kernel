@@ -4,6 +4,10 @@
  */
 namespace RAAS;
 
+/**
+ * Тест для класса TimeDatatypeStrategy
+ * @covers \RAAS\TimeDatatypeStrategy
+ */
 class TimeDatatypeStrategyTest extends AbstractDatatypeStrategyTest
 {
     public function validateDataProvider(): array

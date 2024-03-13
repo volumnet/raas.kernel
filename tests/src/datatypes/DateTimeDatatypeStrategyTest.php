@@ -6,6 +6,10 @@ namespace RAAS;
 
 use InvalidArgumentException;
 
+/**
+ * Тест для класса DateTimeDatatypeStrategy
+ * @covers \RAAS\DateTimeDatatypeStrategy
+ */
 class DateTimeDatatypeStrategyTest extends AbstractDatatypeStrategyTest
 {
     /**

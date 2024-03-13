@@ -4,6 +4,10 @@
  */
 namespace RAAS;
 
+/**
+ * Тест для класса YearDatatypeStrategy
+ * @covers \RAAS\YearDatatypeStrategy
+ */
 class YearDatatypeStrategyTest extends AbstractDatatypeStrategyTest
 {
     /**

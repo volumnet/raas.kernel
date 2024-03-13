@@ -6,6 +6,10 @@ namespace RAAS;
 
 use SOME\BaseTest;
 
+/**
+ * Тест класса SQLSourceStrategy
+ * @covers \RAAS\SQLSourceStrategy
+ */
 class SQLSourceStrategyTest extends BaseTest
 {
     /**

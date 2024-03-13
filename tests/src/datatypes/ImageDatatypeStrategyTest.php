@@ -4,6 +4,10 @@
  */
 namespace RAAS;
 
+/**
+ * Тест для класса ImageDatatypeStrategy
+ * @covers \RAAS\ImageDatatypeStrategy
+ */
 class ImageDatatypeStrategyTest extends AbstractDatatypeStrategyTest
 {
     public function validateDataProvider(): array

@@ -4,6 +4,10 @@
  */
 namespace RAAS;
 
+/**
+ * Тест для класса UrlDatatypeStrategy
+ * @covers \RAAS\UrlDatatypeStrategy
+ */
 class UrlDatatypeStrategyTest extends AbstractDatatypeStrategyTest
 {
     public function validateDataProvider(): array

@@ -7,6 +7,10 @@ namespace RAAS;
 use InvalidArgumentException;
 use SOME\BaseTest;
 
+/**
+ * Тест класса DictionarySourceStrategy
+ * @covers \RAAS\DictionarySourceStrategy
+ */
 class DictionarySourceStrategyTest extends BaseTest
 {
     use WithTempTablesTrait;

@@ -6,6 +6,10 @@ namespace RAAS;
 
 use SOME\BaseTest;
 
+/**
+ * Тест класса INISourceStrategy
+ * @covers \RAAS\INISourceStrategy
+ */
 class INISourceStrategyTest extends BaseTest
 {
     /**

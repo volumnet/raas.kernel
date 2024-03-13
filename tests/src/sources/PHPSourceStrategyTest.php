@@ -6,6 +6,10 @@ namespace RAAS;
 
 use SOME\BaseTest;
 
+/**
+ * Тест класса PHPSourceStrategy
+ * @covers \RAAS\PHPSourceStrategy
+ */
 class PHPSourceStrategyTest extends BaseTest
 {
     /**

@@ -4,6 +4,10 @@
  */
 namespace RAAS;
 
+/**
+ * Тест для класса CheckboxDatatypeStrategy
+ * @covers \RAAS\CheckboxDatatypeStrategy
+ */
 class CheckboxDatatypeStrategyTest extends AbstractDatatypeStrategyTest
 {
     /**

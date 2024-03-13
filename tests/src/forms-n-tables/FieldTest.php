@@ -7,6 +7,10 @@ namespace RAAS;
 use SOME\BaseTest;
 use SOME\SOME;
 
+/**
+ * Тест класса Field
+ * @covers \RAAS\Field
+ */
 class FieldTest extends BaseTest
 {
     use WithTempTablesTrait;
@@ -23,6 +27,7 @@ class FieldTest extends BaseTest
      */
     public function isFilledDataProvider(): array
     {
+        static::installTables();
         $result = [
             [
                 ['name' => 'test', 'type' => 'text'],
@@ -526,6 +531,7 @@ class FieldTest extends BaseTest
      */
     public function isMediaFilledDefaultDataProvider(): array
     {
+        static::installTables();
         return [
             [
                 ['name' => 'test', 'type' => 'text'],
@@ -602,6 +608,7 @@ class FieldTest extends BaseTest
      */
     public function getErrorsDataProvider(): array
     {
+        static::installTables();
         return [
             [
                 ['name' => 'test', 'caption' => 'Тест'],

@@ -7,6 +7,10 @@ namespace RAAS;
 use SOME\BaseTest;
 use RAAS\CMS\Dictionary as CMSDictionary;
 
+/**
+ * Тест класса Dictionary
+ * @covers \RAAS\Dictionary
+ */
 class DictionaryTest extends BaseTest
 {
     public static $tables = ['cms_dictionaries'];
@@ -27,7 +31,23 @@ class DictionaryTest extends BaseTest
 
 
     /**
-     * Проверка метода parseCSV()
+     * Тест метода commit()
+     */
+    public function testCommit()
+    {
+        $entry1 = new CMSDictionary(['pid' => 1, 'name' => 'Entry 1', 'urn' => 'entry1']);
+        $entry1->commit();
+        $entry2 = new CMSDictionary(['pid' => 1, 'name' => 'Entry 2']);
+        $entry2->commit();
+
+        $this->assertEquals($entry1->id + 1, $entry2->id);
+        $this->assertEquals($entry1->priority + 1, $entry2->priority);
+        $this->assertEquals($entry2->id, $entry2->urn);
+    }
+
+
+    /**
+     * Проверка метода parseStdSource()
      */
     public function testParseStdSource()
     {
@@ -76,6 +96,43 @@ class DictionaryTest extends BaseTest
 
 
     /**
+     * Проверка метода parseStdSource() - случай с пустым значением и названием
+     */
+    public function testParseStdSourceWithEmpty()
+    {
+        $source = ['' => ['name' => '']];
+
+        $dictionary = new CMSDictionary(1);
+        $dictionary->parseStdSource($source);
+
+        $this->assertNotEmpty($dictionary->children[0]->id);
+        $this->assertEquals($dictionary->children[0]->id, $dictionary->children[0]->urn);
+        $this->assertEquals('', $dictionary->children[0]->name);
+    }
+
+
+    /**
+     * Проверка метода parseStdSource() - случай с пустым значением и непустым названием
+     */
+    public function testParseStdSourceWithNameOnly()
+    {
+        $source = ['' => ['name' => 'Entry 1'], 'entry2' => ['name' => 'Entry 2']];
+
+        $entry = new CMSDictionary(['pid' => 1, 'name' => 'Entry 1', 'urn' => 'entry1']);
+        $entry->commit();
+
+        $dictionary = new CMSDictionary(1);
+        $dictionary->parseStdSource($source);
+
+        $this->assertEquals($entry->id, $dictionary->children[0]->id);
+        $this->assertEquals('entry1', $dictionary->children[0]->urn);
+        $this->assertEquals('Entry 1', $dictionary->children[0]->name);
+        $this->assertEquals('entry2', $dictionary->children[1]->urn);
+        $this->assertEquals('Entry 2', $dictionary->children[1]->name);
+    }
+
+
+    /**
      * Проверка метода parseCSV()
      */
     public function testParseCSV()
@@ -92,6 +149,8 @@ class DictionaryTest extends BaseTest
 
         $dictionary = new CMSDictionary(1);
         $dictionary->parseCSV($source);
+
+        $cat1Id = (int)$dictionary->children[0]->id;
 
         $this->assertEquals('Category 1', $dictionary->children[0]->name);
         $this->assertEquals('cat1', $dictionary->children[0]->urn);
@@ -111,6 +170,14 @@ class DictionaryTest extends BaseTest
         $this->assertEquals('cat2', $dictionary->children[1]->urn);
         $this->assertEquals('Category 3', $dictionary->children[2]->name);
         $this->assertEquals('cat3', $dictionary->children[2]->urn);
+
+        $source2 = "New category 1;cat1\n";
+
+        $dictionary->parseCSV($source2);
+
+        $child = new CMSDictionary($cat1Id);
+
+        $this->assertEquals('New category 1', $child->name);
     }
 
 
@@ -309,11 +376,13 @@ class DictionaryTest extends BaseTest
         $dictionary = new CMSDictionary(1);
         $dictionary->parseINI($source);
 
-        $this->assertEquals('Category 1', $dictionary->children[0]->name);
-        $this->assertEquals('cat1', $dictionary->children[0]->urn);
-        $this->assertEquals('Category 2', $dictionary->children[1]->name);
-        $this->assertEquals('cat2', $dictionary->children[1]->urn);
-        $this->assertEquals('Category 3', $dictionary->children[2]->name);
-        $this->assertEquals('cat3', $dictionary->children[2]->urn);
+        $children = $dictionary->children;
+
+        $this->assertEquals('Category 1', $children[0]->name);
+        $this->assertEquals('cat1', $children[0]->urn);
+        $this->assertEquals('Category 2', $children[1]->name);
+        $this->assertEquals('cat2', $children[1]->urn);
+        $this->assertEquals('Category 3', $children[2]->name);
+        $this->assertEquals('cat3', $children[2]->urn);
     }
 }

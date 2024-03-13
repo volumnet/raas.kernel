@@ -6,6 +6,10 @@ namespace RAAS;
 
 use SOME\BaseTest;
 
+/**
+ * Тест класса XMLSourceStrategy
+ * @covers \RAAS\XMLSourceStrategy
+ */
 class XMLSourceStrategyTest extends BaseTest
 {
     /**

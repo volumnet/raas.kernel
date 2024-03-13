@@ -4,6 +4,10 @@
  */
 namespace RAAS;
 
+/**
+ * Тест для класса WeekDatatypeStrategy
+ * @covers \RAAS\WeekDatatypeStrategy
+ */
 class WeekDatatypeStrategyTest extends AbstractDatatypeStrategyTest
 {
     /**

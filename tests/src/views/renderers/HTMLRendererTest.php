@@ -8,7 +8,7 @@ use SOME\BaseTest;
 
 /**
  * Класс теста рендерера HTML
- * @covers RAAS\HTMLRenderer
+ * @covers \RAAS\HTMLRenderer
  */
 class HTMLRendererTest extends BaseTest
 {

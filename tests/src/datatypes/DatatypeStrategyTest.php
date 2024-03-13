@@ -8,6 +8,10 @@ use stdClass;
 use Exception;
 use InvalidArgumentException;
 
+/**
+ * Тест для класса DatatypeStrategy
+ * @covers \RAAS\DatatypeStrategy
+ */
 class DatatypeStrategyTest extends AbstractDatatypeStrategyTest
 {
     use WithTempTablesTrait;

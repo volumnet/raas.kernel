@@ -1,15 +1,6 @@
 <?php
 /**
  * Тест для класса FileDatatypeStrategy
- */
-namespace RAAS;
-
-use stdClass;
-use Exception;
-use InvalidArgumentException;
-
-/**
- * Класс теста класса FileDatatypeStrategy
  *
  * <pre><code>
  * Предустановленные типы данных:
@@ -19,6 +10,16 @@ use InvalidArgumentException;
  *     'type' => string MIME-типы файлов,
  * ]
  * </code></pre>
+ */
+namespace RAAS;
+
+use stdClass;
+use Exception;
+use InvalidArgumentException;
+
+/**
+ * Класс теста класса FileDatatypeStrategy
+ * @covers \RAAS\FileDatatypeStrategy
  */
 class FileDatatypeStrategyTest extends AbstractDatatypeStrategyTest
 {
@@ -758,6 +759,7 @@ class FileDatatypeStrategyTest extends AbstractDatatypeStrategyTest
      */
     public function exportDataProvider(): array
     {
+        static::installTables();
         return [
             [new Attachment(['id' => 1]), 1],
             ['abc', null, InvalidArgumentException::class],

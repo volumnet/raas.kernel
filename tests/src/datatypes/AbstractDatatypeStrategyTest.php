@@ -6,6 +6,10 @@ namespace RAAS;
 
 use SOME\BaseTest;
 
+/**
+ * Абстрактный класс проверки класса DatatypeStrategy
+ * @covers \RAAS\DatatypeStrategy
+ */
 abstract class AbstractDatatypeStrategyTest extends BaseTest
 {
     /**

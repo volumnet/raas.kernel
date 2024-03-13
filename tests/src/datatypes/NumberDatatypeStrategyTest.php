@@ -4,6 +4,10 @@
  */
 namespace RAAS;
 
+/**
+ * Тест для класса NumberDatatypeStrategy
+ * @covers \RAAS\NumberDatatypeStrategy
+ */
 class NumberDatatypeStrategyTest extends AbstractDatatypeStrategyTest
 {
     /**

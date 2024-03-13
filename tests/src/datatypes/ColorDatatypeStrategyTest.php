@@ -6,6 +6,10 @@ namespace RAAS;
 
 use InvalidArgumentException;
 
+/**
+ * Тест для класса ColorDatatypeStrategy
+ * @covers \RAAS\ColorDatatypeStrategy
+ */
 class ColorDatatypeStrategyTest extends AbstractDatatypeStrategyTest
 {
     public function validateDataProvider(): array
