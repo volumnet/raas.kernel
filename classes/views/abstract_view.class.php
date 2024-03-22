@@ -93,10 +93,10 @@ abstract class Abstract_View extends Singleton implements IAbstract_Context_View
                 break;
 
             case 'availableLanguages':
-                $dir = (array)File::scandir($this->languagesDir);
+                $glob = glob($this->languagesDir . '/*.ini');
                 $temp = [];
-                foreach ($dir as $row) {
-                    $arr = parse_ini_file($this->languagesDir . '/' . $row);
+                foreach ($glob as $row) {
+                    $arr = parse_ini_file($row);
                     $temp[pathinfo($row, PATHINFO_FILENAME)] = $arr['__LANG'] ?? '';
                 }
                 return $temp;

@@ -103,8 +103,8 @@ abstract class Command
      */
     public function lock()
     {
+        $filename = $this->getLockFilename();
         if (!is_file($filename)) {
-            $filename = $this->getLockFilename();
             $backtrace = debug_backtrace(0, 2);
             foreach ($backtrace as $bt) {
                 if ($bt['function'] == 'process') {
