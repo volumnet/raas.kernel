@@ -928,7 +928,7 @@ abstract class CustomField extends SOME
     }
 
 
-    public static function getSet()
+    public static function getSet(): array
     {
         $args = func_get_args();
         if (!isset($args[0]['where'])) {

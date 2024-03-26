@@ -179,14 +179,14 @@ abstract class Dictionary extends SOME
     }
 
 
-    public static function _references($key = null)
+    public static function _references(string $key = null): array
     {
         $references = ['parent' => ['FK' => 'pid', 'classname' => static::class, 'cascade' => true]];
         return $key ? $references[$key] : $references;
     }
 
 
-    public static function _children($key = null)
+    public static function _children(string $key = null): array
     {
         $children = ['children' => ['classname' => static::class, 'FK' => 'pid']];
         return $key ? $children[$key] : $children;
