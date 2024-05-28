@@ -2,6 +2,8 @@
 /**
  * Стратегия источника PHP
  */
+declare(strict_types=1);
+
 namespace RAAS;
 
 class PHPSourceStrategy extends SourceStrategy

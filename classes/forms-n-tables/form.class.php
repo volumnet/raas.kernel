@@ -273,7 +273,7 @@ class Form extends FieldContainer
     public function process()
     {
         $this->success = false;
-        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        if (($_SERVER['REQUEST_METHOD'] ?? null) == 'POST') {
             $this->isPost = true;
             if (isset($_POST['@cancel'])) {
                 if ($f = $this->cancel) {
@@ -323,7 +323,7 @@ class Form extends FieldContainer
         } else {
             $this->DATA = $this->importDefault();
         }
-        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        if (($_SERVER['REQUEST_METHOD'] ?? null) == 'POST') {
             $this->DATA['@oncommit'] = $_POST['@oncommit'] ?? null;
         } else {
             $this->DATA['@oncommit'] = $_COOKIE['RAASForm@oncommit'] ?? null;

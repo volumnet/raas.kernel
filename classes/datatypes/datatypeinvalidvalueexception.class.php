@@ -2,6 +2,8 @@
 /**
  * Исключение некорректного значения типа данных
  */
+declare(strict_types=1);
+
 namespace RAAS;
 
 use InvalidArgumentException;

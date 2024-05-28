@@ -2,6 +2,8 @@
 /**
  * Стратегия источника справочников
  */
+declare(strict_types=1);
+
 namespace RAAS;
 
 use InvalidArgumentException;

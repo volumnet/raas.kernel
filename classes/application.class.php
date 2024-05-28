@@ -405,7 +405,7 @@ final class Application extends Singleton implements IContext
     {
         $text = '<' . "?php\r\n";
         foreach (self::$configVars as $var) {
-             $text .= '$' . $var . ' = \'' . addslashes($DATA[$var]) . "';\r\n";
+             $text .= '$' . $var . ' = \'' . addslashes($DATA[$var] ?? '') . "';\r\n";
         }
         file_put_contents($this->configFile, $text);
         chmod($this->configFile, 0777);
@@ -841,6 +841,11 @@ final class Application extends Singleton implements IContext
             $mail->SMTPDebug = $debugMode ? SMTP::DEBUG_LOWLEVEL : 0;
             if ($smtpEncryption == 'tls') {
                 $mail->SMTPSecure = 'TLS';
+            } elseif (!$smtpEncryption) {
+                // 2024-05-22, AVS: добавил, чтобы не пытался автоматом соединяться по шифрованному соединению
+                // (возможно отключение в связи с ошибкой сертификата)
+                $mail->SMTPSecure = false;
+                $mail->SMTPAutoTLS = false;
             }
             $mail->Host = $smtpHost;
             $mail->Port = $smtpPort;

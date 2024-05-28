@@ -2,6 +2,8 @@
 /**
  * Стратегия источника
  */
+declare(strict_types=1);
+
 namespace RAAS;
 
 use SOME\AbstractStrategy;

@@ -2,6 +2,8 @@
 /**
  * Стратегия типа данных "Дата"
  */
+declare(strict_types=1);
+
 namespace RAAS;
 
 class DateDatatypeStrategy extends DateTimeDatatypeStrategy

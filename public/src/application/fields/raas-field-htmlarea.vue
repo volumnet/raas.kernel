@@ -1,6 +1,9 @@
 <style lang="scss">
-.ck-editor__editable {
+.ck-editor__editable, .ck-source-editing-area textarea {
     max-height: 320px;
+}
+.ck-source-editing-area textarea {
+    overflow: auto !important;
 }
 .ck.ck-sticky-panel .ck-sticky-panel__content_sticky {
     position: relative !important;
@@ -10,7 +13,14 @@
 
 <template>
   <div>
-    <ckeditor :editor="editor" :value="pValue" @input="pValue = $event; $emit('input', $event)" :config="ckEditorConfig"></ckeditor>
+    <ckeditor 
+      :editor="editor" 
+      :value="pValue" 
+      :config="ckEditorConfig"
+      ref="ckeditor"
+      @input="pValue = $event; $emit('input', $event)" 
+      @ready="onMounted($event)"
+    ></ckeditor>
     <input type="hidden" :name="name" :value="beautifiedHTML">
   </div>
 </template>
@@ -33,7 +43,7 @@ import { PageBreak } from '@ckeditor/ckeditor5-page-break';
 import { HtmlComment } from '@ckeditor/ckeditor5-html-support';
 import { HtmlEmbed } from '@ckeditor/ckeditor5-html-embed';
 import { MediaEmbed } from '@ckeditor/ckeditor5-media-embed';
-import { RemoveFormat } from '@ckeditor/ckeditor5-remove-format';
+import { RemoveFormat } from 'app/libs/ckeditor5-remove-format';
 import { List } from '@ckeditor/ckeditor5-list';
 import { Indent, IndentBlock } from '@ckeditor/ckeditor5-indent';
 import { BlockQuote } from '@ckeditor/ckeditor5-block-quote';
@@ -56,9 +66,32 @@ export default {
             type: String,
         },
     },
+    data() {
+        return {
+            instance: null,
+        };
+    },
     methods: {
         checkCKEditor() {
             // Пустое (должно переопределять стандартное)
+        },
+        /**
+         * Обработчик готовности CKEditor'а
+         * Костыль для сохранения данных из режима источника
+         * @param  {ClassicEditor} $event Экземпляр CKEditor'а
+         */
+        onMounted($event) {
+            this.instance = $event;
+            const sourceEditing = $event.plugins.get("SourceEditing");
+            sourceEditing.on("change:isSourceEditingMode", (_eventInfo, _name, value, _oldValue) => {
+                const sourceEditingTextarea = $event.editing.view.getDomRoot()?.nextSibling?.firstChild;
+                if (!sourceEditingTextarea) {
+                    return; // Находимся не в режиме источника
+                }
+                sourceEditingTextarea.addEventListener('input', () => {
+                    sourceEditing.updateEditorData();
+                });
+            });
         },
     },
     computed: {

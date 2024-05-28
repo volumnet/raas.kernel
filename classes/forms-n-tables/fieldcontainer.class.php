@@ -181,7 +181,7 @@ class FieldContainer extends FormElement
     public function importDefault()
     {
         $DATA = array();
-        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        if (($_SERVER['REQUEST_METHOD'] ?? null) == 'POST') {
             $DATA = $_POST;
         } elseif ($this->Form->Item && $this->Form->Item->__id()) {
             foreach ($this->children as $row) {

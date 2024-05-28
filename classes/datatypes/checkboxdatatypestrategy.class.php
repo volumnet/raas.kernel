@@ -12,6 +12,6 @@ class CheckboxDatatypeStrategy extends DatatypeStrategy
 
     public function export($value): string
     {
-        return trim($value ?: '');
+        return trim((string)($value ?: ''));
     }
 }

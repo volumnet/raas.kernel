@@ -44,6 +44,11 @@ abstract class CustomField extends SOME
     const DICTIONARY_CLASS = '';
 
     /**
+     * Класс поля по умолчанию
+     */
+    const DEFAULT_CLASSNAME = SOME::class;
+
+    /**
      * Кэш значений
      * @var array <pre><code>array<string[] ID# владельца => array<
      *     string[] ID# поля => mixed[] Значения
@@ -190,6 +195,9 @@ abstract class CustomField extends SOME
                     if (!$this->multiple || $this->required) {
                         $result->default = $this->defval;
                     }
+                    if (in_array($this->datatype, ['text', 'number', 'range']) && $this->source) {
+                        $result->unit = $this->source;
+                    }
                 }
                 $result->meta['CustomField'] = $this;
                 $result->oncommit = function (Field $field) {
@@ -272,10 +280,10 @@ abstract class CustomField extends SOME
             $attachment->mime = $fileData['type'];
             if ($this->datatype == 'image') {
                 $attachment->image = 1;
-                if ($maxSize = (int)Application::i()->context->registryGet('maxsize')) {
+                if ($maxSize = $this->getMaxSize()) {
                     $attachment->maxWidth = $attachment->maxHeight = $maxSize;
                 }
-                if ($tnSize = (int)Application::i()->context->registryGet('tnsize')) {
+                if ($tnSize = $this->getTnSize()) {
                     $attachment->tnsize = $tnSize;
                 }
             }
@@ -283,6 +291,28 @@ abstract class CustomField extends SOME
             return $attachment;
         }
         return null;
+    }
+
+
+    /**
+     * Возвращает максимальный размер изображения в пикселях
+     * @return int
+     */
+    public function getMaxSize(): int
+    {
+        $result = (int)Application::i()->context->registryGet('maxsize');
+        return $result;
+    }
+
+
+    /**
+     * Возвращает размер эскиза в пикселях
+     * @return int
+     */
+    public function getTnSize(): int
+    {
+        $result = (int)Application::i()->context->registryGet('tnsize');
+        return $result;
     }
 
 
@@ -936,9 +966,7 @@ abstract class CustomField extends SOME
         } else {
             $args[0]['where'] = (array)$args[0]['where'];
         }
-        if (isset(static::$references['parent']['classname']) &&
-            ($classname = static::$references['parent']['classname'])
-        ) {
+        if ($classname = static::$references['parent']['classname'] ?? null) {
             $args[0]['where'][] = "classname = '" . static::$SQL->real_escape_string($classname) . "'";
         }
         return call_user_func_array('parent::getSet', $args);

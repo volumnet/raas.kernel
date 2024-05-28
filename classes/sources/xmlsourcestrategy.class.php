@@ -2,6 +2,8 @@
 /**
  * Стратегия источника XML
  */
+declare(strict_types=1);
+
 namespace RAAS;
 
 use Exception;
@@ -29,22 +31,22 @@ class XMLSourceStrategy extends SourceStrategy
         }
         if ($sxe) {
             foreach ($sxe->children() as $row) {
-                if (trim($row['title'] ?? '')) {
-                    $val = $row['title'];
-                } elseif (trim($row['name'] ?? '')) {
-                    $val = $row['name'];
+                if (trim((string)$row['title'] ?? '')) {
+                    $val = (string)$row['title'];
+                } elseif (trim((string)$row['name'] ?? '')) {
+                    $val = (string)$row['name'];
                 } else {
-                    $val = $row->getName();
+                    $val = (string)$row->getName();
                 }
                 $val = trim($val);
-                if (trim($row['value'] ?? '')) {
-                    $key = $row['value'];
-                } elseif (trim($row['id'] ?? '')) {
-                    $key = $row['id'];
+                if (trim((string)$row['value'] ?? '')) {
+                    $key = (string)$row['value'];
+                } elseif (trim((string)$row['id'] ?? '')) {
+                    $key = (string)$row['id'];
                 } else {
-                    $key = $val;
+                    $key = (string)$val;
                 }
-                $key = trim($key);
+                $key = trim((string)$key);
                 $result[$key] = ['name' => $val];
                 if ($parsedChildren = $this->parse($row)) {
                     $result[$key]['children'] = $parsedChildren;

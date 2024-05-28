@@ -32,6 +32,7 @@ $_RAASForm_Attrs = function(\RAAS\FormElement $FormElement, $additional = array(
     if ($FormElement->type == 'password') {
         unset($arr['confirm']);
     }
+    unset($arr['unit']);
     if (!isset($arr['disabled']) || !$arr['disabled']) {
         unset($arr['disabled']);
     }

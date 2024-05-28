@@ -2,6 +2,8 @@
 /**
  * Стратегия источника SQL
  */
+declare(strict_types=1);
+
 namespace RAAS;
 
 class SQLSourceStrategy extends SourceStrategy
@@ -32,20 +34,20 @@ class SQLSourceStrategy extends SourceStrategy
                 return ($originalPid == $pid) || (!$originalPid && !$pid);
             }));
             foreach ($rawData as $sqlRow) {
-                if (trim($sqlRow['name'] ?? '')) {
-                    $val = $sqlRow['name'];
+                if (trim((string)($sqlRow['name'] ?? ''))) {
+                    $val = (string)$sqlRow['name'];
                 } else {
                     $sqlRowValues = array_values($sqlRow);
-                    $val = array_shift($sqlRowValues);
+                    $val = (string)array_shift($sqlRowValues);
                 }
-                $val = trim($val);
+                $val = trim((string)$val);
                 $allowRecursive = isset($sqlRow['pid']);
-                if (trim($sqlRow['val'] ?? '') !== '') {
-                    $key = $sqlRow['val'];
+                if (trim((string)($sqlRow['val'] ?? '')) !== '') {
+                    $key = (string)$sqlRow['val'];
                 } else {
-                    $key = $val;
+                    $key = (string)$val;
                 }
-                $key = trim($key);
+                $key = trim((string)$key);
                 $result[$key] = ['name' => $val];
                 if ($allowRecursive) {
                     if ($temp = $this->parse($sqlResult, $key)) {

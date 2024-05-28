@@ -2,6 +2,8 @@
 /**
  * Стратегия типа данных "Неделя"
  */
+declare(strict_types=1);
+
 namespace RAAS;
 
 class WeekDatatypeStrategy extends DateTimeDatatypeStrategy

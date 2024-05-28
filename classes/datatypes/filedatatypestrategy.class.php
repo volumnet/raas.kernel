@@ -2,6 +2,8 @@
 /**
  * Стратегия типа данных "Файл"
  */
+declare(strict_types=1);
+
 namespace RAAS;
 
 use InvalidArgumentException;
@@ -104,7 +106,7 @@ class FileDatatypeStrategy extends DatatypeStrategy
 
     /**
      * Возвращает данные файлов для поля
-     * @param Field|CustomFfield|string $field Поле для получения данных
+     * @param Field|CustomField|string $field Поле для получения данных
      * @param bool $forceArray Привести к массиву
      * @param bool $withMetaData С дополнительными мета-данными из POST-массива
      * @param array|null $filesData FILES-данные для явного указания
@@ -126,7 +128,7 @@ class FileDatatypeStrategy extends DatatypeStrategy
         } elseif ($field instanceof CustomField) {
             $fieldName = $field->urn;
         } elseif (is_string($field)) {
-            $fieldName = trim($field);
+            $fieldName = trim((string)$field);
         } else {
             throw new InvalidArgumentException('Param $field must be Field|CustomField|string');
         }
@@ -174,7 +176,7 @@ class FileDatatypeStrategy extends DatatypeStrategy
         if (!DatatypeStrategy::isFilled($value)) {
             return false;
         }
-        return $this->isFileLoaded(trim($value), $debug);
+        return $this->isFileLoaded(trim((string)$value), $debug);
     }
 
 
@@ -185,7 +187,7 @@ class FileDatatypeStrategy extends DatatypeStrategy
      */
     public function validate($value, Field $field = null): bool
     {
-        if (!is_scalar($value['tmp_name'] ?? null) || (trim($value['tmp_name'] ?? '') === '')) {
+        if (!is_scalar($value['tmp_name'] ?? null) || (trim((string)($value['tmp_name'] ?? '')) === '')) {
             return true;
         }
         if ($field) {
@@ -197,7 +199,7 @@ class FileDatatypeStrategy extends DatatypeStrategy
             if ($field->accept) {
                 $accept = explode(',', mb_strtolower($field->accept));
                 $accept = array_map(function ($x) {
-                    $y = trim($x);
+                    $y = trim((string)$x);
                     if ($y[0] == '.') {
                         $y = mb_substr($y, 1);
                     }
@@ -293,11 +295,11 @@ class FileDatatypeStrategy extends DatatypeStrategy
             $sqlResult = Attachment::getSet(['where' => "id IN (" . implode(", ", $ids) . ")"]);
             $attachments = [];
             foreach ($sqlResult as $attachment) {
-                $attachments[trim($attachment->id)] = $attachment;
+                $attachments[trim((string)$attachment->id)] = $attachment;
             }
             foreach ($values as $key => $value) {
-                if (isset($attachments[trim($value)])) {
-                    $result[$key] = $attachments[trim($value)];
+                if (isset($attachments[trim((string)$value)])) {
+                    $result[$key] = $attachments[trim((string)$value)];
                 }
             }
         }

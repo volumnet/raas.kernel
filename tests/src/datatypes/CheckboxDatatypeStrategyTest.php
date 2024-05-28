@@ -11,6 +11,20 @@ namespace RAAS;
 class CheckboxDatatypeStrategyTest extends AbstractDatatypeStrategyTest
 {
     /**
+     * Проверка ошибки от 2024-05-14 15:56
+     * TypeError: trim(): Argument #1 ($string) must be of type string, int given
+     * При передаче в export значения типа int
+     */
+    public function test202405141556()
+    {
+        $strategy = DatatypeStrategy::spawn('checkbox');
+
+        $result = $strategy->export(1);
+
+        $this->assertEquals('1', $result);
+    }
+
+    /**
      * Провайдер данных для метода testExport
      * @return array <pre><code>array<[
      *     mixed Проверяемое значение

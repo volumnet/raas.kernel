@@ -10,37 +10,77 @@
     </report>
   </coverage>
   <testsuites>
-    <testsuite name="nodb">
+    <testsuite name="CheckboxDatatypeStrategy">
       <file>src/datatypes/CheckboxDatatypeStrategyTest.php</file>
+    </testsuite>
+    <testsuite name="ColorDatatypeStrategy">
       <file>src/datatypes/ColorDatatypeStrategyTest.php</file>
+    </testsuite>
+    <testsuite name="DatatypeStrategy">
       <file>src/datatypes/DatatypeStrategyTest.php</file>
+    </testsuite>
+    <testsuite name="DateDatatypeStrategy">
       <file>src/datatypes/DateDatatypeStrategyTest.php</file>
+    </testsuite>
+    <testsuite name="DateTimeDatatypeStrategy">
       <file>src/datatypes/DateTimeDatatypeStrategyTest.php</file>
+    </testsuite>
+    <testsuite name="EmailDatatypeStrategy">
       <file>src/datatypes/EmailDatatypeStrategyTest.php</file>
-      <file>src/datatypes/ImageDatatypeStrategyTest.php</file>
-      <file>src/datatypes/MonthDatatypeStrategyTest.php</file>
-      <file>src/datatypes/NumberDatatypeStrategyTest.php</file>
-      <file>src/datatypes/TimeDatatypeStrategyTest.php</file>
-      <file>src/datatypes/UrlDatatypeStrategyTest.php</file>
-      <file>src/datatypes/WeekDatatypeStrategyTest.php</file>
-      <file>src/datatypes/YearDatatypeStrategyTest.php</file>
-      <file>src/forms-n-tables/FieldTest.php</file>
-      <file>src/sources/CSVSourceStrategyTest.php</file>
-      <file>src/sources/DictionarySourceStrategyTest.php</file>
-      <file>src/sources/INISourceStrategyTest.php</file>
-      <file>src/sources/PHPSourceStrategyTest.php</file>
-      <file>src/sources/SQLSourceStrategyTest.php</file>
-      <file>src/sources/XMLSourceStrategyTest.php</file>
-      <file>src/views/renderers/HTMLRendererTest.php</file>
     </testsuite>
     <testsuite name="FileDatatypeStrategy">
       <file>src/datatypes/FileDatatypeStrategyTest.php</file>
     </testsuite>
-    <testsuite name="Dictionary">
-      <file>src/semantic/DictionaryTest.php</file>
+    <testsuite name="ImageDatatypeStrategy">
+      <file>src/datatypes/ImageDatatypeStrategyTest.php</file>
+    </testsuite>
+    <testsuite name="MonthDatatypeStrategy">
+      <file>src/datatypes/MonthDatatypeStrategyTest.php</file>
+    </testsuite>
+    <testsuite name="NumberDatatypeStrategy">
+      <file>src/datatypes/NumberDatatypeStrategyTest.php</file>
+    </testsuite>
+    <testsuite name="TimeDatatypeStrategy">
+      <file>src/datatypes/TimeDatatypeStrategyTest.php</file>
+    </testsuite>
+    <testsuite name="UrlDatatypeStrategy">
+      <file>src/datatypes/UrlDatatypeStrategyTest.php</file>
+    </testsuite>
+    <testsuite name="WeekDatatypeStrategy">
+      <file>src/datatypes/WeekDatatypeStrategyTest.php</file>
+    </testsuite>
+    <testsuite name="YearDatatypeStrategy">
+      <file>src/datatypes/YearDatatypeStrategyTest.php</file>
+    </testsuite>
+    <testsuite name="Field">
+      <file>src/forms-n-tables/FieldTest.php</file>
     </testsuite>
     <testsuite name="CustomField">
       <file>src/semantic/CustomFieldTest.php</file>
+    </testsuite>
+    <testsuite name="Dictionary">
+      <file>src/semantic/DictionaryTest.php</file>
+    </testsuite>
+    <testsuite name="CSVSourceStrategy">
+      <file>src/sources/CSVSourceStrategyTest.php</file>
+    </testsuite>
+    <testsuite name="DictionarySourceStrategy">
+      <file>src/sources/DictionarySourceStrategyTest.php</file>
+    </testsuite>
+    <testsuite name="INISourceStrategy">
+      <file>src/sources/INISourceStrategyTest.php</file>
+    </testsuite>
+    <testsuite name="PHPSourceStrategy">
+      <file>src/sources/PHPSourceStrategyTest.php</file>
+    </testsuite>
+    <testsuite name="SQLSourceStrategy">
+      <file>src/sources/SQLSourceStrategyTest.php</file>
+    </testsuite>
+    <testsuite name="XMLSourceStrategy">
+      <file>src/sources/XMLSourceStrategyTest.php</file>
+    </testsuite>
+    <testsuite name="HTMLRenderer">
+      <file>src/views/renderers/HTMLRendererTest.php</file>
     </testsuite>
   </testsuites>
   <logging/>

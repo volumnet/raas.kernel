@@ -188,7 +188,7 @@ class EditUserForm extends Form
                         },
                         'export' => function ($field) {
                             $arr = [];
-                            foreach ((array)$_POST[$field->name] as $key => $val) {
+                            foreach ((array)($_POST[$field->name] ?? []) as $key => $val) {
                                 $arr[$val] = 1;
                             }
                             $field->Form->Item->_SET_groups = $arr;

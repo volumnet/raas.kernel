@@ -1,0 +1,68 @@
+{
+  "_from": "@ckeditor/ckeditor5-remove-format@^41.2.0",
+  "_id": "@ckeditor/ckeditor5-remove-format@41.2.0",
+  "_inBundle": false,
+  "_integrity": "sha512-sFDzj46Y7Run9nHDbb0MXOBZZRwApowBKlDDDdc5UUd5jPQAEVtALEqV+kgL7Ew7NiCGy/KJoPHfreglRml3jA==",
+  "_location": "/@ckeditor/ckeditor5-remove-format",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "range",
+    "registry": true,
+    "raw": "@ckeditor/ckeditor5-remove-format@^41.2.0",
+    "name": "@ckeditor/ckeditor5-remove-format",
+    "escapedName": "@ckeditor%2fckeditor5-remove-format",
+    "scope": "@ckeditor",
+    "rawSpec": "^41.2.0",
+    "saveSpec": null,
+    "fetchSpec": "^41.2.0"
+  },
+  "_requiredBy": [
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/@ckeditor/ckeditor5-remove-format/-/ckeditor5-remove-format-41.2.0.tgz",
+  "_shasum": "46ce9e67d746e2150b093e2e864988b7c0f53acd",
+  "_spec": "@ckeditor/ckeditor5-remove-format@^41.2.0",
+  "_where": "D:\\web\\home\\libs\\raas.kernel",
+  "author": {
+    "name": "CKSource",
+    "url": "http://cksource.com/"
+  },
+  "bugs": {
+    "url": "https://github.com/ckeditor/ckeditor5/issues"
+  },
+  "bundleDependencies": false,
+  "dependencies": {
+    "ckeditor5": "41.2.0"
+  },
+  "deprecated": false,
+  "description": "Remove format feature for CKEditor 5.",
+  "files": [
+    "lang",
+    "src/**/*.js",
+    "src/**/*.d.ts",
+    "theme",
+    "build",
+    "ckeditor5-metadata.json",
+    "CHANGELOG.md"
+  ],
+  "homepage": "https://ckeditor.com/ckeditor-5",
+  "keywords": [
+    "ckeditor",
+    "ckeditor5",
+    "ckeditor 5",
+    "ckeditor5-feature",
+    "ckeditor5-plugin",
+    "ckeditor5-dll"
+  ],
+  "license": "GPL-2.0-or-later",
+  "main": "src/index.js",
+  "name": "@ckeditor/ckeditor5-remove-format",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ckeditor/ckeditor5.git",
+    "directory": "packages/ckeditor5-remove-format"
+  },
+  "type": "module",
+  "types": "src/index.d.ts",
+  "version": "41.2.0"
+}

@@ -6,6 +6,11 @@ namespace RAAS;
 
 use SOME\BaseTest;
 use SOME\SOME;
+use RAAS\CMS\Material_Type;
+use RAAS\CMS\Package;
+use RAAS\CMS\Page_Field;
+use RAAS\CMS\User as CMSUser;
+use RAAS\CMS\User_Field;
 
 /**
  * Тест класса CustomField
@@ -13,7 +18,7 @@ use SOME\SOME;
  */
 class CustomFieldTest extends BaseTest
 {
-    public static $tables = ['attachments', 'cms_data'];
+    public static $tables = ['attachments', 'cms_data', 'cms_fields'];
 
     use WithTempTablesTrait;
 
@@ -21,6 +26,90 @@ class CustomFieldTest extends BaseTest
     {
         parent::setUpBeforeClass();
         static::setUpBeforeClassMethod();
+    }
+
+
+    /**
+     * Тест ошибки от 2024-05-02
+     * Поле страниц после отцепления от страницы сохраняется с классом SOME\SOME
+     * Нужно чтобы было с классом Material_Type и pid=0
+     */
+    public function test20240502PageField()
+    {
+        $field = new Page_Field(['urn' => 'testpagefield', 'datatype' => 'text', 'name' => 'Тестовое поле страницы']);
+
+        $field->commit();
+
+        $this->assertEquals(Material_Type::class, $field->classname);
+        $this->assertEquals(0, $field->pid);
+
+        Page_Field::delete($field);
+    }
+
+
+    /**
+     * Тест ошибки от 2024-05-02
+     * Поле пользователей после отцепления от страницы сохраняется с классом SOME\SOME
+     * Нужно чтобы было с классом User, и pid=0
+     */
+    public function test20240502UserField()
+    {
+        $field = new User_Field(['urn' => 'testuserfield', 'datatype' => 'text', 'name' => 'Тестовое поле пользователя']);
+
+        $field->commit();
+
+        $this->assertEquals(CMSUser::class, $field->classname);
+        $this->assertEquals(0, $field->pid);
+
+        User_Field::delete($field);
+    }
+
+
+    /**
+     * Тест ошибки от 2024-05-02
+     * В качестве полей страницы получаются все поля с pid = 0
+     * Нужно чтобы было с классом Material_Type и pid=0
+     */
+    public function test20240502PageFieldGetSet()
+    {
+        $set = Page_Field::getSet();
+        $set = array_map(function ($x) {
+            return [
+                'id' => (int)$x->id,
+                'urn' => trim($x->urn),
+            ];
+        }, $set);
+
+        $this->assertEquals([
+            ['id' => 1, 'urn' => '_description_'],
+            ['id' => 2, 'urn' => 'image'],
+            ['id' => 3, 'urn' => 'noindex'],
+            ['id' => 4, 'urn' => 'background'],
+        ], $set);
+    }
+
+
+    /**
+     * Тест ошибки от 2024-05-02
+     * В качестве полей пользователей получаются все поля с pid = 0
+     * Нужно чтобы было с классом User, и pid=0
+     */
+    public function test20240502UserFieldGetSet()
+    {
+        $set = User_Field::getSet();
+        $set = array_map(function ($x) {
+            return [
+                'id' => (int)$x->id,
+                'urn' => trim($x->urn),
+            ];
+        }, $set);
+
+        $this->assertEquals([
+            ['id' => 37, 'urn' => 'phone'],
+            ['id' => 43, 'urn' => 'last_name'],
+            ['id' => 44, 'urn' => 'first_name'],
+            ['id' => 45, 'urn' => 'second_name'],
+        ], $set);
     }
 
 
@@ -134,6 +223,7 @@ class CustomFieldTest extends BaseTest
                     'max_val' => '9999',
                     'step' => '2',
                     'placeholder' => 'Test field',
+                    'source' => 'шт.',
                     'pattern' => '\d+',
                 ],
                 [
@@ -148,6 +238,7 @@ class CustomFieldTest extends BaseTest
                     'step' => 2,
                     'placeholder' => 'Test field',
                     'pattern' => '\d+',
+                    'unit' => 'шт.',
                     'export' => 'is_null',
                 ],
             ],
@@ -342,6 +433,40 @@ class CustomFieldTest extends BaseTest
         $this->assertEquals($expected, $result);
 
         $_POST = $oldPost;
+    }
+
+
+    /**
+     * Проверка метода getMaxSize()
+     */
+    public function testGetMaxSize()
+    {
+        $oldContext = Application::i()->context;
+        Application::i()->context = Package::i();
+        $field = new TestField();
+
+        $result = $field->getMaxSize();
+
+        $this->assertEquals(1920, $result);
+
+        Application::i()->context = $oldContext;
+    }
+
+
+    /**
+     * Проверка метода getTnSize()
+     */
+    public function testGetTnSize()
+    {
+        $oldContext = Application::i()->context;
+        Application::i()->context = Package::i();
+        $field = new TestField();
+
+        $result = $field->getTnSize();
+
+        $this->assertEquals(300, $result);
+
+        Application::i()->context = $oldContext;
     }
 
 

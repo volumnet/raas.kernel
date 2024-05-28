@@ -646,7 +646,7 @@ class Field extends OptionContainer
      */
     protected function processAttachment(array $fileData, SOME $entity)
     {
-        if ($this->datatypeStrategy->isFileLoaded($fileData['tmp_name'], Application::i()->debug)) {
+        if ($this->datatypeStrategy->isFileLoaded($fileData['tmp_name'] ?? '', Application::i()->debug)) {
             $attachmentVar = $this->meta['attachmentVar'] ?? 'attachments';
             $attachment = null;
             if (!$this->multiple && $entity->$attachmentVar) {

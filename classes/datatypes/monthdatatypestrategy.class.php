@@ -2,6 +2,8 @@
 /**
  * Стратегия типа данных "Месяц"
  */
+declare(strict_types=1);
+
 namespace RAAS;
 
 class MonthDatatypeStrategy extends DateTimeDatatypeStrategy

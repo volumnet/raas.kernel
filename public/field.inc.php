@@ -342,7 +342,14 @@ $_RAASForm_Field = function (Field $field) use (
           <label class="control-label" for="<?php echo htmlspecialchars((string)$field->name)?>">
             <?php echo htmlspecialchars($field->caption ? $field->caption . ':' : '')?>
           </label>
-          <div class="controls"><?php echo $_RAASForm_Control($field, false)?></div>
+          <div class="controls">
+            <?php
+            echo $_RAASForm_Control($field, false);
+            if ($field->unit) {
+                echo ' <span class="control-unit">' . htmlspecialchars($field->unit) . '</span>';
+            }
+            ?>
+        </div>
         </div>
         <?php
     }

@@ -2,6 +2,8 @@
 /**
  * Стратегия типа данных "E-mail"
  */
+declare(strict_types=1);
+
 namespace RAAS;
 
 class EmailDatatypeStrategy extends TextDatatypeStrategy
