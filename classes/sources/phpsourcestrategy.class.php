@@ -20,7 +20,7 @@ class PHPSourceStrategy extends SourceStrategy
         }
         if ($phpResult) {
             foreach ((array)$phpResult as $key => $arr) {
-                $key = trim($key);
+                $key = trim((string)$key);
                 if (is_array($arr)) {
                     $result[$key] = [];
                     if ($arr['name'] ?? '') {

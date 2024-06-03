@@ -35,6 +35,7 @@ class PHPSourceStrategyTest extends BaseTest
             ],
             'cat2' => ['name' => 'Category2'],
             'cat3' => ['name' => 'Category3'],
+            1 => 'aaa',
         ];";
 
         $result = PHPSourceStrategy::i()->parse($source);
@@ -56,6 +57,7 @@ class PHPSourceStrategyTest extends BaseTest
             ],
             'cat2' => ['name' => 'Category2'],
             'cat3' => ['name' => 'Category3'],
+            '1' => ['name' => 'aaa'],
         ];
 
         $this->assertEquals($expected, $result);
