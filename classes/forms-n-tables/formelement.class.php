@@ -93,7 +93,7 @@ abstract class FormElement extends HTMLElement
      * Конструктор класса
      * @param array([[имя параметра] => mixed]) $params массив дополнительных свойств, доступных для установки
      */
-    public function __construct(array $params = array())
+    public function __construct(array $params = [])
     {
         $classname = static::CHILDREN_TYPE;
         $this->children = new $classname();
