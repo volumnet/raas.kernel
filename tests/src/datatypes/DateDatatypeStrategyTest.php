@@ -121,7 +121,7 @@ class DateDatatypeStrategyTest extends AbstractDatatypeStrategyTest
             ['2023-11-12', '2023-11-12'],
             ['2023-11-12 12:01:02', '2023-11-12'],
             ['2023-11-12T12:01:02', '2023-11-12'],
-
+            [null, ''] //strtotime(): Argument #1 ($datetime) must be of type string, null given in datedatatypestrategy.class.php on line 25
         ];
         return $result;
     }
@@ -133,7 +133,7 @@ class DateDatatypeStrategyTest extends AbstractDatatypeStrategyTest
      * @param mixed $value Проверяемое значение
      * @param string $expected Ожидаемое значение
      */
-    public function testImport(string $value, string $expected)
+    public function testImport($value, string $expected)
     {
         $strategy = DatatypeStrategy::spawn('date');
 
