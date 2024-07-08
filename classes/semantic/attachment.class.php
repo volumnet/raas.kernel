@@ -467,6 +467,12 @@ class Attachment extends SOME
         }
         $att->filename = $basename;
 
+        if ($newMime = @mime_content_type($filename)) {
+            $att->mime = $newMime;
+        } else {
+            $att->mime = $mime;
+        }
+
         $type = getimagesize($att->upload);
         if ($type) {
             $newExt = image_type_to_extension($type[2], false);
@@ -474,16 +480,12 @@ class Attachment extends SOME
             if (in_array($newExt, ['jpeg', 'pjpeg'])) {
                 $newExt = 'jpg';
             }
-            $att->filename = $basenameWOExt . '.' . $newExt;
-            $att->mime = image_type_to_mime_type($type[2]);
-            $att->image = 1;
-            $att->maxWidth = $att->maxHeight = $maxSize;
-            $att->tnsize = $tnSize;
-        } else {
-            if ($newMime = @mime_content_type($filename)) {
-                $att->mime = $newMime;
-            } else {
-                $att->mime = $mime;
+            if (in_array($newExt, ['jpg', 'png', 'gif', 'webp'])) {
+                $att->filename = $basenameWOExt . '.' . $newExt;
+                $att->mime = image_type_to_mime_type($type[2]);
+                $att->image = 1;
+                $att->maxWidth = $att->maxHeight = $maxSize;
+                $att->tnsize = $tnSize;
             }
         }
         if ($parentField) {
