@@ -3,7 +3,7 @@
     $self: &;
     position: relative;
     &__title {
-        @include center-alignment(40px, 24px)
+        @include center-alignment(40px, 24px);
         width: auto;
         padding: 0 1rem;
         background: transparent;

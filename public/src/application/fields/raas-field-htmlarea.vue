@@ -1,5 +1,5 @@
 <style lang="scss">
-.ck-editor__editable, .ck-source-editing-area textarea {
+.ck-editor__editable, .ck-source-editing-area, .ck-source-editing-area textarea {
     max-height: 320px;
 }
 .ck-source-editing-area textarea {

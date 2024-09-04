@@ -35,7 +35,7 @@ class ProcessesTable extends Table
                 'id' => [
                     'caption' => $this->view->_('ID'),
                     'callback' => function ($item) {
-                        return '<span' . (!$item['process'] ? ' class="muted"' : '') . '>' .
+                        return '<span' . (!$item['process'] ?? null ? ' class="muted"' : '') . '>' .
                                   (int)$item['pid'] .
                                '</span>';
                     }
@@ -43,7 +43,7 @@ class ProcessesTable extends Table
                 'name' => [
                     'caption' => $this->view->_('NAME'),
                     'callback' => function ($item) {
-                        $text = '<span' . (!$item['process'] ? ' class="muted"' : '') . '>
+                        $text = '<span' . (!($item['process'] ?? null) ? ' class="muted"' : '') . '>
                                    ' . htmlspecialchars($item['file']) . '
                                  </span>';
                         return $text;
@@ -53,7 +53,7 @@ class ProcessesTable extends Table
                     'caption' => $this->view->_('CPU'),
                     'callback' => function ($item) {
                         if (isset($item['cpu%'])) {
-                            $text = '<span' . (!$item['process'] ? ' class="muted"' : '') . '>
+                            $text = '<span' . (!$item['process'] ?? null ? ' class="muted"' : '') . '>
                                        ' . htmlspecialchars($item['cpu%']) . '%
                                      </span>';
                             return $text;
@@ -71,7 +71,7 @@ class ProcessesTable extends Table
                                  . $this->view->_('FILESIZE_KBYTES');
                         }
                         if ($val) {
-                            $text = '<span' . (!$item['process'] ? ' class="muted"' : '') . ' style="white-space: nowrap">
+                            $text = '<span' . (!$item['process'] ?? null ? ' class="muted"' : '') . ' style="white-space: nowrap">
                                        ' . htmlspecialchars($val) . '
                                      </span>';
                             return $text;
@@ -82,7 +82,7 @@ class ProcessesTable extends Table
                     'caption' => $this->view->_('TIME'),
                     'callback' => function ($item) {
                         if (isset($item['time'])) {
-                            $text = '<span' . (!$item['process'] ? ' class="muted"' : '') . ' style="white-space: nowrap">
+                            $text = '<span' . (!$item['process'] ?? null ? ' class="muted"' : '') . ' style="white-space: nowrap">
                                        ' . htmlspecialchars($item['time']) . '
                                      </span>';
                             return $text;
@@ -93,7 +93,7 @@ class ProcessesTable extends Table
                     'caption' => $this->view->_('DESCRIPTION'),
                     'callback' => function ($item) {
                         $text = '';
-                        if ($process = $item['process']) {
+                        if ($process = $item['process'] ?? null) {
                             $t = strtotime($process->post_date);
                             $text .= '<div>'
                                   .     date('Y-m-d H:i:s', $t)

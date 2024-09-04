@@ -36,7 +36,7 @@
         color: #ddd;
     }
     &__back, &__close {
-        @include center-alignment(41px, 24px)
+        @include center-alignment(41px, 24px);
         box-sizing: border-box !important;
         border: none;
         background: transparent;

@@ -1,8 +1,8 @@
 {
   "private": true,
   "scripts": {
-    "watch": "webpack -w --mode development",
-    "build": "webpack --mode production"
+    "watch": "set NODE_OPTIONS=--openssl-legacy-provider && webpack -w --mode development",
+    "build": "set NODE_OPTIONS=--openssl-legacy-provider && webpack --mode production"
   },
   "dependencies": {
     "@ckeditor/ckeditor5-alignment": "^41.2.0",
@@ -52,6 +52,7 @@
     "postcss-loader": "^4.3.0",
     "query-string": "^7.1.1",
     "raw-loader": "^4.0.2",
+    "sass": "^1.77.8",
     "spectrum-colorpicker": "^1.8.1",
     "vue": "^2.6.14"
   },
@@ -70,9 +71,8 @@
     "imports-loader": "^1.2.0",
     "json-loader": "^0.5.7",
     "mini-css-extract-plugin": "^1.6.2",
-    "node-sass": "^4.14.1",
     "npm": "^6.14.16",
-    "optimize-css-assets-webpack-plugin": "^5.0.8",
+    "optimize-css-assets-webpack-plugin": "^6.0.1",
     "sass-loader": "^10.2.1",
     "style-loader": "^2.0.0",
     "stylus": "^0.54.7",

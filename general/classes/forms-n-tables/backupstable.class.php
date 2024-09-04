@@ -83,7 +83,7 @@ class BackupsTable extends Table
                         $filesize = (int)@filesize($item->filepath);
                         $sizelog = floor(log10($filesize) / 3);
                         return round($filesize / (pow(10, ($sizelog * 3)) ?: 1), 1) .
-                               $sizesPrefixes[$sizelog];
+                               ($sizesPrefixes[$sizelog] ?? '');
                     },
                 ],
                 ' ' => [

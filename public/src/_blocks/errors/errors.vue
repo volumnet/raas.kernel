@@ -21,7 +21,7 @@
         opacity: 0.2;
         position: absolute;
         top: 1rem;
-        right: (3rem / 2);
+        right: 1.5rem;
         transform: translate(50%, 0);
         padding: 0;
         cursor: pointer;
