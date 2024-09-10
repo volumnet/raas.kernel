@@ -12,7 +12,7 @@ class TimeDatatypeStrategy extends DateTimeDatatypeStrategy
 
     public function export($value): string
     {
-        $t = @strtotime($value);
+        $t = @strtotime((string)$value);
         if (!$this->isFilled($value) || ($t === false)) {
             return '00:00:00';
         }
@@ -22,7 +22,7 @@ class TimeDatatypeStrategy extends DateTimeDatatypeStrategy
 
     public function import($value): string
     {
-        $t = @strtotime($value);
+        $t = @strtotime((string)$value);
         if (!$this->isFilled($value) || ($t === false)) {
             return '';
         }

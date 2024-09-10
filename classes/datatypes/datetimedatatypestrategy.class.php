@@ -29,7 +29,7 @@ class DateTimeDatatypeStrategy extends DatatypeStrategy
             return true;
         }
         DatatypeStrategy::validate($value, $field);
-        $t = @strtotime($value);
+        $t = @strtotime((string)$value);
         if ($t === false) {
             throw new DatatypeInvalidValueException();
         }
@@ -111,7 +111,7 @@ class DateTimeDatatypeStrategy extends DatatypeStrategy
 
     public function export($value): string
     {
-        $t = @strtotime($value);
+        $t = @strtotime((string)$value);
         if (!$this->isFilled($value) || ($t === false)) {
             return '0000-00-00 00:00:00';
         }
@@ -121,7 +121,7 @@ class DateTimeDatatypeStrategy extends DatatypeStrategy
 
     public function import($value): string
     {
-        $t = @strtotime($value);
+        $t = @strtotime((string)$value);
         if (!$this->isFilled($value) || ($t === false)) {
             return '';
         }

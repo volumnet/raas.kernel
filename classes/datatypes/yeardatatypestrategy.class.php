@@ -12,7 +12,7 @@ class YearDatatypeStrategy extends DateTimeDatatypeStrategy
 
     public function export($value): string
     {
-        $t = @strtotime($value);
+        $t = @strtotime((string)$value);
         if (!$this->isFilled($value) || ($t === false)) {
             return '0000';
         }
@@ -25,7 +25,7 @@ class YearDatatypeStrategy extends DateTimeDatatypeStrategy
 
     public function import($value): string
     {
-        $t = @strtotime($value);
+        $t = @strtotime((string)$value);
         $newValue = str_pad((string)(int)$value, 4, '0', STR_PAD_LEFT);
         if (!$this->isFilled($value) || ($t === false)) {
             return '';
