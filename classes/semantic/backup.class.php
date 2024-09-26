@@ -158,6 +158,9 @@ abstract class Backup
             static::$data = [];
             if (is_file($filename)) {
                 $result = @eval('?>' . file_get_contents($filename));
+                $result = array_filter($result, function ($x) {
+                    return is_file($x->filepath);
+                });
                 static::$data = (array)$result;
             }
         }
