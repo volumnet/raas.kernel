@@ -30,7 +30,7 @@ class PHPSourceStrategy extends SourceStrategy
                         $result[$key]['children'] = $children;
                     }
                 } else {
-                    $result[$key] = ['name' => trim($arr)];
+                    $result[$key] = ['name' => trim((string)$arr)];
                 }
             }
         }
