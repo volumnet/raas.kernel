@@ -262,7 +262,8 @@ abstract class CustomField extends SOME
      * @param array $fileData <pre><code>[
      *     'tmp_name' => string Путь к файлу,
      *     'name' => string Название файла,
-     *     'type' => string MIME-тип файла
+     *     'type' => string MIME-тип файла,
+     *     'copy' =>? bool Скопировать файл вместо перемещения
      * ]</code></pre>
      * @return Attachment|null
      */
@@ -272,7 +273,7 @@ abstract class CustomField extends SOME
             $attachment = new Attachment();
 
             $attachment->upload = $fileData['tmp_name'];
-            if (!is_uploaded_file($fileData['tmp_name'])) {
+            if (!is_uploaded_file($fileData['tmp_name']) || ($fileData['copy'] ?? false)) {
                 $attachment->copy = true;
             }
             $attachment->filename = $fileData['name'];
