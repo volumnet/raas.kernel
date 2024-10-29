@@ -1,7 +1,7 @@
 <template>
-  <nav class="menu-left">
+  <raas-tree class="menu-left">
     <menu-left-list :menu="menu" :unfolded="true"></menu-left-list>
-  </nav>
+  </raas-tree>
 </template>
 
 <script>

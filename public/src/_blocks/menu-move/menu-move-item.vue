@@ -1,15 +1,7 @@
 <style lang="scss" scoped>
-.menu-left__item {
+.menu-move__item {
     &_active {
         color: black;
-    }
-    &_level_0 {
-        @include gradient-y($gray-200, transparent);
-        border-radius: 5px;
-        padding: .33rem .75rem .33rem 1rem;
-    }
-    &_inner {
-        padding-left: 20px;
     }
 }
 </style>
@@ -17,12 +9,18 @@
 <template>
   <raas-tree-item 
     :class="liClasses" 
-    :foldable="!!(realItem.submenu && realItem.submenu.length && (level >= $root.config.shownLevel))" 
+    :foldable="!!(realItem.submenu && realItem.submenu.length && (level >= foldedLevel))" 
     :active="unfolded"
     @fold="clickFold()"
   >
-    <menu-left-link :item="realItem" :level="level"></menu-left-link>
-    <menu-left-list v-if="realItem.submenu && realItem.submenu.length" :menu="realItem.submenu" :level="level + 1" :unfolded="(level < $root.config.shownLevel) || unfolded"></menu-left-list>
+    <menu-move-link :item="realItem" :level="level"></menu-move-link>
+    <menu-move-list 
+      v-if="realItem.submenu && realItem.submenu.length" 
+      :menu="realItem.submenu" 
+      :level="level + 1" 
+      :unfolded="(level < foldedLevel) || unfolded"
+      :folded-level="foldedLevel"
+    ></menu-move-list>
   </raas-tree-item>
 </template>
 
@@ -48,11 +46,19 @@ export default {
             type: Number,
             default: 0,
         },
+        /**
+         * Уровень, на котором начинается сворачивание
+         * @type {Number}
+         */
+        foldedLevel: {
+            type: Number,
+            default: 2
+        },
     },
     data() {
         return {
             realItem: JSON.parse(JSON.stringify(this.item)), // Реальный пункт (чтобы можно было менять)
-            unfolded: this.item.active, // Пункт развернут
+            unfolded: this.item.unfolded, // Пункт развернут
         }
     },
     methods: {
@@ -81,13 +87,13 @@ export default {
          * @return {Object}
          */
         liClasses() {
-            const result = { 'menu-left__item': true };
+            const result = { 'menu-move__item': true };
             if (this.level) {
-                result['menu-left__item_inner'] = true;
+                result['menu-move__item_inner'] = true;
             } else {
-                result['menu-left__item_main'] = true;
+                result['menu-move__item_main'] = true;
             }
-            result['menu-left__item_level_' + this.level] = true;
+            result['menu-move__item_level_' + this.level] = true;
             return result;
         }
     },

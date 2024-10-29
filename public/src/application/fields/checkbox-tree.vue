@@ -1,31 +1,88 @@
 <style lang="scss">
 .checkbox-tree {
-    padding-left: 0;
-    &_flat {
+    $self: &;
+    &__list {
+        $list: &;
         display: flex;
-        flex-wrap: wrap;
-        margin: -.5rem;
-        li {
-            padding: .5rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+        padding-left: 0;
+        margin: 0;
+        #{$list} & {
+            margin-top: 5px;
+        }
+        #{$self}_flat & {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            column-gap: 1rem;
+            row-gap: .5rem;
         }
     }
-    li {
-        display: block;
+    &__item {
+        #{$self}:not(#{$self}_flat) & {
+            padding-left: 20px;
+        }
+        #{$self}_flat & {
+            padding: 0px;
+            list-style-type: none;
+        }
     }
 }
 </style>
 
 <template>
-  <ul>
-    <li v-for="option in source">
-      <label>
-        <raas-field-checkbox v-if="type == 'checkbox'" @input="$emit('input', { value: option.value, checked: !!$event })" :type="type" :required="!!$attrs.required && !arrayValue.length" :name="/\[/.test(name) ? name : (name + '[]')" :value="(arrayValue && arrayValue.indexOf(option.value) != -1) ? option.value : ''" :defval="option.value"></raas-field-checkbox>
-        <raas-field-radio v-else-if="type == 'radio'" @input="$emit('input', $event)" :type="type" :name="name" :value="value" :defval="option.value" :required="!!$attrs.required && !value"></raas-field-radio>
-        {{option.name}}
-      </label>
-      <checkbox-tree v-if="option.children && option.children.length" @input="$emit('input', $event)" :type="type" :name="name" :value="value" :defval="defval" :source="option.children"></checkbox-tree>
-    </li>
-  </ul>
+  <component :is="isFlat ? 'nav' : 'raas-tree'" class="checkbox-tree" :class="{ 'checkbox-tree_flat': isFlat }">
+    <component :is="isFlat ? 'ul' : 'raas-tree-list'" class="checkbox-tree__list">
+      <template v-for="option in source">
+        <component 
+          :is="isFlat ? 'li' : 'raas-tree-item'" 
+          class="checkbox-tree__item" 
+          :foldable="!!option.children.length" 
+          :active="!!selfOrChildrenChecked[option.value.toString()]"
+        >
+          <template>
+            <!-- 2024-05-28, AVS: приводим к string, чтобы не было путаницы при различных типах -->
+            <label v-if="type == 'checkbox'" @contextmenu.prevent.stop="$emit('input', { value: option.value })">
+              <raas-field-checkbox 
+                @input="$emit('propagate', { option, checked: !!$event })" 
+                ref="field"
+                :type="type" 
+                :required="!!$attrs.required && !arrayValue.length" 
+                :name="/\[/.test(name) ? name : (name + '[]')" 
+                :value="checkedValues[option.value.toString()] || ''" 
+                :defval="option.value"
+              ></raas-field-checkbox>
+              {{option.name}}
+            </label>
+            <label v-else-if="type == 'radio'">
+              <raas-field-radio 
+                @input="$emit('input', $event)" 
+                :type="type" 
+                :name="name" 
+                :value="value" 
+                :defval="option.value" 
+                :required="!!$attrs.required && !value"
+              ></raas-field-radio>
+              {{option.name}}
+            </label>
+          </template>
+          <checkbox-tree 
+            v-if="option.children && option.children.length" 
+            @input="$emit('input', $event)" 
+            @propagate="$emit('propagate', $event)" 
+            :is-flat="isFlat"
+            :type="type" 
+            :name="name" 
+            :value="value" 
+            :defval="defval" 
+            :source="option.children"
+          ></checkbox-tree>
+        </component>
+      </template>
+    </component>
+  </component>
 </template>
 
 <script>
@@ -33,6 +90,46 @@ import CheckboxTree from 'cms/application/fields/checkbox-tree.vue.js';
 
 export default {
     mixins: [CheckboxTree],
-    
+    props: {
+        /**
+         * Плоский список
+         * @type {Object}
+         */
+        isFlat: {
+            type: Boolean,
+            default: false,
+        },
+    },
+    methods: {
+        /**
+         * Получает список для опций, отмечена ли конкретная опция или любая из ее дочерних
+         * @param  {Object[]} options Опция
+         * @return {Object} Ассоциативный массив 
+         *     <pre><code>array<string[] Значение в текстовом виде => bool></code></pre>
+         */
+        hasSelfOrChildrenChecked(options)
+        {
+            let result = {};
+            for (let option of options) {
+                let optionChildren = {};
+                if (option.children) {
+                    optionChildren = this.hasSelfOrChildrenChecked(option.children);
+                    result = { ...result, ...optionChildren };
+                }
+                if (Object.values(optionChildren).filter(x => !!x).length || 
+                    this.arrayValue.map(x => x.toString()).indexOf(option.value.toString()) != -1
+                ) {
+                    result[option.value.toString()] = true;
+                }
+            }
+            // console.log(result)
+            return result;
+        },
+    },
+    computed: {
+        selfOrChildrenChecked() {
+            return this.hasSelfOrChildrenChecked(this.source);
+        },
+    }
 }
 </script>

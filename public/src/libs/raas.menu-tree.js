@@ -1,3 +1,6 @@
+/**
+ * @deprecated Дерево меню реализовано в RAAS
+ */
 export default function(method) {
     var $thisObj;
     var defaultParams = { shownLevel: 2 };
@@ -49,6 +52,9 @@ export default function(method) {
                 $thisObj = $(sel, this);
             } else {
                 $thisObj = $(this);
+            }
+            if ($thisObj.length) {
+                alert('Функция jQuery.menuTree устарела и будет отключена 01.01.2026. Пожалуйста, обратитесь к разработчику для обновления системы!');
             }
             methods.hideUL($thisObj);
             methods.addPluses($thisObj);

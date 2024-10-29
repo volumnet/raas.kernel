@@ -1,37 +1,33 @@
 <style lang="scss" scoped>
-.menu-left__link {
+.menu-move__link {
     $self: &;
     display: block;
-    &#{$self}_active {
-        color: black !important;
+    line-height: 1.5;
+    &_active {
+        color: $body-color;
+    }
+    &_current {
+        font-weight: bold;
     }
     &_level_0 {
-        font-size: 16px;
-        line-height: 24px;
+        font-size: 15px;
     }
     &_inner {
         font-size: 12px;
-        line-height: 20px; 
     }
     &_level_1 {
         font-size: 14px;
-        line-height: 22px;
-    }
-}
-.menu-left__counter {
-    &-inner {
-        font-weight: bold;
     }
 }
 </style>
 
 <template>
-  <a :class="aClasses" :href="item.href" v-bind="attrs">
-    <span v-html="item.name"></span>
-    <span class="menu-left__counter" v-if="item.counter">
-      (<span class="menu-left__counter-inner">{{ item.counter }}</span>)
-    </span>
+  <a v-if="item.href" :class="aClasses" :href="item.href" v-bind="attrs">
+    {{ item.name }}
   </a>
+  <span :class="aClasses" v-else>
+    {{ item.name }}
+  </span>
 </template>
 
 <script>
@@ -81,16 +77,19 @@ export default {
          * @return {Object}
          */
         aClasses() {
-            const result = { 'menu-left__link': true };
+            const result = { 'menu-move__link': true };
             if (this.level) {
-                result['menu-left__link_inner'] = true;
+                result['menu-move__link_inner'] = true;
             } else {
-                result['menu-left__link_main'] = true;
+                result['menu-move__link_main'] = true;
             }
             if (this.item.active) {
-                result['menu-left__link_active'] = true;
+                result['menu-move__link_active'] = true;
             }
-            result['menu-left__link_level_' + this.level] = true;
+            if (this.item.isCurrent) {
+                result['menu-move__link_current'] = true;
+            }
+            result['menu-move__link_level_' + this.level] = true;
             if (this.item.class) {
                 let classNames = this.item.class
                     .trim()

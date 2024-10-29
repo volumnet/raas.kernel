@@ -2,12 +2,12 @@
  * Context.js
  * Copyright Jacob Kelley
  * MIT License
+ * @deprecated 2024-10-09 Контекстное меню реализовано в RAAS
  *
  * Modified by Joshua Christman
  */
 
 context = (function () {
-
 	var options = {
 		fadeSpeed: 100,
 		filter: function ($obj) {
@@ -129,6 +129,7 @@ context = (function () {
     }
 
 	function addContext(selector, data) {
+		alert('Функция jQuery.context устарела и будет отключена 01.01.2026. Пожалуйста, обратитесь к разработчику для обновления системы!');
         if (typeof data.id !== 'undefined' && typeof data.data !== 'undefined') {
             var id = data.id;
             $menu = $('body').find('#dropdown-' + id)[0];

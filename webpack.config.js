@@ -1,6 +1,6 @@
 const TerserJSPlugin = require('terser-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+// const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const FixStyleOnlyEntriesPlugin = require("webpack-fix-style-only-entries");
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
 const webpack = require('webpack');
@@ -43,14 +43,14 @@ const config = {
             new TerserJSPlugin({ 
                 terserOptions: { output: { comments: false, }}
             }), 
-            new OptimizeCSSAssetsPlugin({
-                cssProcessorPluginOptions: {
-                    preset: [
-                        'default', 
-                        { discardComments: { removeAll: true }}
-                    ],
-                },
-            }),
+            // new OptimizeCSSAssetsPlugin({
+            //     cssProcessorPluginOptions: {
+            //         preset: [
+            //             'default', 
+            //             { discardComments: { removeAll: true }}
+            //         ],
+            //     },
+            // }),
         ],
     },
     externals: {
@@ -115,6 +115,24 @@ const config = {
                     // 'style-loader',
                     { loader: MiniCssExtractPlugin.loader },
                     { loader: "css-loader", options: {url: false}, },
+                    {
+                        loader: 'postcss-loader', // Run postcss actions
+                        options: {
+                            postcssOptions: {
+                                plugins: [
+                                    ['postcss-utilities', { centerMethod: 'flexbox' }], 
+                                    'autoprefixer',
+                                    'rucksack-css',
+                                    'postcss-short',
+                                    // 'postcss-preset-env',
+                                    'postcss-combine-duplicated-selectors',
+                                    // 'postcss-sort-media-queries',
+                                    // 'css-mqpacker', // Убрали, т.к. плохо работает со слоями, а выигрыш размера меньше 1%
+                                    'postcss-pseudo-elements-content',
+                                ],
+                            },
+                        },
+                    },
                     // {
                     //   loader: 'postcss-loader', // Run postcss actions
                     //   options: {

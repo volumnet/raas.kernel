@@ -21,7 +21,7 @@
       @input="pValue = $event; $emit('input', $event)" 
       @ready="onMounted($event)"
     ></ckeditor>
-    <input type="hidden" :name="name" :value="beautifiedHTML">
+    <input type="hidden" :name="name" :value="beautifiedHTML" :disabled="!!$attrs.disabled">
   </div>
 </template>
 

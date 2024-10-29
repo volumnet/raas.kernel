@@ -57,6 +57,7 @@ window.Vue = Vue;
 // import 'jquery-ui-timepicker-addon';
 // import 'jquery-ui-timepicker-addon/dist/i18n/jquery-ui-timepicker-ru.js';
 
+import raasTreeComponents from './_blocks/raas-tree';
 import raasIconComponents from './_blocks/raas-icon';
 import menuLeftComponents from './_blocks/menu-left';
 import menuDropdownComponents from './_blocks/menu-dropdown';
@@ -72,6 +73,7 @@ import menuContextComponents from './_blocks/menu-context';
 import raasErrorsComponents from './_blocks/errors';
 import raasFieldComponents from './application/fields';
 import raasAppComponents from './_blocks/raas-app';
+import menuMoveComponents from './_blocks/menu-move';
 
 window.raasConfig = {
     shownLevel: 1,
@@ -79,6 +81,7 @@ window.raasConfig = {
 
 window.raasComponents = Object.assign(
     {}, 
+    raasTreeComponents,
     raasIconComponents,
     menuLeftComponents,
     menuDropdownComponents,
@@ -94,6 +97,7 @@ window.raasComponents = Object.assign(
     raasErrorsComponents,
     raasFieldComponents,
     raasAppComponents,
+    menuMoveComponents,
 );
 
 window.ymapSettings = {

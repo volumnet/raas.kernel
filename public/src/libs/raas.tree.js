@@ -1,3 +1,6 @@
+/**
+ * @deprecated Дерево реализовано в RAAS (checkbox-tree)
+ */
 export default function(method) {
     var $thisObj;
     var methods = {
@@ -75,7 +78,11 @@ export default function(method) {
             return false;
         },
         init : function(options) { 
+            console.log(this)
             $thisObj = $(this);
+            if ($thisObj.length) {
+                alert('Функция jQuery.tree устарела и будет отключена 01.01.2026. Пожалуйста, обратитесь к разработчику для обновления системы!');
+            }
             methods.hideUL($thisObj);
             methods.addPluses($thisObj);
             methods.unfold($('li:has(input:checked)', $thisObj), false);

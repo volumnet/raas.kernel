@@ -41,7 +41,17 @@
 </style>
 
 <template>
-  <checkbox-tree v-if="source" v-bind="$attrs" @input="$emit('input', $event)" class="checkbox-tree checkbox-tree_radio" :class="{ 'checkbox-tree_flat': !multilevel && (flatSource.length <= 5) }" :type="type" :name="name" :value="value" :source="source"></checkbox-tree>
+  <checkbox-tree 
+    v-if="source" 
+    v-bind="$attrs" 
+    @input="$emit('input', $event)" 
+    class="checkbox-tree checkbox-tree_radio" 
+    :class="{ 'checkbox-tree_flat': !multilevel && (flatSource.length <= flatMaxCounter) }" 
+    :type="type" 
+    :name="name" 
+    :value="value" 
+    :source="source"
+  ></checkbox-tree>
   <span v-else class="raas-field-radio" :class="{ 'raas-field-radio_active': !!checked }">
     <input type="radio" v-bind="$attrs" :name="name" :value="defval" :checked="checked" @click="$emit('input', defval)">
   </span>

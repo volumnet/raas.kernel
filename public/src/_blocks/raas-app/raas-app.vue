@@ -119,6 +119,7 @@
         }
         &-inner {
             overflow: auto;
+            flex-grow: 1;
         }
     }
     &__content-header {

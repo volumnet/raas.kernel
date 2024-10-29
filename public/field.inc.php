@@ -44,6 +44,24 @@ $_RAASForm_Options = function (
     }
 };
 
+$_RAASForm_Source = function (
+    OptionCollection $options,
+    $level = 0
+) use (&$_RAASForm_Source) {
+    $result = [];
+    foreach ((array)$options as $option) {
+        $optionData = (array)$option->attrs;
+        $optionData['name'] = $option->caption;
+        foreach (['checked', 'multiple', 'type'] as $key) {
+            unset($optionData[$key]);
+        }
+        if ($children = $option->children) {
+            $optionData['children'] = $_RAASForm_Source($children, $level + 1);
+        }
+        $result[] = $optionData;
+    }
+    return $result;
+};
 
 /**
  * Шаблон флажков
@@ -56,50 +74,64 @@ $_RAASForm_Checkbox = function (
     $level = 0
 ) use (
     &$_RAASForm_Checkbox,
-    &$_RAASForm_Attrs
+    &$_RAASForm_Attrs,
+    &$_RAASForm_Source
 ) {
     $field = $options->Parent;
+    $originalOptions = $options;
     $options = (array)$options;
     $attrs = [];
     $text = '';
     $plain = !$level && !array_filter($options, function ($x) {
         return (bool)(array)$x->children;
     }) && (count($options) < 16);
-    foreach ($options as $row) {
-        $attrs = $row->attrs;
-        foreach (['type', 'name', 'multiple'] as $key) {
-            $attrs[$key] = $field->$key;
+    // foreach ($options as $row) {
+    //     $attrs = $row->attrs;
+    //     foreach (['type', 'name', 'multiple'] as $key) {
+    //         $attrs[$key] = $field->$key;
+    //     }
+    //     if (in_array($row->value, (array)($field->Form->DATA[$field->name] ?? []))) {
+    //         $attrs['checked'] = 'checked';
+    //     } else {
+    //         $attrs['checked'] = false;
+    //     }
+    //     if ($plain) {
+    //         $text .= '<label class="' . $field->type . ' inline">
+    //                     <input' . $_RAASForm_Attrs($field, $attrs) . ' /> '
+    //               .     htmlspecialchars($row->caption)
+    //               .  '</label>';
+    //     } else {
+    //         $text .= '<li>';
+    //         if ($row instanceof OptGroup) {
+    //             $text .= '  <label>'
+    //                   .       htmlspecialchars($row->caption)
+    //                   .  '  </label>' ;
+    //         } else {
+    //             $text .= '  <label>
+    //                           <input' . $_RAASForm_Attrs($field, $attrs) . ' /> '
+    //                   .       htmlspecialchars($row->caption)
+    //                   .  '  </label>' ;
+    //         }
+    //         $text .=    $_RAASForm_Checkbox($row->children, $level + 1) . '
+    //                   </li>';
+    //     }
+    // }
+    if (!$level) {
+        $attrs = [];
+        foreach (['value', 'checked'] as $key) {
+            $attrs[$key] = null; // Убираем, т.к. для raas-field это не нужно
         }
-        if (in_array($row->value, (array)($field->Form->DATA[$field->name] ?? []))) {
-            $attrs['checked'] = 'checked';
-        } else {
-            $attrs['checked'] = false;
-        }
-        if ($plain) {
-            $text .= '<label class="' . $field->type . ' inline">
-                        <input' . $_RAASForm_Attrs($field, $attrs) . ' /> '
-                  .     htmlspecialchars($row->caption)
-                  .  '</label>';
-        } else {
-            $text .= '<li>';
-            if ($row instanceof OptGroup) {
-                $text .= '  <label>'
-                      .       htmlspecialchars($row->caption)
-                      .  '  </label>' ;
-            } else {
-                $text .= '  <label>
-                              <input' . $_RAASForm_Attrs($field, $attrs) . ' /> '
-                      .       htmlspecialchars($row->caption)
-                      .  '  </label>' ;
-            }
-            $text .=    $_RAASForm_Checkbox($row->children, $level + 1) . '
-                      </li>';
-        }
+        $source = $_RAASForm_Source($originalOptions);
+        $attrs[':source'] = json_encode($source);
+        $attrs[':value'] = json_encode((array)($field->Form->DATA[$field->name] ?? []));
+        // $attrs = $_RAASForm_Attrs($field, $attrs);
+        $text .= '<raas-field-checkbox' . $_RAASForm_Attrs($field, $attrs) . '></raas-field-checkbox>';
     }
     if ($text && !$plain) {
-        return '<ul' . (!$level ? ' class="tree" data-raas-role="tree"' : '') . '>' .
-                  $text .
-               '</ul>';
+        // $text = '<ul' . (!$level ? ' class="tree" data-raas-role="tree"' : '') . '>' .
+        //           $text .
+        //        '</ul>';
+        return $text;
     } else {
         return $text;
     }
@@ -116,7 +148,8 @@ $_RAASForm_Control = function (
 ) use (
     &$_RAASForm_Attrs,
     &$_RAASForm_Options,
-    &$_RAASForm_Checkbox
+    &$_RAASForm_Checkbox,
+    &$_RAASForm_Source
 ) {
     $attrs = [];
     switch ($field->type) {
@@ -180,16 +213,17 @@ $_RAASForm_Control = function (
         case 'checkbox':
             $attrs = [];
             if ($field->multiple) {
-                echo $_RAASForm_Checkbox($field->children);
+                $source = $_RAASForm_Source($field->children);
+                $attrs[':source'] = json_encode($source);
+                $attrs[':value'] = json_encode((array)($field->Form->DATA[$field->name] ?? []));
             } else {
-                $attrs['value'] = 1;
-                if (isset($field->Form->DATA[$field->name]) && $field->Form->DATA[$field->name]) {
-                    $attrs['checked'] = 'checked';
-                }
-                ?>
-                <input<?php echo $_RAASForm_Attrs($field, $attrs)?> />
-                <?php
+                $attrs['defval'] = $field->defval ?: '1';
+                $attrs['mask'] = '0';
+                $attrs[':value'] = json_encode($field->Form->DATA[$field->name] ?? null);
             }
+            ?>
+            <raas-field-checkbox<?php echo $_RAASForm_Attrs($field, $attrs)?>></raas-field-checkbox>
+            <?php
             break;
         case 'radio':
             echo $_RAASForm_Checkbox($field->children);
@@ -260,13 +294,19 @@ $_RAASForm_Control = function (
                     <?php } ?>
                   </div>
                   <div data-role="raas-repo">
-                    <raas-field-<?php echo htmlspecialchars($fieldType)?> <?php echo $_RAASForm_Attrs($field, array_merge($attrs, ['disabled' => 'disabled', ':source' => $childrenArr ? json_encode($childrenArr) : false]))?>></raas-field-<?php echo htmlspecialchars($fieldType)?>>
+                    <raas-field-<?php echo htmlspecialchars($fieldType)?>
+                      <?php echo $_RAASForm_Attrs($field, array_merge($attrs, ['disabled' => 'disabled', ':source' => $childrenArr ? json_encode($childrenArr) : false]))?>
+                    ></raas-field-<?php echo htmlspecialchars($fieldType)?>>
                   </div>
                 </div>
                 <?php
             } else {
+                $attrs[':value'] = json_encode($field->Form->DATA[$field->name] ?? null);
+                $attrs[':source'] = $childrenArr ? json_encode($childrenArr) : false;
                 ?>
-                <raas-field-<?php echo htmlspecialchars($fieldType)?> <?php echo $_RAASForm_Attrs($field, array_merge($attrs, [':value' => json_encode(isset($field->Form->DATA[$field->name]) ? $field->Form->DATA[$field->name] : null), ':source' => $childrenArr ? json_encode($childrenArr) : false]))?>></raas-field-<?php echo htmlspecialchars($fieldType)?>>
+                <raas-field-<?php echo htmlspecialchars($fieldType)?>
+                  <?php echo $_RAASForm_Attrs($field, $attrs)?>
+                ></raas-field-<?php echo htmlspecialchars($fieldType)?>>
                 <?php
             }
             break;
