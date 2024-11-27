@@ -4,6 +4,10 @@
 @import 'app/application/bootstrap-fix.scss';
 @import 'app/application/fa-fix.scss';
 
+:root {
+    --header-outer-height: 41px;
+}
+
 .body {
     &__background-holder {
         @include gradient-y(#08f, #8cf);
@@ -24,7 +28,7 @@
     
     &__header-outer {
         @media screen {
-            min-height: 41px;
+            min-height: var(--header-outer-height);
         }
         @media print {
             display: none;
@@ -88,6 +92,7 @@
         display: grid;
         overflow: hidden;
         padding: 2rem;
+        // min-height: calc(100vh - var(--header-outer-height) - 1rem);
         gap: 1rem;
         flex-grow: 1;
         background: white;

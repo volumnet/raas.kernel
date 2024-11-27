@@ -39,7 +39,7 @@
         <component 
           :is="isFlat ? 'li' : 'raas-tree-item'" 
           class="checkbox-tree__item" 
-          :foldable="!!option.children.length" 
+          :foldable="!!option.children?.length" 
           :active="!!selfOrChildrenChecked[option.value.toString()]"
         >
           <template>
@@ -54,7 +54,7 @@
                 :value="checkedValues[option.value.toString()] || ''" 
                 :defval="option.value"
               ></raas-field-checkbox>
-              {{option.name}}
+              {{ option.caption }}
             </label>
             <label v-else-if="type == 'radio'">
               <raas-field-radio 
@@ -65,7 +65,7 @@
                 :defval="option.value" 
                 :required="!!$attrs.required && !value"
               ></raas-field-radio>
-              {{option.name}}
+              {{ option.caption }}
             </label>
           </template>
           <checkbox-tree 

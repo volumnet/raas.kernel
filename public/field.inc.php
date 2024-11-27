@@ -52,6 +52,7 @@ $_RAASForm_Source = function (
     foreach ((array)$options as $option) {
         $optionData = (array)$option->attrs;
         $optionData['name'] = $option->caption;
+        $optionData['caption'] = $option->caption;
         foreach (['checked', 'multiple', 'type'] as $key) {
             unset($optionData[$key]);
         }
@@ -226,7 +227,14 @@ $_RAASForm_Control = function (
             <?php
             break;
         case 'radio':
-            echo $_RAASForm_Checkbox($field->children);
+            // echo $_RAASForm_Checkbox($field->children);
+            $attrs = [];
+            $source = $_RAASForm_Source($field->children);
+            $attrs[':source'] = json_encode($source);
+            $attrs[':value'] = json_encode($field->Form->DATA[$field->name] ?? null);
+            ?>
+            <raas-field-radio<?php echo $_RAASForm_Attrs($field, $attrs)?>></raas-field-radio>
+            <?php
             break;
         case 'select':
             $attrs['type'] = false;
