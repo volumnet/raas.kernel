@@ -393,6 +393,8 @@ final class Application extends Singleton implements IContext
     public function initDB()
     {
         $this->SQL = new DB($this->DSN, $this->config['dbuser'], $this->config['dbpass'], 'utf8');
+        // 2024-12-02, AVS: добавил для совместимости
+        $this->SQL->query("SET SESSION sql_mode = 'ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION'");
         return true;
     }
 
