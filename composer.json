@@ -1,12 +1,12 @@
 {
     "name": "volumnet/raas.kernel",
-    "description": "RAAS v4.3.54 Remote Automated Assistant",
-    "version": "4.3.54",
+    "description": "RAAS v4.5.0 Remote Automated Assistant",
+    "version": "4.5.0",
     "license": "GPL-3.0-or-later",
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
-        "php": ">=7.0",
+        "php": ">=8.0",
         "ext-session": ">=0",
         "ext-iconv": ">=0",
         "ext-intl": ">=0",
@@ -21,7 +21,7 @@
         "phpmailer/phpmailer": "~6.1",
         "edsdk/flmngr-server-php": "*",
         "phpdocumentor/reflection-docblock": "*",
-        "volumnet/some4": ">=4.6.30"
+        "volumnet/some4": ">=4.7.0"
     },
     "require-dev": {
         "phpunit/phpunit": "*",
