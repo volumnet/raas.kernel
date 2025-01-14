@@ -970,7 +970,9 @@ abstract class CustomField extends SOME
         if ($classname = static::$references['parent']['classname'] ?? null) {
             $args[0]['where'][] = "classname = '" . static::$SQL->real_escape_string($classname) . "'";
         }
-        return call_user_func_array('parent::getSet', $args);
+        // return call_user_func_array('parent::getSet', $args);
+        $result = parent::getSet(...$args);
+        return $result;
     }
 
 

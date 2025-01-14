@@ -162,6 +162,12 @@ class Field extends OptionContainer
      */
     protected $isMediaFilled;
 
+    /**
+     * Кастомизированный метод, вызываемый после коммита формы
+     * @var ?callable <pre><code>function (self $field): void</code></pre>
+     */
+    protected $oncommit;
+
     public function __get($var)
     {
         switch ($var) {

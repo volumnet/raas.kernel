@@ -2,9 +2,8 @@
 /**
  * Файл Cron-контроллера ядра RAAS
  * @package RAAS
- * @version 4.1
  * @author Alex V. Surnin <info@volumnet.ru>
- * @copyright 2015, Volume Networks
+ * @copyright Volume Networks
  */
 namespace RAAS;
 
@@ -26,6 +25,12 @@ abstract class Abstract_Controller_Cron extends Abstract_Controller
      * @var int
      */
     public $st;
+
+    /**
+     * Действие
+     * @var ?string
+     */
+    public ?string $action = null;
 
     /**
      * Кодировка по умолчанию
