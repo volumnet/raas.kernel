@@ -117,7 +117,7 @@ class ViewSub_Users extends \RAAS\Abstract_Sub_View
     }
 
 
-    public function getUserContextMenu(User $item, Group $group = null)
+    public function getUserContextMenu(User $item, ?Group $group = null)
     {
         $arr = [];
         if ($item->id) {

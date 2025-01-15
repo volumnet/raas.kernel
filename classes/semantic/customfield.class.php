@@ -136,8 +136,12 @@ abstract class CustomField extends SOME
                 return DatatypeStrategy::spawn($this->datatype);
                 break;
             case 'sourceStrategy':
+                // 2025-01-14, AVS: непонятно почему, но SourceStrategy::spawn('') валит Apache без записи в логи
+                if (!$this->source_type) {
+                    return null;
+                }
                 try {
-                    return SourceStrategy::spawn($this->source_type);
+                    return SourceStrategy::spawn((string)$this->source_type);
                 } catch (Exception $e) {
                 }
                 return null;
