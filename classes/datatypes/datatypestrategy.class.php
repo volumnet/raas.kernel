@@ -13,7 +13,7 @@ abstract class DatatypeStrategy extends AbstractStrategy
 {
     protected static $registeredStrategies = [];
 
-    public static function spawn(string $key = null): AbstractStrategy
+    public static function spawn(?string $key = null): AbstractStrategy
     {
         if (!$key || !isset(static::$registeredStrategies[$key])) {
             $key = 'text';
@@ -26,11 +26,11 @@ abstract class DatatypeStrategy extends AbstractStrategy
      * Возвращает POST-данные для поля
      * @param Field|CustomField|string $field Поле для получения данных
      * @param bool $forceArray Привести к массиву
-     * @param array|null $postData POST-данные для явного указания
+     * @param ?array $postData POST-данные для явного указания
      * @return mixed
      * @throws InvalidArgumentException В случае если $field неподходящего типа
      */
-    public function getPostData($field, $forceArray = false, array $postData = null)
+    public function getPostData($field, $forceArray = false, ?array $postData = null)
     {
         if ($postData === null) {
             $postData = $_POST;
@@ -77,11 +77,11 @@ abstract class DatatypeStrategy extends AbstractStrategy
     /**
      * Проверка корректности значения согласно установленному типу данных
      * @param mixed $value Значение для проверки
-     * @param Field $field Поле для проверки
+     * @param ?Field $field Поле для проверки
      * @return bool true, если значение признано корректным
      * @throws DatatypeInvalidValueException в случае, если значение некорректно
      */
-    public function validate($value, Field $field = null): bool
+    public function validate($value, ?Field $field = null): bool
     {
         if (!is_scalar($value) || (trim((string)$value) === '')) {
             return true;

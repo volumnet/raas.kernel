@@ -507,13 +507,13 @@ class Field extends OptionContainer
      * Обработка массива SOME объектов
      * @param SOME[] массив объектов для обработки
      * @param string $nameN имя свойства, где хранится наименование объекта
-     * @param int|null $levelN уровень обработки дочерних элементов, null - не ограничено
-     * @param string|null $childrenN свойство, где хранятся дочерние элементы, null - определить автоматически
-     * @param callable|null $additionalF - Функция, которой передается на вход объект, на выходе дополнительные атрибуты
+     * @param ?int $levelN уровень обработки дочерних элементов, null - не ограничено
+     * @param ?string $childrenN свойство, где хранятся дочерние элементы, null - определить автоматически
+     * @param ?callable $additionalF - Функция, которой передается на вход объект, на выходе дополнительные атрибуты
      *     для элемента в виде 'имя атрибута' => 'значение атрибута'. NULL - не обрабатывать дополнительные значения
      * @param bool $useOptionGroups - Если установлен в TRUE, каждая опция, содержащая дочерние,
      *     будет представлена как OptGroup, если FALSE - то как Option
-     * @param callable|null $filter - Функция для фильтрации элементов - принимает в качестве единственного аргумента
+     * @param ?callable $filter - Функция для фильтрации элементов - принимает в качестве единственного аргумента
      *     SOME-объект для фильтрации. Возвращает TRUE, если элемент удовлетворяет критерию фильтрации,
      *     или FALSE в противном случае. NULL - не фильтровать.
      * @return [[Option]] массив опций
@@ -521,11 +521,11 @@ class Field extends OptionContainer
     public function parseSet(
         array $Set = [],
         string $nameN = 'name',
-        int $level = null,
-        string $childrenN = null,
-        callable $additionalF = null,
+        ?int $level = null,
+        ?string $childrenN = null,
+        ?callable $additionalF = null,
         bool $useOptionGroups = false,
-        callable $filter = null
+        ?callable $filter = null
     ) {
         $options = new OptionCollection();
         $options->Parent = $this;

@@ -133,7 +133,7 @@ abstract class Access
     }
 
 
-    final public static function flushRights(User $User = null)
+    final public static function flushRights(?User $User = null)
     {
         $SQL_query = "UPDATE " . User::_tablename() . " SET cache_rights = '' WHERE 1";
         if ($User && $User->id) {

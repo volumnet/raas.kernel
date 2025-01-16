@@ -109,12 +109,12 @@ class FileDatatypeStrategy extends DatatypeStrategy
      * @param Field|CustomField|string $field Поле для получения данных
      * @param bool $forceArray Привести к массиву
      * @param bool $withMetaData С дополнительными мета-данными из POST-массива
-     * @param array|null $filesData FILES-данные для явного указания
-     * @param array|null $postData POST-данные для явного указания
+     * @param ?array $filesData FILES-данные для явного указания
+     * @param ?array $postData POST-данные для явного указания
      * @return mixed
      * @throws InvalidArgumentException В случае если $field неподходящего типа
      */
-    public function getFilesData($field, $forceArray = false, bool $withMetaData = false, array $filesData = null, array $postData = null): array
+    public function getFilesData($field, $forceArray = false, bool $withMetaData = false, ?array $filesData = null, ?array $postData = null): array
     {
         if ($postData === null) {
             $postData = $_POST;
@@ -183,9 +183,9 @@ class FileDatatypeStrategy extends DatatypeStrategy
     /**
      * Проверяет запись файла
      * @param array $value <pre><code><ФАЙЛ></code></pre> запись файла для проверки
-     * @param Field $field Поле для проверки
+     * @param ?Field $field Поле для проверки
      */
-    public function validate($value, Field $field = null): bool
+    public function validate($value, ?Field $field = null): bool
     {
         if (!is_scalar($value['tmp_name'] ?? null) || (trim((string)($value['tmp_name'] ?? '')) === '')) {
             return true;

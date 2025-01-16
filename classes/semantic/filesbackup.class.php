@@ -72,12 +72,11 @@ class FilesBackup extends Backup
     /**
      * Записывает архив в файл
      * @param string $filename Имя файла
-     * @param DateTime|null $dateTime Дата/время, с которого нужно
-     *                                формировать файлы (либо null, если все)
+     * @param ?DateTime $dateTime Дата/время, с которого нужно формировать файлы (либо null, если все)
      * @throws NoFilesForBackupException Выбрасывается, если нет
      *                                   файлов для добавления
      */
-    public static function writeArchive($filename, DateTime $dateTime = null)
+    public static function writeArchive($filename, ?DateTime $dateTime = null)
     {
         $baseDir = realpath(Application::i()->baseFilesDir);
         $directory = new RecursiveDirectoryIterator($baseDir);

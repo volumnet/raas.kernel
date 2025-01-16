@@ -400,10 +400,10 @@ abstract class CustomField extends SOME
     /**
      * Предполучает значение кэша поля относительно одного родителя,
      * если не существует
-     * @param SOME $parent Родительский объект, для которого нужно получить кэш
+     * @param ?SOME $parent Родительский объект, для которого нужно получить кэш
      *     Если не задан, получает относительно Owner'а
      */
-    public function prefetchIfNotExists(SOME $parent = null)
+    public function prefetchIfNotExists(?SOME $parent = null)
     {
         if (!$parent) {
             $parent = $this->Owner;

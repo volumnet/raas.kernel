@@ -23,9 +23,9 @@ abstract class Command
 
     /**
      * Конструктор класса
-     * @param Abstract_Controller_Cron|null $controller Контроллер, вызвавший команду
+     * @param ?Abstract_Controller_Cron $controller Контроллер, вызвавший команду
      */
-    public function __construct(Abstract_Controller_Cron $controller = null)
+    public function __construct(?Abstract_Controller_Cron $controller = null)
     {
         $this->controller = $controller;
     }

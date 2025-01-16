@@ -60,7 +60,7 @@ function getMenu(array $menu): array
 
 /**
  * Формирует контекстное меню
- * @param array|null $menu <pre>array<[
+ * @param ?array $menu <pre>array<[
  *     'href' => string URL пункта меню,
  *     'name' => string Заголовок пункта ссылки,
  *     'icon' => string Иконка пункта меню,
@@ -75,7 +75,7 @@ function getMenu(array $menu): array
  * @return string HTML-код контекстного меню
  */
 function rowContextMenu(
-    array $menu = null,
+    ?array $menu = null,
     $title = '',
     $classname = 'pull-right',
     $btnClass = ''

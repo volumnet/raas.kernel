@@ -171,14 +171,14 @@ class UserLog
      * @param callable[] $filters Фильтры по логам <pre><code>array<
      *     function (UserLog $log): boolean
      * ></code></pre>
-     * @param Pages|null $pages Постраничная разбивка
+     * @param ?Pages $pages Постраничная разбивка
      * @return self[]
      */
     public static function getSet(
         $dateFrom = null,
         $dateTo = null,
         array $filters = [],
-        Pages $pages = null
+        ?Pages $pages = null
     ) {
         $tFrom = $tTo = null;
         if ($dateFrom && (($t = strtotime($dateFrom)) > 0)) {

@@ -177,7 +177,7 @@ abstract class Module extends Singleton implements IRightsContext
     }
 
 
-    public function access(IOwner $Owner = null)
+    public function access(?IOwner $Owner = null)
     {
         if ($Owner === null) {
             $Owner = Application::i()->user;

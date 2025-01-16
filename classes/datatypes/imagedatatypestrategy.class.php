@@ -10,7 +10,7 @@ class ImageDatatypeStrategy extends FileDatatypeStrategy
 {
     protected static $instance;
 
-    public function validate($value, Field $field = null): bool
+    public function validate($value, ?Field $field = null): bool
     {
         if (!is_scalar($value['tmp_name'] ?? null) || (trim($value['tmp_name'] ?? '') === '')) {
             return true;

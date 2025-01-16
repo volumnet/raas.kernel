@@ -10,7 +10,7 @@ class UrlDatatypeStrategy extends TextDatatypeStrategy
 {
     protected static $instance;
 
-    public function validate($value, Field $field = null): bool
+    public function validate($value, ?Field $field = null): bool
     {
         if (!is_scalar($value) || (trim($value) === '')) {
             return true;

@@ -438,14 +438,14 @@ class Attachment extends SOME
     /**
      * Создает вложение из файла
      * @param string $filename Файл, из которого нужно создать вложение
-     * @param SOME|null $parentField Родительский объект
+     * @param ?SOME $parentField Родительский объект
      * @param int $maxSize Максимальный размер полноразмерного изображения
      * @param int $tnSize Размер эскиза
      * @param string $mime MIME-тип вложения
      */
     public static function createFromFile(
         string $filename,
-        SOME $parentField = null,
+        ?SOME $parentField = null,
         int $maxSize = 1920,
         int $tnSize = 300,
         string $mime = 'application/octet-stream'

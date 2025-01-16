@@ -20,7 +20,7 @@ class NumberDatatypeStrategy extends DatatypeStrategy
 
 
 
-    public function validate($value, Field $field = null): bool
+    public function validate($value, ?Field $field = null): bool
     {
         if (!is_scalar($value) || (trim((string)$value) === '')) {
             return true;

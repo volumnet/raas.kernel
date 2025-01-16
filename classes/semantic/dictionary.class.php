@@ -127,11 +127,11 @@ abstract class Dictionary extends SOME
     /**
      * Сохраняет запись справочника по URN и заголовку
      * @param string|null $name Заголовок записи
-     * @param string|null $urn URN записи
-     * @param self|null Родительская запись
+     * @param ?string $urn URN записи
+     * @param ?self Родительская запись
      * @return self
      */
-    protected static function exportByNameURN(string $name, string $urn = null, self $parent = null): self
+    protected static function exportByNameURN(string $name, ?string $urn = null, ?self $parent = null): self
     {
         if ($item = static::importByLike($urn, $name, $parent)) {
             if ($name && ($item->name != $name)) {
@@ -153,12 +153,12 @@ abstract class Dictionary extends SOME
 
     /**
      * Получает запись справочника по соответствию URN, заголовка и родителя
-     * @param string|null $urn URN записи
-     * @param string|null $name Заголовок записи
-     * @param self|null Родительская запись
+     * @param ?string $urn URN записи
+     * @param ?string $name Заголовок записи
+     * @param ?self Родительская запись
      * @return self|null
      */
-    protected static function importByLike(string $urn = null, string $name = null, self $parent = null)
+    protected static function importByLike(?string $urn = null, ?string $name = null, ?self $parent = null)
     {
         if (!$urn && !$name) {
             return null;
@@ -179,14 +179,14 @@ abstract class Dictionary extends SOME
     }
 
 
-    public static function _references(string $key = null): array
+    public static function _references(?string $key = null): array
     {
         $references = ['parent' => ['FK' => 'pid', 'classname' => static::class, 'cascade' => true]];
         return $key ? $references[$key] : $references;
     }
 
 
-    public static function _children(string $key = null): array
+    public static function _children(?string $key = null): array
     {
         $children = ['children' => ['classname' => static::class, 'FK' => 'pid']];
         return $key ? $children[$key] : $children;
