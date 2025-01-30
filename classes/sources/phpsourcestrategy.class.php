@@ -1,11 +1,14 @@
 <?php
 /**
- * Стратегия источника PHP
+ * @package RAAS
  */
 declare(strict_types=1);
 
 namespace RAAS;
 
+/**
+ * Стратегия источника данных PHP
+ */
 class PHPSourceStrategy extends SourceStrategy
 {
     protected static $instance;

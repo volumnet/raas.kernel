@@ -1,6 +1,6 @@
 <?php
 /**
- * Файл модуля диспетчера задач
+ * @package RAAS.General
  */
 namespace RAAS\General;
 

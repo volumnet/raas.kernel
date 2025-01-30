@@ -1,14 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" colors="true" bootstrap="./bootstrap.php" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
-  <coverage includeUncoveredFiles="false">
-    <include>
-      <directory suffix=".php">../classes</directory>
-      <directory suffix=".php">../general</directory>
-    </include>
+<phpunit 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+  colors="true" 
+  bootstrap="./bootstrap.php" 
+  xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.5/phpunit.xsd"
+  displayDetailsOnTestsThatTriggerDeprecations="true"
+  displayDetailsOnTestsThatTriggerErrors="true"
+  displayDetailsOnTestsThatTriggerNotices="true"
+  displayDetailsOnTestsThatTriggerWarnings="true"
+  displayDetailsOnPhpunitDeprecations="true"
+>
+  <coverage>
     <report>
       <html outputDirectory="coverage"/>
     </report>
   </coverage>
+  <logging/>
+  <source>
+    <include>
+      <directory suffix=".php">../classes</directory>
+      <directory suffix=".php">../general</directory>
+    </include>
+  </source>
   <testsuites>
     <testsuite name="CheckboxDatatypeStrategy">
       <file>src/datatypes/CheckboxDatatypeStrategyTest.php</file>
@@ -83,5 +96,4 @@
       <file>src/views/renderers/HTMLRendererTest.php</file>
     </testsuite>
   </testsuites>
-  <logging/>
 </phpunit>

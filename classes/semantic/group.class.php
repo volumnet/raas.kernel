@@ -1,6 +1,15 @@
 <?php 
+/**
+ * @package RAAS
+ */
 namespace RAAS;
-class Group extends \SOME\SOME implements IOwner
+
+use SOME\SOME;
+
+/**
+ * Группа пользователей
+ */
+class Group extends SOME implements IOwner
 {
     protected static $tablename = 'groups';
     protected static $defaultOrderBy = "name";

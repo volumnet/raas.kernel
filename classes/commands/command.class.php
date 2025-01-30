@@ -1,11 +1,11 @@
 <?php
 /**
- * Файл класса команды
+ * @package RAAS
  */
 namespace RAAS;
 
 /**
- * Класс комманды
+ * Команда
  */
 abstract class Command
 {

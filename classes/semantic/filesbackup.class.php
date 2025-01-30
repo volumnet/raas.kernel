@@ -1,6 +1,6 @@
 <?php
 /**
- * Файл класса резервной копии файлов
+ * @package RAAS
  */
 namespace RAAS;
 
@@ -10,7 +10,7 @@ use RecursiveDirectoryIterator;
 use ZipArchive;
 
 /**
- * Класс резервной копии файлов
+ * Резервная копия файлов
  * @property-read string $filename Имя файла резервной копии
  * @property-read bool $hasChildren Есть ли инкрементарные резервные копии,
  *                                  базирующиеся на данной

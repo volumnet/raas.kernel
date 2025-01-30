@@ -1,10 +1,6 @@
 <?php
 /**
- * Файл абстрактного контроллера модуля RAAS
  * @package RAAS
- * @version 4.1
- * @author Alex V. Surnin <info@volumnet.ru>
- * @copyright 2011, Volume Networks
  */
 namespace RAAS;
 
@@ -12,8 +8,7 @@ use SOME\Namespaces;
 use SOME\Singleton;
 
 /**
- * Класс абстрактного контроллера модуля RAAS
- * @package RAAS
+ * Абстрактный контроллер модуля RAAS
  * @property-read Module $module ссылка на экземпляр модуля
  * @property-read Module $model ссылка на экземпляр модуля
  * @property-read Abstract_Package_Controller $parent ссылка на экземпляр активного контроллера пакета

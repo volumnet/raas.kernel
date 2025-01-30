@@ -1,10 +1,6 @@
 <?php
 /**
- * Файл интерфейса контекста
  * @package RAAS
- * @version 4.1
- * @author Alex V. Surnin <info@volumnet.ru>
- * @copyright 2012, Volume Networks
  */
 namespace RAAS;
 
@@ -12,7 +8,6 @@ namespace RAAS;
  * Интерфейс контекста RAAS
  *
  * Контекст представляет собой собственно приложение, любой пакет или модуль
- * @package RAAS
  * @property-read string $baseDir основная директория
  * @property-read string $systemDir системная директория
  * @property-read string $classesDir директория классов

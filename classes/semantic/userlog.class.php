@@ -1,6 +1,6 @@
 <?php
 /**
- * Лог пользователей
+ * @package RAAS
  */
 namespace RAAS;
 
@@ -9,7 +9,7 @@ use SOME\SOME;
 use SOME\Pages;
 
 /**
- * Класс лога пользователей
+ * Лог пользователей
  * @property-read User $user Пользователь
  */
 class UserLog

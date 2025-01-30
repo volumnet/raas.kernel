@@ -4,13 +4,16 @@
  */
 namespace RAAS;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use SOME\BaseTest;
 use SOME\SOME;
 
 /**
  * Тест класса Field
- * @covers \RAAS\Field
  */
+#[CoversClass(Field::class)]
 class FieldTest extends BaseTest
 {
     use WithTempTablesTrait;
@@ -25,7 +28,7 @@ class FieldTest extends BaseTest
      *     array? Данные объекта
      * ]></code></pre>
      */
-    public function isFilledDataProvider(): array
+    public static function isFilledDataProvider(): array
     {
         static::installTables();
         $result = [
@@ -207,7 +210,7 @@ class FieldTest extends BaseTest
                 ['name' => 'test', 'type' => 'image'],
                 [],
                 ['test' => [
-                    'tmp_name' => [$this->getResourcesDir() . '/nophoto.jpg'],
+                    'tmp_name' => [static::getResourcesDir() . '/nophoto.jpg'],
                     'name' => ['nophoto.jpg'],
                     'type' => ['image/jpeg'],
                 ]],
@@ -217,7 +220,7 @@ class FieldTest extends BaseTest
                 ['name' => 'test', 'type' => 'image', 'multiple' => true],
                 [],
                 ['test' => [
-                    'tmp_name' => [$this->getResourcesDir() . '/nophoto.jpg'],
+                    'tmp_name' => [static::getResourcesDir() . '/nophoto.jpg'],
                     'name' => ['nophoto.jpg'],
                     'type' => ['image/jpeg'],
                 ]],
@@ -227,7 +230,7 @@ class FieldTest extends BaseTest
                 ['name' => 'test', 'type' => 'image'],
                 [],
                 ['test' => [
-                    'tmp_name' => $this->getResourcesDir() . '/aaa.jpg',
+                    'tmp_name' => static::getResourcesDir() . '/aaa.jpg',
                     'name' => 'aaa.jpg',
                     'type' => 'image/jpeg',
                 ]],
@@ -237,7 +240,7 @@ class FieldTest extends BaseTest
                 ['name' => 'test', 'type' => 'image', 'multiple' => true],
                 [],
                 ['test' => [
-                    'tmp_name' => [$this->getResourcesDir() . '/aaa.jpg'],
+                    'tmp_name' => [static::getResourcesDir() . '/aaa.jpg'],
                     'name' => ['aaa.jpg'],
                     'type' => ['image/jpeg'],
                 ]],
@@ -284,13 +287,13 @@ class FieldTest extends BaseTest
 
     /**
      * Проверка атрибута isFilled / метода _isFilled()
-     * @dataProvider isFilledDataProvider
      * @param array $fieldData Данные поля
      * @param array $postData POST-данные
      * @param array $filesData FILES-данные
      * @param bool $expected Ожидаемое значение
      * @param array? $itemData Данные объекта
      */
+    #[DataProvider('isFilledDataProvider')]
     public function testIsFilled(
         array $fieldData,
         array $postData,
@@ -325,7 +328,7 @@ class FieldTest extends BaseTest
      *     bool Ожидаемый результат
      * ]></code></pre>
      */
-    public function validateDataProvider(): array
+    public static function validateDataProvider(): array
     {
         $result = [
             [[], ' ', true],
@@ -358,8 +361,8 @@ class FieldTest extends BaseTest
             [['type' => 'time'], '23:99', false],
             [['type' => 'time'], '23:59:99', false],
             [['type' => 'time'], 'aaa', false],
-            [['type' => 'image'], $this->getResourcesDir() . '/nophoto.jpg', true],
-            [['type' => 'image'], $this->getResourcesDir() . '/favicon.svg', true],
+            [['type' => 'image'], static::getResourcesDir() . '/nophoto.jpg', true],
+            [['type' => 'image'], static::getResourcesDir() . '/favicon.svg', true],
             [['type' => 'image'], __FILE__, false],
             [['type' => 'image'], '', true],
         ];
@@ -369,11 +372,11 @@ class FieldTest extends BaseTest
 
     /**
      * Проверка атрибута validate / метода _validate()
-     * @dataProvider validateDataProvider
      * @param array $fieldData Установочные данные для поля
      * @param mixed $value Проверяемое значение
      * @param bool $expected Ожидаемое значение
      */
+    #[DataProvider('validateDataProvider')]
     public function testValidate(array $fieldData, $value, bool $expected)
     {
         $field = new Field(array_merge($fieldData, ['name' => 'test', 'multiple' => false]));
@@ -398,38 +401,23 @@ class FieldTest extends BaseTest
 
 
     /**
-     * Провайдер данных для метода testSetGet
-     * @return array <pre><code>array<[
-     *     string Свойство для установки,
-     *     mixed Значение для установки/проверки
-     * ]></code></pre>
-     */
-    public function setGetDataProvider(): array
-    {
-        return [
-            ['errorEmptyString', 'aaa'],
-            ['errorInvalidString', 'bbb'],
-            ['errorEmptyFileString', 'ccc'],
-            ['errorInvalidFileString', 'ddd'],
-            ['errorInvalidFileWithExtensionsString', 'eee'],
-            ['errorInvalidImageString', 'fff'],
-            ['errorDoesntMatch', 'ggg'],
-            ['datatypeStrategyURN', 'cms.field'],
-            ['default', '123'],
-            ['check', 'is_null'],
-            ['export', 'intval'],
-            ['import', 'floatval'],
-            ['oncommit', 'trim'],
-        ];
-    }
-
-
-    /**
      * Проверка методов __set()/__get()
-     * @dataProvider setGetDataProvider
      * @param string $var Свойство для установки
      * @param mixed $val Значение для установки/проверки
      */
+    #[TestWith(['errorEmptyString', 'aaa'])]
+    #[TestWith(['errorInvalidString', 'bbb'])]
+    #[TestWith(['errorEmptyFileString', 'ccc'])]
+    #[TestWith(['errorInvalidFileString', 'ddd'])]
+    #[TestWith(['errorInvalidFileWithExtensionsString', 'eee'])]
+    #[TestWith(['errorInvalidImageString', 'fff'])]
+    #[TestWith(['errorDoesntMatch', 'ggg'])]
+    #[TestWith(['datatypeStrategyURN', 'cms.field'])]
+    #[TestWith(['default', '123'])]
+    #[TestWith(['check', 'is_null'])]
+    #[TestWith(['export', 'intval'])]
+    #[TestWith(['import', 'floatval'])]
+    #[TestWith(['oncommit', 'trim'])]
     public function testSetGet(string $var, $val)
     {
         $field = new Field();
@@ -471,42 +459,26 @@ class FieldTest extends BaseTest
 
 
     /**
-     * Провайдер данных для метода testMatchConfirm()
-     * @return array <pre><code>array<[
-     *     array Данные поля,
-     *     array POST-данные,
-     *     bool Ожидаемое значение
-     * ]></code></pre>
-     */
-    public function matchConfirmDataProvider(): array
-    {
-        return [
-            [
-                ['type' => 'password', 'name' => 'password'],
-                ['password' => 'pass', 'password@confirm' => 'pass'],
-                true,
-            ],
-            [
-                ['type' => 'password', 'name' => 'password'],
-                ['password' => 'pass', 'password@confirm' => 'pass1'],
-                false,
-            ],
-            [
-                ['type' => 'text', 'name' => 'aaa'],
-                ['password' => 'pass', 'password@confirm' => 'pass1'],
-                true,
-            ],
-        ];
-    }
-
-
-    /**
      * Проверка атрибута matchConfirm
-     * @dataProvider matchConfirmDataProvider
      * @param array $fieldData Данные поля
      * @param array $postData POST-данные
      * @param bool $expected Ожидаемое значение
      */
+    #[TestWith([
+        ['type' => 'password', 'name' => 'password'],
+        ['password' => 'pass', 'password@confirm' => 'pass'],
+        true,
+    ])]
+    #[TestWith([
+        ['type' => 'password', 'name' => 'password'],
+        ['password' => 'pass', 'password@confirm' => 'pass1'],
+        false,
+    ])]
+    #[TestWith([
+        ['type' => 'text', 'name' => 'aaa'],
+        ['password' => 'pass', 'password@confirm' => 'pass1'],
+        true,
+    ])]
     public function testMatchConfirm(array $fieldData, array $postData, bool $expected)
     {
         $field = new Field($fieldData);
@@ -529,7 +501,7 @@ class FieldTest extends BaseTest
      *     array? Данные объекта
      * ]></code></pre>
      */
-    public function isMediaFilledDefaultDataProvider(): array
+    public static function isMediaFilledDefaultDataProvider(): array
     {
         static::installTables();
         return [
@@ -576,11 +548,11 @@ class FieldTest extends BaseTest
 
     /**
      * Проверка метода isMediaFilledDefault
-     * @dataProvider isMediaFilledDefaultDataProvider
      * @param array $fieldData Данные поля
      * @param bool $expected Ожидаемое значение
      * @param array $itemData Данные объекта
      */
+    #[DataProvider('isMediaFilledDefaultDataProvider')]
     public function testIsMediaFilledDefault(array $fieldData, bool $expected, array $itemData = [])
     {
         $field = new Field($fieldData);
@@ -606,7 +578,7 @@ class FieldTest extends BaseTest
      *     array? Данные объекта
      * </code></pre>
      */
-    public function getErrorsDataProvider(): array
+    public static function getErrorsDataProvider(): array
     {
         static::installTables();
         return [
@@ -638,7 +610,7 @@ class FieldTest extends BaseTest
                 ['name' => 'test', 'caption' => 'Тест', 'type' => 'image', 'required' => true],
                 [],
                 ['test' => [
-                    'tmp_name' => $this->getResourcesDir() . '/nophoto.jpg',
+                    'tmp_name' => static::getResourcesDir() . '/nophoto.jpg',
                     'name' => 'nophoto.jpg',
                     'type' => 'image/jpeg',
                 ]],
@@ -688,7 +660,7 @@ class FieldTest extends BaseTest
                 ['name' => 'test', 'caption' => 'Тест', 'type' => 'image', 'required' => true, 'pattern' => '2022'],
                 [],
                 ['test' => [
-                    'tmp_name' => $this->getResourcesDir() . '/nophoto.jpg',
+                    'tmp_name' => static::getResourcesDir() . '/nophoto.jpg',
                     'name' => 'nophoto.jpg',
                     'type' => 'image/jpeg',
                 ]],
@@ -704,7 +676,7 @@ class FieldTest extends BaseTest
                 ],
                 [],
                 ['test' => [
-                    'tmp_name' => $this->getResourcesDir() . '/nophoto.jpg',
+                    'tmp_name' => static::getResourcesDir() . '/nophoto.jpg',
                     'name' => 'nophoto.jpg',
                     'type' => 'image/jpeg',
                 ]],
@@ -729,10 +701,10 @@ class FieldTest extends BaseTest
                 [],
                 ['test' => [
                     'tmp_name' => [
-                        $this->getResourcesDir() . '/favicon.txt',
+                        static::getResourcesDir() . '/favicon.txt',
                         __FILE__,
-                        $this->getResourcesDir() . '/nophoto.jpg',
-                        $this->getResourcesDir() . '/favicon.svg',
+                        static::getResourcesDir() . '/nophoto.jpg',
+                        static::getResourcesDir() . '/favicon.svg',
                     ],
                     'name' => [
                         'favicon.txt',
@@ -771,13 +743,13 @@ class FieldTest extends BaseTest
 
     /**
      * Проверка метода getErrors
-     * @dataProvider getErrorsDataProvider
      * @param array $fieldData Данные поля
      * @param array $postData POST-данные
      * @param array $filesData FILES-данные
      * @param array $expected Ожидаемый набор ошибок
      * @param array $itemData Данные объекта
      */
+    #[DataProvider('getErrorsDataProvider')]
     public function testGetErrors(
         array $fieldData,
         array $postData,
@@ -928,53 +900,36 @@ class FieldTest extends BaseTest
 
 
     /**
-     * Провайдер данных для метода testExportDefault
-     * @return array <pre><code>array<[
-     *     array Установочные данные для поля
-     *     mixed Входное значение
-     *     mixed Ожидаемый результат
-     * ]></code></pre>
-     */
-    public function exportDefaultDataProvider(): array
-    {
-        $result = [
-            [
-                ['type' => 'date', 'multiple' => true],
-                ['2023-11-12', '1900-01-01', 'aaa', '', '0000-00-00', '0001-01-01'],
-                ['2023-11-12', '1900-01-01', '0000-00-00', '0000-00-00', '0000-00-00', '0001-01-01']
-            ],
-            [
-                ['type' => 'datetime', 'multiple' => true],
-                ['2023-11-12T16:05', '1900-01-01T10:00', 'aaa', '', '0001-01-01 12:30'],
-                ['2023-11-12 16:05:00', '1900-01-01 10:00:00', '0000-00-00 00:00:00', '0000-00-00 00:00:00', '0001-01-01 12:30:00']
-            ],
-            [['type' => 'year'], '2023-01-01', '2023'],
-            [['type' => 'number'], '123,5', 123.5],
-            [['type' => 'time'], '12:05', '12:05:00'],
-            [['type' => 'time'], 'aaa', '00:00:00'],
-            [['type' => 'time'], '', '00:00:00'],
-            [['type' => 'month'], '2023-11', '2023-11-01'],
-            [['type' => 'month'], 'aaa', '0000-00-00'],
-            [['type' => 'month'], '0000-00', '0000-00-00'],
-            [['type' => 'month'], '0001-01', '0001-01-01'],
-            [['type' => 'week'], '2023-W01', '2023-01-02'], // Хз почему так, но вроде так
-            [['type' => 'week'], '0000-W00', '0000-00-00'],
-            [['type' => 'week'], 'aaa', '0000-00-00'],
-            [['type' => 'checkbox'], 'aaa ', 'aaa'],
-            [['type' => 'checkbox', 'multiple' => true], ['aaa', 'bbb '], ['aaa', 'bbb']],
-            [['type' => 'image'], 'aaa', null]
-        ];
-        return $result;
-    }
-
-
-    /**
      * Проверка метода exportDefault()
-     * @dataProvider exportDefaultDataProvider
      * @param array $fieldData Установочные данные для поля
      * @param mixed $value Проверяемое значение
-     * @param mixed $exp'ected Ожидаемое значение
+     * @param mixed $expected Ожидаемое значение
      */
+    #[TestWith([
+        ['type' => 'date', 'multiple' => true],
+        ['2023-11-12', '1900-01-01', 'aaa', '', '0000-00-00', '0001-01-01'],
+        ['2023-11-12', '1900-01-01', '0000-00-00', '0000-00-00', '0000-00-00', '0001-01-01']
+    ])]
+    #[TestWith([
+        ['type' => 'datetime', 'multiple' => true],
+        ['2023-11-12T16:05', '1900-01-01T10:00', 'aaa', '', '0001-01-01 12:30'],
+        ['2023-11-12 16:05:00', '1900-01-01 10:00:00', '0000-00-00 00:00:00', '0000-00-00 00:00:00', '0001-01-01 12:30:00']
+    ])]
+    #[TestWith([['type' => 'year'], '2023-01-01', '2023'])]
+    #[TestWith([['type' => 'number'], '123,5', 123.5])]
+    #[TestWith([['type' => 'time'], '12:05', '12:05:00'])]
+    #[TestWith([['type' => 'time'], 'aaa', '00:00:00'])]
+    #[TestWith([['type' => 'time'], '', '00:00:00'])]
+    #[TestWith([['type' => 'month'], '2023-11', '2023-11-01'])]
+    #[TestWith([['type' => 'month'], 'aaa', '0000-00-00'])]
+    #[TestWith([['type' => 'month'], '0000-00', '0000-00-00'])]
+    #[TestWith([['type' => 'month'], '0001-01', '0001-01-01'])]
+    #[TestWith([['type' => 'week'], '2023-W01', '2023-01-02'])] // Хз почему так, но вроде так
+    #[TestWith([['type' => 'week'], '0000-W00', '0000-00-00'])]
+    #[TestWith([['type' => 'week'], 'aaa', '0000-00-00'])]
+    #[TestWith([['type' => 'checkbox'], 'aaa ', 'aaa'])]
+    #[TestWith([['type' => 'checkbox', 'multiple' => true], ['aaa', 'bbb '], ['aaa', 'bbb']])]
+    #[TestWith([['type' => 'image'], 'aaa', null])]
     public function testExportDefault(array $fieldData, $value, $expected)
     {
         $item = new CustomEntity();
@@ -1002,43 +957,26 @@ class FieldTest extends BaseTest
 
 
     /**
-     * Провайдер данных для метода testImportDefault
-     * @return array <pre><code>array<[
-     *     array Установочные данные для поля
-     *     mixed Входное значение
-     *     mixed Ожидаемый результат
-     * ]></code></pre>
-     */
-    public function importDefaultDataProvider(): array
-    {
-        $result = [
-            [['type' => 'image'], 'aaa', null],
-            [['type' => 'date', 'multiple' => true], ['2023-11-12', '1900-01-01'], ['2023-11-12', '1900-01-01']],
-            [['type' => 'date'], '0000-00-00', ''],
-            [
-                ['type' => 'datetime', 'multiple' => true],
-                ['2023-11-12 16:05:00', '1900-01-01 10:00:00'],
-                ['2023-11-12 16:05', '1900-01-01 10:00'],
-            ],
-            [
-                ['type' => 'datetime-local', 'multiple' => true],
-                ['2023-11-12 16:05:00', '1900-01-01 10:00:00'],
-                ['2023-11-12 16:05', '1900-01-01 10:00'],
-            ],
-            [['type' => 'time'], '12:05:00', '12:05'],
-            [['type' => 'number', 'multiple' => true], ['0,25 ', 'bbb '], [0.25, 0]],
-        ];
-        return $result;
-    }
-
-
-    /**
      * Проверка метода importDefault()
-     * @dataProvider importDefaultDataProvider
      * @param array $fieldData Установочные данные для поля
      * @param mixed $value Проверяемое значение
      * @param mixed $expected Ожидаемое значение
      */
+    #[TestWith([['type' => 'image'], 'aaa', null])]
+    #[TestWith([['type' => 'date', 'multiple' => true], ['2023-11-12', '1900-01-01'], ['2023-11-12', '1900-01-01']])]
+    #[TestWith([['type' => 'date'], '0000-00-00', ''])]
+    #[TestWith([
+        ['type' => 'datetime', 'multiple' => true],
+        ['2023-11-12 16:05:00', '1900-01-01 10:00:00'],
+        ['2023-11-12 16:05', '1900-01-01 10:00'],
+    ])]
+    #[TestWith([
+        ['type' => 'datetime-local', 'multiple' => true],
+        ['2023-11-12 16:05:00', '1900-01-01 10:00:00'],
+        ['2023-11-12 16:05', '1900-01-01 10:00'],
+    ])]
+    #[TestWith([['type' => 'time'], '12:05:00', '12:05'])]
+    #[TestWith([['type' => 'number', 'multiple' => true], ['0,25 ', 'bbb '], [0.25, 0]])]
     public function testImportDefault(array $fieldData, $value, $expected)
     {
         $item = new User(['test' => $value]);
@@ -1069,7 +1007,7 @@ class FieldTest extends BaseTest
         $oldPost = $_POST;
         $oldFiles = $_FILES;
         $_FILES = ['test' => [
-            'tmp_name' => $this->getResourcesDir() . '/nophoto.jpg',
+            'tmp_name' => static::getResourcesDir() . '/nophoto.jpg',
             'name' => 'nophoto.jpg',
             'type' => 'image/jpeg',
         ]];
@@ -1085,7 +1023,7 @@ class FieldTest extends BaseTest
 
         $item->customAttachments = [$attachment];
         $_FILES = ['test' => [
-            'tmp_name' => $this->getResourcesDir() . '/favicon.svg',
+            'tmp_name' => static::getResourcesDir() . '/favicon.svg',
             'name' => 'favicon.svg',
             'type' => 'application/xml+svg',
         ]];
@@ -1105,9 +1043,6 @@ class FieldTest extends BaseTest
     }
 
 
-
-
-
     /**
      * Проверка метода oncommitDefault() - случай с несуществующим файлом
      */
@@ -1121,7 +1056,7 @@ class FieldTest extends BaseTest
         $oldPost = $_POST;
         $oldFiles = $_FILES;
         $_FILES = ['test' => [
-            'tmp_name' => $this->getResourcesDir() . '/doesntexist.jpg',
+            'tmp_name' => static::getResourcesDir() . '/doesntexist.jpg',
             'name' => 'doesntexist.jpg',
             'type' => 'image/jpeg',
         ]];
@@ -1150,8 +1085,8 @@ class FieldTest extends BaseTest
         $oldFiles = $_FILES;
         $_FILES = ['test' => [
             'tmp_name' => [
-                $this->getResourcesDir() . '/nophoto.jpg',
-                $this->getResourcesDir() . '/favicon.svg',
+                static::getResourcesDir() . '/nophoto.jpg',
+                static::getResourcesDir() . '/favicon.svg',
             ],
             'name' => [
                 'nophoto.jpg',
@@ -1196,8 +1131,8 @@ class FieldTest extends BaseTest
         $oldFiles = $_FILES;
         $_FILES = ['test' => [
             'tmp_name' => [
-                $this->getResourcesDir() . '/nophoto.jpg',
-                $this->getResourcesDir() . '/favicon.svg',
+                static::getResourcesDir() . '/nophoto.jpg',
+                static::getResourcesDir() . '/favicon.svg',
             ],
             'name' => [
                 'nophoto.jpg',

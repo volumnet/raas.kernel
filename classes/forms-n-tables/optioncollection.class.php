@@ -1,6 +1,6 @@
 <?php
 /**
- * Файл класса коллекции опций
+ * @package RAAS
  */
 declare(strict_types=1);
 
@@ -9,8 +9,7 @@ namespace RAAS;
 use ArrayObject;
 
 /**
- * Класс коллекции опций
- * @package RAAS
+ * Коллекция опций
  * @property-read Form $Form Рабочая форма
  * @property FormElement $Parent Родительский элемент
  */

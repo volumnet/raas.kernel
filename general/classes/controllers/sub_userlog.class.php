@@ -1,6 +1,6 @@
 <?php
 /**
- * Файл модуля пользовательских логов
+ * @package RAAS.General
  */
 declare(strict_types=1);
 

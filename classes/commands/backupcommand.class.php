@@ -1,6 +1,6 @@
 <?php
 /**
- * Команда резервного копирования
+ * @package RAAS
  */
 namespace RAAS;
 

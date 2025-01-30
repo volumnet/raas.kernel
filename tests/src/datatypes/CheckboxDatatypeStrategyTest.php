@@ -4,86 +4,39 @@
  */
 namespace RAAS;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
+
 /**
  * Тест для класса CheckboxDatatypeStrategy
- * @covers \RAAS\CheckboxDatatypeStrategy
  */
+#[CoversClass(CheckboxDatatypeStrategy::class)]
 class CheckboxDatatypeStrategyTest extends AbstractDatatypeStrategyTest
 {
-    /**
-     * Проверка ошибки от 2024-05-14 15:56
-     * TypeError: trim(): Argument #1 ($string) must be of type string, int given
-     * При передаче в export значения типа int
-     */
-    public function test202405141556()
-    {
-        $strategy = DatatypeStrategy::spawn('checkbox');
-
-        $result = $strategy->export(1);
-
-        $this->assertEquals('1', $result);
-    }
-
-    /**
-     * Провайдер данных для метода testExport
-     * @return array <pre><code>array<[
-     *     mixed Проверяемое значение
-     *     string Ожидаемый результат
-     * ]></code></pre>
-     */
-    public function exportDataProvider(): array
-    {
-        $result = [
-            [' aaa ', 'aaa'],
-        ];
-        return $result;
-    }
-
+    const DATATYPE = 'checkbox';
 
     /**
      * Проверка метода export()
-     * @dataProvider exportDataProvider
      * @param mixed $value Проверяемое значение
-     * @param string $expected Ожидаемое значение
+     * @param mixed $expected Ожидаемое значение
      */
-    public function testExport(string $value, string $expected)
+    #[TestWith([' aaa ', 'aaa'])]
+    #[TestWith([1, '1'])] // Проверка ошибки от 2024-05-14 15:56 : TypeError: trim(): Argument #1 ($string) must be of type string, int given, при передаче в export значения типа int
+    public function testExport($value, $expected)
     {
-        $strategy = DatatypeStrategy::spawn('checkbox');
-
-        $result = $strategy->export($value);
-
-        $this->assertEquals($expected, $result);
-    }
-
-
-    /**
-     * Провайдер данных для метода testImport
-     * @return array <pre><code>array<[
-     *     mixed Проверяемое значение
-     *     string Ожидаемый результат
-     * ]></code></pre>
-     */
-    public function importDataProvider(): array
-    {
-        $result = [
-            [' aaa ', ' aaa '],
-        ];
-        return $result;
+        $this->checkExport($value, $expected);
     }
 
 
     /**
      * Проверка метода import()
-     * @dataProvider importDataProvider
      * @param mixed $value Проверяемое значение
      * @param string $expected Ожидаемое значение
      */
+    #[TestWith([' aaa ', ' aaa '])]
     public function testImport(string $value, string $expected)
     {
-        $strategy = DatatypeStrategy::spawn('checkbox');
-
-        $result = $strategy->import($value);
-
-        $this->assertEquals($expected, $result);
+        $this->checkImport($value, $expected);
     }
 }

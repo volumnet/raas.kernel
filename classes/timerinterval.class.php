@@ -1,17 +1,13 @@
 <?php
 /**
- * Файл класса интервала таймера
  * @package RAAS
- * @version 4.3
- * @author Alex V. Surnin <info@volumnet.ru>
- * @copyright 2018, Volume Networks
  */
 namespace RAAS;
 
 use SOME\Singleton;
 
 /**
- * Класс интервала таймера
+ * Интервал таймера
  * @property-read float $time Время интервала (с миллисекундами)
  * @property-read bool $active Интервал запущен, но не остановлен
  * @property-read float $startTime UNIX-timestamp (с миллисекундами) начала интервала

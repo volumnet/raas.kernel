@@ -1,10 +1,6 @@
 <?php
 /**
- * Файл класса коллекции колонок
  * @package RAAS
- * @version 4.2
- * @author Alex V. Surnin <info@volumnet.ru>
- * @copyright 2013, Volume Networks
  */
 declare(strict_types=1);
 
@@ -13,8 +9,7 @@ namespace RAAS;
 use ArrayObject;
 
 /**
- * Класс коллекции колонок
- * @package RAAS
+ * Коллекция колонок
  * @property-read Table $Table Рабочая таблица
  * @property TableElement $Parent Родительский элемент
  */

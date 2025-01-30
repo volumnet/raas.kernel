@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS {$DBPREFIX$}attachments (
   KEY classname_2 (classname),
   KEY pid (pid),
   INDEX realname (realname(32))
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Attachments';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Attachments';
 
 CREATE TABLE IF NOT EXISTS {$DBPREFIX$}crontab (
   id int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID#',
@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS {$DBPREFIX$}crontab (
 
   PRIMARY KEY (id),
   INDEX (priority)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Crontab';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Crontab';
 
 CREATE TABLE IF NOT EXISTS {$DBPREFIX$}crontab_logs (
   id int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID#',
@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS {$DBPREFIX$}crontab_logs (
   KEY (pid),
   INDEX (post_date),
   KEY (attachment_id)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Crontab logs';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Crontab logs';
 
 CREATE TABLE IF NOT EXISTS `{$DBPREFIX$}groups` (
   id smallint(5) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID#',
@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS `{$DBPREFIX$}groups` (
   description text COMMENT 'Description',
   PRIMARY KEY (id),
   KEY pid (pid)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Groups of users';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Groups of users';
 
 CREATE TABLE IF NOT EXISTS {$DBPREFIX$}groups_levels_assoc (
   gid smallint(5) unsigned NOT NULL DEFAULT '0' COMMENT 'Group ID#',
@@ -63,7 +63,7 @@ CREATE TABLE IF NOT EXISTS {$DBPREFIX$}groups_levels_assoc (
   KEY gid (gid),
   KEY lid (lid),
   KEY m (m)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Groups-rights levels associations';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Groups-rights levels associations';
 
 CREATE TABLE IF NOT EXISTS {$DBPREFIX$}groups_rights (
   gid smallint(5) unsigned NOT NULL DEFAULT '0' COMMENT 'Group ID#',
@@ -72,7 +72,7 @@ CREATE TABLE IF NOT EXISTS {$DBPREFIX$}groups_rights (
   PRIMARY KEY (gid,m),
   KEY gid (gid),
   KEY m (m)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Groups access rights';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Groups access rights';
 
 CREATE TABLE IF NOT EXISTS {$DBPREFIX$}levels (
   id smallint(5) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID#',
@@ -83,7 +83,7 @@ CREATE TABLE IF NOT EXISTS {$DBPREFIX$}levels (
   priority smallint(5) unsigned NOT NULL DEFAULT '0' COMMENT 'Priority',
   PRIMARY KEY (id),
   KEY m (m)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Access levels';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Access levels';
 
 CREATE TABLE IF NOT EXISTS {$DBPREFIX$}processes (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID#',
@@ -94,7 +94,7 @@ CREATE TABLE IF NOT EXISTS {$DBPREFIX$}processes (
 
   PRIMARY KEY (id),
   INDEX (post_date)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Processes';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Processes';
 
 CREATE TABLE IF NOT EXISTS {$DBPREFIX$}registry (
   m varchar(32) NOT NULL DEFAULT '' COMMENT 'MID',
@@ -104,7 +104,7 @@ CREATE TABLE IF NOT EXISTS {$DBPREFIX$}registry (
   PRIMARY KEY (m,`name`),
   KEY m (m),
   KEY `name` (`name`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='System Registry';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='System Registry';
 
 CREATE TABLE IF NOT EXISTS {$DBPREFIX$}users (
   id smallint(5) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID#',
@@ -121,7 +121,7 @@ CREATE TABLE IF NOT EXISTS {$DBPREFIX$}users (
   cache_rights text COMMENT 'Rights table serialize',
   prefs text COMMENT 'User preferences',
   PRIMARY KEY (id)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Users';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Users';
 
 CREATE TABLE IF NOT EXISTS {$DBPREFIX$}users_groups_assoc (
   uid smallint(5) unsigned NOT NULL DEFAULT '0' COMMENT 'User ID#',
@@ -130,7 +130,7 @@ CREATE TABLE IF NOT EXISTS {$DBPREFIX$}users_groups_assoc (
   PRIMARY KEY (uid,gid),
   KEY uid (uid),
   KEY gid (gid)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Users-groups associations';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Users-groups associations';
 
 CREATE TABLE IF NOT EXISTS {$DBPREFIX$}users_levels_assoc (
   uid smallint(5) unsigned NOT NULL DEFAULT '0' COMMENT 'User ID#',
@@ -140,7 +140,7 @@ CREATE TABLE IF NOT EXISTS {$DBPREFIX$}users_levels_assoc (
   KEY uid (uid),
   KEY lid (lid),
   KEY m (m)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Users-rights levels associations';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Users-rights levels associations';
 
 CREATE TABLE IF NOT EXISTS {$DBPREFIX$}users_rights (
   uid smallint(5) unsigned NOT NULL DEFAULT '0' COMMENT 'User ID#',
@@ -149,7 +149,7 @@ CREATE TABLE IF NOT EXISTS {$DBPREFIX$}users_rights (
   PRIMARY KEY (uid,m),
   KEY uid (uid),
   KEY m (m)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Users access rights';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Users access rights';
 
 INSERT IGNORE INTO {$DBPREFIX$}registry (name, value, locked) VALUES ('installDate', NOW(), 1);
 INSERT IGNORE INTO {$DBPREFIX$}registry (name, value, locked) VALUES ('cookieLifetime', '14', 0);

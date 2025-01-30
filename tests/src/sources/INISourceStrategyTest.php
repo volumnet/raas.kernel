@@ -4,12 +4,15 @@
  */
 namespace RAAS;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use SOME\BaseTest;
 
 /**
  * Тест класса INISourceStrategy
- * @covers \RAAS\INISourceStrategy
  */
+#[CoversClass(INISourceStrategy::class)]
 class INISourceStrategyTest extends BaseTest
 {
     /**

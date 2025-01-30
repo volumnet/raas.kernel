@@ -1,11 +1,14 @@
 <?php
 /**
- * Стратегия источника SQL
+ * @package RAAS
  */
 declare(strict_types=1);
 
 namespace RAAS;
 
+/**
+ * Стратегия источника данных SQL
+ */
 class SQLSourceStrategy extends SourceStrategy
 {
     protected static $instance;

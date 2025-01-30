@@ -1,10 +1,6 @@
 <?php
 /**
- * Файл класса формы
  * @package RAAS
- * @version 4.2
- * @author Alex V. Surnin <info@volumnet.ru>
- * @copyright 2013, Volume Networks
  */
 declare(strict_types=1);
 
@@ -13,8 +9,7 @@ namespace RAAS;
 use SOME\SOME;
 
 /**
- * Класс формы
- * @package RAAS
+ * Форма
  * @property-read Form $Form Возвращает текущую форму
  * @property SOME $Item Объект для сохранения
  * @property string $selfUrl Шаблон адреса текущего документа для sprintf с подстановкой %s - ID текущего документа

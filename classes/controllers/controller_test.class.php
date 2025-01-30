@@ -1,11 +1,11 @@
 <?php
 /**
- * Контроллер Cron
+ * @package RAAS
  */
 namespace RAAS;
 
 /**
- * Файл контроллера Cron
+ * Контроллер Cron
  */
 class Controller_Test extends Abstract_Controller_Cron
 {

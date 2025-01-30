@@ -5,12 +5,15 @@
 namespace RAAS;
 
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use SOME\BaseTest;
 
 /**
  * Тест класса DictionarySourceStrategy
- * @covers \RAAS\DictionarySourceStrategy
  */
+#[CoversClass(DictionarySourceStrategy::class)]
 class DictionarySourceStrategyTest extends BaseTest
 {
     use WithTempTablesTrait;

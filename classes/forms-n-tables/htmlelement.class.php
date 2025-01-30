@@ -1,16 +1,11 @@
 <?php
 /**
- * Файл класса HTML-элемента
  * @package RAAS
- * @version 4.2
- * @author Alex V. Surnin <info@volumnet.ru>
- * @copyright 2013, Volume Networks
  */
 namespace RAAS;
 
 /**
- * Класс HTML-элемента
- * @package RAAS
+ * HTML-элемент
  * @property IAbstract_Context_View $view Представление текущего контекста приложения
  * @property string $caption Человеко-читаемое название элемента
  * @property-read StringCollection $attrs Массив дополнительных HTML-атрибутов опции для вывода

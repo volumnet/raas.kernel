@@ -1,6 +1,6 @@
 <?php
 /**
- * Файл API-представления ядра RAAS
+ * @package RAAS
  */
 declare(strict_types=1);
 
@@ -11,7 +11,7 @@ use SOME\SOME;
 use SOME\Text;
 
 /**
- * Класс API-представления ядра RAAS
+ * API-представление ядра RAAS
  * @property int $theme вид вывода (JSON или XML согласно одноименным константам класса)
  * @property array $tree древовидный массив для отображения пользователю
  * @method void checkDB(array $in) - проверка подключения к базе данных. $in - входные данные

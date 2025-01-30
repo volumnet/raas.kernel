@@ -1,10 +1,16 @@
 <?php
 /**
- * Файл класса поля формы
  * @package RAAS
- * @version 4.2
- * @author Alex V. Surnin <info@volumnet.ru>
- * @copyright 2013, Volume Networks
+ *
+ */
+declare(strict_types=1);
+
+namespace RAAS;
+
+use SOME\SOME;
+
+/**
+ * Поле формы
  *
  * <pre><code>
  * Предустановленные типы:
@@ -15,16 +21,6 @@
  *     'description' => string Текстовое описание ошибки
  * ]
  * </code></pre>
- */
-declare(strict_types=1);
-
-namespace RAAS;
-
-use SOME\SOME;
-
-/**
- * Класс поля формы
- * @package RAAS
  * @property mixed $default значение по умолчанию
  * @property-read bool $isFilled заполнено ли поле
  * @property-read bool|array $validate проверка на правильность заполнения поля - true в случае успешной проверки,

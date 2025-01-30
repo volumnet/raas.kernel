@@ -1,6 +1,6 @@
 <?php
 /**
- * Подмодуль пользователей
+ * @package RAAS.General
  */
 declare(strict_types=1);
 

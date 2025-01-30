@@ -1,6 +1,6 @@
 <?php
 /**
- * Класс трейта контекста
+ * @package RAAS
  */
 namespace RAAS;
 

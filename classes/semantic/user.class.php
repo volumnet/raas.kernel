@@ -1,6 +1,6 @@
 <?php
 /**
- * Пользователь системы
+ * @package RAAS
  */
 declare(strict_types=1);
 
@@ -10,7 +10,7 @@ use SOME\Namespaces;
 use SOME\SOME;
 
 /**
- * Класс пользователя системы
+ * Пользователь системы
  * @property-read bool $isFirst Первый пользователь в системе
  * @property-read string $full_name Полное имя
  * @property-read bool $canAdminUsers Может редактировать пользователей

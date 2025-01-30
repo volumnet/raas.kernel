@@ -1,6 +1,6 @@
 <?php
 /**
- * Файл модуля планировщика
+ * @package RAAS.General
  */
 namespace RAAS\General;
 

@@ -4,134 +4,74 @@
  */
 namespace RAAS;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
+
 /**
  * Тест для класса NumberDatatypeStrategy
- * @covers \RAAS\NumberDatatypeStrategy
  */
+#[CoversClass(NumberDatatypeStrategy::class)]
 class NumberDatatypeStrategyTest extends AbstractDatatypeStrategyTest
 {
-    /**
-     * Провайдер данных для метода testIsFilled
-     * @return array <pre><code>array<[
-     *     mixed Проверяемое значение
-     *     bool Ожидаемый результат
-     * ]></code></pre>
-     */
-    public function isFilledDataProvider(): array
-    {
-        $result = [
-            ['', false],
-            ['123', true],
-            ['0.0', false],
-            ['0,00', false],
-        ];
-        return $result;
-    }
-
+    const DATATYPE = 'number';
 
     /**
      * Проверка метода isFilled()
-     * @dataProvider isFilledDataProvider
      * @param mixed $value Проверяемое значение
      * @param bool $expected Ожидаемое значение
      */
+    #[TestWith(['', false])]
+    #[TestWith(['123', true])]
+    #[TestWith(['0.0', false])]
+    #[TestWith(['0,00', false])]
     public function testIsFilled($value, bool $expected)
     {
-        $strategy = DatatypeStrategy::spawn('number');
-
-        $result = $strategy->isFilled($value);
-
-        $this->assertEquals($expected, $result);
+        $this->checkIsFilled($value, $expected);
     }
 
 
     /**
-     * Провайдер данных для метода testValidate
-     * @return array <pre><code>array<[
-     *     mixed Проверяемое значение
-     *     float|null Минимальное значение
-     *     float|null Максимальное значение
-     *     bool Ожидаемый результат
-     * ]></code></pre>
+     * Проверка метода validate()
+     * @param mixed $value Проверяемое значение
+     * @param mixed $expected Ожидаемое значение
      */
-    public function validateDataProvider(): array
+    #[TestWith([['type' => self::DATATYPE], '', true])]
+    #[TestWith([['type' => self::DATATYPE], 'aaa', DatatypeInvalidValueException::class])]
+    #[TestWith([['type' => self::DATATYPE, 'min' => 10], 9, DatatypeOutOfRangeException::class])]
+    #[TestWith([['type' => self::DATATYPE, 'max' => 999], 1000, DatatypeOutOfRangeException::class])]
+    #[TestWith([['type' => self::DATATYPE, 'min' => 10, 'max' => 999], 100, true])]
+    #[TestWith([['type' => self::DATATYPE, 'pattern' => '2022'], '2023', DatatypePatternMismatchException::class])]
+    public function testValidate(array $fieldData, $value, $expected)
     {
-        $result = [
-            [['type' => 'number'], '', true],
-            [['type' => 'number'], 'aaa', DatatypeInvalidValueException::class],
-            [['type' => 'number', 'min' => 10], 9, DatatypeOutOfRangeException::class],
-            [['type' => 'number', 'max' => 999], 1000, DatatypeOutOfRangeException::class],
-            [['type' => 'number', 'min' => 10, 'max' => 999], 100, true],
-            [['type' => 'number', 'pattern' => '2022'], '2023', DatatypePatternMismatchException::class],
-        ];
-        return $result;
-    }
-
-
-    /**
-     * Провайдер данных для метода testExport
-     * @return array <pre><code>array<[
-     *     mixed Проверяемое значение
-     *     float Ожидаемый результат
-     * ]></code></pre>
-     */
-    public function exportDataProvider(): array
-    {
-        $result = [
-            [' aaa ', 0],
-            [' 1,52 ', 1.52],
-            ['123,5 ', 123.5],
-        ];
-        return $result;
+        $this->checkValidate($fieldData, $value, $expected);
     }
 
 
     /**
      * Проверка метода export()
-     * @dataProvider exportDataProvider
      * @param mixed $value Проверяемое значение
      * @param float $expected Ожидаемое значение
      */
+    #[TestWith([' aaa ', 0])]
+    #[TestWith([' 1,52 ', 1.52])]
+    #[TestWith(['123,5 ', 123.5])]
     public function testExport(string $value, float $expected)
     {
-        $strategy = DatatypeStrategy::spawn('number');
-
-        $result = $strategy->export($value);
-
-        $this->assertEquals($expected, $result);
-    }
-
-
-    /**
-     * Провайдер данных для метода testImport
-     * @return array <pre><code>array<[
-     *     mixed Проверяемое значение
-     *     string Ожидаемый результат
-     * ]></code></pre>
-     */
-    public function importDataProvider(): array
-    {
-        $result = [
-            ['0', 0],
-            [' 1,52 ', 1.52],
-            [123.5, 123.5],
-        ];
-        return $result;
+        $this->checkExport($value, $expected);
     }
 
 
     /**
      * Проверка метода import()
-     * @dataProvider importDataProvider
      * @param mixed $value Проверяемое значение
      * @param string $expected Ожидаемое значение
      */
+    #[TestWith(['0', 0])]
+    #[TestWith([' 1,52 ', 1.52])]
+    #[TestWith([123.5, 123.5])]
     public function testImport($value, $expected)
     {
-        $strategy = DatatypeStrategy::spawn('number');
-
-        $result = $strategy->import($value);
-
-        $this->assertEquals($expected, $result);
+        $this->checkImport($value, $expected);
     }
 }

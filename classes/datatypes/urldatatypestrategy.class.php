@@ -1,11 +1,14 @@
 <?php
 /**
- * Стратегия типа данных "Адрес сайта"
+ * @package RAAS
  */
 declare(strict_types=1);
 
 namespace RAAS;
 
+/**
+ * Стратегия типа данных "адрес сайта"
+ */
 class UrlDatatypeStrategy extends TextDatatypeStrategy
 {
     protected static $instance;

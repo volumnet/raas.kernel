@@ -1,6 +1,12 @@
 <?php
+/**
+ * @package RAAS
+ */
 namespace RAAS;
 
+/**
+ * Доступ к ресурсу RAAS
+ */
 abstract class Access
 {
     private $Owner;

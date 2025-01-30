@@ -1,17 +1,13 @@
 <?php
 /**
- * Файл класса таймера
  * @package RAAS
- * @version 4.3
- * @author Alex V. Surnin <info@volumnet.ru>
- * @copyright 2018, Volume Networks
  */
 namespace RAAS;
 
 use SOME\Singleton;
 
 /**
- * Класс таймера
+ * Таймер
  * @property-read float $time Общее время таймера
  * @property-read TimerInterval|null $active Активный интервал, если таймер запущен, но не остановлен,
  *                                           null если таймер остановлен

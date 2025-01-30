@@ -1,13 +1,13 @@
 <?php
 /**
- * Исключение выхода числового значения за границы допустимых значений
+ * @package RAAS
  */
 declare(strict_types=1);
 
 namespace RAAS;
 
 /**
- * Класс исключения выхода числового значения за границы допустимых значений
+ * Исключение выхода числового значения за границы допустимых значений
  */
 class DatatypeOutOfRangeException extends DatatypeInvalidValueException
 {

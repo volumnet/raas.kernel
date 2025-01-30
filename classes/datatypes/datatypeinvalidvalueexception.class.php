@@ -1,6 +1,6 @@
 <?php
 /**
- * Исключение некорректного значения типа данных
+ * @package RAAS
  */
 declare(strict_types=1);
 
@@ -9,7 +9,7 @@ namespace RAAS;
 use InvalidArgumentException;
 
 /**
- * Класс исключения некорректного значения типа данных
+ * Исключение некорректного значения типа данных
  */
 class DatatypeInvalidValueException extends InvalidArgumentException
 {

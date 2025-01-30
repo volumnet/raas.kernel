@@ -1,6 +1,6 @@
 <?php
 /**
- * Файл класса блокирующей команды
+ * @package RAAS
  */
 namespace RAAS;
 

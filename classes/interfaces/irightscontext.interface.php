@@ -1,10 +1,6 @@
 <?php
 /**
- * Файл интерфейса контекста с возможностью назначения прав
  * @package RAAS
- * @version 4.1
- * @author Alex V. Surnin <info@volumnet.ru>
- * @copyright 2012, Volume Networks
  */
 namespace RAAS;
 
@@ -12,7 +8,6 @@ namespace RAAS;
  * Интерфейс контекста с возможностью назначения прав
  *
  * Контекст с возможностью назначения прав реализован в виде любого пакета или модуля
- * @package RAAS
  * @property-read \RAAS\Application $application объект приложения
  * @property-read string $alias псевдоним модуля
  * @property-read array(\RAAS\Level) $levels уровни доступа

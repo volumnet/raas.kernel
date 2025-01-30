@@ -1,16 +1,11 @@
 <?php
 /**
- * Файл класса элемента формы
  * @package RAAS
- * @version 4.2
- * @author Alex V. Surnin <info@volumnet.ru>
- * @copyright 2013, Volume Networks
  */
 namespace RAAS;
 
 /**
- * Класс элемента формы
- * @package RAAS
+ * Элемент формы
  * @property-read {static::CHILDREN_TYPE} $children Массив дочерних элементов
  * @property-write {static::CHILDREN_TYPE} $children Массив дочерних элементов
  * @property-read Form $Form Рабочая форма

@@ -1,10 +1,6 @@
 <?php
 /**
- * Файл класса таблицы
  * @package RAAS
- * @version 4.2
- * @author Alex V. Surnin <info@volumnet.ru>
- * @copyright 2013, Volume Networks
  */
 namespace RAAS;
 
@@ -12,8 +8,7 @@ use ArrayObject;
 use SOME\Pages;
 
 /**
- * Класс таблицы
- * @package RAAS
+ * Таблица
  * @property-read Table $Table Возвращает текущую таблицу
  * @property array $Set Массив данных для отображения
  * @property Pages $Pages Объект постраничной разбивки

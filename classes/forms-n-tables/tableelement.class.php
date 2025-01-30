@@ -1,16 +1,11 @@
 <?php
 /**
- * Файл класса элемента таблицы
  * @package RAAS
- * @version 4.2
- * @author Alex V. Surnin <info@volumnet.ru>
- * @copyright 2013, Volume Networks
  */       
 namespace RAAS;
 
 /**
- * Класс элемента таблицы
- * @package RAAS
+ * Элемент таблицы
  * @property callable $callback Функция для обработки входных данных
  */       
 abstract class TableElement extends HTMLElement

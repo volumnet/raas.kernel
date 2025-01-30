@@ -1,6 +1,15 @@
 <?php
+/**
+ * @package RAAS
+ */
 namespace RAAS;
-class Level extends \SOME\SOME
+
+use SOME\SOME;
+
+/**
+ * Уровень доступа
+ */
+class Level extends SOME
 {
     const GRANT_ALL = -1;
     const REVOKE_ALL = -2;

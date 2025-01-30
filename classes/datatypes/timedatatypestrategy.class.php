@@ -1,11 +1,14 @@
 <?php
 /**
- * Стратегия типа данных "Время"
+ * @package RAAS
  */
 declare(strict_types=1);
 
 namespace RAAS;
 
+/**
+ * Стратегия типа данных "время"
+ */
 class TimeDatatypeStrategy extends DateTimeDatatypeStrategy
 {
     protected static $instance;

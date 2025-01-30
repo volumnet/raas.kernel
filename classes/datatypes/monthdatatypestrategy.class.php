@@ -1,11 +1,14 @@
 <?php
 /**
- * Стратегия типа данных "Месяц"
+ * @package RAAS
  */
 declare(strict_types=1);
 
 namespace RAAS;
 
+/**
+ * Стратегия типа данных "месяц"
+ */
 class MonthDatatypeStrategy extends DateTimeDatatypeStrategy
 {
     protected static $instance;

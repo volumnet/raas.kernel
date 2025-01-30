@@ -1,13 +1,13 @@
 <?php
 /**
- * Рендерер HTML
+ * @package RAAS
  */
 declare(strict_types=1);
 
 namespace RAAS;
 
 /**
- * Класс рендерера HTML
+ * Рендерер HTML
  */
 class HTMLRenderer
 {

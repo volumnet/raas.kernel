@@ -4,12 +4,15 @@
  */
 namespace RAAS;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use SOME\BaseTest;
 
 /**
  * Тест класса CSVSourceStrategy
- * @covers \RAAS\CSVSourceStrategy
  */
+#[CoversClass(CSVSourceStrategy::class)]
 class CSVSourceStrategyTest extends BaseTest
 {
     /**

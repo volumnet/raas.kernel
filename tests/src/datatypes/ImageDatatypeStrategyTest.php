@@ -4,17 +4,23 @@
  */
 namespace RAAS;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
+
 /**
  * Тест для класса ImageDatatypeStrategy
- * @covers \RAAS\ImageDatatypeStrategy
  */
+#[CoversClass(ImageDatatypeStrategy::class)]
 class ImageDatatypeStrategyTest extends AbstractDatatypeStrategyTest
 {
-    public function validateDataProvider(): array
+    const DATATYPE = 'image';
+
+    public static function validateDataProvider(): array
     {
         $result = [
             [
-                ['type' => 'image'],
+                ['type' => self::DATATYPE],
                 [
                     'tmp_name' => '',
                     'name' => '',
@@ -23,35 +29,35 @@ class ImageDatatypeStrategyTest extends AbstractDatatypeStrategyTest
                 true,
             ],
             [
-                ['type' => 'image'],
+                ['type' => self::DATATYPE],
                 [],
                 true,
             ],
             [
-                ['type' => 'image'],
+                ['type' => self::DATATYPE],
                 '',
                 true,
             ],
             [
-                ['type' => 'image'],
+                ['type' => self::DATATYPE],
                 [
-                    'tmp_name' => $this->getResourcesDir() . '/nophoto.jpg',
+                    'tmp_name' => static::getResourcesDir() . '/nophoto.jpg',
                     'name' => 'nophoto.jpg',
                     'type' => 'image/jpeg',
                 ],
                 true,
             ],
             [
-                ['type' => 'image'],
+                ['type' => self::DATATYPE],
                 [
-                    'tmp_name' => $this->getResourcesDir() . '/favicon.svg',
+                    'tmp_name' => static::getResourcesDir() . '/favicon.svg',
                     'name' => 'favicon.svg',
                     'type' => 'application/svg+xml',
                 ],
                 true,
             ],
             [
-                ['type' => 'image'],
+                ['type' => self::DATATYPE],
                 [
                     'tmp_name' => __FILE__,
                     'name' => basename(__FILE__),
@@ -60,9 +66,9 @@ class ImageDatatypeStrategyTest extends AbstractDatatypeStrategyTest
                 DatatypeImageTypeMismatchException::class,
             ],
             [
-                ['type' => 'image', 'pattern' => '2022'],
+                ['type' => self::DATATYPE, 'pattern' => '2022'],
                 [
-                    'tmp_name' => $this->getResourcesDir() . '/nophoto.jpg',
+                    'tmp_name' => static::getResourcesDir() . '/nophoto.jpg',
                     'name' => 'nophoto.jpg',
                     'type' => 'image/jpeg',
                 ],
@@ -74,11 +80,23 @@ class ImageDatatypeStrategyTest extends AbstractDatatypeStrategyTest
 
 
     /**
+     * Проверка метода validate()
+     * @param mixed $value Проверяемое значение
+     * @param mixed $expected Ожидаемое значение
+     */
+    #[DataProvider('validateDataProvider')]
+    public function testValidate(array $fieldData, $value, $expected)
+    {
+        $this->checkValidate($fieldData, $value, $expected);
+    }
+
+
+    /**
      * Проверяет стратегию на медиа-поле
      */
     public function testIsMedia()
     {
-        $strategy = DatatypeStrategy::spawn('image');
+        $strategy = DatatypeStrategy::spawn(self::DATATYPE);
 
         $result = $strategy->isMedia();
 

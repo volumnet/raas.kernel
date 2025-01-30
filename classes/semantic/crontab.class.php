@@ -1,6 +1,6 @@
 <?php
 /**
- * Задача планировщика
+ * @package RAAS
  */
 namespace RAAS;
 
@@ -10,7 +10,7 @@ use phpDocumentor\Reflection\DocBlockFactory;
 use SOME\SOME;
 
 /**
- * Класс задачи планировщика
+ * Задача планировщика
  * @property-read CrontabLog[] $logs Набор логов
  * @property mixed[] $arguments Набор аргументов в виде массива
  * @property-read array|null $commandData <pre>[

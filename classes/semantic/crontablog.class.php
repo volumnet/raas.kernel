@@ -1,6 +1,6 @@
 <?php
 /**
- * Лог задачи планировщика
+ * @package RAAS
  */
 namespace RAAS;
 

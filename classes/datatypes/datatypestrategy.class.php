@@ -1,6 +1,6 @@
 <?php
 /**
- * Стратегия типа данных
+ * @package RAAS
  */
 declare(strict_types=1);
 
@@ -9,6 +9,9 @@ namespace RAAS;
 use InvalidArgumentException;
 use SOME\AbstractStrategy;
 
+/**
+ * Стратегия типа данных
+ */
 abstract class DatatypeStrategy extends AbstractStrategy
 {
     protected static $registeredStrategies = [];

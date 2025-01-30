@@ -1,25 +1,20 @@
 <?php
 /**
- * Файл интерфейса владельца прав доступа
  * @package RAAS
- * @version 4.1
- * @author Alex V. Surnin <info@volumnet.ru>
- * @copyright 2012, Volume Networks
  */
 namespace RAAS;
 
 /**
- * Интерфейс владельца прав RAAS
+ * РРЅС‚РµСЂС„РµР№СЃ РІР»Р°РґРµР»СЊС†Р° РїСЂР°РІ RAAS
  * 
- * Владельцы прав представлены пользователями и группами
- * @package RAAS
+ * Р’Р»Р°РґРµР»СЊС†С‹ РїСЂР°РІ РїСЂРµРґСЃС‚Р°РІР»РµРЅС‹ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏРјРё Рё РіСЂСѓРїРїР°РјРё
  */       
 interface IOwner
 {
     /**
-     * Получает уровень доступа
-     * @param \RAAS\IRightsContext $Context Контекст доступа
-     * @return \RAAS\Access уровень доступа          
+     * РџРѕР»СѓС‡Р°РµС‚ СѓСЂРѕРІРµРЅСЊ РґРѕСЃС‚СѓРїР°
+     * @param \RAAS\IRightsContext $Context РљРѕРЅС‚РµРєСЃС‚ РґРѕСЃС‚СѓРїР°
+     * @return \RAAS\Access СѓСЂРѕРІРµРЅСЊ РґРѕСЃС‚СѓРїР°
      */         
     function access(IRightsContext $Context);
 }

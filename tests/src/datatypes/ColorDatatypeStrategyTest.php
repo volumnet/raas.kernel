@@ -5,21 +5,29 @@
 namespace RAAS;
 
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 
 /**
  * Тест для класса ColorDatatypeStrategy
- * @covers \RAAS\ColorDatatypeStrategy
  */
+#[CoversClass(ColorDatatypeStrategy::class)]
 class ColorDatatypeStrategyTest extends AbstractDatatypeStrategyTest
 {
-    public function validateDataProvider(): array
+    const DATATYPE = 'color';
+
+    /**
+     * Проверка метода validate()
+     * @param mixed $value Проверяемое значение
+     * @param mixed $expected Ожидаемое значение
+     */
+    #[TestWith([['type' => self::DATATYPE], '', true])]
+    #[TestWith([['type' => self::DATATYPE], '#abcdef', true])]
+    #[TestWith([['type' => self::DATATYPE], '#zzzzzz', DatatypeInvalidValueException::class])]
+    #[TestWith([['type' => self::DATATYPE, 'pattern' => 'aaa'], '#bbbbbb', DatatypePatternMismatchException::class])]
+    public function testValidate(array $fieldData, $value, $expected)
     {
-        $result = [
-            [['type' => 'color'], '', true],
-            [['type' => 'color'], '#abcdef', true],
-            [['type' => 'color'], '#zzzzzz', DatatypeInvalidValueException::class],
-            [['type' => 'color', 'pattern' => 'aaa'], '#bbbbbb', DatatypePatternMismatchException::class]
-        ];
-        return $result;
+        $this->checkValidate($fieldData, $value, $expected);
     }
 }

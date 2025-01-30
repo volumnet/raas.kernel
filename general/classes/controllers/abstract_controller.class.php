@@ -1,6 +1,6 @@
 <?php
 /**
- * Абстрактный контроллер пакета "Главная"
+ * @package RAAS.General
  */
 declare(strict_types=1);
 

@@ -1,11 +1,14 @@
 <?php
 /**
- * Стратегия типа данных "Число"
+ * @package RAAS
  */
 declare(strict_types=1);
 
 namespace RAAS;
 
+/**
+ * Стратегия типа данных "число"
+ */
 class NumberDatatypeStrategy extends DatatypeStrategy
 {
     protected static $instance;

@@ -1,6 +1,6 @@
 <?php
 /**
- * Файл абстрактного представления абстрактного подмодуля RAAS
+ * @package RAAS
  */
 declare(strict_types=1);
 
@@ -10,7 +10,7 @@ use SOME\Namespaces;
 use SOME\Singleton;
 
 /**
- * Класс абстрактного представления абстрактного подмодуля RAAS
+ * Абстрактное представление абстрактного подмодуля RAAS
  * @property-read IRightsContext $module ссылка на экземпляр подмодуля
  * @property-read IRightsContext $model ссылка на экземпляр подмодуля
  * @property-read Abstract_Package_View $parent ссылка на экземпляр активного представления пакета

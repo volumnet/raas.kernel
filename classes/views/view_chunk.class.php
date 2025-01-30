@@ -1,16 +1,11 @@
 <?php
 /**
- * Файл фрагментированного web-представления ядра RAAS
  * @package RAAS
- * @version 4.1
- * @author Alex V. Surnin <info@volumnet.ru>
- * @copyright 2012, Volume Networks
  */
 namespace RAAS;
 
 /**
- * Класс фрагментированного web-представления ядра RAAS
- * @package RAAS
+ * Фрагментированное web-представление ядра RAAS
  */
 final class View_Chunk extends View_Web
 {

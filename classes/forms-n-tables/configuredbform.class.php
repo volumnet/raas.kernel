@@ -1,13 +1,13 @@
 <?php
 /**
- * Форма настройки базы данных
+ * @package RAAS
  */
 namespace RAAS;
 
 use SOME\DB;
 
 /**
- * Класс формы настройки базы данных
+ * Форма настройки базы данных
  * @property-read ViewSub_Dev $view Представление
  */
 class ConfigureDBForm extends Form

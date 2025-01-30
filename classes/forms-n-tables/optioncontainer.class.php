@@ -1,16 +1,11 @@
 <?php
 /**
- * Файл класса контейнера опций
  * @package RAAS
- * @version 4.2
- * @author Alex V. Surnin <info@volumnet.ru>
- * @copyright 2013, Volume Networks
  */
 namespace RAAS;
 
 /**
- * Класс контейнера опций
- * @package RAAS
+ * Контейнер опций
  * @property-read Field $Field Поле, к которому принадлежит опция
  */
 class OptionContainer extends FormElement

@@ -1,11 +1,11 @@
 <?php
 /**
- * Файл класса резервной копии базы данных
+ * @package RAAS
  */
 namespace RAAS;
 
 /**
- * Класс резервной копии базы данных
+ * Резервная копия базы данных
  * @property-read string $filename Имя файла резервной копии
  */
 class DBBackup extends Backup

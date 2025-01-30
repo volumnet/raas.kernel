@@ -1,6 +1,6 @@
 <?php
 /**
- * Файл модуля резервного копирования
+ * @package RAAS.General
  */
 declare(strict_types=1);
 

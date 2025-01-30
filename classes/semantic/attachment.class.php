@@ -1,6 +1,6 @@
 <?php
 /**
- * Вложение
+ * @package RAAS
  */
 declare(strict_types=1);
 
@@ -13,7 +13,7 @@ use SOME\Thumbnail;
 use RAAS\IContext;
 
 /**
- * Класс вложения
+ * Вложение
  * @property-read IContext $model Контекст-модель
  * @property-read string $dirpath Путь к папке, где размещается файл
  * @property-read string $dirURL URL папки, где размещается файл

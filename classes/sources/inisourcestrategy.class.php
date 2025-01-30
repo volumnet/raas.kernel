@@ -1,11 +1,14 @@
 <?php
 /**
- * Стратегия источника INI
+ * @package RAAS
  */
 declare(strict_types=1);
 
 namespace RAAS;
 
+/**
+ * Стратегия источника данных INI
+ */
 class INISourceStrategy extends SourceStrategy
 {
     protected static $instance;

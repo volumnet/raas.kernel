@@ -1,6 +1,6 @@
 <?php
 /**
- * Таблица логов задачи планировщика
+ * @package RAAS.General
  */
 namespace RAAS\General;
 

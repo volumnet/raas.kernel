@@ -1,13 +1,13 @@
 <?php
 /**
- * Файл класса абстрактной резервной копии
+ * @package RAAS
  */
 namespace RAAS;
 
 use DateTime;
 
 /**
- * Класс абстрактной резервной копии
+ * Абстрактная резервная копия
  * @property-read DateTime $dateTime Дата/время резервной копии в формате DateTime
  * @property-read string $filename Имя файла (без пути) резервной копии
  * @property-read string $filepath Путь к файлу резервной копии

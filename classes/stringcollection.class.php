@@ -1,6 +1,6 @@
 <?php
 /**
- * Файл класса коллекции строк
+ * @package RAAS
  */
 declare(strict_types=1);
 
@@ -9,8 +9,7 @@ namespace RAAS;
 use ArrayObject;
 
 /**
- * Класс коллекции строк
- * @package RAAS
+ * Коллекция строк
  */
 class StringCollection extends ArrayObject
 {

@@ -4,6 +4,9 @@
  */
 namespace RAAS;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use SOME\BaseTest;
 use SOME\SOME;
 use RAAS\CMS\Material_Type;
@@ -14,8 +17,8 @@ use RAAS\CMS\User_Field;
 
 /**
  * Тест класса CustomField
- * @covers \RAAS\CustomField
  */
+#[CoversClass(CustomField::class)]
 class CustomFieldTest extends BaseTest
 {
     public static $tables = ['attachments', 'cms_data', 'cms_fields'];
@@ -202,66 +205,51 @@ class CustomFieldTest extends BaseTest
 
 
     /**
-     * Провайдер данных для метода testField()
-     * @return array <pre><code>array<[
-     *     array<string[] => mixed> Набор полей для установки CustomField,
-     *     array<string[] => mixed> Набор полей для проверки RAAS-поля
-     * ]></code></pre>
-     */
-    public function fieldDataProvider(): array
-    {
-        return [
-            [
-                [
-                    'datatype' => 'number',
-                    'urn' => 'test',
-                    'name' => 'Test',
-                    'required' => '1',
-                    'maxlength' => '4',
-                    'defval' => '2',
-                    'min_val' => '1',
-                    'max_val' => '9999',
-                    'step' => '2',
-                    'placeholder' => 'Test field',
-                    'source' => 'шт.',
-                    'pattern' => '\d+',
-                ],
-                [
-                    'type' => 'number',
-                    'name' => 'test',
-                    'caption' => 'Test',
-                    'required' => true,
-                    'maxlength' => 4,
-                    'default' => '2',
-                    'min' => 1,
-                    'max' => 9999,
-                    'step' => 2,
-                    'placeholder' => 'Test field',
-                    'pattern' => '\d+',
-                    'unit' => 'шт.',
-                    'export' => 'is_null',
-                ],
-            ],
-            [
-                [
-                    'datatype' => 'file',
-                    'source' => 'image/jpeg, doc, docx, pdf, xls, xlsx',
-                ],
-                [
-                    'type' => 'file',
-                    'accept' => 'image/jpeg,.doc,.docx,.pdf,.xls,.xlsx',
-                ],
-            ],
-        ];
-    }
-
-
-    /**
      * Проверка получения RAAS-поля
-     * @dataProvider fieldDataProvider
      * @param array $fieldData <pre><code>array<string[] => mixed></code></pre> Набор полей для установки CustomField,
      * @param array $expected <pre><code>array<string[] => mixed></code></pre> Набор полей для проверки RAAS-поля
      */
+    #[TestWith([
+        [
+            'datatype' => 'number',
+            'urn' => 'test',
+            'name' => 'Test',
+            'required' => '1',
+            'maxlength' => '4',
+            'defval' => '2',
+            'min_val' => '1',
+            'max_val' => '9999',
+            'step' => '2',
+            'placeholder' => 'Test field',
+            'source' => 'шт.',
+            'pattern' => '\d+',
+        ],
+        [
+            'type' => 'number',
+            'name' => 'test',
+            'caption' => 'Test',
+            'required' => true,
+            'maxlength' => 4,
+            'default' => '2',
+            'min' => 1,
+            'max' => 9999,
+            'step' => 2,
+            'placeholder' => 'Test field',
+            'pattern' => '\d+',
+            'unit' => 'шт.',
+            'export' => 'is_null',
+        ],
+    ])]
+    #[TestWith([
+        [
+            'datatype' => 'file',
+            'source' => 'image/jpeg, doc, docx, pdf, xls, xlsx',
+        ],
+        [
+            'type' => 'file',
+            'accept' => 'image/jpeg,.doc,.docx,.pdf,.xls,.xlsx',
+        ],
+    ])]
     public function testField(array $fieldData, array $expected)
     {
         $field = new TestField($fieldData);
@@ -325,32 +313,16 @@ class CustomFieldTest extends BaseTest
 
 
     /**
-     * Провайдер данных для метода testInherited()
-     * @return array <pre><code>array<[
-     *     int ID# сущности,
-     *     array Набор значений inherited полей,
-     *     bool Ожидаемое значение,
-     * ]></code></pre>
-     */
-    public function inheritedDataProvider(): array
-    {
-        return [
-            [0, [], false],
-            [1, [1, 1, 1], true],
-            [2, [1, 0], false],
-            [3, [1], true],
-            [4, [0], false],
-        ];
-    }
-
-
-    /**
      * Проверка получения наследования
-     * @dataProvider inheritedDataProvider
      * @param int $itemId ID# сущности
      * @param array $inheritedVals Набор значений inherited полей
      * @param bool $expected Ожидаемое значение
      */
+    #[TestWith([0, [], false])]
+    #[TestWith([1, [1, 1, 1], true])]
+    #[TestWith([2, [1, 0], false])]
+    #[TestWith([3, [1], true])]
+    #[TestWith([4, [0], false])]
     public function testInherited(int $itemId, array $inheritedVals, bool $expected)
     {
         $field = new TestField(['id' => 1, 'urn' => 'test', 'type' => 'text', 'name' => 'Custom field']);
@@ -372,53 +344,36 @@ class CustomFieldTest extends BaseTest
 
 
     /**
-     * Провайдер данных для метода testIsMediaFilled
-     * @return array <pre><code>array<>
-     *     array Данные поля,
-     *     array POST-данные,
-     *     bool Ожидаемое значение,
-     * </code></pre>
-     */
-    public function isMediaFilledDataProvider(): array
-    {
-        return [
-            [
-                ['urn' => 'test', 'name' => 'Тест', 'datatype' => 'text', 'required' => true],
-                ['test' => 'aaa'],
-                false,
-            ],
-            [
-                ['urn' => 'test', 'name' => 'Тест', 'datatype' => 'image', 'required' => true],
-                [],
-                false,
-            ],
-            [
-                ['urn' => 'test', 'name' => 'Тест', 'datatype' => 'image', 'required' => true],
-                ['test' => '123'],
-                true,
-            ],
-            [
-                ['urn' => 'test', 'name' => 'Тест', 'datatype' => 'image', 'multiple' => true, 'pattern' => 'favicon'],
-                ['test' => [123, '456']],
-                true,
-            ],
-            [
-                ['urn' => 'test', 'name' => 'Тест', 'datatype' => 'image', 'multiple' => true, 'pattern' => 'favicon'],
-                ['test' => ['aaa', 'bbb']],
-                false,
-            ],
-
-        ];
-    }
-
-
-    /**
      * Проверяет поле на ошибки (с использованием метода $this->Field->check)
-     * @dataProvider isMediaFilledDataProvider
      * @param array $fieldData Данные поля
      * @param array $postData POST-данные
      * @param bool $expected Ожидаемое значение
      */
+    #[TestWith([
+        ['urn' => 'test', 'name' => 'Тест', 'datatype' => 'text', 'required' => true],
+        ['test' => 'aaa'],
+        false,
+    ])]
+    #[TestWith([
+        ['urn' => 'test', 'name' => 'Тест', 'datatype' => 'image', 'required' => true],
+        [],
+        false,
+    ])]
+    #[TestWith([
+        ['urn' => 'test', 'name' => 'Тест', 'datatype' => 'image', 'required' => true],
+        ['test' => '123'],
+        true,
+    ])]
+    #[TestWith([
+        ['urn' => 'test', 'name' => 'Тест', 'datatype' => 'image', 'multiple' => true, 'pattern' => 'favicon'],
+        ['test' => [123, '456']],
+        true,
+    ])]
+    #[TestWith([
+        ['urn' => 'test', 'name' => 'Тест', 'datatype' => 'image', 'multiple' => true, 'pattern' => 'favicon'],
+        ['test' => ['aaa', 'bbb']],
+        false,
+    ])]
     public function testIsMediaFilled(array $fieldData, array $postData, bool $expected)
     {
         $field = new TestField($fieldData);
@@ -471,52 +426,35 @@ class CustomFieldTest extends BaseTest
 
 
     /**
-     * Провайдер данных для метода testOnCommitWithScalar
-     * @return array <pre><code>array<[
-     *     array Установочные данные для поля
-     *     mixed Входное значение
-     *     array Список ожидаемых значение
-     * ]></code></pre>
-     */
-    public function onCommitDataProvider(): array
-    {
-        $result = [
-            [
-                ['datatype' => 'date', 'multiple' => true],
-                ['2023-11-12', '1900-01-01', 'aaa', '', '0000-00-00', '0001-01-01'],
-                ['2023-11-12', '1900-01-01', '0000-00-00', '0000-00-00', '0000-00-00', '0001-01-01']
-            ],
-            [
-                ['datatype' => 'datetime', 'multiple' => true],
-                ['2023-11-12T16:05', '1900-01-01T10:00', 'aaa', '', '0001-01-01 12:30'],
-                ['2023-11-12 16:05:00', '1900-01-01 10:00:00', '0000-00-00 00:00:00', '0000-00-00 00:00:00', '0001-01-01 12:30:00']
-            ],
-            [['datatype' => 'year'], '2023-01-01', ['2023']],
-            [['datatype' => 'number'], '123,5', [123.5]],
-            [['datatype' => 'time'], '12:05', ['12:05:00']],
-            [['datatype' => 'time'], 'aaa', ['00:00:00']],
-            [['datatype' => 'time'], '', ['00:00:00']],
-            [['datatype' => 'month'], '2023-11', ['2023-11-01']],
-            [['datatype' => 'month'], 'aaa', ['0000-00-00']],
-            [['datatype' => 'month'], '0000-00', ['0000-00-00']],
-            [['datatype' => 'month'], '0001-01', ['0001-01-01']],
-            [['datatype' => 'week'], '2023-W01', ['2023-01-02']], // Хз почему так, но вроде так
-            [['datatype' => 'week'], '0000-W00', ['0000-00-00']],
-            [['datatype' => 'week'], 'aaa', ['0000-00-00']],
-            [['datatype' => 'checkbox'], 'aaa ', ['aaa']],
-            [['datatype' => 'checkbox', 'multiple' => true], ['aaa', 'bbb '], ['aaa', 'bbb']],
-        ];
-        return $result;
-    }
-
-
-    /**
      * Тест коммита (случай со скалярными значениями)
-     * @dataProvider onCommitDataProvider
      * @param array $fieldData Установочные данные для поля
      * @param mixed $value Проверяемое значение
      * @param array $expected Список ожидаемых значение
      */
+    #[TestWith([
+        ['datatype' => 'date', 'multiple' => true],
+        ['2023-11-12', '1900-01-01', 'aaa', '', '0000-00-00', '0001-01-01'],
+        ['2023-11-12', '1900-01-01', '0000-00-00', '0000-00-00', '0000-00-00', '0001-01-01']
+    ])]
+    #[TestWith([
+        ['datatype' => 'datetime', 'multiple' => true],
+        ['2023-11-12T16:05', '1900-01-01T10:00', 'aaa', '', '0001-01-01 12:30'],
+        ['2023-11-12 16:05:00', '1900-01-01 10:00:00', '0000-00-00 00:00:00', '0000-00-00 00:00:00', '0001-01-01 12:30:00']
+    ])]
+    #[TestWith([['datatype' => 'year'], '2023-01-01', ['2023']])]
+    #[TestWith([['datatype' => 'number'], '123,5', [123.5]])]
+    #[TestWith([['datatype' => 'time'], '12:05', ['12:05:00']])]
+    #[TestWith([['datatype' => 'time'], 'aaa', ['00:00:00']])]
+    #[TestWith([['datatype' => 'time'], '', ['00:00:00']])]
+    #[TestWith([['datatype' => 'month'], '2023-11', ['2023-11-01']])]
+    #[TestWith([['datatype' => 'month'], 'aaa', ['0000-00-00']])]
+    #[TestWith([['datatype' => 'month'], '0000-00', ['0000-00-00']])]
+    #[TestWith([['datatype' => 'month'], '0001-01', ['0001-01-01']])]
+    #[TestWith([['datatype' => 'week'], '2023-W01', ['2023-01-02']])] // Хз почему так, но вроде так
+    #[TestWith([['datatype' => 'week'], '0000-W00', ['0000-00-00']])]
+    #[TestWith([['datatype' => 'week'], 'aaa', ['0000-00-00']])]
+    #[TestWith([['datatype' => 'checkbox'], 'aaa ', ['aaa']])]
+    #[TestWith([['datatype' => 'checkbox', 'multiple' => true], ['aaa', 'bbb '], ['aaa', 'bbb']])]
     public function testOnCommitWithScalar(array $fieldData, $value, $expected)
     {
         $item = new CustomEntity(['id' => 10]);
@@ -560,10 +498,10 @@ class CustomFieldTest extends BaseTest
         ]];
         $_FILES = ['test' => [
             'tmp_name' => [
-                $this->getResourcesDir() . '/nophoto.jpg',
-                $this->getResourcesDir() . '/notexist.jpg',
+                static::getResourcesDir() . '/nophoto.jpg',
+                static::getResourcesDir() . '/notexist.jpg',
                 null,
-                $this->getResourcesDir() . '/favicon.svg',
+                static::getResourcesDir() . '/favicon.svg',
             ],
             'name' => [
                 'nophoto.jpg',
@@ -820,7 +758,7 @@ class CustomFieldTest extends BaseTest
      *     bool Ожидаемый результат,
      * ]></code></pre>
      */
-    public function isFilledDataProvider(): array
+    public static function isFilledDataProvider(): array
     {
         $result = [
             [
@@ -890,12 +828,12 @@ class CustomFieldTest extends BaseTest
             ],
             [
                 ['urn' => 'test', 'datatype' => 'image'],
-                $this->getResourcesDir() . '/nophoto.jpg',
+                static::getResourcesDir() . '/nophoto.jpg',
                 true,
             ],
             [
                 ['urn' => 'test', 'datatype' => 'image'],
-                $this->getResourcesDir() . '/aaa.jpg',
+                static::getResourcesDir() . '/aaa.jpg',
                 false,
             ],
             [
@@ -911,11 +849,11 @@ class CustomFieldTest extends BaseTest
 
     /**
      * Проверка метода isFilled()
-     * @dataProvider isFilledDataProvider
      * @param array $fieldData Данные поля
      * @param mixed $value Данные для проверки
      * @param bool $expected Ожидаемое значение
      */
+    #[DataProvider('isFilledDataProvider')]
     public function testIsFilled(array $fieldData, $value, bool $expected)
     {
         $field = new TestField($fieldData);
@@ -934,7 +872,7 @@ class CustomFieldTest extends BaseTest
      *     bool Ожидаемый результат
      * ]></code></pre>
      */
-    public function validateDataProvider(): array
+    public static function validateDataProvider(): array
     {
         $result = [
             [[], ' ', true],
@@ -970,7 +908,7 @@ class CustomFieldTest extends BaseTest
             [
                 ['datatype' => 'image'],
                 [
-                    'tmp_name' => $this->getResourcesDir() . '/nophoto.jpg',
+                    'tmp_name' => static::getResourcesDir() . '/nophoto.jpg',
                     'name' => 'nophoto.jpg',
                     'type' => 'image/jpeg',
                 ],
@@ -978,7 +916,7 @@ class CustomFieldTest extends BaseTest
             [
                 ['datatype' => 'image'],
                 [
-                    'tmp_name' => $this->getResourcesDir() . '/favicon.svg',
+                    'tmp_name' => static::getResourcesDir() . '/favicon.svg',
                     'name' => 'favicon.svg',
                     'type' => 'application/xml+svg',
                 ],
@@ -1006,11 +944,11 @@ class CustomFieldTest extends BaseTest
 
     /**
      * Проверка метода validate()
-     * @dataProvider validateDataProvider
      * @param array $fieldData Установочные данные для поля
      * @param mixed $value Проверяемое значение
      * @param bool $expected Ожидаемое значение
      */
+    #[DataProvider('validateDataProvider')]
     public function testValidate(array $fieldData, $value, bool $expected)
     {
         $field = new TestField($fieldData);
@@ -1639,7 +1577,7 @@ class CustomFieldTest extends BaseTest
      *     array? Данные сущности
      * ]></code></pre>
      */
-    public function doRichDataProvider(): array
+    public static function doRichDataProvider(): array
     {
         static::installTables();
         $attachment = new Attachment(['id' => 123]);
@@ -1718,12 +1656,12 @@ class CustomFieldTest extends BaseTest
 
     /**
      * Проверка метода doRich()
-     * @dataProvider doRichDataProvider
      * @param $fieldData  Данные поля,
      * @param $expected Ожидаемое значение,
      * @param $value  Проверяемое значение,
      * @param $itemData Данные сущности
      */
+    #[DataProvider('doRichDataProvider')]
     public function testDoRich($fieldData, $expected, $value = null, $itemData = [])
     {
         $field = new TestField($fieldData);
@@ -1766,67 +1704,51 @@ class CustomFieldTest extends BaseTest
 
 
     /**
-     * Провайдер данных для метода testGetRichValues
-     * @return array <pre><code>array<[
-     *     array Данные поля,
-     *     bool $forceArray Привести к массиву,
-     *     array $expected Ожидаемое значение
-     * ]></code></pre>
-     */
-    public function getRichValuesDataProvider(): array
-    {
-        return [
-            [
-                [
-                    'id' => 1,
-                    'urn' => 'test',
-                    'datatype' => 'select',
-                    'source_type' => 'ini',
-                    'source' => 'aaa="Test AAA"' . "\n" .
-                                'bbb="Test BBB"' . "\n" .
-                                'ccc="Test CCC"',
-                ],
-                false,
-                'Test AAA'
-            ],
-            [
-                [
-                    'id' => 1,
-                    'urn' => 'test',
-                    'datatype' => 'select',
-                    'source_type' => 'ini',
-                    'source' => 'aaa="Test AAA"' . "\n" .
-                                'bbb="Test BBB"' . "\n" .
-                                'ccc="Test CCC"',
-                ],
-                true,
-                ['Test AAA', 'Test BBB', 'Test CCC']
-            ],
-            [
-                [
-                    'id' => 1,
-                    'multiple' => true,
-                    'urn' => 'test',
-                    'datatype' => 'select',
-                    'source_type' => 'ini',
-                    'source' => 'aaa="Test AAA"' . "\n" .
-                                'bbb="Test BBB"' . "\n" .
-                                'ccc="Test CCC"',
-                ],
-                false,
-                ['Test AAA', 'Test BBB', 'Test CCC']
-            ],
-        ];
-    }
-
-
-    /**
      * Проверка метода getRichValues()
-     * @dataProvider getRichValuesDataProvider
      * @param array $fieldData Данные поля
      * @param bool $forceArray Привести к массиву
      * @param mixed expected Ожидаемое значение
      */
+    #[TestWith([
+        [
+            'id' => 1,
+            'urn' => 'test',
+            'datatype' => 'select',
+            'source_type' => 'ini',
+            'source' => 'aaa="Test AAA"' . "\n" .
+                        'bbb="Test BBB"' . "\n" .
+                        'ccc="Test CCC"',
+        ],
+        false,
+        'Test AAA'
+    ])]
+    #[TestWith([
+        [
+            'id' => 1,
+            'urn' => 'test',
+            'datatype' => 'select',
+            'source_type' => 'ini',
+            'source' => 'aaa="Test AAA"' . "\n" .
+                        'bbb="Test BBB"' . "\n" .
+                        'ccc="Test CCC"',
+        ],
+        true,
+        ['Test AAA', 'Test BBB', 'Test CCC']
+    ])]
+    #[TestWith([
+        [
+            'id' => 1,
+            'multiple' => true,
+            'urn' => 'test',
+            'datatype' => 'select',
+            'source_type' => 'ini',
+            'source' => 'aaa="Test AAA"' . "\n" .
+                        'bbb="Test BBB"' . "\n" .
+                        'ccc="Test CCC"',
+        ],
+        false,
+        ['Test AAA', 'Test BBB', 'Test CCC']
+    ])]
     public function testGetRichValues(array $fieldData, bool $forceArray, $expected)
     {
         $field = new TestField($fieldData);
@@ -1891,7 +1813,7 @@ class CustomFieldTest extends BaseTest
      *     mixed Ожидаемое значение,
      * ]></code></pre>
      */
-    public function fromRichDataProvider(): array
+    public static function fromRichDataProvider(): array
     {
         static::installTables();
         $attachment = new Attachment(['id' => 123]);
@@ -1956,12 +1878,12 @@ class CustomFieldTest extends BaseTest
 
     /**
      * Проверка метода fromRich()
-     * @dataProvider fromRichDataProvider
      * @param $fieldData  Данные поля,
      * @param $expected Ожидаемое значение,
      * @param $value  Проверяемое значение,
      * @param $itemData Данные сущности
      */
+    #[DataProvider('fromRichDataProvider')]
     public function testFromRich($fieldData, $value, $expected)
     {
         $field = new TestField($fieldData);

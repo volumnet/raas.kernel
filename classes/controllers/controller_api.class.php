@@ -1,16 +1,11 @@
 <?php
 /**
- * Файл API-контроллера ядра RAAS
  * @package RAAS
- * @version 4.1
- * @author Alex V. Surnin <info@volumnet.ru>
- * @copyright 2011, Volume Networks
  */       
 namespace RAAS;
 
 /**
- * Класс API-контроллера ядра RAAS
- * @package RAAS
+ * API-контроллер ядра RAAS
  */       
 final class Controller_Api extends Abstract_Controller
 {

@@ -1,18 +1,11 @@
 <?php
 /**
- * Файл стандартного подмодуля RAAS
- *
- * Стандартный подмодуль объединяет типовые задачи, характерные для большинства SOME-объектов
  * @package RAAS
- * @version 4.1
- * @author Alex V. Surnin <info@volumnet.ru>
- * @copyright 2013, Volume Networks
  */
 namespace RAAS;
 
 /**
- * Класс стандартного подмодуля RAAS
- * @package RAAS
+ * Стандартный подмодуль RAAS
  */
 class StdSub extends Abstract_Sub_Controller
 {

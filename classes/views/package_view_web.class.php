@@ -1,16 +1,11 @@
 <?php
 /**
- * Файл web-представления абстрактного пакета RAAS
  * @package RAAS
- * @version 4.1
- * @author Alex V. Surnin <info@volumnet.ru>
- * @copyright 2011, Volume Networks
  */
 namespace RAAS;
 
 /**
- * Класс web-представления абстрактного пакета RAAS
- * @package RAAS
+ * Web-представление абстрактного пакета RAAS
  */
 class Package_View_Web extends Abstract_Package_View implements IRightsContext_View_Web
 {

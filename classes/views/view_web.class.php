@@ -1,6 +1,6 @@
 <?php
 /**
- * Файл web-представления ядра RAAS
+ * @package RAAS
  */
 declare(strict_types=1);
 
@@ -10,8 +10,7 @@ use ArrayObject;
 use SOME\File;
 
 /**
- * Класс web-представления ядра RAAS
- * @package RAAS
+ * Web-представление ядра RAAS
  * @property ArrayObject Верхнее меню, пункты в виде array('name' => 'текст ссылки', ['href' => 'ссылка', ...прочие аттрибуты тега <a...></a>...])
  * @property ArrayObject Левое меню, пункты в виде array('name' => 'текст ссылки', ['href' => 'ссылка', ...прочие аттрибуты тега <a...></a>...])
  * @property ArrayObject Строка навигации, пункты в виде array('name' => 'текст ссылки', ['href' => 'ссылка', ...прочие аттрибуты тега <a...></a>...])

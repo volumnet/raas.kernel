@@ -4,13 +4,16 @@
  */
 namespace RAAS;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use SOME\BaseTest;
 use RAAS\CMS\Dictionary as CMSDictionary;
 
 /**
  * Тест класса Dictionary
- * @covers \RAAS\Dictionary
  */
+#[CoversClass(Dictionary::class)]
 class DictionaryTest extends BaseTest
 {
     public static $tables = ['cms_dictionaries'];

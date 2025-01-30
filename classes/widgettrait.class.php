@@ -1,6 +1,6 @@
 <?php
 /**
- * Файл трейта работы с виджетами
+ * @package RAAS
  */
 namespace RAAS;
 

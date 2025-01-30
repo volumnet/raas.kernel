@@ -1,16 +1,11 @@
 <?php
 /**
- * Файл класса строки таблицы
  * @package RAAS
- * @version 4.2
- * @author Alex V. Surnin <info@volumnet.ru>
- * @copyright 2013, Volume Networks
  */       
 namespace RAAS;
 
 /**
- * Класс строки таблицы
- * @package RAAS
+ * Строка таблицы
  * @property-read Table $Table Рабочая таблица
  * @property Table $Parent Рабочая таблица
  * @property mixed $source Исходные значения

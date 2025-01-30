@@ -1,6 +1,6 @@
 <?php
 /**
- * Абстрактный справочник
+ * @package RAAS
  */
 declare(strict_types=1);
 
@@ -12,7 +12,7 @@ use SOME\CSV;
 use SOME\SOME;
 
 /**
- * Класс абстрактного справочника
+ * Абстрактный справочник
  * @property-read self $parent Родительский справочник
  * @property-read self[] $children Дочерние справочники
  * @property-read self[] $parents Цепочка родительских справочников

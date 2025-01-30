@@ -1,11 +1,14 @@
 <?php
 /**
- * Стратегия типа данных "Изображение"
+ * @package RAAS
  */
 declare(strict_types=1);
 
 namespace RAAS;
 
+/**
+ * Стратегия типа данных "изображение"
+ */
 class ImageDatatypeStrategy extends FileDatatypeStrategy
 {
     protected static $instance;

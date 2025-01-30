@@ -1,6 +1,6 @@
 <?php
 /**
- * Процесс системы
+ * @package RAAS
  */
 namespace RAAS;
 
@@ -9,7 +9,7 @@ use SOME\SOME;
 use SOME\CSV;
 
 /**
- * Класс процесса
+ * Процесс
  */
 class Process extends SOME
 {

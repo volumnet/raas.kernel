@@ -1,16 +1,11 @@
 <?php
 /**
- * Файл мастера перенаправлений
  * @package RAAS
- * @version 4.1
- * @author Alex V. Surnin <info@volumnet.ru>
- * @copyright 2011, Volume Networks
  */
 namespace RAAS;
 
 /**
- * Класс мастера перенаправлений
- * @package RAAS
+ * Мастер перенаправлений
  */
 class Redirector
 {

@@ -1,6 +1,6 @@
 <?php
 /**
- * Стратегия типа данных "Файл"
+ * @package RAAS
  */
 declare(strict_types=1);
 
@@ -9,7 +9,7 @@ namespace RAAS;
 use InvalidArgumentException;
 
 /**
- * Класс файла стратегии типа данных "Файл"
+ * Стратегия типа данных "файл"
  *
  * <pre><code>
  * Предустановленные типы данных:

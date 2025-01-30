@@ -1,11 +1,14 @@
 <?php
 /**
- * Стратегия типа данных "E-mail"
+ * @package RAAS
  */
 declare(strict_types=1);
 
 namespace RAAS;
 
+/**
+ * Стратегия типа данных "e-mail"
+ */
 class EmailDatatypeStrategy extends TextDatatypeStrategy
 {
     protected static $instance;

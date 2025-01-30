@@ -7,14 +7,19 @@ namespace RAAS;
 use stdClass;
 use Exception;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 
 /**
  * Тест для класса DatatypeStrategy
- * @covers \RAAS\DatatypeStrategy
  */
+#[CoversClass(DatatypeStrategy::class)]
 class DatatypeStrategyTest extends AbstractDatatypeStrategyTest
 {
     use WithTempTablesTrait;
+
+    const DATATYPE = 'text';
 
     /**
      * Тестирует методы register/get/unregister/clear
@@ -51,107 +56,90 @@ class DatatypeStrategyTest extends AbstractDatatypeStrategyTest
 
 
     /**
-     * Провайдер данных для метода testGetPostData
-     * @return array <pre><code>array<
-     *     array Данные поля,
-     *     bool Приводить к массиву,
-     *     array POST-данные,
-     *     array Ожидаемое значение,
-     * ></code></pre>
-     */
-    public function getPostDataDataProvider()
-    {
-        return [
-            [
-                ['name' => 'test', 'multiple' => false],
-                false,
-                ['aaa' => 'abc', 'test' => 'xyz'],
-                'xyz',
-            ],
-            [
-                ['name' => 'test', 'multiple' => false],
-                true,
-                ['aaa' => 'abc', 'test' => 'xyz'],
-                ['xyz'],
-            ],
-            [
-                ['name' => 'test', 'multiple' => false],
-                false,
-                ['aaa' => 'abc', 'test' => ['xyz']],
-                ['xyz'],
-            ],
-            [
-                ['name' => 'test', 'multiple' => false],
-                true,
-                ['aaa' => 'abc', 'test' => ['aaa' => 'xyz']],
-                ['aaa' => 'xyz'],
-            ],
-            [
-                ['name' => 'test', 'multiple' => false],
-                false,
-                ['aaa' => 'abc'],
-                null,
-            ],
-            [
-                ['name' => 'test', 'multiple' => false],
-                true,
-                ['aaa' => 'abc'],
-                [],
-            ],
-            [
-                ['name' => 'test', 'multiple' => true],
-                false,
-                ['aaa' => 'abc', 'test' => 'xyz'],
-                'xyz',
-            ],
-            [
-                ['name' => 'test', 'multiple' => true],
-                true,
-                ['aaa' => 'abc', 'test' => 'xyz'],
-                ['xyz'],
-            ],
-            [
-                ['name' => 'test', 'multiple' => true],
-                false,
-                ['aaa' => 'abc', 'test' => ['xyz']],
-                ['xyz'],
-            ],
-            [
-                ['name' => 'test', 'multiple' => true],
-                true,
-                ['aaa' => 'abc', 'test' => ['xyz']],
-                ['xyz'],
-            ],
-            [
-                ['name' => 'test', 'multiple' => true],
-                false,
-                ['aaa' => 'abc'],
-                null,
-            ],
-            [
-                ['name' => 'test', 'multiple' => true],
-                true,
-                ['aaa' => 'abc'],
-                [],
-            ],
-        ];
-    }
-
-
-    /**
      * Тест метода getPostData
-     * @dataProvider getPostDataDataProvider
      * @param array $fieldData Данные поля
      * @param bool $forceArray Приводить к массиву
      * @param array $postData POST-данные
      * @param mixed $expected Ожидаемое значение
      */
+    #[TestWith([
+        ['name' => 'test', 'multiple' => false],
+        false,
+        ['aaa' => 'abc', 'test' => 'xyz'],
+        'xyz',
+    ])]
+    #[TestWith([
+        ['name' => 'test', 'multiple' => false],
+        true,
+        ['aaa' => 'abc', 'test' => 'xyz'],
+        ['xyz'],
+    ])]
+    #[TestWith([
+        ['name' => 'test', 'multiple' => false],
+        false,
+        ['aaa' => 'abc', 'test' => ['xyz']],
+        ['xyz'],
+    ])]
+    #[TestWith([
+        ['name' => 'test', 'multiple' => false],
+        true,
+        ['aaa' => 'abc', 'test' => ['aaa' => 'xyz']],
+        ['aaa' => 'xyz'],
+    ])]
+    #[TestWith([
+        ['name' => 'test', 'multiple' => false],
+        false,
+        ['aaa' => 'abc'],
+        null,
+    ])]
+    #[TestWith([
+        ['name' => 'test', 'multiple' => false],
+        true,
+        ['aaa' => 'abc'],
+        [],
+    ])]
+    #[TestWith([
+        ['name' => 'test', 'multiple' => true],
+        false,
+        ['aaa' => 'abc', 'test' => 'xyz'],
+        'xyz',
+    ])]
+    #[TestWith([
+        ['name' => 'test', 'multiple' => true],
+        true,
+        ['aaa' => 'abc', 'test' => 'xyz'],
+        ['xyz'],
+    ])]
+    #[TestWith([
+        ['name' => 'test', 'multiple' => true],
+        false,
+        ['aaa' => 'abc', 'test' => ['xyz']],
+        ['xyz'],
+    ])]
+    #[TestWith([
+        ['name' => 'test', 'multiple' => true],
+        true,
+        ['aaa' => 'abc', 'test' => ['xyz']],
+        ['xyz'],
+    ])]
+    #[TestWith([
+        ['name' => 'test', 'multiple' => true],
+        false,
+        ['aaa' => 'abc'],
+        null,
+    ])]
+    #[TestWith([
+        ['name' => 'test', 'multiple' => true],
+        true,
+        ['aaa' => 'abc'],
+        [],
+    ])]
     public function testGetPostData(array $fieldData, bool $forceArray, array $postData, $expected)
     {
         $field = new Field($fieldData);
         $oldPost = $_POST;
         $_POST = $postData;
-        $datatypeStrategy = DatatypeStrategy::spawn('text');
+        $datatypeStrategy = DatatypeStrategy::spawn(self::DATATYPE);
 
         $result = $datatypeStrategy->getPostData($field, $forceArray);
         $result2 = $datatypeStrategy->getPostData(new TestField(['urn' => $fieldData['name']]), $forceArray);
@@ -171,7 +159,7 @@ class DatatypeStrategyTest extends AbstractDatatypeStrategyTest
     public function testGetPostDataWithException()
     {
         $this->expectException(InvalidArgumentException::class);
-        $datatypeStrategy = DatatypeStrategy::spawn('text');
+        $datatypeStrategy = DatatypeStrategy::spawn(self::DATATYPE);
 
         $result = $datatypeStrategy->getPostData(new stdClass());
     }
@@ -219,49 +207,32 @@ class DatatypeStrategyTest extends AbstractDatatypeStrategyTest
 
 
     /**
-     * Провайдер данных для метода testIsFilled
-     * @return array <pre><code>array<[
-     *     mixed Проверяемое значение
-     *     bool Ожидаемый результат
-     * ]></code></pre>
+     * Проверка метода isFilled()
+     * @param mixed $value Проверяемое значение
+     * @param bool $expected Ожидаемое значение
      */
-    public function isFilledDataProvider(): array
+    #[TestWith(['aaa', true])]
+    #[TestWith(['', false])]
+    #[TestWith([['aaa'], true])]
+    #[TestWith([[], false])]
+    public function testIsFilled($value, bool $expected)
     {
-        $result = [
-            ['aaa', true],
-            ['', false],
-            [['aaa'], true],
-            [[], false],
-        ];
-        return $result;
+        $this->checkIsFilled($value, $expected);
     }
 
 
     /**
-     * Проверка метода isFilled()
-     * @dataProvider isFilledDataProvider
+     * Проверка метода validate()
      * @param mixed $value Проверяемое значение
-     * @param bool $expected Ожидаемое значение
+     * @param mixed $expected Ожидаемое значение
      */
-    public function testIsFilled($value, bool $expected)
+    #[TestWith([['type' => self::DATATYPE], ' ', true])]
+    #[TestWith([['type' => self::DATATYPE], ['aaa' => 'bbb'], true])]
+    #[TestWith([['type' => self::DATATYPE, 'pattern' => '^\\d+$'], '123', true])]
+    #[TestWith([['type' => self::DATATYPE, 'pattern' => '^\\d+$'], 'aaa', DatatypePatternMismatchException::class])]
+    public function testValidate(array $fieldData, $value, $expected)
     {
-        $strategy = DatatypeStrategy::spawn();
-
-        $result = $strategy->isFilled($value);
-
-        $this->assertEquals($expected, $result);
-    }
-
-
-    public function validateDataProvider(): array
-    {
-        $result = [
-            [['type' => 'text'], ' ', true],
-            [['type' => 'text'], ['aaa' => 'bbb'], true],
-            [['type' => 'text', 'pattern' => '^\\d+$'], '123', true],
-            [['type' => 'text', 'pattern' => '^\\d+$'], 'aaa', DatatypePatternMismatchException::class],
-        ];
-        return $result;
+        $this->checkValidate($fieldData, $value, $expected);
     }
 
 
@@ -271,74 +242,32 @@ class DatatypeStrategyTest extends AbstractDatatypeStrategyTest
     public function testIsMedia()
     {
         $strategy = DatatypeStrategy::spawn();
-
         $result = $strategy->isMedia();
-
         $this->assertFalse($result);
     }
 
 
     /**
-     * Провайдер данных для метода testExport
-     * @return array <pre><code>array<[
-     *     mixed Проверяемое значение
-     *     string Ожидаемый результат
-     * ]></code></pre>
-     */
-    public function exportDataProvider(): array
-    {
-        $result = [
-            [' aaa ', 'aaa'],
-        ];
-        return $result;
-    }
-
-
-    /**
      * Проверка метода export()
-     * @dataProvider exportDataProvider
      * @param mixed $value Проверяемое значение
      * @param string $expected Ожидаемое значение
      */
+    #[TestWith([' aaa ', 'aaa'])]
     public function testExport(string $value, string $expected)
     {
-        $strategy = DatatypeStrategy::spawn('text');
-
-        $result = $strategy->export($value);
-
-        $this->assertEquals($expected, $result);
-    }
-
-
-    /**
-     * Провайдер данных для метода testImport
-     * @return array <pre><code>array<[
-     *     mixed Проверяемое значение
-     *     string Ожидаемый результат
-     * ]></code></pre>
-     */
-    public function importDataProvider(): array
-    {
-        $result = [
-            [' aaa ', ' aaa '],
-        ];
-        return $result;
+        $this->checkExport($value, $expected);
     }
 
 
     /**
      * Проверка метода import()
-     * @dataProvider importDataProvider
      * @param mixed $value Проверяемое значение
      * @param string $expected Ожидаемое значение
      */
+    #[TestWith([' aaa ', ' aaa '])]
     public function testImport(string $value, string $expected)
     {
-        $strategy = DatatypeStrategy::spawn('text');
-
-        $result = $strategy->import($value);
-
-        $this->assertEquals($expected, $result);
+        $this->checkImport($value, $expected);
     }
 
 
@@ -347,10 +276,8 @@ class DatatypeStrategyTest extends AbstractDatatypeStrategyTest
      */
     public function testBatchExport()
     {
-        $strategy = DatatypeStrategy::spawn('text');
-
+        $strategy = DatatypeStrategy::spawn(self::DATATYPE);
         $result = $strategy->batchExport([' aaa ', ' bbb', null, ' ccc', ]);
-
         $this->assertEquals(['aaa', 'bbb', '', 'ccc'], $result);
     }
 
@@ -360,10 +287,8 @@ class DatatypeStrategyTest extends AbstractDatatypeStrategyTest
      */
     public function testBatchImport()
     {
-        $strategy = DatatypeStrategy::spawn('text');
-
+        $strategy = DatatypeStrategy::spawn(self::DATATYPE);
         $result = $strategy->batchImport([' aaa ', ' bbb', null, ' ccc']);
-
         $this->assertEquals([' aaa ', ' bbb', ' ccc'], $result);
     }
 }

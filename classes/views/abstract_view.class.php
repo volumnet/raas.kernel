@@ -1,6 +1,6 @@
 <?php
 /**
- * Файл абстрактного представления ядра RAAS
+ * @package RAAS
  */
 declare(strict_types=1);
 
@@ -11,7 +11,7 @@ use SOME\File;
 use SOME\Singleton;
 
 /**
- * Класс абстрактного представления ядра RAAS
+ * Абстрактное представление ядра RAAS
  * @property-read \RAAS\Application $model ссылка на экземпляр приложения
  * @property-read \RAAS\IAbstract_Context_View $context представление текущего пакета/модуля
  * @property-read array $translations массив переводов

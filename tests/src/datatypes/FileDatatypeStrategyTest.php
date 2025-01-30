@@ -16,13 +16,18 @@ namespace RAAS;
 use stdClass;
 use Exception;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 
 /**
  * Класс теста класса FileDatatypeStrategy
- * @covers \RAAS\FileDatatypeStrategy
  */
+#[CoversClass(FileDatatypeStrategy::class)]
 class FileDatatypeStrategyTest extends AbstractDatatypeStrategyTest
 {
+    const DATATYPE = 'file';
+
     public static $tables = ['attachments'];
 
     /**
@@ -40,7 +45,7 @@ class FileDatatypeStrategyTest extends AbstractDatatypeStrategyTest
      *     <ФАЙЛ>|array<string[]|int[] Ключ массива => <ФАЙЛ>|рекурсивно> Ожидаемое значение
      * ]</code></pre>
      */
-    public function getFilesDataDataProvider(): array
+    public static function getFilesDataDataProvider(): array
     {
         return [
             [
@@ -89,7 +94,7 @@ class FileDatatypeStrategyTest extends AbstractDatatypeStrategyTest
             [
                 ['name' => 'test', 'type' => 'image', 'multiple' => true],
                 ['test' => [
-                    'tmp_name' => [$this->getResourcesDir() . '/nophoto.jpg'],
+                    'tmp_name' => [static::getResourcesDir() . '/nophoto.jpg'],
                     'name' => ['nophoto.jpg'],
                     'type' => ['image/jpeg'],
                 ]],
@@ -98,7 +103,7 @@ class FileDatatypeStrategyTest extends AbstractDatatypeStrategyTest
                 true,
                 [
                     [
-                        'tmp_name' => $this->getResourcesDir() . '/nophoto.jpg',
+                        'tmp_name' => static::getResourcesDir() . '/nophoto.jpg',
                         'name' => 'nophoto.jpg',
                         'type' => 'image/jpeg',
                     ],
@@ -161,7 +166,7 @@ class FileDatatypeStrategyTest extends AbstractDatatypeStrategyTest
                 ['name' => 'test', 'type' => 'image', 'multiple' => true],
                 ['test' => [
                     'tmp_name' => [
-                        $this->getResourcesDir() . '/nophoto.jpg',
+                        static::getResourcesDir() . '/nophoto.jpg',
                     ],
                     'name' => [
                         'nophoto.jpg',
@@ -175,7 +180,7 @@ class FileDatatypeStrategyTest extends AbstractDatatypeStrategyTest
                 true,
                 [
                     [
-                        'tmp_name' => $this->getResourcesDir() . '/nophoto.jpg',
+                        'tmp_name' => static::getResourcesDir() . '/nophoto.jpg',
                         'name' => 'nophoto.jpg',
                         'type' => 'image/jpeg',
                         'meta' => ['attachment' => 0],
@@ -186,10 +191,10 @@ class FileDatatypeStrategyTest extends AbstractDatatypeStrategyTest
                 ['name' => 'test', 'type' => 'image', 'multiple' => true],
                 ['test' => [
                     'tmp_name' => [
-                        $this->getResourcesDir() . '/nophoto.jpg',
-                        $this->getResourcesDir() . '/notexist.jpg',
+                        static::getResourcesDir() . '/nophoto.jpg',
+                        static::getResourcesDir() . '/notexist.jpg',
                         null,
-                        $this->getResourcesDir() . '/favicon.svg',
+                        static::getResourcesDir() . '/favicon.svg',
                     ],
                     'name' => [
                         'nophoto.jpg',
@@ -209,13 +214,13 @@ class FileDatatypeStrategyTest extends AbstractDatatypeStrategyTest
                 true,
                 [
                     [
-                        'tmp_name' => $this->getResourcesDir() . '/nophoto.jpg',
+                        'tmp_name' => static::getResourcesDir() . '/nophoto.jpg',
                         'name' => 'nophoto.jpg',
                         'type' => 'image/jpeg',
                         'meta' => ['attachment' => 0],
                     ],
                     [
-                        'tmp_name' => $this->getResourcesDir() . '/notexist.jpg',
+                        'tmp_name' => static::getResourcesDir() . '/notexist.jpg',
                         'name' => 'notexist.jpg',
                         'type' => 'image/jpeg',
                         'meta' => ['attachment' => 0],
@@ -228,7 +233,7 @@ class FileDatatypeStrategyTest extends AbstractDatatypeStrategyTest
                     ],
 
                     [
-                        'tmp_name' => $this->getResourcesDir() . '/favicon.svg',
+                        'tmp_name' => static::getResourcesDir() . '/favicon.svg',
                         'name' => 'favicon.svg',
                         'type' => 'application/xml+svg',
                         'meta' => ['attachment' => 0],
@@ -530,7 +535,6 @@ class FileDatatypeStrategyTest extends AbstractDatatypeStrategyTest
 
     /**
      * Проверка метода getFilesData()
-     * @dataProvider getFilesDataDataProvider
      * @param array $fieldData Данные поля,
      * @param bool $forceArray Приводить результат к массиву
      * @param array $filesData <pre><code>[
@@ -542,6 +546,7 @@ class FileDatatypeStrategyTest extends AbstractDatatypeStrategyTest
      *     <ФАЙЛ>|array<string[]|int[] Ключ массива => <ФАЙЛ>|рекурсивно>
      * </code></pre> Ожидаемое значение
      */
+    #[DataProvider('getFilesDataDataProvider')]
     public function testGetFilesData(
         array $fieldData,
         array $filesData,
@@ -550,8 +555,8 @@ class FileDatatypeStrategyTest extends AbstractDatatypeStrategyTest
         bool $forceArray,
         array $expected
     ) {
-        $field = new Field(array_merge(['name' => 'test', 'type' => 'file'], $fieldData));
-        $strategy = DatatypeStrategy::spawn('file');
+        $field = new Field(array_merge(['name' => 'test', 'type' => self::DATATYPE], $fieldData));
+        $strategy = DatatypeStrategy::spawn(self::DATATYPE);
         $oldFiles = $_FILES;
         $oldPost = $_POST;
         $_FILES = $filesData;
@@ -576,7 +581,7 @@ class FileDatatypeStrategyTest extends AbstractDatatypeStrategyTest
     public function testGetPostDataWithException()
     {
         $this->expectException(InvalidArgumentException::class);
-        $datatypeStrategy = DatatypeStrategy::spawn('file');
+        $datatypeStrategy = DatatypeStrategy::spawn(self::DATATYPE);
 
         $result = $datatypeStrategy->getFilesData(new stdClass());
     }
@@ -590,29 +595,27 @@ class FileDatatypeStrategyTest extends AbstractDatatypeStrategyTest
      *     bool Ожидаемое значение,
      * ]></code></pre>
      */
-    public function isFileLoadedDataProvider(): array
+    public static function isFileLoadedDataProvider(): array
     {
         return [
-            [$this->getResourcesDir() . '/nophoto.jpg', true, true],
-            [$this->getResourcesDir() . '/nophoto.jpg', false, false],
-            [$this->getResourcesDir() . '/aaa.bbb', true, false],
+            [static::getResourcesDir() . '/nophoto.jpg', true, true],
+            [static::getResourcesDir() . '/nophoto.jpg', false, false],
+            [static::getResourcesDir() . '/aaa.bbb', true, false],
         ];
     }
 
 
     /**
      * Тест метода isFileLoaded
-     * @dataProvider isFileLoadedDataProvider
      * @param string $filename Файл для проверки
      * @param bool $debug Режим отладки
      * @param bool $expected Ожидаемое значение
      */
+    #[DataProvider('isFileLoadedDataProvider')]
     public function testIsFileLoaded($filename, $debug, $expected)
     {
-        $strategy = DatatypeStrategy::spawn('file');
-
+        $strategy = DatatypeStrategy::spawn(self::DATATYPE);
         $result = $strategy->isFileLoaded($filename, $debug);
-
         $this->assertEquals($expected, $result);
     }
 
@@ -624,12 +627,12 @@ class FileDatatypeStrategyTest extends AbstractDatatypeStrategyTest
      *     bool Ожидаемый результат
      * ]></code></pre>
      */
-    public function isFilledDataProvider(): array
+    public static function isFilledDataProvider(): array
     {
         $result = [
             ['', false],
-            [$this->getResourcesDir() . '/nophoto.jpg', true],
-            [$this->getResourcesDir() . '/aaa.jpg', false],
+            [static::getResourcesDir() . '/nophoto.jpg', true],
+            [static::getResourcesDir() . '/aaa.jpg', false],
         ];
         return $result;
     }
@@ -637,106 +640,105 @@ class FileDatatypeStrategyTest extends AbstractDatatypeStrategyTest
 
     /**
      * Проверка метода isFilled()
-     * @dataProvider isFilledDataProvider
      * @param mixed $value Проверяемое значение
      * @param bool $expected Ожидаемое значение
      */
+    #[DataProvider('isFilledDataProvider')]
     public function testIsFilled($value, bool $expected)
     {
-        $strategy = DatatypeStrategy::spawn('file');
-
+        $strategy = DatatypeStrategy::spawn(self::DATATYPE);
         $result = $strategy->isFilled($value, true);
-
         $this->assertEquals($expected, $result);
     }
 
-    public function validateDataProvider(): array
+
+    public static function validateDataProvider(): array
     {
         $result = [
             [
-                ['type' => 'file'],
+                ['type' => self::DATATYPE],
                 '',
                 true,
             ],
             [
-                ['type' => 'file'],
+                ['type' => self::DATATYPE],
                 [],
                 true,
             ],
             [
-                ['type' => 'file'],
+                ['type' => self::DATATYPE],
                 [
-                    'tmp_name' => $this->getResourcesDir() . '/nophoto.jpg',
+                    'tmp_name' => static::getResourcesDir() . '/nophoto.jpg',
                     'name' => 'nophoto.jpg',
                     'type' => 'image/jpeg',
                 ],
                 true
             ],
             [
-                ['type' => 'file', 'accept' => 'image/jpeg,.svg'],
+                ['type' => self::DATATYPE, 'accept' => 'image/jpeg,.svg'],
                 [
-                    'tmp_name' => $this->getResourcesDir() . '/nophoto.jpg',
+                    'tmp_name' => static::getResourcesDir() . '/nophoto.jpg',
                     'name' => 'nophoto.jpg',
                     'type' => 'image/jpeg',
                 ],
                 true
             ],
             [
-                ['type' => 'file', 'accept' => 'image/*,.svg'],
+                ['type' => self::DATATYPE, 'accept' => 'image/*,.svg'],
                 [
-                    'tmp_name' => $this->getResourcesDir() . '/nophoto.jpg',
+                    'tmp_name' => static::getResourcesDir() . '/nophoto.jpg',
                     'name' => 'nophoto.jpg',
                     'type' => 'image/jpeg',
                 ],
                 true
             ],
             [
-                ['type' => 'file', 'accept' => '.svg'],
+                ['type' => self::DATATYPE, 'accept' => '.svg'],
                 [
-                    'tmp_name' => $this->getResourcesDir() . '/nophoto.jpg',
+                    'tmp_name' => static::getResourcesDir() . '/nophoto.jpg',
                     'name' => 'nophoto.jpg',
                     'type' => 'image/jpeg',
                 ],
                 DatatypeFileTypeMismatchException::class
             ],
             [
-                ['type' => 'file', 'accept' => '.jpg,.svg'],
+                ['type' => self::DATATYPE, 'accept' => '.jpg,.svg'],
                 [
-                    'tmp_name' => $this->getResourcesDir() . '/nophoto.jpg',
+                    'tmp_name' => static::getResourcesDir() . '/nophoto.jpg',
                     'name' => 'nophoto.jpg',
                     'type' => 'image/jpeg',
                 ],
                 true
             ],
             [
-                ['type' => 'file'],
+                ['type' => self::DATATYPE],
                 [
-                    'tmp_name' => $this->getResourcesDir() . '/favicon.svg',
+                    'tmp_name' => static::getResourcesDir() . '/favicon.svg',
                     'name' => 'favicon.svg',
                     'type' => 'application/xml+svg',
                 ],
                 true
             ],
             [
-                ['type' => 'file', 'pattern' => 'favicon'],
+                ['type' => self::DATATYPE, 'pattern' => 'favicon'],
                 [
-                    'tmp_name' => $this->getResourcesDir() . '/favicon.svg',
+                    'tmp_name' => static::getResourcesDir() . '/favicon.svg',
                     'name' => 'favicon.svg',
                     'type' => 'application/xml+svg',
                 ],
                 true
             ],
             [
-                ['type' => 'file', 'pattern' => 'image'],
+                ['type' => self::DATATYPE, 'pattern' => 'image'],
                 [
-                    'tmp_name' => $this->getResourcesDir() . '/favicon.svg',
+                    'tmp_name' => static::getResourcesDir() . '/favicon.svg',
                     'name' => 'favicon.svg',
                     'type' => 'application/svg+xml',
                 ],
                 DatatypePatternMismatchException::class
             ],
             [
-                ['type' => 'file'],
+                ['type' => self::DATATYPE],
                 [
                     'tmp_name' => __FILE__,
                     'name' => basename(__FILE__),
@@ -750,6 +752,18 @@ class FileDatatypeStrategyTest extends AbstractDatatypeStrategyTest
 
 
     /**
+     * Проверка метода validate()
+     * @param mixed $value Проверяемое значение
+     * @param mixed $expected Ожидаемое значение
+     */
+    #[DataProvider('validateDataProvider')]
+    public function testValidate(array $fieldData, $value, $expected)
+    {
+        $this->checkValidate($fieldData, $value, $expected);
+    }
+
+
+    /**
      * Провайдер данных для метода testExport
      * @return array <pre><code>array<[
      *     mixed Входное значение,
@@ -757,7 +771,7 @@ class FileDatatypeStrategyTest extends AbstractDatatypeStrategyTest
      *     string? Ожидается исключение класса
      * ]></code></pre>
      */
-    public function exportDataProvider(): array
+    public static function exportDataProvider(): array
     {
         static::installTables();
         return [
@@ -769,14 +783,14 @@ class FileDatatypeStrategyTest extends AbstractDatatypeStrategyTest
 
     /**
      * Проверка метода export()
-     * @dataProvider exportDataProvider
      * @param mixed $inputValue Входное значение
      * @param mixed $expected Ожидаемое значение
      * @param string $expectedException Ожидается исключение класса
      */
+    #[DataProvider('exportDataProvider')]
     public function testExport($inputValue, $expected, $expectedException = null)
     {
-        $strategy = DatatypeStrategy::spawn('file');
+        $strategy = DatatypeStrategy::spawn(self::DATATYPE);
 
         if ($expectedException) {
             $this->expectException($expectedException);
@@ -801,7 +815,7 @@ class FileDatatypeStrategyTest extends AbstractDatatypeStrategyTest
         $attachment->commit();
         $attachmentId = (int)$attachment->id;
 
-        $strategy = DatatypeStrategy::spawn('file');
+        $strategy = DatatypeStrategy::spawn(self::DATATYPE);
 
         $result = $strategy->import($attachmentId);
 
@@ -818,7 +832,7 @@ class FileDatatypeStrategyTest extends AbstractDatatypeStrategyTest
      */
     public function testBatchImportAttachmentsIds()
     {
-        $strategy = DatatypeStrategy::spawn('file');
+        $strategy = DatatypeStrategy::spawn(self::DATATYPE);
 
         $result = $strategy->batchImportAttachmentsIds([1, 2, 'aaa', 3, 2, 1, 'bbb' => 4, 4]);
 
@@ -847,7 +861,7 @@ class FileDatatypeStrategyTest extends AbstractDatatypeStrategyTest
         $attachment3Id = (int)$attachment3->id;
         $ids = [$attachment1Id, $attachment2Id, $attachment3Id];
 
-        $strategy = DatatypeStrategy::spawn('file');
+        $strategy = DatatypeStrategy::spawn(self::DATATYPE);
 
         $result = $strategy->batchImport($ids);
 
@@ -871,7 +885,7 @@ class FileDatatypeStrategyTest extends AbstractDatatypeStrategyTest
      */
     public function testImportWithEmpty()
     {
-        $strategy = DatatypeStrategy::spawn('file');
+        $strategy = DatatypeStrategy::spawn(self::DATATYPE);
 
         $result = $strategy->import('');
 
@@ -884,10 +898,8 @@ class FileDatatypeStrategyTest extends AbstractDatatypeStrategyTest
      */
     public function testIsMedia()
     {
-        $strategy = DatatypeStrategy::spawn('file');
-
+        $strategy = DatatypeStrategy::spawn(self::DATATYPE);
         $result = $strategy->isMedia();
-
         $this->assertTrue($result);
     }
 }

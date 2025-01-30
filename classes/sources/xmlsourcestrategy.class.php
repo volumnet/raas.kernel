@@ -1,6 +1,6 @@
 <?php
 /**
- * Стратегия источника XML
+ * @package RAAS
  */
 declare(strict_types=1);
 
@@ -9,6 +9,9 @@ namespace RAAS;
 use Exception;
 use SimpleXMLElement;
 
+/**
+ * Стратегия источника данных XML
+ */
 class XMLSourceStrategy extends SourceStrategy
 {
     protected static $instance;

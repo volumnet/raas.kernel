@@ -1,6 +1,6 @@
 <?php
 /**
- * Стратегия источника
+ * @package RAAS
  */
 declare(strict_types=1);
 
@@ -8,6 +8,9 @@ namespace RAAS;
 
 use SOME\AbstractStrategy;
 
+/**
+ * Стратегия источника данных
+ */
 abstract class SourceStrategy extends AbstractStrategy
 {
     protected static $registeredStrategies = [];

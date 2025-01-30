@@ -1,10 +1,6 @@
 <?php
 /**
- * Файл приложения RAAS
  * @package RAAS
- * @version 4.1
- * @author Alex V. Surnin <info@volumnet.ru>
- * @copyright 2011, Volume Networks
  */
 declare(strict_types=1);
 
@@ -22,15 +18,13 @@ use SOME\Singleton;
 use SOME\SOME;
 
 /**
- * Класс приложения RAAS
- * @package RAAS
+ * Приложение RAAS
  * @property-read array<Package> $packages массив загруженных пакетов
  * @property Package $activePackage активный пакет
  * @property Module $activeModule активный модуль
  * @property IContext $context активный модуль или пакет
  * @property-read string $configFile путь к файлу системных настроек
- * @property-read string[] $availableDatabases массив названий доступных СУБД в виде
- *                                                  'alias' => 'Название СУБД'
+ * @property-read string[] $availableDatabases массив названий доступных СУБД в виде 'alias' => 'Название СУБД'
  * @property-read bool $debug режим отладки
  * @property User $user активный пользователь системы
  * @property-read DB $SQL подключение к базе данных

@@ -1,6 +1,6 @@
 <?php
 /**
- * Представление подмодуля "Пользователи"
+ * @package RAAS.General
  */
 namespace RAAS\General;
 

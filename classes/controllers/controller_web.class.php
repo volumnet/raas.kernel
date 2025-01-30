@@ -1,6 +1,6 @@
 <?php
 /**
- * Файл web-контроллера модуля RAAS
+ * @package RAAS
  */
 declare(strict_types=1);
 
@@ -10,8 +10,7 @@ use EdSDK\FlmngrServer\FlmngrServer;
 use RAAS\General\Package as GeneralPackage;
 
 /**
- * Класс web-контроллера модуля RAAS
- * @package RAAS
+ * Web-контроллер модуля RAAS
  */
 class Controller_Web extends Abstract_Controller
 {

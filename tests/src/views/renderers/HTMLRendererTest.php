@@ -4,12 +4,15 @@
  */
 namespace RAAS;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use SOME\BaseTest;
 
 /**
  * Класс теста рендерера HTML
- * @covers \RAAS\HTMLRenderer
  */
+#[CoversClass(HTMLRenderer::class)]
 class HTMLRendererTest extends BaseTest
 {
     /**

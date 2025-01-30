@@ -1,6 +1,6 @@
 <?php
 /**
- * Стратегия источника CSV
+ * @package RAAS
  */
 declare(strict_types=1);
 
@@ -8,6 +8,9 @@ namespace RAAS;
 
 use SOME\CSV;
 
+/**
+ * Стратегия источника данных CSV
+ */
 class CSVSourceStrategy extends SourceStrategy
 {
     protected static $instance;

@@ -1,6 +1,6 @@
 <?php
 /**
- * Стратегия источника справочников
+ * @package RAAS
  */
 declare(strict_types=1);
 
@@ -8,6 +8,9 @@ namespace RAAS;
 
 use InvalidArgumentException;
 
+/**
+ * Стратегия источника данных справочников
+ */
 class DictionarySourceStrategy extends SourceStrategy
 {
     protected static $instance;

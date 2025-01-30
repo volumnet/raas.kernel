@@ -1,6 +1,6 @@
 <?php
 /**
- * Файл класса инкрементарной резервной копии файлов
+ * @package RAAS
  */
 namespace RAAS;
 
@@ -8,7 +8,7 @@ use SOME\File;
 use SOME\ZipArchive;
 
 /**
- * Класс инкрементарной резервной копии файлов
+ * Инкрементарная резервная копия файлов
  */
 class FilesIncBackup extends FilesBackup
 {

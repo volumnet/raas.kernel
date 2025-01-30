@@ -1,13 +1,13 @@
 <?php
 /**
- * Файл класса контейнера полей
+ * @package RAAS
  */
 declare(strict_types=1);
 
 namespace RAAS;
 
 /**
- * Класс контейнера полей
+ * Контейнер полей
  * @property callable $check Кастомизированный метод проверки ошибок. Возвращает array массив ошибок формата метода Field::getErrors - см. описание там
  * @property callable $export Кастомизированный метод назначения переменных для сохранения.
  * @property callable $import Кастомизированный метод импорта переменных.

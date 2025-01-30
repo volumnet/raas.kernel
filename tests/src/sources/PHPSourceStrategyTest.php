@@ -4,12 +4,15 @@
  */
 namespace RAAS;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use SOME\BaseTest;
 
 /**
  * Тест класса PHPSourceStrategy
- * @covers \RAAS\PHPSourceStrategy
  */
+#[CoversClass(PHPSourceStrategy::class)]
 class PHPSourceStrategyTest extends BaseTest
 {
     /**

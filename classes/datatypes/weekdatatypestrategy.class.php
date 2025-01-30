@@ -1,11 +1,14 @@
 <?php
 /**
- * Стратегия типа данных "Неделя"
+ * @package RAAS
  */
 declare(strict_types=1);
 
 namespace RAAS;
 
+/**
+ * Стратегия типа данных "неделя"
+ */
 class WeekDatatypeStrategy extends DateTimeDatatypeStrategy
 {
     protected static $instance;

@@ -1,6 +1,6 @@
 <?php
 /**
- * Файл класса команды планировщика
+ * @package RAAS
  */
 namespace RAAS;
 

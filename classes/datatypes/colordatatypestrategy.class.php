@@ -1,11 +1,14 @@
 <?php
 /**
- * Стратегия типа данных "Цвет"
+ * @package RAAS
  */
 declare(strict_types=1);
 
 namespace RAAS;
 
+/**
+ * Стратегия типа данных "цвет"
+ */
 class ColorDatatypeStrategy extends TextDatatypeStrategy
 {
     protected static $instance;

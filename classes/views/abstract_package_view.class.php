@@ -1,6 +1,6 @@
 <?php
 /**
- * Файл абстрактного представления абстрактного пакета RAAS
+ * @package RAAS
  */
 declare(strict_types=1);
 
@@ -10,7 +10,7 @@ use SOME\Namespaces;
 use SOME\Singleton;
 
 /**
- * Класс абстрактного представления абстрактного пакета RAAS
+ * Абстрактное представление абстрактного пакета RAAS
  * @property-read Package $model ссылка на экземпляр пакета
  * @property-read Abstract_View $parent ссылка на экземпляр активного представления ядра
  */

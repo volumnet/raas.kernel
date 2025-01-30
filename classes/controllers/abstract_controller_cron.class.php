@@ -1,17 +1,13 @@
 <?php
 /**
- * Файл Cron-контроллера ядра RAAS
  * @package RAAS
- * @author Alex V. Surnin <info@volumnet.ru>
- * @copyright Volume Networks
  */
 namespace RAAS;
 
 use Exception;
 
 /**
- * Класс Cron-контроллера ядра RAAS
- * @package RAAS
+ * Cron-контроллер ядра RAAS
  */
 abstract class Abstract_Controller_Cron extends Abstract_Controller
 {

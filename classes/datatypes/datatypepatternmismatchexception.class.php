@@ -1,13 +1,13 @@
 <?php
 /**
- * Исключение несоответствия значения шаблону ввода
+ * @package RAAS
  */
 declare(strict_types=1);
 
 namespace RAAS;
 
 /**
- * Класс исключения несоответствия значения шаблону ввода
+ * Исключение несоответствия значения шаблону ввода
  */
 class DatatypePatternMismatchException extends DatatypeInvalidValueException
 {

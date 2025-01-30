@@ -4,135 +4,84 @@
  */
 namespace RAAS;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
+
 /**
  * Тест для класса WeekDatatypeStrategy
- * @covers \RAAS\WeekDatatypeStrategy
  */
+#[CoversClass(WeekDatatypeStrategy::class)]
 class WeekDatatypeStrategyTest extends AbstractDatatypeStrategyTest
 {
-    /**
-     * Провайдер данных для метода testIsFilled
-     * @return array <pre><code>array<[
-     *     mixed Проверяемое значение
-     *     bool Ожидаемый результат
-     * ]></code></pre>
-     */
-    public function isFilledDataProvider(): array
-    {
-        $result = [
-            ['', false],
-            ['2023-W11', true],
-            ['2023-12-06', true],
-            ['2023-12-06 11:08:01', true],
-            ['2023-12-06T11:08:01', true],
-            ['0000-W00', false],
-        ];
-        return $result;
-    }
-
+    const DATATYPE = 'week';
 
     /**
      * Проверка метода isFilled()
-     * @dataProvider isFilledDataProvider
      * @param mixed $value Проверяемое значение
      * @param bool $expected Ожидаемое значение
      */
+    #[TestWith(['', false])]
+    #[TestWith(['2023-W11', true])]
+    #[TestWith(['2023-12-06', true])]
+    #[TestWith(['2023-12-06 11:08:01', true])]
+    #[TestWith(['2023-12-06T11:08:01', true])]
+    #[TestWith(['0000-W00', false])]
     public function testIsFilled($value, bool $expected)
     {
-        $strategy = DatatypeStrategy::spawn('week');
-
-        $result = $strategy->isFilled($value);
-
-        $this->assertEquals($expected, $result);
-    }
-
-
-    public function validateDataProvider(): array
-    {
-        $result = [
-            [['type' => 'week'], '', true],
-            [['type' => 'week'], '2023-W01', true],
-            [['type' => 'week'], '2023-11-12', true],
-            [['type' => 'week'], '2023-11-12 12:01:02', true],
-            [['type' => 'week'], '2023-11-12T12:01:02', true],
-            [['type' => 'week'], '2023-01', true],
-            [['type' => 'week'], '2023-W00', DatatypeInvalidValueException::class],
-            [['type' => 'week'], '2023-W99', DatatypeInvalidValueException::class],
-            [['type' => 'week', 'pattern' => '2022'], '2023-W11', DatatypePatternMismatchException::class],
-        ];
-        return $result;
+        $this->checkIsFilled($value, $expected);
     }
 
 
     /**
-     * Провайдер данных для метода testExport
-     * @return array <pre><code>array<[
-     *     mixed Проверяемое значение
-     *     string Ожидаемый результат
-     * ]></code></pre>
+     * Проверка метода validate()
+     * @param mixed $value Проверяемое значение
+     * @param mixed $expected Ожидаемое значение
      */
-    public function exportDataProvider(): array
+    #[TestWith([['type' => self::DATATYPE], '', true])]
+    #[TestWith([['type' => self::DATATYPE], '2023-W01', true])]
+    #[TestWith([['type' => self::DATATYPE], '2023-11-12', true])]
+    #[TestWith([['type' => self::DATATYPE], '2023-11-12 12:01:02', true])]
+    #[TestWith([['type' => self::DATATYPE], '2023-11-12T12:01:02', true])]
+    #[TestWith([['type' => self::DATATYPE], '2023-01', true])]
+    #[TestWith([['type' => self::DATATYPE], '2023-W00', DatatypeInvalidValueException::class])]
+    #[TestWith([['type' => self::DATATYPE], '2023-W99', DatatypeInvalidValueException::class])]
+    #[TestWith([['type' => self::DATATYPE, 'pattern' => '2022'], '2023-W11', DatatypePatternMismatchException::class])]
+    public function testValidate(array $fieldData, $value, $expected)
     {
-        $result = [
-            ['2023-W01', '2023-01-02'], // Хз почему так, но вроде так
-            ['0000-W00', '0000-00-00'],
-            ['2023-11-12', '2023-11-12'],
-            ['2023-11-12 12:01:02', '2023-11-12'],
-            ['2023-11-12T12:01:02', '2023-11-12'],
-            ['aaa', '0000-00-00'],
-        ];
-        return $result;
+        $this->checkValidate($fieldData, $value, $expected);
     }
 
 
     /**
      * Проверка метода export()
-     * @dataProvider exportDataProvider
      * @param mixed $value Проверяемое значение
      * @param string $expected Ожидаемое значение
      */
+    #[TestWith(['2023-W01', '2023-01-02'])] // Хз почему так, но вроде так
+    #[TestWith(['0000-W00', '0000-00-00'])]
+    #[TestWith(['2023-11-12', '2023-11-12'])]
+    #[TestWith(['2023-11-12 12:01:02', '2023-11-12'])]
+    #[TestWith(['2023-11-12T12:01:02', '2023-11-12'])]
+    #[TestWith(['aaa', '0000-00-00'])]
     public function testExport(string $value, string $expected)
     {
-        $strategy = DatatypeStrategy::spawn('week');
-
-        $result = $strategy->export($value);
-
-        $this->assertEquals($expected, $result);
-    }
-
-
-    /**
-     * Провайдер данных для метода testImport
-     * @return array <pre><code>array<[
-     *     mixed Проверяемое значение
-     *     string Ожидаемый результат
-     * ]></code></pre>
-     */
-    public function importDataProvider(): array
-    {
-        $result = [
-            ['2023-01-02', '2023-W01'], // Хз почему так, но вроде так
-            ['0000-00-00', ''],
-            ['2023-01-02', '2023-W01'],
-            ['2023-01-02 12:01:02', '2023-W01'],
-            ['2023-01-02T12:01:02', '2023-W01'],
-        ];
-        return $result;
+        $this->checkExport($value, $expected);
     }
 
 
     /**
      * Проверка метода import()
-     * @dataProvider importDataProvider
      * @param mixed $value Проверяемое значение
      * @param string $expected Ожидаемое значение
      */
+    #[TestWith(['2023-01-02', '2023-W01'])] // Хз почему так, но вроде так
+    #[TestWith(['0000-00-00', ''])]
+    #[TestWith(['2023-01-02', '2023-W01'])]
+    #[TestWith(['2023-01-02 12:01:02', '2023-W01'])]
+    #[TestWith(['2023-01-02T12:01:02', '2023-W01'])]
     public function testImport(string $value, string $expected)
     {
-        $strategy = DatatypeStrategy::spawn('week');
-
-        $result = $strategy->import($value);
-
-        $this->assertEquals($expected, $result);
+        $this->checkImport($value, $expected);
     }
 }

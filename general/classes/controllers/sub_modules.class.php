@@ -1,4 +1,7 @@
 <?php
+/**
+ * @package RAAS.General
+ */
 namespace RAAS\General;
 
 use SOME\HTTP;

@@ -1,16 +1,11 @@
 <?php
 /**
- * Файл класса колонки таблицы
  * @package RAAS
- * @version 4.2
- * @author Alex V. Surnin <info@volumnet.ru>
- * @copyright 2013, Volume Networks
  */       
 namespace RAAS;
 
 /**
- * Класс колонки таблицы
- * @package RAAS
+ * Колонка таблицы
  * @property-read Table $Table Рабочая таблица
  * @property Table $Parent Рабочая таблица
  * @property int $sortable Сортируемое поле

@@ -1,6 +1,6 @@
 <?php
 /**
- * Файл таблицы резервных копий
+ * @package RAAS.General
  */
 namespace RAAS\General;
 

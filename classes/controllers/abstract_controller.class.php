@@ -1,6 +1,6 @@
 <?php
 /**
- * Файл абстрактного контроллера ядра RAAS
+ * @package RAAS
  */
 declare(strict_types=1);
 
@@ -9,8 +9,7 @@ namespace RAAS;
 use SOME\Singleton;
 
 /**
- * Класс абстрактного контроллера ядра RAAS
- * @package RAAS
+ * Абстрактный контроллер ядра RAAS
  * @property-read Application $model ссылка на экземпляр приложения
  * @property-read Abstract_View $view ссылка на экземпляр текущего
  *                                    представления ядра
