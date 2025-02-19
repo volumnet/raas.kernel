@@ -127,23 +127,6 @@ class Package extends \RAAS\Package
         return (bool)$sqlResult;
     }
 
-
-    /**
-     * Генерирует в stdout бэкап SQL-базы в виде дампа
-     */
-    public function backupSQL()
-    {
-        $tmpname = tempnam(sys_get_temp_dir(), '');
-        $fp = fopen($tmpname, 'w+');
-        DBBackup::writeSQLDump($fp);
-        fclose($fp);
-        header('Content-Type: text/plain;encoding=UTF-8');
-        header('Content-Disposition: attachment; filename="' . date('Y-m-d H-i') . ' ' . $this->dbname . '.sql"');
-        readfile($tmpname);
-        unlink($tmpname);
-        exit;
-    }
-
     /**
      * Генерирует в stdout бэкап файлов
      */

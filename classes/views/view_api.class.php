@@ -41,7 +41,7 @@ class View_Api extends View_Web
      * Вид вывода (JSON или XML согласно одноименным константам класса)
      * @var int
      */
-    private $theme = self::THEME_XML;
+    private $theme = self::THEME_JSON;
     
     /**
      * Экземпляр класса
@@ -88,7 +88,7 @@ class View_Api extends View_Web
     /**
      * Конструктор класса
      */
-    protected function init($theme = self::THEME_XML)
+    protected function init($theme = self::THEME_JSON)
     {
         $this->tree = new ArrayObject();
         parent::init();

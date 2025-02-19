@@ -63,7 +63,17 @@ class Sub_Backup extends Abstract_Sub_Controller
                 while (ob_get_level()) {
                     ob_end_clean();
                 }
-                $this->model->backupSQL();
+                $tmpname = tempnam(sys_get_temp_dir(), '');
+                $gzip = (bool)($_GET['gzip'] ?? null);
+                $filename = date('Y-m-d H-i') . ' ' . Application::i()->dbname . '.sql';
+                if ($gzip) {
+                    $filename .= '.gz';
+                }
+                DBBackup::saveSQLDump($tmpname, $gzip);
+                header('Content-Type: text/plain;encoding=UTF-8');
+                header('Content-Disposition: attachment; filename="' . $filename . '"');
+                readfile($tmpname);
+                unlink($tmpname);
                 exit;
                 break;
             case 'files':

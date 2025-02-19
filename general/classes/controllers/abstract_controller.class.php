@@ -52,6 +52,8 @@ abstract class Abstract_Controller extends \RAAS\Abstract_Package_Controller
             parent::execute();
         } elseif (($this->sub == 'user_log') && $this->model->user->root) {
             Sub_UserLog::i()->run();
+        } elseif (($this->sub == 'phperrors') && $this->model->user->root) {
+            Sub_PHPErrors::i()->run();
         } else {
             $this->main();
         }

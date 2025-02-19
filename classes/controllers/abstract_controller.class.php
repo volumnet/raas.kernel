@@ -505,6 +505,12 @@ abstract class Abstract_Controller extends Singleton implements IAbstract_Contex
                 'caption' => $this->view->_('PHP_COMMAND'),
                 'placeholder' => 'php',
             ],
+            [
+                'type' => 'text',
+                'name' => 'mysqldump_command',
+                'caption' => $this->view->_('MYSQLDUMP_COMMAND'),
+                'placeholder' => 'mysqldump',
+            ],
         ];
     }
 

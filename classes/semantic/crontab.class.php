@@ -222,6 +222,7 @@ class Crontab extends SOME
      */
     public function processCommand(Abstract_Controller_Cron $controller)
     {
+        $result = null;
         if ($classname = $this->command_classname) {
             $command = new $classname($controller);
             $result = call_user_func_array(
@@ -248,7 +249,7 @@ class Crontab extends SOME
                 if ($logs) {
                     $log = $logs[0];
                     if ($log->file->id && $log->file->file) {
-                        file_put_contents($log->file->file, "\n" . $result, FILE_APPEND);
+                        file_put_contents($log->file->file, "\n", FILE_APPEND);
                     }
                 }
             }

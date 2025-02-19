@@ -321,7 +321,7 @@ class EditCrontabForm extends Form
                 'export' => function ($field) use ($commandData) {
                     $vals = array_map(function ($x) {
                         return (trim($x) !== '') ? trim($x) : null;
-                    }, (array)$_POST[$field->name]);
+                    }, (array)($_POST[$field->name] ?? []));
                     $this->postArgs = array_merge($this->postArgs, $vals);
                 }
             ];
@@ -354,7 +354,7 @@ class EditCrontabForm extends Form
             !in_array($field->name, ['minutes', 'hours'])
         ) {
             $field->Form->Item->{$field->name} = $this->compactValues(
-                (array)$_POST[$field->name],
+                (array)($_POST[$field->name] ?? []),
                 $field->name
             );
         }

@@ -68,6 +68,9 @@
     <testsuite name="Field">
       <file>src/forms-n-tables/FieldTest.php</file>
     </testsuite>
+    <testsuite name="PHPErrorLogParser">
+      <file>src/PHPErrorLogParserTest.php</file>
+    </testsuite>
     <testsuite name="CustomField">
       <file>src/semantic/CustomFieldTest.php</file>
     </testsuite>

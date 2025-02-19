@@ -34,9 +34,7 @@ class DBBackup extends Backup
     public function commit()
     {
         if ($this->new) {
-            $fp = gzopen($this->filepath, 'w');
-            static::writeSQLDump($fp);
-            fclose($fp);
+            static::saveSQLDump($this->filepath, true);
         }
         parent::commit();
     }
@@ -46,6 +44,38 @@ class DBBackup extends Backup
     {
         if (is_file($this->filepath)) {
             static::restoreSQLDump($this->filepath);
+        }
+    }
+
+
+    /**
+     * Сохраняет SQL-дамп текущей базы данных в файл
+     * @param string $filename Имя файла,
+     * @param bool $gzip Сжимать файл
+     */
+    public static function saveSQLDump(string $filename, bool $gzip = false)
+    {
+        // Попробуем через консоль
+        Application::i()->mysqldump($filename, $gzip);
+        if (is_file($filename)) {
+            if (filesize($filename) > 100) {
+                return; // Получилось
+            } else {
+                unlink($filename);
+            }
+        }
+
+        // Fallback на обычный дамп
+        if ($gzip) {
+            $fp = gzopen($filename, 'w');
+        } else {
+            $fp = fopen($filename, 'w');
+        }
+        DBBackup::writeSQLDump($fp);
+        if ($gzip) {
+            gzclose($fp);
+        } else {
+            fclose($fp);
         }
     }
 

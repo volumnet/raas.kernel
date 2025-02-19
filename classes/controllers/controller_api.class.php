@@ -22,15 +22,15 @@ final class Controller_Api extends Abstract_Controller
     {
         if (isset($_GET['v'])) {
             switch ($_GET['v']) {
-                case 'json':
-                    $this->view = View_Api::i(View_Api::THEME_JSON);
+                case 'xml':
+                    $this->view = View_Api::i(View_Api::THEME_XML);
                     break;
                 default:
-                    $this->view = View_Api::i(View_Api::THEME_XML);
+                    $this->view = View_Api::i(View_Api::THEME_JSON);
                     break;
             }
         } else {
-            $this->view = View_Api::i(View_Api::THEME_XML);
+            $this->view = View_Api::i(View_Api::THEME_JSON);
         }
         parent::init();
     }

@@ -983,6 +983,30 @@ final class Application extends Singleton implements IContext
 
 
     /**
+     * Пытается сохранить дамп текущей базы через mysqldump
+     *
+     * Именно здесь, поскольку registryGet('mysqldump_command') относится к приложению, а пароль не разглашается,
+     * кроме как в DB (но там registryGet('mysqldump_command') не имеет смысла)
+     * @param string $filename Имя файла
+     * @param bool $gzip Сжимать файл
+     */
+    public function mysqldump(string $filename, bool $gzip = false)
+    {
+        $mysqldump = $this->registryGet('mysqldump_command') ?: 'mysqldump';
+        $cmd = $mysqldump . ' -u ' . $this->config['dbuser'];
+        if ($this->config['dbpass'] ?? '') {
+            $cmd .= ' -p' . $this->config['dbpass'];
+        }
+        $cmd .= ' --default-character-set=utf8 ' . $this->config['dbname'] ;
+        if ($gzip) {
+            $cmd .= ' | gzip ';
+        }
+        $cmd .= ' > "' . $filename . '"';
+        exec($cmd);
+    }
+
+
+    /**
      * Регистрирует стратегии типов данных
      */
     public function registerDatatypes()
