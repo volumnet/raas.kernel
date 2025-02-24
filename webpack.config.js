@@ -4,10 +4,9 @@ const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const RemoveEmptyScriptsPlugin = require("webpack-remove-empty-scripts");
 const { VueLoaderPlugin } = require('vue-loader')
 const webpack = require('webpack');
-const glob = require('glob');
 const path = require('path');
-const { styles } = require('@ckeditor/ckeditor5-dev-utils');
-const { CKEditorTranslationsPlugin } = require('@ckeditor/ckeditor5-dev-translations');
+// const { styles } = require('@ckeditor/ckeditor5-dev-utils');
+// const { CKEditorTranslationsPlugin } = require('@ckeditor/ckeditor5-dev-translations');
 
 const isProduction = process.argv[process.argv.indexOf('--mode') + 1] === 'production';
 
@@ -60,32 +59,32 @@ const config = {
                 test: /ckeditor5-[^/\\]+[/\\]theme[/\\]icons[/\\][^/\\]+\.svg$/,
                 use: [ 'raw-loader' ]
             },
-            {
-                test: /ckeditor5-[^/\\]+[/\\]theme[/\\].+\.css$/,
-                use: [
-                    {
-                        loader: 'style-loader',
-                        options: {
-                            injectType: 'singletonStyleTag',
-                            attributes: {
-                                'data-cke': true
-                            }
-                        }
-                    },
-                    'css-loader',
-                    {
-                        loader: 'postcss-loader',
-                        options: {
-                            postcssOptions: styles.getPostCssConfig( {
-                                themeImporter: {
-                                    themePath: require.resolve( '@ckeditor/ckeditor5-theme-lark' )
-                                },
-                                minify: true
-                            } )
-                        }
-                    }
-                ]
-            },
+            // {
+            //     test: /ckeditor5-[^/\\]+[/\\]theme[/\\].+\.css$/,
+            //     use: [
+            //         {
+            //             loader: 'style-loader',
+            //             options: {
+            //                 injectType: 'singletonStyleTag',
+            //                 attributes: {
+            //                     'data-cke': true
+            //                 }
+            //             }
+            //         },
+            //         'css-loader',
+            //         {
+            //             loader: 'postcss-loader',
+            //             options: {
+            //                 postcssOptions: styles.getPostCssConfig( {
+            //                     themeImporter: {
+            //                         themePath: require.resolve( '@ckeditor/ckeditor5-theme-lark' )
+            //                     },
+            //                     minify: true
+            //                 } )
+            //             }
+            //         }
+            //     ]
+            // },
             {
                 test: /\.js$/,
                 use: 'babel-loader',
@@ -181,11 +180,11 @@ const config = {
         }),
         new RemoveEmptyScriptsPlugin(),
         new MiniCssExtractPlugin({ filename: './[name].css' }),
-        new CKEditorTranslationsPlugin( {
-            language: 'en',
-            additionalLanguages: ['ru'],
-            buildAllTranslationsToSeparateFiles: true,
-        } ),
+        // new CKEditorTranslationsPlugin( {
+        //     language: 'en',
+        //     additionalLanguages: ['ru'],
+        //     buildAllTranslationsToSeparateFiles: true,
+        // } ),
     ]
 };
 

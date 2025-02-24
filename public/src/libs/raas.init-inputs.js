@@ -23,7 +23,7 @@ export default function() {
     });
     
     $('input[data-hint], textarea[data-hint], select[data-hint]', thisObj).each(function() {
-        var text = '<a class="btn" href="#" rel="popover" data-content="' + $(this).attr('data-hint') + '"><i class="icon-question-sign"></i></a>';
+        var text = '<a class="btn" href="#" rel="popover" data-content="' + $(this).attr('data-hint') + '"><i class="fa fa-circle-question"></i></a>';
         if (!$(this).closest('.control-group').find('a[rel="popover"]').length) {
             $(this).closest('.control-group').find('.controls').append(text);
         }

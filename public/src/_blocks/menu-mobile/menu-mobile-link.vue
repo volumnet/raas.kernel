@@ -74,11 +74,7 @@ export default {
             default: 0,
         },
     },
-    methods: {
-      alert() {
-        alert('aaa')
-      }
-    },
+    emits: ['open'],
     computed: {
         /**
          * Дополнительные атрибуты

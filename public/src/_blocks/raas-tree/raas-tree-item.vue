@@ -66,6 +66,7 @@ export default {
             default: false,
         },
     },
+    emits: ['fold'],
     data() {
         return {
             unfolded: this.active, // Пункт развернут

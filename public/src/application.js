@@ -12,9 +12,6 @@ import RAAS_repo from './libs/raas.repo.js';
 import RAASInitInputs from './libs/raas.init-inputs.js';
 import RAAS_queryString from './libs/raas.query-string.js';
 
-// import { Ckeditor } from '@ckeditor/ckeditor5-vue';
-
-
 window.queryString = queryString;
 
 // Vue.use(YmapPlugin, window.ymapSettings);
@@ -35,7 +32,6 @@ jQuery(function ($) {
 
 let app, vueRoot;
 vueRoot = app = Vue.createApp(App);
-// vueRoot.use(Ckeditor);
 
 window.registeredRAASComponents = {};
 Object.keys(window.raasComponents).forEach((componentURN) => {

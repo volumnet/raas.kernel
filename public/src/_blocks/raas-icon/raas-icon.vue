@@ -23,6 +23,9 @@ export default {
                 case 'off':
                     return 'power-off';
                     break;
+                case 'ok':
+                    return 'check';
+                    break;
                 default:
                     return this.icon;
                     break;

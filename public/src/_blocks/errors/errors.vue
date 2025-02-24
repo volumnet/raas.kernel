@@ -71,5 +71,6 @@ export default {
             },
         },
     },
+    emits: ['close'],
 };
 </script>

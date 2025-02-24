@@ -42,32 +42,30 @@
           :foldable="!!option.children?.length" 
           :active="!!selfOrChildrenChecked[option.value.toString()]"
         >
-          <template>
-            <!-- 2024-05-28, AVS: приводим к string, чтобы не было путаницы при различных типах -->
-            <label v-if="type == 'checkbox'" @contextmenu.prevent.stop="$emit('update:modelValue', { value: option.value })">
-              <raas-field-checkbox 
-                @update:model-value="$emit('propagate', { option, checked: !!$event })" 
-                ref="field"
-                :type="type" 
-                :required="!!$attrs.required && !arrayValue.length" 
-                :name="/\[/.test(name) ? name : (name + '[]')" 
-                :model-value="checkedValues[option.value.toString()] || ''" 
-                :defval="option.value"
-              ></raas-field-checkbox>
-              {{ option.caption }}
-            </label>
-            <label v-else-if="type == 'radio'">
-              <raas-field-radio 
-                @update:model-value="$emit('update:modelValue', $event)" 
-                :type="type" 
-                :name="name" 
-                :model-value="modelValue" 
-                :defval="option.value" 
-                :required="!!$attrs.required && !modelValue"
-              ></raas-field-radio>
-              {{ option.caption }}
-            </label>
-          </template>
+          <!-- 2024-05-28, AVS: приводим к string, чтобы не было путаницы при различных типах -->
+          <label v-if="type == 'checkbox'" @contextmenu.prevent.stop="$emit('update:modelValue', { value: option.value })">
+            <raas-field-checkbox 
+              @update:model-value="$emit('propagate', { option, checked: !!$event })" 
+              ref="field"
+              :type="type" 
+              :required="!!$attrs.required && !arrayValue.length" 
+              :name="/\[/.test(name) ? name : (name + '[]')" 
+              :model-value="checkedValues[option.value.toString()] || ''" 
+              :defval="option.value"
+            ></raas-field-checkbox>
+            {{ option.caption }}
+          </label>
+          <label v-else-if="type == 'radio'">
+            <raas-field-radio 
+              @update:model-value="$emit('update:modelValue', $event)" 
+              :type="type" 
+              :name="name" 
+              :model-value="modelValue" 
+              :defval="option.value" 
+              :required="!!$attrs.required && !modelValue"
+            ></raas-field-radio>
+            {{ option.caption }}
+          </label>
           <checkbox-tree 
             v-if="option.children && option.children.length" 
             @update:model-value="$emit('update:modelValue', $event)" 
@@ -100,6 +98,7 @@ export default {
             default: false,
         },
     },
+    emits: ['propagate'],
     methods: {
         /**
          * Получает список для опций, отмечена ли конкретная опция или любая из ее дочерних

@@ -26,41 +26,75 @@
 </template>
 
 <script>
-import { ClassicEditor } from '@ckeditor/ckeditor5-editor-classic';
+// import { ClassicEditor } from '@ckeditor/ckeditor5-editor-classic';
 
-import { Essentials } from '@ckeditor/ckeditor5-essentials';
-import { Paragraph } from '@ckeditor/ckeditor5-paragraph';
-import { Bold, Italic, Underline, Strikethrough, Subscript, Superscript, } from '@ckeditor/ckeditor5-basic-styles';
-import { SourceEditing } from '@ckeditor/ckeditor5-source-editing';
-import { FindAndReplace } from '@ckeditor/ckeditor5-find-and-replace';
-import { SelectAll } from '@ckeditor/ckeditor5-select-all';
-import { Image, ImageCaption, ImageResize, ImageStyle, ImageToolbar, ImageUpload, ImageInsert } from '@ckeditor/ckeditor5-image';
-import { Link, LinkImage } from '@ckeditor/ckeditor5-link';
-import { Table, TableCellProperties, TableProperties, TableToolbar } from '@ckeditor/ckeditor5-table';
-import { HorizontalLine } from '@ckeditor/ckeditor5-horizontal-line';
-import { SpecialCharacters, SpecialCharactersEssentials } from '@ckeditor/ckeditor5-special-characters';
-import { PageBreak } from '@ckeditor/ckeditor5-page-break';
-import { HtmlComment } from '@ckeditor/ckeditor5-html-support';
-import { HtmlEmbed } from '@ckeditor/ckeditor5-html-embed';
-import { MediaEmbed } from '@ckeditor/ckeditor5-media-embed';
+// import { Essentials } from '@ckeditor/ckeditor5-essentials';
+// import { Paragraph } from '@ckeditor/ckeditor5-paragraph';
+// import { Bold, Italic, Underline, Strikethrough, Subscript, Superscript, } from '@ckeditor/ckeditor5-basic-styles';
+// import { SourceEditing } from '@ckeditor/ckeditor5-source-editing';
+// import { FindAndReplace } from '@ckeditor/ckeditor5-find-and-replace';
+// import { SelectAll } from '@ckeditor/ckeditor5-select-all';
+// import { Image, ImageCaption, ImageResize, ImageStyle, ImageToolbar, ImageUpload, ImageInsert } from '@ckeditor/ckeditor5-image';
+// import { Link, LinkImage } from '@ckeditor/ckeditor5-link';
+// import { Table, TableCellProperties, TableProperties, TableToolbar } from '@ckeditor/ckeditor5-table';
+// import { HorizontalLine } from '@ckeditor/ckeditor5-horizontal-line';
+// import { SpecialCharacters, SpecialCharactersEssentials } from '@ckeditor/ckeditor5-special-characters';
+// import { PageBreak } from '@ckeditor/ckeditor5-page-break';
+// import { HtmlComment } from '@ckeditor/ckeditor5-html-support';
+// import { HtmlEmbed } from '@ckeditor/ckeditor5-html-embed';
+// import { MediaEmbed } from '@ckeditor/ckeditor5-media-embed';
+// import { List } from '@ckeditor/ckeditor5-list';
+// import { Indent, IndentBlock } from '@ckeditor/ckeditor5-indent';
+// import { BlockQuote } from '@ckeditor/ckeditor5-block-quote';
+// import { Alignment } from '@ckeditor/ckeditor5-alignment';
+// import { Font } from '@ckeditor/ckeditor5-font';
+// import { Heading } from '@ckeditor/ckeditor5-heading';
+// import { GeneralHtmlSupport } from '@ckeditor/ckeditor5-html-support';
+// import { ShowBlocks } from '@ckeditor/ckeditor5-show-blocks';
+// import { Clipboard } from '@ckeditor/ckeditor5-clipboard';
+
+import {
+    ClassicEditor,
+    Essentials,
+    Paragraph,
+    Bold, Italic, Underline, Strikethrough, Subscript, Superscript,
+    SourceEditing,
+    FindAndReplace,
+    SelectAll,
+    Image, ImageCaption, ImageResize, ImageStyle, ImageToolbar, ImageUpload, ImageInsert,
+    Link, LinkImage,
+    Table, TableCellProperties, TableProperties, TableToolbar,
+    HorizontalLine,
+    SpecialCharacters, SpecialCharactersEssentials,
+    PageBreak,
+    HtmlComment,
+    HtmlEmbed,
+    MediaEmbed,
+    List,
+    Indent, IndentBlock,
+    BlockQuote,
+    Alignment,
+    Font,
+    Heading,
+    GeneralHtmlSupport,
+    ShowBlocks,
+    Clipboard,
+} from 'ckeditor5';
+
 import { RemoveFormat } from 'app/libs/ckeditor5-remove-format';
-import { List } from '@ckeditor/ckeditor5-list';
-import { Indent, IndentBlock } from '@ckeditor/ckeditor5-indent';
-import { BlockQuote } from '@ckeditor/ckeditor5-block-quote';
-import { Alignment } from '@ckeditor/ckeditor5-alignment';
-import { Font } from '@ckeditor/ckeditor5-font';
-import { Heading } from '@ckeditor/ckeditor5-heading';
-import { GeneralHtmlSupport } from '@ckeditor/ckeditor5-html-support';
-import { ShowBlocks } from '@ckeditor/ckeditor5-show-blocks';
-import { Clipboard } from '@ckeditor/ckeditor5-clipboard';
 import Flmngr from "app/libs/flmngr-ckeditor5/src/flmngr";
 import { html as htmlBeautifier } from 'js-beautify';
+
+import { Ckeditor } from '@ckeditor/ckeditor5-vue';
 
 import RAASFieldHTMLArea from 'cms/application/fields/raas-field-htmlarea.vue.js';
 
 
 export default {
     mixins: [RAASFieldHTMLArea],
+    components: {
+        'ckeditor': Ckeditor,
+    },
     props: {
         name: {
             type: String,
@@ -103,6 +137,7 @@ export default {
         },
         ckEditorConfig() {
             return Object.assign({
+                licenseKey: 'GPL',
                 plugins: [ 
                     SourceEditing, 
                     Essentials, 
@@ -151,7 +186,7 @@ export default {
                     GeneralHtmlSupport,
                     ShowBlocks,
                     Clipboard,
-                    Flmngr,
+                    // Flmngr,
                 ],
             }, (window.ckEditor5Config || {}));
         },

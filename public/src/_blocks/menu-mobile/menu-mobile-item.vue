@@ -65,6 +65,7 @@ export default {
             default: 0,
         },
     },
+    emits: ['close'],
     data() {
         return {
             realItem: JSON.parse(JSON.stringify(this.item)), // Реальный пункт (чтобы можно было менять)

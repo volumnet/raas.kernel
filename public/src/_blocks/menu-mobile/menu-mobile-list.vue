@@ -147,6 +147,7 @@ export default {
             default: false,
         }
     },
+    emits: ['back', 'close'],
     computed: {
         /**
          * CSS-класс списка
