@@ -146,14 +146,14 @@ table {
 .table-striped {
     > tbody {
         > tr:nth-child(odd) {
-            background-color: $gray-100;
+            background-color: var(--gray-f);
         }
     }
 }
 .table-hover {
     > tbody {
         > tr:hover {
-            background-color: $gray-100;
+            background-color: var(--gray-f);
         }
     }
 }

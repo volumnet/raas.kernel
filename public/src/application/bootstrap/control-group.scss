@@ -1,7 +1,7 @@
 .control-group.warning .control-label,
 .control-group.warning .help-block,
 .control-group.warning .help-inline {
-  color: $warning;
+  color: var(--warning);
 }
 
 .control-group.warning .checkbox,
@@ -9,13 +9,13 @@
 .control-group.warning input,
 .control-group.warning select,
 .control-group.warning textarea {
-  color: $warning;
+  color: var(--warning);
 }
 
 .control-group.warning input,
 .control-group.warning select,
 .control-group.warning textarea {
-  border-color: $warning;
+  border-color: var(--warning);
           box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
 }
 
@@ -28,15 +28,15 @@
 
 .control-group.warning .input-prepend .add-on,
 .control-group.warning .input-append .add-on {
-  color: $warning;
+  color: var(--warning);
   background-color: #fcf8e3;
-  border-color: $warning;
+  border-color: var(--warning);
 }
 
 .control-group.error .control-label,
 .control-group.error .help-block,
 .control-group.error .help-inline {
-  color: $danger;
+  color: var(--danger);
 }
 
 .control-group.error .checkbox,
@@ -44,13 +44,13 @@
 .control-group.error input,
 .control-group.error select,
 .control-group.error textarea {
-  color: $danger;
+  color: var(--danger);
 }
 
 .control-group.error input,
 .control-group.error select,
 .control-group.error textarea {
-  border-color: $danger;
+  border-color: var(--danger);
           box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
 }
 
@@ -63,15 +63,15 @@
 
 .control-group.error .input-prepend .add-on,
 .control-group.error .input-append .add-on {
-  color: $danger;
+  color: var(--danger);
   background-color: #f2dede;
-  border-color: $danger;
+  border-color: var(--danger);
 }
 
 .control-group.success .control-label,
 .control-group.success .help-block,
 .control-group.success .help-inline {
-  color: $success;
+  color: var(--success);
 }
 
 .control-group.success .checkbox,
@@ -79,13 +79,13 @@
 .control-group.success input,
 .control-group.success select,
 .control-group.success textarea {
-  color: $success;
+  color: var(--success);
 }
 
 .control-group.success input,
 .control-group.success select,
 .control-group.success textarea {
-  border-color: $success;
+  border-color: var(--success);
           box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
 }
 
@@ -98,15 +98,15 @@
 
 .control-group.success .input-prepend .add-on,
 .control-group.success .input-append .add-on {
-  color: $success;
+  color: var(--success);
   background-color: #dff0d8;
-  border-color: $success;
+  border-color: var(--success);
 }
 
 .control-group.info .control-label,
 .control-group.info .help-block,
 .control-group.info .help-inline {
-  color: $info;
+  color: var(--info);
 }
 
 .control-group.info .checkbox,
@@ -114,13 +114,13 @@
 .control-group.info input,
 .control-group.info select,
 .control-group.info textarea {
-  color: $info;
+  color: var(--info);
 }
 
 .control-group.info input,
 .control-group.info select,
 .control-group.info textarea {
-  border-color: $info;
+  border-color: var(--info);
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
 }
 
@@ -133,9 +133,9 @@
 
 .control-group.info .input-prepend .add-on,
 .control-group.info .input-append .add-on {
-  color: $info;
+  color: var(--info);
   background-color: #d9edf7;
-  border-color: $info;
+  border-color: var(--info);
 }
 
 .control-group {
@@ -145,7 +145,7 @@
     > * {
         box-sizing: border-box;
         padding: 0 0.5rem;
-        @include viewport-down('sm') {
+        @include viewport('<sm') {
             padding: 0;
         }
     }
@@ -159,7 +159,7 @@ legend + .control-group {
 .form-horizontal .control-group {
     display: flex;
     align-items: flex-start;
-    @include viewport-down('sm') {
+    @include viewport('<sm') {
         flex-wrap: wrap;
     }
 }

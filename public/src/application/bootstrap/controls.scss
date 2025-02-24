@@ -18,10 +18,10 @@
     input[type="color"], 
     select, 
     textarea {
-        @include viewport-up('md') {
+        @include viewport('>md') {
             max-width: 100%;
         }
-        @include viewport-down('sm') {
+        @include viewport('<sm') {
             width: 100%;
         }
     }
@@ -37,10 +37,10 @@
     // *padding-left: 20px;
     // margin-left: 180px;
     // *margin-left: 0;
-    @include viewport-up('md') {
+    @include viewport('>md') {
         flex-grow: 1;
     }
-    @include viewport-down('md') {
+    @include viewport('<sm') {
         width: 100%;
     }
     &_full {
@@ -51,7 +51,7 @@
 
 
 .form-horizontal .controls:not(.controls_full):first-child {
-    @include viewport-up('md') {
+    @include viewport('>sm') {
         padding-left: calc(180px + .5rem);
     }
 }

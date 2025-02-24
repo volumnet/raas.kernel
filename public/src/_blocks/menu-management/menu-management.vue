@@ -5,23 +5,23 @@
     &__title {
         display: flex;
         align-items: center;
-        border-radius: $border-radius-lg;
-        @include viewport-up('md') {
+        border-radius: var(--border-radius-lg);
+        @include viewport('>md') {
             padding: 0.75rem 1.25rem;
         }
-        @include viewport-down('sm') {
+        @include viewport('<sm') {
             padding: 0.5rem 1rem;
         }
         span {
             font-size: 17.5px;
-            @include viewport-down('sm') {
+            @include viewport('<sm') {
                 display: none;
             }
         }
         &:after {
             @include fa('caret-down');
             font-size: 12px;
-            @include viewport-up('md') {
+            @include viewport('>md') {
                 margin-left: .5rem;
             }
             #{$self}_active & {

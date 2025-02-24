@@ -4,7 +4,7 @@
         color: black;
     }
     &_level_0 {
-        @include gradient-y($gray-200, transparent);
+        background: linear-gradient(to bottom, var(--gray-e), transparent);
         border-radius: 5px;
         padding: .33rem .75rem .33rem 1rem;
     }

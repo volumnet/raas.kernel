@@ -324,7 +324,7 @@
     margin-left: 0;
   }
 }
-@include viewport-down('sm') {
+@include viewport('<sm') {
     .table {
         td, th {
             padding: 0.25rem;

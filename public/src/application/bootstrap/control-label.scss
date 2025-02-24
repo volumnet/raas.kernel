@@ -4,13 +4,13 @@
 }
 
 .form-horizontal .control-label {
-    @include viewport-up('md') {
+    @include viewport('>md') {
         padding-top: 5px;
         width: 180px;
         text-align: right;
         flex-shrink: 0;
     }
-    @include viewport-down('sm') {
+    @include viewport('<sm') {
         width: 100%;
         padding-left: 0;
         padding-right: 0px;

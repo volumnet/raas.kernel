@@ -5,12 +5,57 @@
 @import 'app/application/fa-fix.scss';
 
 :root {
+    font-size: 16px; // Не менять - это для определения rem; меняется в .body
     --header-outer-height: 41px;
+
+    --headings-line-height: 1.2;
+    --border-radius: .375rem;
+    --border-radius-lg: .25rem;
+    --border-radius-sm: .5rem;
+    
+    --gray-1: #111;
+    --gray-2: #212529;
+    --gray-3: #343a40;
+    --gray-4: #495057;
+    --gray-5: #555;
+    --gray-6: #6c757d;
+    --gray-7: #777;
+    --gray-8: #888;
+    --gray-9: #999;
+    --gray-a: #adb5bd;
+    --gray-b: #bbb;
+    --gray-c: #ced4da;
+    --gray-d: #dee2e6;
+    --gray-e: #e9ecef;
+    --gray-f: #f8f9fa;
+    --blue: #0088cc;
+    --red: #b94a48;
+    --yellow: #ffc107;
+    --green: #198754;
+    --danger: var(--red);
+    --primary: var(--blue);
+    --warning: var(--yellow);
+    --success: var(--green);
+    --info: var(--cyan);
+    --body-color: var(--gray-2);
+
+
+    // $white:    #fff !default;
+    // $gray-100: #f8f9fa !default;
+    // $gray-200: #e9ecef !default;
+    // $gray-300: #dee2e6 !default;
+    // $gray-400: #ced4da !default;
+    // $gray-500: #adb5bd !default;
+    // $gray-600: #6c757d !default;
+    // $gray-700: #495057 !default;
+    // $gray-800: #343a40 !default;
+    // $gray-900: #212529 !default;
+
 }
 
 .body {
     &__background-holder {
-        @include gradient-y(#08f, #8cf);
+        background: linear-gradient(to bottom, #08f, #8cf);
         min-height: 100vh;
         width: 100%;
         display: flex;
@@ -38,7 +83,7 @@
         $header: &;
         padding-inline: 2rem;
         z-index: 2;
-        background: darken($gray-900, 10%);
+        background: color-mix(in srgb, var(--gray-2), black 10%);
         color: white;
         align-items: center;
         justify-content: space-between;
@@ -67,19 +112,19 @@
     &__menu-main {
         flex-grow: 1;
         padding: 0;
-        @include viewport-down('md') {
+        @include viewport('<md') {
             display: none;
         }
     }
     &__menu-user {
         flex-shrink: 0;
-        @include viewport-down('md') {
+        @include viewport('<md') {
             display: none;
         }
     }
     &__menu-mobile {
         flex-shrink: 0;
-        @include viewport-up('lg') {
+        @include viewport('>lg') {
             display: none;
         }
     }
@@ -97,14 +142,14 @@
         flex-grow: 1;
         background: white;
         @media screen {
-            @include viewport-up('lg') {
+            @include viewport('>lg') {
                 grid-template-columns: 320px 1fr;
             }
         }
     }
     &__left {
         box-sizing: border-box;
-        @include print-or-down('md') {
+        @include viewport('p|<md') {
             display: none;
         }
     }
@@ -118,7 +163,7 @@
         gap: 1rem;
         overflow: hidden;
         &:not(&_sided) {
-            @include viewport-up('lg') {
+            @include viewport('>lg') {
                 grid-column: span 2;
             }
         }
@@ -135,23 +180,12 @@
     &__title {
         text-shadow: 1px 1px 0 silver;
         font-weight: bold;
-        line-height: $headings-line-height;
+        line-height: var(--headings-line-height);
         margin: 0;
-        @include viewport-up('lg') {
-            font-size: 38px;
-        }
-        @include viewport('md') {
-            font-size: 32px;
-        }
-        @include viewport('sm') {
-            font-size: 28px;
-        }
-        @include viewport-down('xs') {
-            font-size: 24px;
-        }
+        font-size: relMin(38px, $min: 24px);
     }
     &__subtitle {
-        color: $gray-500;
+        color: var(--gray-a);
         font-size: 12px;
     }
     &__footer {
@@ -159,7 +193,7 @@
         padding-top: 1rem;
         font-size: 9px;
         text-align: center;
-        @include viewport-up('lg') {
+        @include viewport('>lg') {
             grid-column: span 2;
         }
     }

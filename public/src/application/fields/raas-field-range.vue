@@ -15,7 +15,7 @@
     &__slider {
         width: 218px;
         .ui-slider-handle {
-            background: $primary;
+            background: var(--primary);
         }
     }
     &__input {

@@ -25,11 +25,12 @@
     border-radius: 2px;
     &:after {
         font-size: 10px;
-        @include fa('plus-square-o');
+        @include fa('square-plus');
+        font-weight: normal;
     }
     &_unfolded {
         &:after {
-            @include fa('minus-square-o');
+            @include fa('square-minus');
         }
     }
 }

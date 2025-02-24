@@ -12,7 +12,7 @@
     font-size: 16px;
     overflow: hidden;
     &, &:hover, &:focus {
-        color: $gray-900;
+        color: var(--gray-2);
         text-decoration: none;
     }
     &:focus, &:active {

@@ -1,29 +1,21 @@
-import '@fortawesome/fontawesome-free/scss/regular.scss';
-import '@fortawesome/fontawesome-free/scss/solid.scss';
-import '@fortawesome/fontawesome-free/scss/brands.scss';
-import '@fortawesome/fontawesome-free/scss/_icons.scss';
+// import '@fortawesome/fontawesome-free/scss/regular.scss';
+// import '@fortawesome/fontawesome-free/scss/solid.scss';
+// import '@fortawesome/fontawesome-free/scss/brands.scss';
+// import '@fortawesome/fontawesome-free/scss/fontawesome.scss';
 
-import jQuery from 'expose-loader?exposes[]=$&exposes[]=jQuery!jquery';
-import Cookie from 'expose-loader?exposes[]=Cookie!js-cookie';
+import jQuery from 'expose-loader?exposes=$,jQuery!jquery';
+import Cookie from 'js-cookie';
 
 import numTxt from 'cms/application/_libs/num-txt.js';
 import formatPrice from 'cms/application/_libs/format-price.js';
-
-// import 'jquery-ui/themes/base/all.css'
-// // import 'jquery-ui/jquery-ui.structure.css'
-// // import 'jquery-ui/jquery-ui.theme.css'
-// import 'jquery-ui-timepicker-addon/dist/jquery-ui-timepicker-addon.css'
+import * as Vue from 'expose-loader?exposes=Vue!vue/dist/vue.esm-bundler.js'
 
 import 'spectrum-colorpicker/spectrum.css'
 import 'bootstrap-multiselect/dist/css/bootstrap-multiselect.css'
-import 'codemirror/lib/codemirror.css'
-// import 'jquery-ui-timepicker-addon/dist/jquery-ui-timepicker-addon.css'
+
 
 import 'jquery-form'
 import './libs/bootstrap.js'
-import 'jquery.scrollto'
-import queryString from 'query-string';
-window.queryString = queryString;
 
 import 'jquery-ui'
 import 'jquery-ui/themes/base/all.css';
@@ -34,28 +26,13 @@ import 'jquery-ui/ui/widgets/slider.js';
 import 'jquery-ui/ui/widgets/autocomplete.js';
 
 import 'spectrum-colorpicker';
-import './libs/context.js';
 
 import 'bootstrap-multiselect';
-import CodeMirror from 'codemirror';
-window.CodeMirror = CodeMirror;
-import 'codemirror/mode/xml/xml.js';
-import 'codemirror/mode/javascript/javascript.js';
-import 'codemirror/mode/css/css.js';
-import 'codemirror/mode/htmlmixed/htmlmixed.js';
-import 'codemirror/mode/clike/clike.js';
-import 'codemirror/mode/php/php.js';
-// import 'jquery.event.swipe'
 import 'inputmask/dist/jquery.inputmask.js'
-// import 'bootstrap-2.3.2/css/bootstrap.css'
 
-import Vue from 'vue/dist/vue.js'
 window.Vue = Vue;
+window.CodeMirror = CodeMirror;
 
-// import 'jquery-ui/ui/widgets/datepicker.js';
-// import 'jquery-ui/ui/i18n/datepicker-ru.js';
-// import 'jquery-ui-timepicker-addon';
-// import 'jquery-ui-timepicker-addon/dist/i18n/jquery-ui-timepicker-ru.js';
 
 import raasTreeComponents from './_blocks/raas-tree';
 import raasIconComponents from './_blocks/raas-icon';
@@ -79,26 +56,29 @@ window.raasConfig = {
     shownLevel: 1,
 };
 
-window.raasComponents = Object.assign(
-    {}, 
-    raasTreeComponents,
-    raasIconComponents,
-    menuLeftComponents,
-    menuDropdownComponents,
-    rowContextMenuComponents,
-    allContextMenuComponents,
-    menuMobileComponents,
-    menuPackagesComponents,
-    menuMainComponents,
-    menuUserComponents,
-    raasBreadcrumbsComponents,
-    menuManagementComponents,
-    menuContextComponents,
-    raasErrorsComponents,
-    raasFieldComponents,
-    raasAppComponents,
-    menuMoveComponents,
-);
+window.Cookie = Cookie;
+window.numTxt = numTxt;
+window.formatPrice = formatPrice;
+
+window.raasComponents = {
+    ...raasTreeComponents,
+    ...raasIconComponents,
+    ...menuLeftComponents,
+    ...menuDropdownComponents,
+    ...rowContextMenuComponents,
+    ...allContextMenuComponents,
+    ...menuMobileComponents,
+    ...menuPackagesComponents,
+    ...menuMainComponents,
+    ...menuUserComponents,
+    ...raasBreadcrumbsComponents,
+    ...menuManagementComponents,
+    ...menuContextComponents,
+    ...raasErrorsComponents,
+    ...raasFieldComponents,
+    ...raasAppComponents,
+    ...menuMoveComponents,
+};
 
 window.ymapSettings = {
     apiKey: '',
@@ -107,7 +87,3 @@ window.ymapSettings = {
     enterprise: false,
     version: '2.1'
 };
-
-window.Cookie = Cookie;
-window.numTxt = numTxt;
-window.formatPrice = formatPrice;

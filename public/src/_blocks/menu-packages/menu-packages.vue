@@ -1,4 +1,6 @@
 <style lang="scss" scoped>
+@use 'app/_shared/mixins/top-menu-trigger.scss' as *;
+
 .menu-packages {
     $self: &;
     position: relative;

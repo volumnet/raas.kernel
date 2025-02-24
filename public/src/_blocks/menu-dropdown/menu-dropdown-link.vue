@@ -3,13 +3,13 @@
     display: block;
     padding: .25rem 1rem;
     font-size: 14px;
-    color: $body-color;
+    color: var(--body-color);
     white-space: nowrap;
     &, &:hover, &:focus {
         text-decoration: none;
     }
     &:hover {
-        background: $primary;
+        background: var(--primary);
         color: white;
     }
 }

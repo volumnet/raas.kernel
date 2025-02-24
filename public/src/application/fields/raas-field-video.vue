@@ -61,7 +61,7 @@
         display: none;
         color: silver;
         &, &:hover, &:focus {
-            color: $danger;
+            color: var(--danger);
             text-shadow: 0px 0px 4px rgba(white, .5);
             text-decoration: none;
         }

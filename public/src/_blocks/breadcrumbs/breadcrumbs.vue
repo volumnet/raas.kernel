@@ -2,8 +2,8 @@
 .breadcrumbs {
     display: block;
     margin: 0;
-    background: $gray-100;
-    border-radius: $border-radius;
+    background: var(--gray-f);
+    border-radius: var(--border-radius);
     padding: 0.5rem 1rem;
     &__list {
         display: flex;
@@ -15,7 +15,7 @@
     &__item {
         display: flex;
         align-items: center;
-        @include viewport-up('md') {
+        @include viewport('>md') {
             &:after {
                 content: '/';
                 display: block;
@@ -23,7 +23,7 @@
                 color: silver;
             }
         }
-        @include viewport-down('sm') {
+        @include viewport('<sm') {
             display: none;
             &:last-child {
                 display: flex;

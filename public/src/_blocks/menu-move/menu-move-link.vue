@@ -4,7 +4,7 @@
     display: block;
     line-height: 1.5;
     &_active {
-        color: $body-color;
+        color: var(--body-color);
     }
     &_current {
         font-weight: bold;

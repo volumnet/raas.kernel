@@ -12,7 +12,7 @@
         @include filetype();
         @include center-alignment(1em, 1em);
         margin-right: .5rem;
-        color: $gray-600;
+        color: var(--gray-6);
         &:before {
             font-weight: normal;
         }

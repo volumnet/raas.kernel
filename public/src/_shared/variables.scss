@@ -1,22 +1,3 @@
-$blue: #0088cc;
-$red: #b94a48;
-
-$gray-1: #111;
-$gray-2: #222;
-$gray-3: #333;
-$gray-4: #444;
-$gray-5: #555;
-$gray-6: #666;
-$gray-7: #777;
-$gray-8: #888;
-$gray-9: #999;
-$gray-a: #aaa;
-$gray-b: #bbb;
-$gray-c: #ccc;
-$gray-d: #ddd;
-$gray-e: #eee;
-$gray-f: #f8f8f8;
-
 $font-family-sans-serif: "Helvetica Neue", Helvetica, Arial, sans-serif;
 $link-decoration: none;
 $link-hover-decoration: underline;
@@ -29,3 +10,22 @@ $headings-margin-bottom: 1.5rem;
 
 $fa-font-path: '/vendor/volumnet/raas.kernel/public/fonts';
 $fa-major-version: '6';
+
+$grid-breakpoints: (
+  xs: 0,
+  sm: 576px,
+  md: 768px,
+  lg: 992px,
+  xl: 1200px,
+  xxl: 1400px
+);
+
+$container-max-widths: (
+  sm: 540px,
+  md: 720px,
+  lg: 960px,
+  xl: 1140px,
+  xxl: 1320px
+); // Используется также в viewports.scss
+
+$referenceLayout: 'xxl';

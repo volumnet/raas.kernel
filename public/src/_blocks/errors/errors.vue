@@ -2,10 +2,10 @@
 .errors {
     position: relative;
     padding: 1rem 3rem 1rem 1rem;
-    border: 1px solid mix(white, $danger, 70%);
+    border: 1px solid color-mix(in srgb, white, var(--danger), 70%);
     border-radius: 0.25rem;
-    color: $danger;
-    background: mix(white, $danger, 80%);
+    color: var(--danger);
+    background: color-mix(in srgb, white, var(--danger), 80%);
     text-shadow: 0 1px 0 rgba(white, .5);
     &__title {
         font-size: 18px;

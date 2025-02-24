@@ -1,6 +1,7 @@
-
-// import Cookie from 'expose-loader?exposes[]=Cookie!js-cookie'
 import App from './application/app.vue';
+
+import queryString from 'query-string';
+import 'jquery.scrollto'
 
 import RAAS_tree from './libs/raas.tree.js';
 import RAAS_autocompleter from './libs/raas.autocompleter.js';
@@ -11,11 +12,10 @@ import RAAS_repo from './libs/raas.repo.js';
 import RAASInitInputs from './libs/raas.init-inputs.js';
 import RAAS_queryString from './libs/raas.query-string.js';
 
-import CKEditor from '@ckeditor/ckeditor5-vue2';
-window.Vue.use( CKEditor );
+import { Ckeditor } from '@ckeditor/ckeditor5-vue';
 
-// import YmapPlugin from 'vue-yandex-maps';
 
+window.queryString = queryString;
 
 // Vue.use(YmapPlugin, window.ymapSettings);
 
@@ -30,23 +30,20 @@ jQuery(function ($) {
         RAASInitInputs,
     });
     $.extend({ RAAS_queryString });
-    // let lang = $('html').attr('lang') || 'ru';
-    // if (lang == 'en') {
-    //     lang = '';
-    // }
-    // $.datepicker.setDefaults($.datepicker.regional[lang]);
-    // $.timepicker.setDefaults($.timepicker.regional[lang]);
 });
 
+
+let app, vueRoot;
+vueRoot = app = Vue.createApp(App);
+vueRoot.use(Ckeditor);
+
 window.registeredRAASComponents = {};
-for (const componentURN in window.raasComponents) {
-    const component = raasComponents[componentURN];
-    window.registeredRAASComponents[componentURN] = window.Vue.component(componentURN, component);
-}
+Object.keys(window.raasComponents).forEach((componentURN) => {
+    window.registeredRAASComponents[componentURN] = vueRoot.component(componentURN, raasComponents[componentURN]);
+})
 
 jQuery(document).ready(function($) {
-    context.init({ preventDoubleContext: false });
-    window.app = new window.Vue(App);
+    window.app = app.mount('#top');
 
     var hash = document.location.hash;
     if (hash) {

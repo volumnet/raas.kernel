@@ -32,7 +32,7 @@
         justify-content: space-between;
         padding: 0;
         height: 41px;
-        background: darken($gray-900, 10%);
+        background: color-mix(in srgb, var(--gray-2), black 10%);
         color: #ddd;
     }
     &__back, &__close {

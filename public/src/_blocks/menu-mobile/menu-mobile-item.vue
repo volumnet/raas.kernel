@@ -9,12 +9,12 @@
         padding: 0;
         border-bottom: 1px solid #ddd;
         &_active, &_semiactive {
-            background: $gray-200;
+            background: var(--gray-e);
         }
         &_system {
-            border-bottom-color: $gray-700;
+            border-bottom-color: var(--gray-4);
             &, &_active, &_semiactive {
-                background: $gray-800;
+                background: var(--gray-3);
             }
         }
     }
@@ -22,7 +22,7 @@
         @include center-alignment(41px, 24px);
         border: none;
         background: transparent;
-        color: $gray-900;
+        color: var(--gray-2);
         flex-shrink: 0;
         &:after {
             @include fa('angle-right');

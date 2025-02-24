@@ -3,7 +3,7 @@
     $self: &;
     background: white;
     box-shadow: 0 5px 10px rgba(black, .2);
-    border-radius: $border-radius;
+    border-radius: var(--border-radius);
     border: 1px solid silver;
     padding: 0.25rem 0;
     min-width: 200px;
@@ -32,14 +32,14 @@
     display: block;
     position: relative;
     font-weight: bold;
-    color: $body-color;
+    color: var(--body-color);
     padding: .5rem 1rem;
     margin-top: -0.25rem;
     white-space: nowrap;
-    background: $gray-100;
+    background: var(--gray-f);
     border-bottom: 1px solid #ddd;
-    border-top-left-radius: $border-radius;
-    border-top-right-radius: $border-radius;
+    border-top-left-radius: var(--border-radius);
+    border-top-right-radius: var(--border-radius);
 } 
 </style>
 

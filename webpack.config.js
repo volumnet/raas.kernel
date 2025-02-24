@@ -1,13 +1,15 @@
 const TerserJSPlugin = require('terser-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-// const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
-const FixStyleOnlyEntriesPlugin = require("webpack-fix-style-only-entries");
-const VueLoaderPlugin = require('vue-loader/lib/plugin');
+const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+const RemoveEmptyScriptsPlugin = require("webpack-remove-empty-scripts");
+const { VueLoaderPlugin } = require('vue-loader')
 const webpack = require('webpack');
 const glob = require('glob');
 const path = require('path');
 const { styles } = require('@ckeditor/ckeditor5-dev-utils');
 const { CKEditorTranslationsPlugin } = require('@ckeditor/ckeditor5-dev-translations');
+
+const isProduction = process.argv[process.argv.indexOf('--mode') + 1] === 'production';
 
 const config = {
     mode: 'production',
@@ -20,15 +22,13 @@ const config = {
         modules: ['node_modules'],
         alias: {
             app: path.resolve(__dirname, 'public/src/'),
-            // css: path.resolve(__dirname, 'dev/css/'),
             jquery: path.resolve(__dirname, 'node_modules/jquery/dist/jquery'),
-            cms: path.resolve(__dirname, 'd:/web/home/libs/raas.cms/resources/js'),
-            // shop: path.resolve(__dirname, 'vendor/volumnet/raas.cms.shop/resources/js'),
-            // users: path.resolve(__dirname, 'vendor/volumnet/raas.cms.users/resources/js'),
+            cms: path.resolve(__dirname, 'd:/web/home/libs/raas.cms/resources/js.vue3'),
+            'fa-mixin': path.resolve(__dirname, 'd:/web/home/libs/raas.cms/resources/js.vue3/_shared/mixins/fa6.scss'),
             "./dependencyLibs/inputmask.dependencyLib": "./dependencyLibs/inputmask.dependencyLib.jquery"
         },
         extensions: [
-            '.styl',
+            '.scss',
             '.js',
             '.vue',
         ]
@@ -41,26 +41,19 @@ const config = {
     optimization: {
         minimizer: [
             new TerserJSPlugin({ 
-                terserOptions: { output: { comments: false, }}
-            }), 
-            // new OptimizeCSSAssetsPlugin({
-            //     cssProcessorPluginOptions: {
-            //         preset: [
-            //             'default', 
-            //             { discardComments: { removeAll: true }}
-            //         ],
-            //     },
-            // }),
+                extractComments: false,
+                terserOptions: { format: { comments: false, }}
+            }),
         ],
     },
     externals: {
         knockout: 'knockout',
         jquery: 'jQuery',
-        // vue: 'vue',
         $: 'jquery',
         'window.jQuery': 'jquery',
+        vue: 'Vue', // Иначе при рендеринге компоненты будут тянуть за собой копию Vue
     },
-    // devtool: 'inline-source-map',
+    devtool: (isProduction ? false : 'inline-source-map'),
     module: {
         rules: [
             {
@@ -99,20 +92,8 @@ const config = {
                 exclude: /node_modules/
             },
             {
-                test: /\.styl$/,
-                use: [
-                    // 'vue-style-loader',
-                    // 'style-loader',
-                    { loader: MiniCssExtractPlugin.loader },
-                    { loader: "css-loader", options: {url: false}, },
-                    'stylus-loader'
-                ]
-            },
-            {
                 test: /\.scss$/,
                 use: [
-                    // 'vue-style-loader',
-                    // 'style-loader',
                     { loader: MiniCssExtractPlugin.loader },
                     { loader: "css-loader", options: {url: false}, },
                     {
@@ -124,29 +105,16 @@ const config = {
                                     'autoprefixer',
                                     'rucksack-css',
                                     'postcss-short',
-                                    // 'postcss-preset-env',
                                     'postcss-combine-duplicated-selectors',
-                                    // 'postcss-sort-media-queries',
-                                    // 'css-mqpacker', // Убрали, т.к. плохо работает со слоями, а выигрыш размера меньше 1%
                                     'postcss-pseudo-elements-content',
                                 ],
                             },
                         },
                     },
-                    // {
-                    //   loader: 'postcss-loader', // Run postcss actions
-                    //   options: {
-                    //     plugins: function () { // postcss plugins, can be exported to postcss.config.js
-                    //       return [
-                    //         require('autoprefixer')
-                    //       ];
-                    //     }
-                    //   }
-                    // },
                     {
                         loader: "sass-loader",
                         options: {
-                            additionalData: "@import 'app/_shared/init.scss';\n",
+                            additionalData: "@use 'app/_shared/init.scss' as *;\n",
                         },
                     },
                 ]
@@ -154,7 +122,6 @@ const config = {
             {
                 test: { and: [ /\.css$/, { not: [/ckeditor5-/] } ] },
                 use: [
-                    // 'style-loader',
                     { loader: MiniCssExtractPlugin.loader },
                     { loader: "css-loader", options: {url: false}, },
                 ]
@@ -203,14 +170,16 @@ const config = {
         ],
     },
     plugins: [
+        new VueLoaderPlugin(),
+        new webpack.DefinePlugin({
+            __VUE_OPTIONS_API__: 'true',
+            __VUE_PROD_DEVTOOLS__: 'false',
+            __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: 'false'
+        }),
         new webpack.ProvidePlugin({
             knockout: 'knockout',
-            // $: 'jquery',
-            // jQuery: 'jquery',
-            // 'window.jQuery': 'jquery',
         }),
-        new VueLoaderPlugin(),
-        // new FixStyleOnlyEntriesPlugin(),
+        new RemoveEmptyScriptsPlugin(),
         new MiniCssExtractPlugin({ filename: './[name].css' }),
         new CKEditorTranslationsPlugin( {
             language: 'en',
@@ -222,7 +191,7 @@ const config = {
 
 module.exports = (env, argv) => {
     if (argv.mode === 'development') {
-        config.devtool = 'inline-source-map';
+        //...
     }
 
     if (argv.mode === 'production') {
