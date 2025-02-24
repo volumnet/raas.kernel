@@ -26,7 +26,6 @@
     &:after {
         font-size: 10px;
         @include fa('square-plus');
-        font-weight: normal;
     }
     &_unfolded {
         &:after {
@@ -72,8 +71,6 @@ export default {
             unfolded: this.active, // Пункт развернут
         };
     },
-    mounted() {
-    },
     methods: {
         /**
          * Клик по плюсу-минусу
@@ -97,7 +94,13 @@ export default {
             return result;
         },
         self() {
-            return {...this};
+            return {
+                foldable: this.foldable,
+                active: this.active,
+                unfolded: this.unfolded,
+                clickFold: this.clickFold.bind(this),
+                liClasses: this.liClasses,
+            };
         },
     },
     watch: {

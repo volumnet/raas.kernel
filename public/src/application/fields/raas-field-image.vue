@@ -66,8 +66,20 @@
 
 <template>
   <div class="raas-field-image" :class="{ 'raas-field-image_active': !!fileName }">
-    <input type="file" v-bind="$attrs" :accept="accept" ref="input" v-on="inputListeners" @change="changeFile($event)" style="opacity: 0; pointer-events: none; position: absolute;">
-    <div class="raas-field-image__image" @click="chooseFile()" :title="fileName" :style="{ 'background-image': (fileName ? ('url(' + file + ')') : '') }"></div>
+    <input 
+      type="file" 
+      style="opacity: 0; pointer-events: none; position: absolute;"
+      v-bind="$attrs" 
+      :accept="accept" 
+      ref="input" 
+      @change="changeFile($event)" 
+    >
+    <div 
+      class="raas-field-image__image" 
+      :title="fileName" 
+      :style="{ 'background-image': (fileName ? ('url(' + file + ')') : '') }"
+      @click="chooseFile()" 
+    ></div>
     <a class="raas-field-image__delete" v-if="fileName" @click.stop="clearFile()"></a>
   </div>
 </template>

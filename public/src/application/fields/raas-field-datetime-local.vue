@@ -1,5 +1,11 @@
 <template>
-  <input type="datetime-local" v-bind="$attrs" :value="pValue" v-on="inputListeners" class="form-control">
+  <input 
+    type="datetime-local" 
+    class="form-control"
+    v-bind="$attrs" 
+    :value="pValue" 
+    @input="$emit('update:modelValue', pValue = $event.target.value)"
+  >
 </template>
 
 <script>
@@ -9,12 +15,12 @@ export default {
     mixins: [RAASField],
     data: function () {
         return {
-            pValue: this.value && this.value.replace(' ', 'T'),
+            pValue: this.modelValue && this.modelValue.replace(' ', 'T'),
         };
     },
     watch: {
-        value: function () {
-            this.pValue = this.value.replace(' ', 'T');
+        modelValue: function () {
+            this.pValue = this.modelValue.replace(' ', 'T');
         },
     },
 }

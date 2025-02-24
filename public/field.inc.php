@@ -86,37 +86,6 @@ $_RAASForm_Checkbox = function (
     $plain = !$level && !array_filter($options, function ($x) {
         return (bool)(array)$x->children;
     }) && (count($options) < 16);
-    // foreach ($options as $row) {
-    //     $attrs = $row->attrs;
-    //     foreach (['type', 'name', 'multiple'] as $key) {
-    //         $attrs[$key] = $field->$key;
-    //     }
-    //     if (in_array($row->value, (array)($field->Form->DATA[$field->name] ?? []))) {
-    //         $attrs['checked'] = 'checked';
-    //     } else {
-    //         $attrs['checked'] = false;
-    //     }
-    //     if ($plain) {
-    //         $text .= '<label class="' . $field->type . ' inline">
-    //                     <input' . $_RAASForm_Attrs($field, $attrs) . ' /> '
-    //               .     htmlspecialchars($row->caption)
-    //               .  '</label>';
-    //     } else {
-    //         $text .= '<li>';
-    //         if ($row instanceof OptGroup) {
-    //             $text .= '  <label>'
-    //                   .       htmlspecialchars($row->caption)
-    //                   .  '  </label>' ;
-    //         } else {
-    //             $text .= '  <label>
-    //                           <input' . $_RAASForm_Attrs($field, $attrs) . ' /> '
-    //                   .       htmlspecialchars($row->caption)
-    //                   .  '  </label>' ;
-    //         }
-    //         $text .=    $_RAASForm_Checkbox($row->children, $level + 1) . '
-    //                   </li>';
-    //     }
-    // }
     if (!$level) {
         $attrs = [];
         foreach (['value', 'checked'] as $key) {
@@ -124,18 +93,10 @@ $_RAASForm_Checkbox = function (
         }
         $source = $_RAASForm_Source($originalOptions);
         $attrs[':source'] = json_encode($source);
-        $attrs[':value'] = json_encode((array)($field->Form->DATA[$field->name] ?? []));
-        // $attrs = $_RAASForm_Attrs($field, $attrs);
+        $attrs[':model-value'] = json_encode((array)($field->Form->DATA[$field->name] ?? []));
         $text .= '<raas-field-checkbox' . $_RAASForm_Attrs($field, $attrs) . '></raas-field-checkbox>';
     }
-    if ($text && !$plain) {
-        // $text = '<ul' . (!$level ? ' class="tree" data-raas-role="tree"' : '') . '>' .
-        //           $text .
-        //        '</ul>';
-        return $text;
-    } else {
-        return $text;
-    }
+    return $text;
 };
 
 /**
@@ -216,11 +177,11 @@ $_RAASForm_Control = function (
             if ($field->multiple) {
                 $source = $_RAASForm_Source($field->children);
                 $attrs[':source'] = json_encode($source);
-                $attrs[':value'] = json_encode((array)($field->Form->DATA[$field->name] ?? []));
+                $attrs[':model-value'] = json_encode((array)($field->Form->DATA[$field->name] ?? []));
             } else {
                 $attrs['defval'] = $field->defval ?: '1';
                 $attrs['mask'] = '0';
-                $attrs[':value'] = json_encode($field->Form->DATA[$field->name] ?? null);
+                $attrs[':model-value'] = json_encode($field->Form->DATA[$field->name] ?? null);
             }
             ?>
             <raas-field-checkbox<?php echo $_RAASForm_Attrs($field, $attrs)?>></raas-field-checkbox>
@@ -231,7 +192,7 @@ $_RAASForm_Control = function (
             $attrs = [];
             $source = $_RAASForm_Source($field->children);
             $attrs[':source'] = json_encode($source);
-            $attrs[':value'] = json_encode($field->Form->DATA[$field->name] ?? null);
+            $attrs[':model-value'] = json_encode($field->Form->DATA[$field->name] ?? null);
             ?>
             <raas-field-radio<?php echo $_RAASForm_Attrs($field, $attrs)?>></raas-field-radio>
             <?php
@@ -297,7 +258,7 @@ $_RAASForm_Control = function (
                   <div data-role="raas-repo-container">
                     <?php foreach ((array)($field->Form->DATA[$field->name] ?? []) as $key => $val) { ?>
                         <div data-role="raas-repo-element">
-                          <raas-field-<?php echo htmlspecialchars($fieldType)?> <?php echo $_RAASForm_Attrs($field, array_merge($attrs, [':value' => json_encode($val), ':source' => $childrenArr ? json_encode($childrenArr) : false]))?>></raas-field-<?php echo htmlspecialchars($fieldType)?>>
+                          <raas-field-<?php echo htmlspecialchars($fieldType)?> <?php echo $_RAASForm_Attrs($field, array_merge($attrs, [':model-value' => json_encode($val), ':source' => $childrenArr ? json_encode($childrenArr) : false]))?>></raas-field-<?php echo htmlspecialchars($fieldType)?>>
                         </div>
                     <?php } ?>
                   </div>
@@ -309,7 +270,7 @@ $_RAASForm_Control = function (
                 </div>
                 <?php
             } else {
-                $attrs[':value'] = json_encode($field->Form->DATA[$field->name] ?? null);
+                $attrs[':model-value'] = json_encode($field->Form->DATA[$field->name] ?? null);
                 $attrs[':source'] = $childrenArr ? json_encode($childrenArr) : false;
                 ?>
                 <raas-field-<?php echo htmlspecialchars($fieldType)?>

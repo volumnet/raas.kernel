@@ -1,5 +1,11 @@
 <template>
-  <input type="date" v-bind="$attrs" :value="pValue" v-on="inputListeners" class="form-control">
+  <input 
+    type="date" 
+    class="form-control"
+    v-bind="$attrs" 
+    :value="pValue" 
+    @input="$emit('update:modelValue', pValue = $event.target.value)" 
+  >
 </template>
 
 <script>

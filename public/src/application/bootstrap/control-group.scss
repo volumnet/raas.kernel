@@ -1,147 +1,23 @@
-.control-group.warning .control-label,
-.control-group.warning .help-block,
-.control-group.warning .help-inline {
-  color: var(--warning);
-}
-
-.control-group.warning .checkbox,
-.control-group.warning .radio,
-.control-group.warning input,
-.control-group.warning select,
-.control-group.warning textarea {
-  color: var(--warning);
-}
-
-.control-group.warning input,
-.control-group.warning select,
-.control-group.warning textarea {
-  border-color: var(--warning);
-          box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-}
-
-.control-group.warning input:focus,
-.control-group.warning select:focus,
-.control-group.warning textarea:focus {
-  border-color: #a47e3c;
-          box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #dbc59e;
-}
-
-.control-group.warning .input-prepend .add-on,
-.control-group.warning .input-append .add-on {
-  color: var(--warning);
-  background-color: #fcf8e3;
-  border-color: var(--warning);
-}
-
-.control-group.error .control-label,
-.control-group.error .help-block,
-.control-group.error .help-inline {
-  color: var(--danger);
-}
-
-.control-group.error .checkbox,
-.control-group.error .radio,
-.control-group.error input,
-.control-group.error select,
-.control-group.error textarea {
-  color: var(--danger);
-}
-
-.control-group.error input,
-.control-group.error select,
-.control-group.error textarea {
-  border-color: var(--danger);
-          box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-}
-
-.control-group.error input:focus,
-.control-group.error select:focus,
-.control-group.error textarea:focus {
-  border-color: #953b39;
-          box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #d59392;
-}
-
-.control-group.error .input-prepend .add-on,
-.control-group.error .input-append .add-on {
-  color: var(--danger);
-  background-color: #f2dede;
-  border-color: var(--danger);
-}
-
-.control-group.success .control-label,
-.control-group.success .help-block,
-.control-group.success .help-inline {
-  color: var(--success);
-}
-
-.control-group.success .checkbox,
-.control-group.success .radio,
-.control-group.success input,
-.control-group.success select,
-.control-group.success textarea {
-  color: var(--success);
-}
-
-.control-group.success input,
-.control-group.success select,
-.control-group.success textarea {
-  border-color: var(--success);
-          box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-}
-
-.control-group.success input:focus,
-.control-group.success select:focus,
-.control-group.success textarea:focus {
-  border-color: #356635;
-          box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #7aba7b;
-}
-
-.control-group.success .input-prepend .add-on,
-.control-group.success .input-append .add-on {
-  color: var(--success);
-  background-color: #dff0d8;
-  border-color: var(--success);
-}
-
-.control-group.info .control-label,
-.control-group.info .help-block,
-.control-group.info .help-inline {
-  color: var(--info);
-}
-
-.control-group.info .checkbox,
-.control-group.info .radio,
-.control-group.info input,
-.control-group.info select,
-.control-group.info textarea {
-  color: var(--info);
-}
-
-.control-group.info input,
-.control-group.info select,
-.control-group.info textarea {
-  border-color: var(--info);
-  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-}
-
-.control-group.info input:focus,
-.control-group.info select:focus,
-.control-group.info textarea:focus {
-  border-color: #2d6987;
-  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #7ab5d3;
-}
-
-.control-group.info .input-prepend .add-on,
-.control-group.info .input-append .add-on {
-  color: var(--info);
-  background-color: #d9edf7;
-  border-color: var(--info);
-}
+@use 'cms/_shared/mixins/viewports.scss' as *;
 
 .control-group {
     display: block;
     margin: 0 0 1rem;
     box-sizing: border-box;
+
+    &.warning {
+        --color: var(--warning);
+    }
+    &.error {
+        --color: var(--danger);
+    }
+    &.success {
+        --color: var(--success);
+    }
+    &.info {
+        --color: var(--info);
+    }
+
     > * {
         box-sizing: border-box;
         padding: 0 0.5rem;
@@ -149,25 +25,47 @@
             padding: 0;
         }
     }
-}
-
-legend + .control-group {
-  margin-top: 20px;
-  -webkit-margin-top-collapse: separate;
-}
-
-.form-horizontal .control-group {
-    display: flex;
-    align-items: flex-start;
-    @include viewport('<sm') {
-        flex-wrap: wrap;
+    legend + & {
+        margin-top: 20px;
+        -webkit-margin-top-collapse: separate;
     }
-}
+    .form-horizontal & {
+        display: flex;
+        align-items: flex-start;
+        @include viewport('<sm') {
+            flex-wrap: wrap;
+        }
+        &.control-group_full {
+            display: block;
+            .control-label {
+                padding-top: 0;
+                padding-bottom: 5px;
+            }
+        }
+    }
 
-.form-horizontal .control-group.control-group_full {
-    display: block;
-    .control-label {
-      padding-top: 0;
-      padding-bottom: 5px;
-   }
+    &.warning, &.error, &.success, &.info {
+        .control-label, .help-block, .help-inline {
+            color: var(--color);
+        }
+        .checkbox, .radio, input:not([type="submit"]):not([type="reset"]):not([type="button"]), select, textarea {
+            color: var(--color);
+        }
+        input:not([type="submit"]):not([type="reset"]):not([type="button"]), select, textarea {
+            border-color: var(--color);
+            box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+            &:focus {
+                border-color: color-mix(in srgb, var(--color), black 33%);
+                box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px color-mix(in srgb, var(--color), black 15%);
+            }
+        }
+
+        .input-prepend, .input-append {
+            .add-on {
+                color: var(--color);
+                background-color: color-mix(in srgb, var(--color) 20%, white);
+                border-color: var(--color);
+            }
+        }
+    }
 }

@@ -1,6 +1,20 @@
 <template>
-  <component v-if="typeof type == 'object'" v-on="$listeners" v-bind="resolvedAttrs" v-model="pValue"></component>
-  <component v-else :type="type" :is="currentComponent" v-on="$listeners" v-bind="$attrs" v-model="pValue" :source="source"></component>
+  <component 
+    v-if="typeof type == 'object'" 
+    :is="resolvedAttrs.is" 
+    v-bind="resolvedAttrs" 
+    :model-value="pValue" 
+    @update:model-value="$emit('update:modelValue', pValue = $event)"
+  ></component>
+  <component 
+    v-else 
+    :type="type" 
+    :is="currentComponent" 
+    v-bind="$attrs" 
+    :model-value="pValue" 
+    :source="source"
+    @update:model-value="$emit('update:modelValue', pValue = $event)"
+  ></component>
 </template>
 
 <script>

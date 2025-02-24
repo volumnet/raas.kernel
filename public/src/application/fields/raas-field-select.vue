@@ -1,12 +1,18 @@
 <template>
-  <select v-bind="$attrs" v-on="inputListeners" :multiple="multiple" :data-value="value">
-    <option v-if="!multiple && placeholder" value="" :selected="!value">
+  <select 
+    v-bind="$attrs" 
+    :multiple="multiple" 
+    class="form-control raas-field-select" 
+    :data-value="modelValue" 
+    @change="$emit('update:modelValue', pValue = $event.target.value)"
+  >
+    <option v-if="!multiple && placeholder" value="" :selected="!modelValue">
       {{placeholder}}
     </option>
     <option 
       :value="option.value" 
       v-for="option in flatSource" 
-      :selected="multiple ? ((value || []).indexOf(option.value) != -1) : (option.value == value)" 
+      :selected="multiple ? ((modelValue || []).indexOf(option.value) != -1) : (option.value == modelValue)" 
       :disabled="option.disabled"
     >
       <template v-for="n in option.level">

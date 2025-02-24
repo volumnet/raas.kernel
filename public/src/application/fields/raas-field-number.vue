@@ -1,5 +1,15 @@
 <template>
-  <input type="number" v-bind="$attrs" v-on="inputListeners" @blur="pValue = checkValue(pValue);" :value="pValue" @input="pValue = $event.target.value" :min="min" :max="max" :step="step">
+  <input 
+    type="number" 
+    class="form-control" 
+    v-bind="$attrs" 
+    :value="pValue" 
+    :min="min" 
+    :max="max" 
+    :step="step"
+    @input="$emit('update:modelValue', $event.target.value)"
+    @change="$emit('update:modelValue', checkValue(pValue))" 
+  >
 </template>
 
 <script>

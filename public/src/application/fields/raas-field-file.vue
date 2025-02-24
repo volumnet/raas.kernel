@@ -39,10 +39,22 @@
 
 <template>
   <div class="raas-field-file input-group">
-    <input type="file" v-bind="$attrs" :accept="accept" ref="input" v-on="inputListeners" @change="changeFile($event)" style="opacity: 0; pointer-events: none; position: absolute;">
-    <div class="form-control raas-field-file__input" @click="!fileName ? chooseFile() : null" :style="{ cursor: (fileName ? '' : 'pointer') }">
+    <input 
+      type="file" 
+      style="opacity: 0; pointer-events: none; position: absolute;"
+      v-bind="$attrs" 
+      :accept="accept" 
+      ref="input" 
+      @change="changeFile($event)" 
+    >
+    <div 
+      class="form-control raas-field-file__input" 
+      @click="!fileName ? chooseFile() : null" :style="{ cursor: (fileName ? '' : 'pointer') }"
+    >
       <span class="raas-field-file__icon" :class="iconCSSClass" v-if="fileName"></span>
-      <span class="raas-field-file__filename" :class="{ 'raas-field-file__filename_placeholder': !fileName }">{{fileName || placeholder}}</span>
+      <span class="raas-field-file__filename" :class="{ 'raas-field-file__filename_placeholder': !fileName }">
+        {{fileName || placeholder}}
+      </span>
       <a class="raas-field-file__delete btn btn-close" v-if="fileName" @click.stop="clearFile()"></a>
     </div>
     <button type="button" class="btn btn-outline-secondary raas-field-file__picker" @click="chooseFile()"></button>

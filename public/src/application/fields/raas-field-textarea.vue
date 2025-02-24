@@ -1,5 +1,10 @@
 <template>
-  <textarea v-bind="$attrs" v-on="inputListeners" :value="pValue" @input="pValue = $event.target.value"></textarea>
+  <textarea
+    v-bind="$attrs" 
+    class="form-control" 
+    :value="pValue" 
+    @input="$emit('update:modelValue', pValue = $event.target.value)"
+  ></textarea>
 </template>
 
 <script>

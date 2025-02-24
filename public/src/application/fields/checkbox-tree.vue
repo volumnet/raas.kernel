@@ -44,38 +44,38 @@
         >
           <template>
             <!-- 2024-05-28, AVS: приводим к string, чтобы не было путаницы при различных типах -->
-            <label v-if="type == 'checkbox'" @contextmenu.prevent.stop="$emit('input', { value: option.value })">
+            <label v-if="type == 'checkbox'" @contextmenu.prevent.stop="$emit('update:modelValue', { value: option.value })">
               <raas-field-checkbox 
-                @input="$emit('propagate', { option, checked: !!$event })" 
+                @update:model-value="$emit('propagate', { option, checked: !!$event })" 
                 ref="field"
                 :type="type" 
                 :required="!!$attrs.required && !arrayValue.length" 
                 :name="/\[/.test(name) ? name : (name + '[]')" 
-                :value="checkedValues[option.value.toString()] || ''" 
+                :model-value="checkedValues[option.value.toString()] || ''" 
                 :defval="option.value"
               ></raas-field-checkbox>
               {{ option.caption }}
             </label>
             <label v-else-if="type == 'radio'">
               <raas-field-radio 
-                @input="$emit('input', $event)" 
+                @update:model-value="$emit('update:modelValue', $event)" 
                 :type="type" 
                 :name="name" 
-                :value="value" 
+                :model-value="modelValue" 
                 :defval="option.value" 
-                :required="!!$attrs.required && !value"
+                :required="!!$attrs.required && !modelValue"
               ></raas-field-radio>
               {{ option.caption }}
             </label>
           </template>
           <checkbox-tree 
             v-if="option.children && option.children.length" 
-            @input="$emit('input', $event)" 
+            @update:model-value="$emit('update:modelValue', $event)" 
             @propagate="$emit('propagate', $event)" 
             :is-flat="isFlat"
             :type="type" 
             :name="name" 
-            :value="value" 
+            :model-value="modelValue" 
             :defval="defval" 
             :source="option.children"
           ></checkbox-tree>

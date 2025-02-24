@@ -83,17 +83,25 @@
 </style>
 
 <template>
-  <input type="text" v-bind="$attrs" v-on="inputListeners" :value="value">
-</template>
-
-<template>
   <div class="raas-field-video" :class="{ 'raas-field-video_active': !!ytId }">
-    <a :href="videoURL" target="_blank" class="raas-field-video__image"  :style="{ 'background-image': (ytId ? ('url(' + coverURL + ')') : '') }" v-if="ytId"></a>
+    <a 
+      v-if="ytId"
+      target="_blank" 
+      class="raas-field-video__image"  
+      :href="videoURL" 
+      :style="{ 'background-image': (ytId ? ('url(' + coverURL + ')') : '') }" 
+    ></a>
     <div class="raas-field-video__image" v-else></div>
     <div class="raas-field-video__url">
-      <input type="text" class="form-control" v-bind="$attrs" v-on="inputListeners" :value="value">
+      <input 
+        type="text" 
+        class="form-control" 
+        v-bind="$attrs" 
+        :value="pValue" 
+        @input="$emit('update:modelValue', pValue = $event.target.value)"
+      >
     </div>
-    <a class="raas-field-video__delete" @click="clear()" v-if="ytId"></a>
+    <button v-if="ytId" type="button" class="raas-field-video__delete" @click="clear()"></button>
   </div>
 </template>
 

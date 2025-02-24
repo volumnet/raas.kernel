@@ -32,13 +32,6 @@ export default {
             required: false,
         }
     },
-    mounted() {
-        const cm = new EditorViewCodeMirror.fromTextArea(this.$el, this.codeAreaConfig);
-        cm.on('change', () => {
-            this.pValue = cm.getValue();
-            this.$emit('input', this.pValue);
-        });
-    },
     computed: {
         extensions() {
             const result = [];

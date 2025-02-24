@@ -1,6 +1,8 @@
 <style lang="scss">
 // @import "bootstrap/scss/bootstrap.scss"; 
-@import 'app/application/bootstrap.scss';
+@use 'app/application/bootstrap.scss';
+@use 'sass:map';
+@use 'app/_shared/variables.scss' as *; 
 @import 'app/application/bootstrap-fix.scss';
 @import 'app/application/fa-fix.scss';
 
@@ -12,6 +14,7 @@
     --border-radius: .375rem;
     --border-radius-lg: .25rem;
     --border-radius-sm: .5rem;
+    --control-height: 30px;
     
     --gray-1: #111;
     --gray-2: #212529;
@@ -50,7 +53,24 @@
     // $gray-700: #495057 !default;
     // $gray-800: #343a40 !default;
     // $gray-900: #212529 !default;
+    @include viewport-props((
+        --scrollbar-size: ('s&>lg': 16px, 'p|<md': 0px),
+        --content-ratio: ('s&>lg': .75, 'p|<md': 1),
+        --container-width: (
+            's&xxl': map.get($container-max-widths, 'xxl'),
+            's&xl': map.get($container-max-widths, 'xl'),
+            's&lg': map.get($container-max-widths, 'lg'),
+            's&md': map.get($container-max-widths, 'md'),
+            's&sm': map.get($container-max-widths, 'sm'),
+            's&xs': calc(100vw - 2rem),
+            'p': 100vw,
+        ),  
+    ));
 
+}
+
+* {
+    box-sizing: border-box;
 }
 
 .body {
@@ -68,7 +88,6 @@
         display: flex;
         gap: 2rem;
         padding-inline: 1rem;
-        box-sizing: border-box;
     }
     
     &__header-outer {
@@ -102,7 +121,6 @@
             }
         }
         * {
-          box-sizing: border-box;
         }
     }
     &__menu-packages {
@@ -131,7 +149,6 @@
 
     &__row_main {
         padding-bottom: 1rem;
-        // flex-grow: 1;
     }
     &__main {
         display: grid;
@@ -148,13 +165,9 @@
         }
     }
     &__left {
-        box-sizing: border-box;
         @include viewport('p|<md') {
             display: none;
         }
-    }
-    &__menu-left {
-        box-sizing: border-box;
     }
     &__content {
         display: flex;

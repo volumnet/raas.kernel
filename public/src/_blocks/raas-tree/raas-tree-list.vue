@@ -13,17 +13,12 @@
 
 <template>
   <ul class="raas-tree__list" data-role="raas-tree">
-    <slot v-bind="self"></slot>
+    <slot></slot>
   </ul>
 </template>
 
 
 <script>
 export default {
-    computed: {
-        self() {
-            return {...this};
-        },
-    }
 };
 </script>

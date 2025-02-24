@@ -1,7 +1,7 @@
-// import '@fortawesome/fontawesome-free/scss/regular.scss';
-// import '@fortawesome/fontawesome-free/scss/solid.scss';
-// import '@fortawesome/fontawesome-free/scss/brands.scss';
-// import '@fortawesome/fontawesome-free/scss/fontawesome.scss';
+import '@fortawesome/fontawesome-free/scss/regular.scss';
+import '@fortawesome/fontawesome-free/scss/solid.scss';
+import '@fortawesome/fontawesome-free/scss/brands.scss';
+import '@fortawesome/fontawesome-free/scss/fontawesome.scss';
 
 import jQuery from 'expose-loader?exposes=$,jQuery!jquery';
 import Cookie from 'js-cookie';
@@ -31,8 +31,6 @@ import 'bootstrap-multiselect';
 import 'inputmask/dist/jquery.inputmask.js'
 
 window.Vue = Vue;
-window.CodeMirror = CodeMirror;
-
 
 import raasTreeComponents from './_blocks/raas-tree';
 import raasIconComponents from './_blocks/raas-icon';

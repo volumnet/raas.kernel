@@ -10,10 +10,10 @@ import RaasFieldMonth from './raas-field-month.vue';
 import RaasFieldTime from './raas-field-time.vue';
 import RaasFieldRange from './raas-field-range.vue';
 import RaasFieldTextarea from './raas-field-textarea.vue';
-import RaasFieldHtmlarea from './raas-field-htmlarea.vue';
+// import RaasFieldHtmlarea from './raas-field-htmlarea.vue';
 import RaasFieldCheckbox from './raas-field-checkbox.vue';
 import RaasFieldRadio from './raas-field-radio.vue';
-import RaasFieldCodearea from './raas-field-codearea.vue';
+// import RaasFieldCodearea from './raas-field-codearea.vue';
 import RaasFieldColor from './raas-field-color.vue';
 import RaasFieldHidden from './raas-field-hidden.vue';
 import RaasFieldPassword from './raas-field-password.vue';
@@ -33,10 +33,10 @@ export default {
     RaasFieldTime,
     RaasFieldRange,
     RaasFieldTextarea,
-    RaasFieldHtmlarea,
+    // RaasFieldHtmlarea,
     RaasFieldCheckbox,
     RaasFieldRadio,
-    RaasFieldCodearea,
+    // RaasFieldCodearea,
     RaasFieldColor,
     RaasFieldHidden,
     RaasFieldPassword,

@@ -30,7 +30,16 @@
       <div class="raas-field-range__slider" ref="slider"></div>
     </div>
     <div class="raas-field-range__input-outer">
-      <input type="number" v-bind="$attrs" v-on="inputListeners" :value="pValue" @input="pValue = $event.target.value; checkValue();" class="form-control raas-field-range__input" :min="min" :max="max" :step="step">
+      <input 
+        type="number" 
+        class="form-control raas-field-range__input" 
+        v-bind="$attrs" 
+        :value="pValue" 
+        :min="min" 
+        :max="max" 
+        :step="step"
+        @input="$emit('update:modelValue', checkValue(pValue = $event.target.value));" 
+      >
     </div>
   </div>
 </template>

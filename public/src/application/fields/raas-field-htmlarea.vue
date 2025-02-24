@@ -15,10 +15,10 @@
   <div>
     <ckeditor 
       :editor="editor" 
-      :value="pValue" 
+      :model-value="pValue" 
       :config="ckEditorConfig"
       ref="ckeditor"
-      @input="pValue = $event; $emit('input', $event)" 
+      @input="pValue = $event; $emit('update:modelValue', $event)" 
       @ready="onMounted($event)"
     ></ckeditor>
     <input type="hidden" :name="name" :value="beautifiedHTML" :disabled="!!$attrs.disabled">

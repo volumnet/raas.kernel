@@ -12,7 +12,7 @@ import RAAS_repo from './libs/raas.repo.js';
 import RAASInitInputs from './libs/raas.init-inputs.js';
 import RAAS_queryString from './libs/raas.query-string.js';
 
-import { Ckeditor } from '@ckeditor/ckeditor5-vue';
+// import { Ckeditor } from '@ckeditor/ckeditor5-vue';
 
 
 window.queryString = queryString;
@@ -35,7 +35,7 @@ jQuery(function ($) {
 
 let app, vueRoot;
 vueRoot = app = Vue.createApp(App);
-vueRoot.use(Ckeditor);
+// vueRoot.use(Ckeditor);
 
 window.registeredRAASComponents = {};
 Object.keys(window.raasComponents).forEach((componentURN) => {
@@ -43,7 +43,7 @@ Object.keys(window.raasComponents).forEach((componentURN) => {
 })
 
 jQuery(document).ready(function($) {
-    window.app = app.mount('#top');
+    window.app = app.mount('#raas-app');
 
     var hash = document.location.hash;
     if (hash) {

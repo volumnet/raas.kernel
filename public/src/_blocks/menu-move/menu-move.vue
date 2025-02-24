@@ -28,20 +28,12 @@ export default {
             default: 2
         },
     },
-    data() {
-        return {
-
-        };
-    },
-    mounted() {
-
-    },
-    methods: {
-
-    },
     computed: {
         self() {
-            return {...this};
+            return {
+                menu: this.menu,
+                foldedLevel: this.foldedLevel,
+            };
         },
     },
 };

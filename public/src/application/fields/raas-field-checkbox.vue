@@ -1,17 +1,17 @@
 <template>
   <checkbox-tree 
     v-if="multiple" 
-    class="checkbox-tree checkbox-tree_checkbox" 
     v-bind="$attrs" 
+    class="checkbox-tree checkbox-tree_checkbox" 
     :flat-max-counter="flatMaxCounter"
     :is-flat="!multilevel" 
     :data-options-counter="flatSource.length" 
     :type="type" 
     :name="name" 
-    :value="pValue" 
+    :model-value="pValue" 
     :defval="defval" 
     :source="source"
-    @input="toggleOption($event);" 
+    @update:model-value="toggleOption($event)" 
     @propagate="propagate($event);"
   ></checkbox-tree>
   <span v-else class="raas-field-checkbox" :class="{ 'raas-field-checkbox_active': !!checked }">
@@ -41,7 +41,9 @@ export default {
             for (let option of options) {
                 result[option.value.toString()] = option.value;
                 if (option.children) {
-                    const optionChildren = option.children.filter(child => !option['data-group'] || (child['data-group'].toString() == option['data-group'].toString()));
+                    const optionChildren = option.children.filter(
+                        child => !option['data-group'] || (child['data-group'].toString() == option['data-group'].toString())
+                    );
                     if (optionChildren.length) {
                         ch = ch.concat(optionChildren);
                     }
@@ -73,7 +75,7 @@ export default {
                 return array.indexOf(value) === index;
             });
             this.pValue = newValue;
-            this.$emit('input', newValue);
+            this.$emit('update:modelValue', newValue);
         },
         console(x) {
           console.log(x);

@@ -1,6 +1,8 @@
 <style lang="scss" scoped>
 .menu-dropdown__link {
-    display: block;
+    display: flex;
+    gap: 5px;
+    align-items: center;
     padding: .25rem 1rem;
     font-size: 14px;
     color: var(--body-color);

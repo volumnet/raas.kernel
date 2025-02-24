@@ -1,3 +1,5 @@
+@use 'cms/_shared/mixins/viewports.scss' as *;
+
 .controls {
     box-sizing: border-box;
     // 2022-03-31, AVS: убрал, т.к. в загрузчиках прайсов выпадающее меню внутри контролов

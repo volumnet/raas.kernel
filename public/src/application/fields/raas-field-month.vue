@@ -1,5 +1,11 @@
 <template>
-  <input type="month" v-bind="$attrs" :value="pValue" class="form-control raas-field-month__input">
+  <input 
+    type="month" 
+    class="form-control raas-field-month__input"
+    v-bind="$attrs" 
+    :value="pValue" 
+    @input="$emit('update:modelValue', pValue = $event.target.value)"
+  >
 </template>
 
 <script>

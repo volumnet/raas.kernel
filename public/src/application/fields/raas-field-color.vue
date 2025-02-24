@@ -33,7 +33,14 @@
 
 <template>
   <div class="raas-field-color">
-    <input type="text" v-bind="$attrs" v-on="inputListeners" :value="pValue" pattern="^#[0-9a-fA-F]{6}$" class="form-control raas-field-color__input">
+    <input 
+      type="text" 
+      class="form-control raas-field-color__input"
+      pattern="^#[0-9a-fA-F]{6}$" 
+      v-bind="$attrs" 
+      :value="pValue" 
+      @input="$emit('update:modelValue', pValue = $event.target.value)"
+    >
     <input type="color" ref="picker" />
   </div>
 </template>
@@ -45,10 +52,5 @@ import 'spectrum-colorpicker'
 
 export default {
     mixins: [RAASFieldColor],
-    methods: {
-        check1() {
-            alert('aaa')
-        }
-    }
 }
 </script>
