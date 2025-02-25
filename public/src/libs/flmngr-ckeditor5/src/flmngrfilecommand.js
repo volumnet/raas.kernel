@@ -1,5 +1,4 @@
-import { Command } from 'ckeditor5/src/core';
-import { findAttributeRange } from 'ckeditor5/src/typing';
+import { Command, findAttributeRange } from 'ckeditor5';
 
 export default class FlmngrFileCommand extends Command {
 

@@ -1,67 +1,7 @@
 {
-  "_from": "@edsdk/flmngr-ckeditor5",
-  "_id": "@edsdk/flmngr-ckeditor5@1.0.9",
-  "_inBundle": false,
-  "_integrity": "sha512-OSPYqLAh2WADEDo6PulHR2vUlL26GANXMiq/zlJdY3QcXvQZtNtEtw9sNVO/lRuPP1nnORUB0bxXJQnih7GWzw==",
-  "_location": "/@edsdk/flmngr-ckeditor5",
-  "_phantomChildren": {},
-  "_requested": {
-    "type": "tag",
-    "registry": true,
-    "raw": "@edsdk/flmngr-ckeditor5",
-    "name": "@edsdk/flmngr-ckeditor5",
-    "escapedName": "@edsdk%2fflmngr-ckeditor5",
-    "scope": "@edsdk",
-    "rawSpec": "",
-    "saveSpec": null,
-    "fetchSpec": "latest"
-  },
-  "_requiredBy": [
-    "#DEV:/",
-    "#USER"
-  ],
-  "_resolved": "https://registry.npmjs.org/@edsdk/flmngr-ckeditor5/-/flmngr-ckeditor5-1.0.9.tgz",
-  "_shasum": "43a4e16d5d54b8982b8dfe7540d4a5f9a3e690bd",
-  "_spec": "@edsdk/flmngr-ckeditor5",
-  "_where": "D:\\web\\home\\libs\\raas.kernel",
-  "author": {
-    "name": "Flmngr",
-    "url": "https://flmngr.com/"
-  },
-  "bugs": {
-    "url": "https://github.com/edsdk/flmngr-ckeditor5/issues"
-  },
-  "bundleDependencies": false,
-  "dependencies": {
-    "ckeditor5": ">=35.0.1"
-  },
-  "deprecated": false,
-  "description": "Flmngr integration for CKEditor 5.",
-  "devDependencies": {
-    "@ckeditor/ckeditor5-clipboard": ">=35.0.1",
-    "@ckeditor/ckeditor5-core": ">=35.0.1",
-    "@ckeditor/ckeditor5-dev-utils": ">=30.0.0",
-    "@ckeditor/ckeditor5-editor-classic": ">=35.0.1",
-    "@ckeditor/ckeditor5-engine": ">=35.0.1",
-    "@ckeditor/ckeditor5-image": ">=35.0.1",
-    "@ckeditor/ckeditor5-link": ">=35.0.1",
-    "@ckeditor/ckeditor5-paragraph": ">=35.0.1",
-    "@ckeditor/ckeditor5-theme-lark": ">=35.0.1",
-    "@ckeditor/ckeditor5-ui": ">=35.0.1",
-    "@ckeditor/ckeditor5-utils": ">=35.0.1",
-    "webpack": "^5.58.1",
-    "webpack-cli": "^4.9.0"
-  },
-  "engines": {
-    "node": ">=14.0.0",
-    "npm": ">=5.7.1"
-  },
-  "files": [
-    "src",
-    "ckeditor5-theme/theme",
-    "ckeditor5-metadata.json"
-  ],
-  "homepage": "https://flmngr.com",
+  "name": "@edsdk/flmngr-ckeditor5",
+  "version": "1.1.1",
+  "description": "File manager plugin for CKEditor 5",
   "keywords": [
     "ckeditor",
     "ckeditor5",
@@ -81,17 +21,33 @@
     "image finder",
     "image editor"
   ],
-  "license": "GPL-2.0-or-later",
   "main": "src/index.js",
-  "name": "@edsdk/flmngr-ckeditor5",
+  "dependencies": {
+    "ckeditor5": ">=42.0.0"
+  },
+  "devDependencies": {
+    "webpack": "^5.92.1",
+    "webpack-cli": "^4.10.0"
+  },
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": ">=5.7.1"
+  },
+  "author": "Flmngr (https://flmngr.com/)",
+  "license": "GPL-2.0-or-later",
+  "homepage": "https://flmngr.com",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/edsdk/flmngr-ckeditor5.git",
+    "url": "https://github.com/edsdk/flmngr-ckeditor5.git",
     "directory": ""
   },
+  "files": [
+    "src",
+    "ckeditor5-theme/theme",
+    "ckeditor5-metadata.json"
+  ],
   "scripts": {
-    "build": "webpack",
-    "watch": "webpack --mode development --watch"
-  },
-  "version": "1.0.9"
+    "watch": "webpack --mode development --watch",
+    "build": "webpack"
+  }
 }

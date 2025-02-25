@@ -119,7 +119,8 @@ const config = {
                 ]
             },
             {
-                test: { and: [ /\.css$/, { not: [/ckeditor5-/] } ] },
+                test: /\.css$/,
+                // test: { and: [ /\.css$/, { not: [/ckeditor5-/] } ] },
                 use: [
                     { loader: MiniCssExtractPlugin.loader },
                     { loader: "css-loader", options: {url: false}, },

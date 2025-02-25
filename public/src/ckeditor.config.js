@@ -31,7 +31,7 @@ window.ckEditor5Config = {
         ],
         insert: {
             type: 'auto',
-            integrations: [ /*'upload', 'assetManager', */'url' ]
+            integrations: [ 'upload', 'assetManager', 'url' ]
         },
     },
     table: {

@@ -5,20 +5,14 @@
 /**
  * @module remove-format/removeformatediting
  */
-import { Plugin } from 'ckeditor5/src/core.js';
 import RemoveFormatCommand from './removeformatcommand.js';
+import { Plugin, RemoveFormatEditing as RemoveFormatEditingOriginal } from 'ckeditor5';
 /**
  * The remove format editing plugin.
  *
  * It registers the {@link module:remove-format/removeformatcommand~RemoveFormatCommand removeFormat} command.
  */
-export default class RemoveFormatEditing extends Plugin {
-    /**
-     * @inheritDoc
-     */
-    static get pluginName() {
-        return 'RemoveFormatEditing';
-    }
+export default class RemoveFormatEditing extends RemoveFormatEditingOriginal {
     /**
      * @inheritDoc
      */

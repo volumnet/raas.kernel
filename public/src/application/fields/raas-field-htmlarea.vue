@@ -13,46 +13,18 @@
 
 <template>
   <div>
-    <ckeditor 
-      :editor="editor" 
-      :model-value="pValue" 
+    <ckeditor
+      :editor="editor"
+      :model-value="pValue"
       :config="ckEditorConfig"
-      ref="ckeditor"
-      @input="pValue = $event; $emit('update:modelValue', $event)" 
       @ready="onMounted($event)"
-    ></ckeditor>
+      @update:model-value="$emit('update:modelValue', pValue = $event)"
+    />
     <input type="hidden" :name="name" :value="beautifiedHTML" :disabled="!!$attrs.disabled">
   </div>
 </template>
 
 <script>
-// import { ClassicEditor } from '@ckeditor/ckeditor5-editor-classic';
-
-// import { Essentials } from '@ckeditor/ckeditor5-essentials';
-// import { Paragraph } from '@ckeditor/ckeditor5-paragraph';
-// import { Bold, Italic, Underline, Strikethrough, Subscript, Superscript, } from '@ckeditor/ckeditor5-basic-styles';
-// import { SourceEditing } from '@ckeditor/ckeditor5-source-editing';
-// import { FindAndReplace } from '@ckeditor/ckeditor5-find-and-replace';
-// import { SelectAll } from '@ckeditor/ckeditor5-select-all';
-// import { Image, ImageCaption, ImageResize, ImageStyle, ImageToolbar, ImageUpload, ImageInsert } from '@ckeditor/ckeditor5-image';
-// import { Link, LinkImage } from '@ckeditor/ckeditor5-link';
-// import { Table, TableCellProperties, TableProperties, TableToolbar } from '@ckeditor/ckeditor5-table';
-// import { HorizontalLine } from '@ckeditor/ckeditor5-horizontal-line';
-// import { SpecialCharacters, SpecialCharactersEssentials } from '@ckeditor/ckeditor5-special-characters';
-// import { PageBreak } from '@ckeditor/ckeditor5-page-break';
-// import { HtmlComment } from '@ckeditor/ckeditor5-html-support';
-// import { HtmlEmbed } from '@ckeditor/ckeditor5-html-embed';
-// import { MediaEmbed } from '@ckeditor/ckeditor5-media-embed';
-// import { List } from '@ckeditor/ckeditor5-list';
-// import { Indent, IndentBlock } from '@ckeditor/ckeditor5-indent';
-// import { BlockQuote } from '@ckeditor/ckeditor5-block-quote';
-// import { Alignment } from '@ckeditor/ckeditor5-alignment';
-// import { Font } from '@ckeditor/ckeditor5-font';
-// import { Heading } from '@ckeditor/ckeditor5-heading';
-// import { GeneralHtmlSupport } from '@ckeditor/ckeditor5-html-support';
-// import { ShowBlocks } from '@ckeditor/ckeditor5-show-blocks';
-// import { Clipboard } from '@ckeditor/ckeditor5-clipboard';
-
 import {
     ClassicEditor,
     Essentials,
@@ -80,13 +52,12 @@ import {
     ShowBlocks,
     Clipboard,
 } from 'ckeditor5';
+import 'ckeditor5/ckeditor5.css';
 
 import { RemoveFormat } from 'app/libs/ckeditor5-remove-format';
 import Flmngr from "app/libs/flmngr-ckeditor5/src/flmngr";
 import { html as htmlBeautifier } from 'js-beautify';
-
 import { Ckeditor } from '@ckeditor/ckeditor5-vue';
-
 import RAASFieldHTMLArea from 'cms/application/fields/raas-field-htmlarea.vue.js';
 
 
@@ -186,7 +157,7 @@ export default {
                     GeneralHtmlSupport,
                     ShowBlocks,
                     Clipboard,
-                    // Flmngr,
+                    Flmngr,
                 ],
             }, (window.ckEditor5Config || {}));
         },
