@@ -217,7 +217,6 @@ input {
         }
     }
     &[type="search"] {
-        box-sizing: content-box;
         -webkit-appearance: textfield;
         &::-webkit-search-decoration, &::-webkit-search-cancel-button {
             -webkit-appearance: none;
@@ -362,11 +361,6 @@ select {
     .form-search &, .form-inline & {
         margin-bottom: 0;
     }
-    .form-search & {
-        .search-query {
-            border-radius: 0;
-        }
-    }
 }
 
 
@@ -425,7 +419,6 @@ input.search-query {
     padding-left: 4px \9;
     /* IE7-8 doesn't have border-radius, so don't indent the padding */
     margin-bottom: 0;
-    border-radius: 15px;
 }
 
 .form-search, .form-inline, .form-horizontal {
@@ -447,14 +440,6 @@ input.search-query {
     }
 }
 
-.form-search {
-    .input-append .search-query, .input-prepend .btn {
-        border-radius: 14px 0 0 14px;
-    }
-    .input-append .btn, .input-prepend .search-query {
-        border-radius: 0 14px 14px 0;
-    }
-}
 
 .form-horizontal {
     .help-block {

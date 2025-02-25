@@ -6,6 +6,15 @@
 @import 'app/application/bootstrap-fix.scss';
 @import 'app/application/fa-fix.scss';
 
+@keyframes rotate {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
 :root {
     font-size: 16px; // Не менять - это для определения rem; меняется в .body
     --header-outer-height: 41px;
@@ -15,6 +24,8 @@
     --border-radius-lg: .5rem;
     --border-radius-sm: .25rem;
     --control-height: 30px;
+    --rotation-interval: 2s;
+    --rotate: rotate var(--rotation-interval) infinite linear;
     
     --gray-1: #111;
     --gray-2: #212529;
@@ -32,9 +43,10 @@
     --gray-e: #e9ecef;
     --gray-f: #f8f9fa;
     --blue: #0088cc;
-    --red: #b94a48;
+    --red: #d9534f;
     --yellow: #ffc107;
     --green: #198754;
+    --cyan: #5bc0de;
     --danger: var(--red);
     --primary: var(--blue);
     --warning: var(--yellow);
