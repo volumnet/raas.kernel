@@ -1,3 +1,9 @@
+<style lang="scss">
+.raas-icon {
+    font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands";
+}
+</style>
+
 <template>
   <span :class="cssClass"></span>
 </template>
@@ -31,6 +37,9 @@ export default {
                     break;
                 case 'eye-close':
                     return 'eye-slash';
+                    break;
+                case 'pencil-square-o':
+                    return 'pen-to-square';
                     break;
                 default:
                     return this.icon;
