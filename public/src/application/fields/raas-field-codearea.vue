@@ -1,12 +1,20 @@
+<style lang="scss">
+.raas-field-codearea {
+    .cm-editor {
+        max-height: 320px;
+    }
+}
+</style>
+
 <template>
   <codemirror
-    class="code codearea fullscreen"
+    class="raas-field-codearea"
     v-bind="$attrs" 
     :model-value="pValue" 
     :required="false" 
     :indent-with-tab="true"
     :tab-size="2"
-    :extensions="codeAreaConfig"
+    :extensions="extensions"
     @change="$emit('update:modelValue', pValue = $event)" 
   />
 </template>
@@ -34,24 +42,27 @@ export default {
     },
     computed: {
         extensions() {
+            const mimeArr = (this.dataMime || '').split('/');
             const result = [];
-            switch (this.dataMime) {
+            switch (mimeArr[1] || '') {
                 case 'javascript':
-                    result.push(javascript);
+                case 'json':
+                    result.push(javascript());
                     break;
                 case 'html':
-                    result.push(html);
+                    result.push(html());
                     break;
                 case 'css':
-                    result.push(css);
-                    break;
-                case 'php':
-                    result.push(php);
+                    result.push(css());
                     break;
                 case 'xml':
-                    result.push(xml);
+                    result.push(xml());
+                    break;
+                default:
+                    result.push(php());
                     break;
             }
+            console.log(mimeArr[1], result);
             return result;
         }
     },
