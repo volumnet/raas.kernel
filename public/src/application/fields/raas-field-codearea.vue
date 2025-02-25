@@ -7,16 +7,18 @@
 </style>
 
 <template>
-  <codemirror
-    class="raas-field-codearea"
-    v-bind="$attrs" 
-    :model-value="pValue" 
-    :required="false" 
-    :indent-with-tab="true"
-    :tab-size="2"
-    :extensions="extensions"
-    @change="$emit('update:modelValue', pValue = $event)" 
-  />
+  <div class="raas-field-codearea">
+    <codemirror
+      v-bind="$attrs" 
+      :model-value="pValue" 
+      :required="false" 
+      :indent-with-tab="true"
+      :tab-size="2"
+      :extensions="extensions"
+      @change="$emit('update:modelValue', pValue = $event)" 
+    />
+    <input type="hidden" :name="name" :value="pValue" :disabled="!!$attrs.disabled">
+  </div>
 </template>
 
 <script>
@@ -35,10 +37,22 @@ export default {
         Codemirror
     },
     props: {
+        /**
+         * MIME-тип
+         * @type {String}
+         */
         dataMime: {
             type: String,
             required: false,
-        }
+        },
+        /**
+         * URN Компонента
+         * @type {String}
+         */
+        name: {
+            type: String,
+            required: false,
+        },
     },
     computed: {
         extensions() {
@@ -62,7 +76,6 @@ export default {
                     result.push(php());
                     break;
             }
-            console.log(mimeArr[1], result);
             return result;
         }
     },

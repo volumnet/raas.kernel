@@ -1,29 +1,39 @@
 <style lang="scss">
 
 .raas-field-color {
-    display: flex;
+    $field: &;
+    display: inline-flex;
     align-items: stretch;
     position: relative;
     &__input {
-        border-top-right-radius: 0 !important;
-        border-bottom-right-radius: 0 !important;
-        border-right: none !important;
-        height: 30px;
-        .is-invalid & {
-            background: none;
-        }
+        padding-right: var(--control-height) !important;
     }
-    .sp-replacer {
-        box-sizing: border-box;
+    &__picker {
         display: flex;
         align-items: center;
         justify-content: center;
-        height: 30px;
-        padding: 0 4px;
+        height: 100%;
+        aspect-ratio: 1/1;
+        position: absolute;
+        top: 50%;
+        right: 0;
+        transform: translateY(-50%);
+        background: transparent;
+        border: none;
+        padding: 0;
+        // &:after {
+        //     @include fa('eye');
+        //     font-weight: normal;
+        // }
+        // #{$field}_visible &:after {
+        //     @include fa('eye-slash');
+        // }
     }
     .sp-preview {
-        margin-bottom: 0;
-        margin-right: 0;
+        display: contents;
+        &-inner {
+            inset: 1px;
+        }
     }
     .sp-dd {
         display: none;
@@ -52,5 +62,23 @@ import 'spectrum-colorpicker'
 
 export default {
     mixins: [RAASFieldColor],
+    methods: {
+        checkColorPicker() {
+            var self = this;
+            if (!$(this.$refs.picker).attr('data-colorpicker-applied')) {
+                $(this.$refs.picker).spectrum({
+                    color: this.modelValue,
+                    showInput: true,
+                    showInitial: true,
+                    preferredFormat: 'hex',
+                    replacerClassName: 'raas-field-color__picker',
+                }).on('change', function () {
+                    self.$emit('update:modelValue', self.pValue = $(this).val());
+                }).attr('data-colorpicker-applied', 'true');
+            } else {
+                $(this.$refs.picker).spectrum('set', self.pValue);
+            }
+        },
+    }
 }
 </script>

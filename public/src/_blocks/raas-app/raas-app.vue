@@ -12,8 +12,8 @@
 
     --headings-line-height: 1.2;
     --border-radius: .375rem;
-    --border-radius-lg: .25rem;
-    --border-radius-sm: .5rem;
+    --border-radius-lg: .5rem;
+    --border-radius-sm: .25rem;
     --control-height: 30px;
     
     --gray-1: #111;

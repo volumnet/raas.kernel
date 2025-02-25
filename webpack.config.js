@@ -1,26 +1,19 @@
 const TerserJSPlugin = require('terser-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const RemoveEmptyScriptsPlugin = require("webpack-remove-empty-scripts");
 const { VueLoaderPlugin } = require('vue-loader')
 const webpack = require('webpack');
 const path = require('path');
-// const { styles } = require('@ckeditor/ckeditor5-dev-utils');
-// const { CKEditorTranslationsPlugin } = require('@ckeditor/ckeditor5-dev-translations');
 
 const isProduction = process.argv[process.argv.indexOf('--mode') + 1] === 'production';
 
 const config = {
     mode: 'production',
-    entry: {
-        header: './public/src/header.js',
-        application: './public/src/application.js',
-        'ckeditor.config': './public/src/ckeditor.config.js'
-    },
     resolve: {
         modules: ['node_modules'],
         alias: {
             app: path.resolve(__dirname, 'public/src/'),
+            kernel: path.resolve(__dirname, 'd:/web/home/libs/raas.kernel/public/src'),
             jquery: path.resolve(__dirname, 'node_modules/jquery/dist/jquery'),
             cms: path.resolve(__dirname, 'd:/web/home/libs/raas.cms/resources/js.vue3'),
             'fa-mixin': path.resolve(__dirname, 'd:/web/home/libs/raas.cms/resources/js.vue3/_shared/mixins/fa6.scss'),
@@ -35,7 +28,6 @@ const config = {
     output: {
         filename: '[name].js',
         path: __dirname+'/public',
-        publicPath: '/vendor/volumnet/raas.kernel/public/',
     },
     optimization: {
         minimizer: [
@@ -59,32 +51,6 @@ const config = {
                 test: /ckeditor5-[^/\\]+[/\\]theme[/\\]icons[/\\][^/\\]+\.svg$/,
                 use: [ 'raw-loader' ]
             },
-            // {
-            //     test: /ckeditor5-[^/\\]+[/\\]theme[/\\].+\.css$/,
-            //     use: [
-            //         {
-            //             loader: 'style-loader',
-            //             options: {
-            //                 injectType: 'singletonStyleTag',
-            //                 attributes: {
-            //                     'data-cke': true
-            //                 }
-            //             }
-            //         },
-            //         'css-loader',
-            //         {
-            //             loader: 'postcss-loader',
-            //             options: {
-            //                 postcssOptions: styles.getPostCssConfig( {
-            //                     themeImporter: {
-            //                         themePath: require.resolve( '@ckeditor/ckeditor5-theme-lark' )
-            //                     },
-            //                     minify: true
-            //                 } )
-            //             }
-            //         }
-            //     ]
-            // },
             {
                 test: /\.js$/,
                 use: 'babel-loader',
@@ -113,14 +79,13 @@ const config = {
                     {
                         loader: "sass-loader",
                         options: {
-                            additionalData: "@use 'app/_shared/init.scss' as *;\n",
+                            additionalData: "@use 'kernel/_shared/init.scss' as *;\n",
                         },
                     },
                 ]
             },
             {
                 test: /\.css$/,
-                // test: { and: [ /\.css$/, { not: [/ckeditor5-/] } ] },
                 use: [
                     { loader: MiniCssExtractPlugin.loader },
                     { loader: "css-loader", options: {url: false}, },
@@ -150,23 +115,6 @@ const config = {
                 test: /\.json$/,
                 loader: 'json-loader'
             },
-            {
-                test: require.resolve('bootstrap-multiselect/dist/js/bootstrap-multiselect'),
-                use: [
-                    {
-                        loader: 'imports-loader',
-                        options: {
-                            imports: {
-                                moduleName: 'jquery',
-                                name: '$',
-                            },
-                            additionalCode: 'var define = false; /* Disable AMD for misbehaving libraries */',
-                            wrapper: 'window',
-                        },
-                    }
-                ],
-            },
-            
         ],
     },
     plugins: [
@@ -181,22 +129,30 @@ const config = {
         }),
         new RemoveEmptyScriptsPlugin(),
         new MiniCssExtractPlugin({ filename: './[name].css' }),
-        // new CKEditorTranslationsPlugin( {
-        //     language: 'en',
-        //     additionalLanguages: ['ru'],
-        //     buildAllTranslationsToSeparateFiles: true,
-        // } ),
     ]
 };
 
-module.exports = (env, argv) => {
-    if (argv.mode === 'development') {
-        //...
-    }
-
-    if (argv.mode === 'production') {
-        //...
-    }
-
-    return config;
+config.entry = {
+    header: './public/src/header.js',
+    application: './public/src/application.js',
+    'ckeditor.config': './public/src/ckeditor.config.js'
 };
+config.output.publicPath = '/vendor/volumnet/raas.kernel/public/';
+config.module.rules.push({
+    test: require.resolve('bootstrap-multiselect/dist/js/bootstrap-multiselect'),
+    use: [
+        {
+            loader: 'imports-loader',
+            options: {
+                imports: {
+                    moduleName: 'jquery',
+                    name: '$',
+                },
+                additionalCode: 'var define = false; /* Disable AMD for misbehaving libraries */',
+                wrapper: 'window',
+            },
+        }
+    ],
+});
+
+module.exports = config;

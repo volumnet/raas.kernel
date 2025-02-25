@@ -26,6 +26,12 @@ export default {
                 case 'ok':
                     return 'check';
                     break;
+                case 'eye-open':
+                    return 'eye';
+                    break;
+                case 'eye-close':
+                    return 'eye-slash';
+                    break;
                 default:
                     return this.icon;
                     break;

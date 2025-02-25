@@ -15,6 +15,9 @@
         padding-right: var(--control-height) !important;
     }
     &__show {
+        display: flex;
+        align-items: center;
+        justify-content: center;
         height: 100%;
         aspect-ratio: 1/1;
         position: absolute;
