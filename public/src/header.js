@@ -49,6 +49,7 @@ import raasErrorsComponents from './_blocks/errors';
 import raasFieldComponents from './application/fields';
 import raasAppComponents from './_blocks/raas-app';
 import menuMoveComponents from './_blocks/menu-move';
+import RaasRepo from './application/raas-repo/raas-repo.vue';
 
 window.raasConfig = {
     shownLevel: 1,
@@ -76,6 +77,7 @@ window.raasComponents = {
     ...raasFieldComponents,
     ...raasAppComponents,
     ...menuMoveComponents,
+    RaasRepo
 };
 
 window.ymapSettings = {

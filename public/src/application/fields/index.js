@@ -18,6 +18,7 @@ import RaasFieldColor from './raas-field-color.vue';
 import RaasFieldHidden from './raas-field-hidden.vue';
 import RaasFieldPassword from './raas-field-password.vue';
 import RaasFieldSelect from './raas-field-select.vue';
+import RaasFieldAjax from 'app/application/fields/raas-field-ajax.vue';
 
 export default {
     CheckboxTree,
@@ -41,4 +42,5 @@ export default {
     RaasFieldHidden,
     RaasFieldPassword,
     RaasFieldSelect,
+    RaasFieldAjax,
 };

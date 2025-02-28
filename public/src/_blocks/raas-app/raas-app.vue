@@ -19,6 +19,7 @@
     font-size: 16px; // Не менять - это для определения rem; меняется в .body
     --header-outer-height: 41px;
 
+    --line-height: 1.42;
     --headings-line-height: 1.2;
     --border-radius: .375rem;
     --border-radius-lg: .5rem;
@@ -40,8 +41,8 @@
     --gray-b: #bbb;
     --gray-c: #ced4da;
     --gray-d: #dee2e6;
-    --gray-e: #e9ecef;
-    --gray-f: #f8f9fa;
+    --gray-e: #e3e3e3;
+    --gray-f: #f5f5f5;
     --blue: #0088cc;
     --red: #d9534f;
     --yellow: #ffc107;
@@ -86,6 +87,7 @@
 }
 
 .body {
+    line-height: var(--line-height);
     &__background-holder {
         background: linear-gradient(to bottom, #08f, #8cf);
         min-height: 100vh;

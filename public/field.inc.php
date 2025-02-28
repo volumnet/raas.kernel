@@ -117,6 +117,8 @@ $_RAASForm_Control = function (
     switch ($field->type) {
         case 'image':
         case 'file':
+            // @todo 2025-02-27, AVS: Не совсем понятно, как менять на компонент - используется крайне редко,
+            // и в основном шаблон переопределяется
             $attVar = isset($field->meta['attachmentVar'])
                     ? $field->meta['attachmentVar']
                     : 'attachments';
@@ -252,26 +254,29 @@ $_RAASForm_Control = function (
             }
             // $attrs['v-pre'] = 'v-pre';
             // echo 'TEST!!!';
+            if ($childrenArr) {
+                $attrs[':source'] = json_encode($childrenArr);
+            }
             if ($field->multiple && !in_array($field->type, ['password'])) {
+                $data = (array)($field->Form->DATA[$field->name] ?? []);
+                $attrs['multiple'] = null; // Чтобы перекрыть стандартный атрибут multiple="1"
+                $attrs[':model-value'] = 'repo.modelValue';
+                $attrs['@update:model-value'] = 'repo.emit(\'update:modelValue\', repo.modelValue = $event)';
                 ?>
-                <div data-role="raas-repo-block">
-                  <div data-role="raas-repo-container">
-                    <?php foreach ((array)($field->Form->DATA[$field->name] ?? []) as $key => $val) { ?>
-                        <div data-role="raas-repo-element">
-                          <raas-field-<?php echo htmlspecialchars($fieldType)?> <?php echo $_RAASForm_Attrs($field, array_merge($attrs, [':model-value' => json_encode($val), ':source' => $childrenArr ? json_encode($childrenArr) : false]))?>></raas-field-<?php echo htmlspecialchars($fieldType)?>>
-                        </div>
-                    <?php } ?>
-                  </div>
-                  <div data-role="raas-repo">
-                    <raas-field-<?php echo htmlspecialchars($fieldType)?>
-                      <?php echo $_RAASForm_Attrs($field, array_merge($attrs, ['disabled' => 'disabled', ':source' => $childrenArr ? json_encode($childrenArr) : false]))?>
-                    ></raas-field-<?php echo htmlspecialchars($fieldType)?>>
-                  </div>
-                </div>
+                <raas-repo
+                  :model-value="<?php echo htmlspecialchars(json_encode($data))?>"
+                  :defval="null"
+                  :sortable="true"
+                  :required="<?php echo htmlspecialchars(json_encode((bool)$field->required))?>"
+                  v-slot="repo"
+                >
+                  <raas-field-<?php echo htmlspecialchars($fieldType)?>
+                    <?php echo $_RAASForm_Attrs($field, $attrs)?>
+                  ></raas-field-<?php echo htmlspecialchars($fieldType)?>>
+                </raas-repo>
                 <?php
             } else {
                 $attrs[':model-value'] = json_encode($field->Form->DATA[$field->name] ?? null);
-                $attrs[':source'] = $childrenArr ? json_encode($childrenArr) : false;
                 ?>
                 <raas-field-<?php echo htmlspecialchars($fieldType)?>
                   <?php echo $_RAASForm_Attrs($field, $attrs)?>
@@ -358,7 +363,7 @@ $_RAASForm_Field = function (Field $field) use (
                 echo ' <span class="control-unit">' . htmlspecialchars($field->unit) . '</span>';
             }
             ?>
-        </div>
+          </div>
         </div>
         <?php
     }
