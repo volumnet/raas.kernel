@@ -183,7 +183,10 @@ class PHPErrorLogParser
             $text = trim(mb_substr($text, 0, $indexOfFile));
         }
 
-        $result['description'] = trim($text);
+        // $result['description'] = trim($text);
+        // 2025-03-07, AVS: сделал чтобы отображалась полная ошибка
+        // (т.к. в случае исключений может быть без backtrace не понятно, откуда берется)
+        $result['description'] = trim($error);
 
         return $result;
     }

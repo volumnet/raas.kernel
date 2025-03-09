@@ -89,7 +89,7 @@ Stack trace:
             'line' => 65,
             'type' => 'Warning',
             'datetime' => '2025-02-13T00:05:23+05:00',
-            'description' => 'Undefined array key 2',
+            'description' => '[13-Feb-2025 00:05:23 Asia/Yekaterinburg] PHP Warning:  Undefined array key 2 in d:\\cron.php on line 65',
         ],
     ])]
     #[TestWith([
@@ -100,7 +100,7 @@ Stack trace:
             'evalLine' => 2,
             'type' => 'Warning',
             'datetime' => '2025-02-13T00:00:27+05:00',
-            'description' => 'Undefined array key 590',
+            'description' => '[13-Feb-2025 00:00:27 Asia/Yekaterinburg] PHP Warning:  Undefined array key 590 in d:/web/home/test/www/index.php(546) : eval()\'d code on line 2',
         ],
     ])]
     #[TestWith([
@@ -129,7 +129,24 @@ Stack trace:
             'evalLine' => 3,
             'type' => 'Fatal error',
             'datetime' => '2025-02-13T00:00:27+05:00',
-            'description' => 'Uncaught TypeError: count(): Argument #1 ($value) must be of type Countable|array, null given',
+            'description' => '[13-Feb-2025 00:00:27 Asia/Yekaterinburg] PHP Fatal error:  Uncaught TypeError: count(): Argument #1 ($value) must be of type Countable|array, null given in d:/web/home/test/www/index.php(123) : eval()\'d code:3
+            Stack trace:
+            #0 stack trace entry 0
+            #1 stack trace entry 1
+            #2 stack trace entry 2
+            #3 stack trace entry 3
+            #4 stack trace entry 4
+            #5 stack trace entry 5
+            #6 stack trace entry 6
+            #7 stack trace entry 7
+            #8 stack trace entry 8
+            #9 stack trace entry 9
+            #10 stack trace entry 10
+            #11 stack trace entry 11
+            #12 stack trace entry 12
+            #13 stack trace entry 13
+            #14 stack trace entry 14
+              thrown in d:/web/home/test/www/inc/snippets/.htaccess(123) : eval()\'d code on line 3',
         ],
     ])]
     #[TestWith([
@@ -158,7 +175,24 @@ Stack trace:
             'evalLine' => 3,
             'type' => 'Fatal error',
             'datetime' => '2025-02-13T00:00:27+05:00',
-            'description' => 'Uncaught TypeError: count(): Argument #1 ($value) must be of type Countable|array, null given',
+            'description' => '[13-Feb-2025 00:00:27 Asia/Yekaterinburg] PHP Fatal error:  Uncaught TypeError: count(): Argument #1 ($value) must be of type Countable|array, null given in d:/web/home/test/www/index.php(123) : eval()\'d code on line 3
+            Stack trace:
+            #0 stack trace entry 0
+            #1 stack trace entry 1
+            #2 stack trace entry 2
+            #3 stack trace entry 3
+            #4 stack trace entry 4
+            #5 stack trace entry 5
+            #6 stack trace entry 6
+            #7 stack trace entry 7
+            #8 stack trace entry 8
+            #9 stack trace entry 9
+            #10 stack trace entry 10
+            #11 stack trace entry 11
+            #12 stack trace entry 12
+            #13 stack trace entry 13
+            #14 stack trace entry 14
+              thrown in d:/web/home/test/www/inc/snippets/.htaccess(123) : eval()\'d code on line 3',
         ],
     ])]
     public function testParseError(string $error, array $expected)
@@ -305,7 +339,7 @@ Stack trace:
                 'evalLine' => 2,
                 'type' => 'Warning',
                 'datetime' => '2025-02-13T00:00:27+05:00',
-                'description' => 'Undefined array key 590',
+                'description' => '[13-Feb-2025 00:00:27 Asia/Yekaterinburg] PHP Warning:  Undefined array key 590 in d:/web/home/test/www/index.php(546) : eval()\'d code on line 2',
                 'count' => 3,
             ],
             [
@@ -314,7 +348,7 @@ Stack trace:
                 'evalLine' => 3,
                 'type' => 'Warning',
                 'datetime' => '2025-02-13T00:00:27+05:00',
-                'description' => 'Undefined variable $aaa',
+                'description' => '[13-Feb-2025 00:00:27 Asia/Yekaterinburg] PHP Warning:  Undefined variable $aaa in d:/web/home/test/www/index.php(546) : eval()\'d code on line 3',
                 'count' => 1,
             ],
             [
@@ -323,7 +357,24 @@ Stack trace:
                 'evalLine' => 3,
                 'type' => 'Fatal error',
                 'datetime' => '2025-02-13T00:00:27+05:00',
-                'description' => 'Uncaught TypeError: count(): Argument #1 ($value) must be of type Countable|array, null given',
+                'description' => '[13-Feb-2025 00:00:27 Asia/Yekaterinburg] PHP Fatal error:  Uncaught TypeError: count(): Argument #1 ($value) must be of type Countable|array, null given in d:/web/home/test/www/index.php(546) : eval()\'d code:3
+Stack trace:
+#0 stack trace entry 0
+#1 stack trace entry 1
+#2 stack trace entry 2
+#3 stack trace entry 3
+#4 stack trace entry 4
+#5 stack trace entry 5
+#6 stack trace entry 6
+#7 stack trace entry 7
+#8 stack trace entry 8
+#9 stack trace entry 9
+#10 stack trace entry 10
+#11 stack trace entry 11
+#12 stack trace entry 12
+#13 stack trace entry 13
+#14 stack trace entry 14
+  thrown in d:/web/home/test/www/index.php(546) : eval()\'d code on line 3',
                 'count' => 1,
             ],
             [
@@ -331,7 +382,7 @@ Stack trace:
                 'line' => 65,
                 'type' => 'Warning',
                 'datetime' => '2025-02-13T01:45:24+05:00',
-                'description' => 'Undefined array key 2',
+                'description' => '[13-Feb-2025 00:05:23 Asia/Yekaterinburg] PHP Warning:  Undefined array key 2 in d:/cron.php on line 65',
                 'count' => 21,
             ],
         ]

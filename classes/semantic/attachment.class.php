@@ -171,14 +171,15 @@ class Attachment extends SOME
     /**
      * Проверяет, есть ли другие вложения, использующие те же файлы
      * @param self[] $items Вложения для удаления
-     * @return bool
+     * @return array <pre><code>array<string[] Имя файла => string Имя файла></code></pre> Поля realname для вложений,
+     *     использующих те же файлы
      */
-    public static function checkSharedFiles(array $items): bool
+    public static function checkSharedFiles(array $items): array
     {
         if (!$items) {
-            return false;
+            return [];
         }
-        $sqlQuery = "SELECT COUNT(*)
+        $sqlQuery = "SELECT DISTINCT(realname)
                        FROM " . static::_tablename()
                   . " WHERE realname IN (" . implode(", ", array_fill(0, count($items), "?")) . ")
                         AND id NOT IN (" . implode(", ", array_fill(0, count($items), "?")) . ")";
@@ -190,8 +191,12 @@ class Attachment extends SOME
                 return (int)$x->id;
             }, $items)
         );
-        $sqlResult = (int)static::_SQL()->getvalue([$sqlQuery, $sqlBind]);
-        return ($sqlResult > 0);
+        $sqlResult = static::_SQL()->getcol([$sqlQuery, $sqlBind]);
+        $result = [];
+        foreach ($sqlResult as $sqlValue) {
+            $result[$sqlValue] = $sqlValue;
+        }
+        return $result;
     }
 
 
@@ -204,10 +209,12 @@ class Attachment extends SOME
         // 2022-12-27, AVS: сделал дополнительную проверку на существование других вложений, ссылающихся на данный файл
         // Если они обнаружены, файл не удаляется
         // (хотя такого быть не должно, практика показывает что такое встречается)
-        if (static::checkSharedFiles($items)) {
-            return;
-        }
+        $checkShared = static::checkSharedFiles($items);
         foreach ($items as $item) {
+            // 2025-03-05, AVS: заменил, т.к. должно проверяться по каждому файлу (было в целом)
+            if (isset($checkShared[(string)$item->realname])) {
+                continue;
+            }
             if (is_file($item->dirpath . '/' . $item->realname)) {
                 unlink($item->dirpath . '/' . $item->realname);
             }

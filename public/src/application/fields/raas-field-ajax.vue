@@ -245,8 +245,13 @@ export default {
                     this.autocomplete = null;
                     const data = await this.$root.api(url);
                     this.busy = false;
-                    this.autocomplete = data.Set;
-                    this.$emit('autocomplete', data.Set);
+                    if (data.Set && (data.Set.length == 1)) {
+                        this.pValue = JSON.parse(JSON.stringify(data.Set[0]));
+                        this.$emit('update:modelValue', this.pValue); 
+                    } else {
+                        this.autocomplete = data.Set;
+                        this.$emit('autocomplete', data.Set);
+                    }
                 }, this.showInterval);
             }
         },
