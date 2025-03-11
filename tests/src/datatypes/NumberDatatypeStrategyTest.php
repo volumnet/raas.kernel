@@ -37,6 +37,7 @@ class NumberDatatypeStrategyTest extends AbstractDatatypeStrategyTest
      * @param mixed $expected Ожидаемое значение
      */
     #[TestWith([['type' => self::DATATYPE], '', true])]
+    #[TestWith([['type' => self::DATATYPE], '0', true])]
     #[TestWith([['type' => self::DATATYPE], 'aaa', DatatypeInvalidValueException::class])]
     #[TestWith([['type' => self::DATATYPE, 'min' => 10], 9, DatatypeOutOfRangeException::class])]
     #[TestWith([['type' => self::DATATYPE, 'max' => 999], 1000, DatatypeOutOfRangeException::class])]

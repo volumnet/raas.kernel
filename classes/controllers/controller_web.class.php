@@ -243,10 +243,10 @@ class Controller_Web extends Abstract_Controller
         $context = $this->model->activeModule ? $this->model->activeModule : $this->model->activePackage;
         if (!$this->model->user->access($context)->canDo($this->sub, $this->action, $this->id)) {
             if ($context instanceof GeneralPackage) {
-                $this->id = null;
-                $this->action = null;
+                $_GET['id'] = null;
+                $_GET['action'] = null;
                 if (!$this->model->user->access($context)->canDo($this->sub)) {
-                    $this->sub = null;
+                    $_GET['sub'] = null;
                 }
             } else {
                 exit; // 2023-08-03, AVS: чтобы не было накладки по другим параметрам

@@ -29,7 +29,8 @@ class NumberDatatypeStrategy extends DatatypeStrategy
             return true;
         }
         DatatypeStrategy::validate($value, $field);
-        $value = str_replace(',', '.', (string)$value ?: '');
+        // 2024-03-10, AVS: заменил (string)$value ?: '' на (string)$value, т.к. ноль не проходит (#1275)
+        $value = str_replace(',', '.', (string)$value);
         if (!is_numeric($value)) {
             throw new DatatypeInvalidValueException();
         } else {
