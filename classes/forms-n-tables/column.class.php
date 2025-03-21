@@ -84,4 +84,48 @@ class Column extends TableElement
                 break;
         }
     }
+
+    /**
+     * Рендерит ячейку
+     * @param string $value Значение ячейки
+     * @return string
+     */
+    public function render(string $value = ''): string
+    {
+        $template = $this->template ?? null;
+        if (is_callable($template)) {
+            $result = $template($this);
+        } else {
+            include Application::i()->view->tmp('/column.inc.php');
+            if ($template) {
+                include Application::i()->view->context->tmp($template);
+            }
+            ob_start();
+            $_RAASTable_Cell($this, $value);
+            $result = ob_get_clean();
+        }
+        return $result;
+    }
+
+    /**
+     * Рендерит ячейку-заголовок
+     * @param string $columnURN URN ячейки
+     * @return string
+     */
+    public function renderHeader(string $columnURN = ''): string
+    {
+        $template = $this->template ?? null;
+        if (is_callable($template)) {
+            $result = $template($this);
+        } else {
+            include Application::i()->view->tmp('/column.inc.php');
+            if ($template) {
+                include Application::i()->view->context->tmp($template);
+            }
+            ob_start();
+            $_RAASTable_Header($this, $columnURN);
+            $result = ob_get_clean();
+        }
+        return $result;
+    }
 }

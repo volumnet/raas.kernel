@@ -1,3 +1,6 @@
+/**
+ * @deprecated Репозиторий реализован в RAAS (raas-repo, raas-repo-table) - до 18.03.2026
+ */
 export default function(params) { 
     var defaultParams = {
         'repoContainer': '[data-role="raas-repo-container"]',
@@ -14,6 +17,9 @@ export default function(params) {
     }
     params = $.extend(defaultParams, params);
     var $repoBlock = $(this);
+    if ($(this).length) {
+        alert('Функция RAAS_repo устарела и будет отключена 18.03.2026. Пожалуйста, обратитесь к разработчику для обновления системы!');
+    }
     
     var $repoContainer;
     if ($(this).attr('data-raas-repo-container')) {

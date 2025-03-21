@@ -43,10 +43,8 @@
 
 <script>
 import RepoItem from 'cms/application/raas-repo/raas-repo-item.vue.js';
-import RepoItemControlsList from './raas-repo-item-controls-list.vue';
 
 export default {
     mixins: [RepoItem],
-    components: { 'raas-repo-item-controls-list': RepoItemControlsList },
 };
 </script>

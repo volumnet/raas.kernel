@@ -52,4 +52,28 @@ class Row extends TableElement
                 break;
         }
     }
+
+
+    /**
+     * Рендерит строку
+     * @param int $num Номер ячейки
+     * @return string
+     */
+    public function render(int $num = 0): string
+    {
+        $template = $this->template ?? null;
+        if (is_callable($template)) {
+            $result = $template($this);
+        } else {
+            if ($template) {
+                include Application::i()->view->context->tmp($template);
+            } else {
+                include Application::i()->view->tmp('/row.inc.php'); // Т.к. в шаблоне ничего не содержится кроме $_RAASTable_Row, его не подключаем
+            }
+            ob_start();
+            $_RAASTable_Row($this, $num);
+            $result = ob_get_clean();
+        }
+        return $result;
+    }
 }

@@ -699,4 +699,48 @@ class Field extends OptionContainer
         }
         $item->commit();
     }
+
+
+    /**
+     * Рендерит контрол поля
+     * @param bool $confirmPassword Подтверждающее поле для пароля
+     * @return string
+     */
+    public function render(bool $confirmPassword = false): string
+    {
+        $template = $this->template ?? null;
+        if (is_callable($template)) {
+            $result = $template($this);
+        } else {
+            include Application::i()->view->tmp('/form.inc.php'); // Для совместимости с $_RAAS_attrs
+            include Application::i()->view->tmp('/field.inc.php');
+            if ($template) {
+                include Application::i()->view->context->tmp($template);
+            }
+            ob_start();
+            $_RAASForm_Control($this, $confirmPassword);
+            $result = ob_get_clean();
+        }
+        return $result;
+    }
+
+
+    /**
+     * Рендерит группу поля
+     * @param array $attrs Дополнительные атрибуты
+     * @return string
+     */
+    public function renderGroup(): string
+    {
+        $result = '';
+        include Application::i()->view->tmp('/form.inc.php'); // Для совместимости с $_RAAS_attrs
+        include Application::i()->view->tmp('/field.inc.php');
+        if (is_string($this->template ?? null)) {
+            include Application::i()->view->context->tmp($this->template);
+        }
+        ob_start();
+        $_RAASForm_Field($this);
+        $result = ob_get_clean();
+        return $result;
+    }
 }

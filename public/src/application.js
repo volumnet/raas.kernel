@@ -11,6 +11,7 @@ import RAAS_getSelect from './libs/raas.get-select.js';
 import RAAS_repo from './libs/raas.repo.js';
 import RAASInitInputs from './libs/raas.init-inputs.js';
 import RAAS_queryString from './libs/raas.query-string.js';
+import RAAS_MultiTable from './libs/multitable.js'
 
 window.queryString = queryString;
 
@@ -25,6 +26,7 @@ jQuery(function ($) {
         RAAS_getSelect,
         RAAS_repo,
         RAASInitInputs,
+        RAAS_MultiTable,
     });
     $.extend({ RAAS_queryString });
 });
@@ -86,4 +88,8 @@ jQuery(document).ready(function($) {
     $('*[data-role="raas-repo-element"]:not(:has([data-role="raas-repo-move"])), *[data-role="raas-repo"]:not(:has([data-role="raas-repo-move"]))')
         .append('<a href="#" data-role="raas-repo-move"><i class="icon icon-resize-vertical"></i></a>');
     $('*[data-role="raas-repo-block"]').each(function() { $(this).RAAS_repo() });
+
+    $('[data-role="multitable"]').each(function() {
+        $(this).RAAS_MultiTable();
+    });
 });

@@ -1,5 +1,5 @@
 /**
- * @deprecated Дерево меню реализовано в RAAS
+ * @deprecated Дерево меню реализовано в RAAS - до 2026-01-01
  */
 export default function(method) {
     var $thisObj;

@@ -10,7 +10,8 @@
 
 <script>
 import RAASFieldText from 'cms/application/fields/raas-field-text.vue.js';
+import RAASFieldAutocomplete from './raas-field-autocomplete.vue.js';
 export default {
-    mixins: [RAASFieldText],
+    mixins: [RAASFieldText, RAASFieldAutocomplete],
 }
 </script>

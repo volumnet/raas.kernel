@@ -11,7 +11,6 @@ import formatPrice from 'cms/application/_libs/format-price.js';
 import * as Vue from 'expose-loader?exposes=Vue!vue/dist/vue.esm-bundler.js'
 
 import 'spectrum-colorpicker/spectrum.css'
-import 'bootstrap-multiselect/dist/css/bootstrap-multiselect.css'
 
 
 import 'jquery-form'
@@ -27,7 +26,6 @@ import 'jquery-ui/ui/widgets/autocomplete.js';
 
 import 'spectrum-colorpicker';
 
-import 'bootstrap-multiselect';
 import 'inputmask/dist/jquery.inputmask.js'
 
 window.Vue = Vue;
@@ -49,7 +47,8 @@ import raasErrorsComponents from './_blocks/errors';
 import raasFieldComponents from './application/fields';
 import raasAppComponents from './_blocks/raas-app';
 import menuMoveComponents from './_blocks/menu-move';
-import RaasRepo from './application/raas-repo/raas-repo.vue';
+import hintComponents from './_blocks/raas-hint';
+import repoComponents from './application/raas-repo';
 
 window.raasConfig = {
     shownLevel: 1,
@@ -77,7 +76,8 @@ window.raasComponents = {
     ...raasFieldComponents,
     ...raasAppComponents,
     ...menuMoveComponents,
-    RaasRepo
+    ...hintComponents,
+    ...repoComponents,
 };
 
 window.ymapSettings = {

@@ -7,6 +7,7 @@ namespace RAAS\General;
 use RAAS\Application;
 
 include $VIEW->tmp('/table.inc.php');
+
 ?>
 <form class="form-search" action="" method="get">
   <?php foreach ($VIEW->nav as $key => $val) { ?>
@@ -30,13 +31,14 @@ include $VIEW->tmp('/table.inc.php');
           </tr>
           <tr>
             <th>
-              <select name="uid[]" id="uid" multiple>
-                <?php foreach ($users as $user) { ?>
-                    <option value="<?php echo (int)$user->id?>"<?php echo in_array($user->id, (array)($VIEW->nav['uid'] ?? null)) ? ' selected="selected"' : ''?>>
-                      <?php echo htmlspecialchars($user->login)?>
-                    </option>
-                <?php } ?>
-              </select>
+              <?php
+              ?>
+              <raas-field-multiselect
+                name="uid[]"
+                id="uid"
+                :source="<?php echo htmlspecialchars(json_encode(array_map(fn($x) => ['value' => (int)$x->id, 'caption' => $x->login], $users)))?>"
+                :model-value="<?php echo htmlspecialchars(json_encode((array)($DATA['uid'] ?? [])))?>"
+              ></raas-field-multiselect>
             </th>
             <th>
               <input type="date" name="date_from" class="span2" placeholder="<?php echo $VIEW->context->_('SHOW_FROM')?>" value="<?php echo $DATA['date_from'] ?? ''?>" /><br>
@@ -46,40 +48,36 @@ include $VIEW->tmp('/table.inc.php');
               <input type="text" name="ip" class="span2" value="<?php echo $DATA['ip'] ?? ''?>" />
             </th>
             <th>
-              <select name="filter_method" id="filter_method" multiple>
-                <?php foreach ($methods as $method) { ?>
-                    <option value="<?php echo htmlspecialchars($method)?>"<?php echo in_array($method, (array)($DATA['filter_method'] ?? null)) ? ' selected="selected"' : ''?>>
-                      <?php echo htmlspecialchars($method)?>
-                    </option>
-                <?php } ?>
-              </select>
+              <raas-field-multiselect
+                name="filter_method[]"
+                id="filter_method"
+                :source="<?php echo htmlspecialchars(json_encode(array_map(fn($x) => ['value' => $x, 'caption' => $x], $methods)))?>"
+                :model-value="<?php echo htmlspecialchars(json_encode((array)($DATA['filter_method'] ?? [])))?>"
+              ></raas-field-multiselect>
             </th>
             <th>
-              <select name="filter_package[]" id="filter_package" multiple>
-                <?php foreach ($packages as $package) { ?>
-                    <option value="<?php echo htmlspecialchars($package)?>"<?php echo in_array($package, (array)($DATA['filter_package'] ?? null)) ? ' selected="selected"' : ''?>>
-                      <?php echo htmlspecialchars($package)?>
-                    </option>
-                <?php } ?>
-              </select>
+              <raas-field-multiselect
+                name="filter_package[]"
+                id="filter_package"
+                :source="<?php echo htmlspecialchars(json_encode(array_map(fn($x) => ['value' => $x, 'caption' => $x], $packages)))?>"
+                :model-value="<?php echo htmlspecialchars(json_encode((array)($DATA['filter_package'] ?? [])))?>"
+              ></raas-field-multiselect>
             </th>
             <th>
-              <select name="filter_module[]" id="filter_module" multiple>
-                <?php foreach ($modules as $module) { ?>
-                    <option value="<?php echo htmlspecialchars($module)?>"<?php echo in_array($module, (array)($DATA['filter_module'] ?? null)) ? ' selected="selected"' : ''?>>
-                      <?php echo htmlspecialchars($module)?>
-                    </option>
-                <?php } ?>
-              </select>
+              <raas-field-multiselect
+                name="filter_module[]"
+                id="filter_module"
+                :source="<?php echo htmlspecialchars(json_encode(array_map(fn($x) => ['value' => $x, 'caption' => $x], $modules)))?>"
+                :model-value="<?php echo htmlspecialchars(json_encode((array)($DATA['filter_module'] ?? [])))?>"
+              ></raas-field-multiselect>
             </th>
             <th>
-              <select name="filter_sub[]" id="filter_sub" multiple>
-                <?php foreach ($subs as $sub) { ?>
-                    <option value="<?php echo htmlspecialchars($sub)?>"<?php echo in_array($sub, (array)($DATA['filter_sub'] ?? null)) ? ' selected="selected"' : ''?>>
-                      <?php echo htmlspecialchars($sub)?>
-                    </option>
-                <?php } ?>
-              </select>
+              <raas-field-multiselect
+                name="filter_sub[]"
+                id="filter_sub"
+                :source="<?php echo htmlspecialchars(json_encode(array_map(fn($x) => ['value' => $x, 'caption' => $x], $subs)))?>"
+                :model-value="<?php echo htmlspecialchars(json_encode((array)($DATA['filter_sub'] ?? [])))?>"
+              ></raas-field-multiselect>
             </th>
             <th>
               <input type="text" name="action_name" autocomplete="off" class="span2" value="<?php echo $DATA['action_name'] ?? null?>" />

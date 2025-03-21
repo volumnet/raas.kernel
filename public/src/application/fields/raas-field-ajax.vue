@@ -35,6 +35,7 @@
         &-image {
             flex-shrink: 0;
             size: 32px;
+            object-fit: cover;
         }
         &-text {
             display: flex;
@@ -103,7 +104,7 @@
         class="raas-field-ajax__entity-link" 
         target="_blank"
       >
-        <img :src="pValue.img" class="raas-field-ajax__entity-image">
+        <img v-if="pValue.img" :src="pValue.img" class="raas-field-ajax__entity-image">
         <span class="raas-field-ajax__entity-text">
           <span class="raas-field-ajax__entity-title">
             {{ pValue.name }}
@@ -131,7 +132,7 @@
           class="raas-field-ajax__autocomplete-item" 
           @click="selectItem(autocompleteItem)"
         >
-          <img :src="autocompleteItem.img" class="raas-field-ajax__autocomplete-item-image">
+          <img v-if="autocompleteItem.img" :src="autocompleteItem.img" class="raas-field-ajax__autocomplete-item-image">
           <span class="raas-field-ajax__autocomplete-item-text">
             <span class="raas-field-ajax__autocomplete-item-title">
               {{ autocompleteItem.name }}

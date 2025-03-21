@@ -1,29 +1,8 @@
 export default function() {
     var thisObj = this;
     
-    $('select[multiple]').not('[disabled]', thisObj).multiselect({
-        buttonText: function(options, select) {
-            if (options.length == 0) {
-              return '--';
-            }
-            else {
-              var selected = '';
-              var i = 0;
-              options.each(function() {
-                  if (i < 3) {
-                      selected += $(this).text() + ', ';
-                  }
-                  i++;
-              });
-              selected = selected.substr(0, selected.length -2);
-              return selected + (options.length > 3 ? '...' : '');
-            }
-        },
-        maxHeight: 200
-    });
-    
     $('input[data-hint], textarea[data-hint], select[data-hint]', thisObj).each(function() {
-        var text = '<a class="btn" href="#" rel="popover" data-content="' + $(this).attr('data-hint') + '"><i class="fa fa-circle-question"></i></a>';
+        var text = '<button type="button" class="btn" rel="popover" data-content="' + $(this).attr('data-hint') + '"><span class="raas-icon fa-solid fa-circle-question"></span></button>';
         if (!$(this).closest('.control-group').find('a[rel="popover"]').length) {
             $(this).closest('.control-group').find('.controls').append(text);
         }

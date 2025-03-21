@@ -18,7 +18,13 @@ export default {
     },
     methods: {
         lightBoxInit(options = {}) {
-        }
+        },
+        /**
+         * Для отладки
+         */
+        alert(x) {
+            alert(JSON.stringify(x));
+        },
     }
 };
 </script>

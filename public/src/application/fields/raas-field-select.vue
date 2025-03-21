@@ -3,20 +3,23 @@
     v-bind="$attrs" 
     :multiple="multiple" 
     class="form-control raas-field-select" 
-    :data-value="modelValue" 
+    :data-value="pValue" 
     @change="$emit('update:modelValue', pValue = $event.target.value)"
   >
-    <option v-if="!multiple && placeholder" value="" :selected="!modelValue">
+    <!-- 2025-03-12, AVS: placeholder не устанавливаем здесь, т.к. явно установлен в field.inc.php -->
+    <!-- <option v-if="!multiple && placeholder" value="" :selected="!modelValue">
       {{placeholder}}
-    </option>
+    </option> -->
     <option 
       :value="option.value" 
       v-for="option in flatSource" 
-      :selected="multiple ? ((modelValue || []).indexOf(option.value) != -1) : (option.value == modelValue)" 
+      :selected="multiple ? ((pValue || []).indexOf(option.value) != -1) : (option.value == pValue)" 
       :disabled="option.disabled"
+      :data-group="option['data-group']"
+      :style="option.style"
     >
       <template v-for="n in option.level">
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;
       </template>
       {{option.caption}}
     </option>
@@ -39,10 +42,27 @@ export default {
             required: false,
         },
     },
+    data() {
+        return {
+            pSource: this.source,
+        };
+    },
+    mounted() {
+        // Совместимость с RAAS_fillSelect
+        $(this.$el).on('raas.fill-select', (e, data) => {
+            if (data.source) {
+                this.pSource = data.source;
+            }
+            if (data.value !== undefined) {
+                this.pValue = data.value;
+                this.$emit('update:modelValue', this.pValue);
+            }
+        });
+    },
     methods: {
-        checkMultiselect: function () {
+        checkMultiselect() {
         },
-        getFlatSource: function (source, level = 0) {
+        getFlatSource(source, level = 0) {
             let result = [];
             for (let option of source) {
                 let newOption = JSON.parse(JSON.stringify(option));
@@ -56,8 +76,21 @@ export default {
             return result;
         },
     },
-
-
-
+    computed: {
+        flatSource() {
+            let source = this.pSource;
+            if (!(source instanceof Array)) {
+                source = [];
+            }
+            return this.getFlatSource(source);
+        },
+    },
+    watch: {
+        source(newValue, oldValue) {
+            if (JSON.stringify(newValue) != JSON.stringify(oldValue)) {
+                this.pSource = newValue;
+            }
+        }
+    },
 }
 </script>

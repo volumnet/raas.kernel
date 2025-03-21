@@ -1,5 +1,5 @@
 /**
- * @deprecated Дерево реализовано в RAAS (checkbox-tree)
+ * @deprecated Дерево реализовано в RAAS (checkbox-tree) - до 01.01.2026
  */
 export default function(method) {
     var $thisObj;

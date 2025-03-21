@@ -15,6 +15,7 @@ class CheckboxDatatypeStrategy extends DatatypeStrategy
 
     public function export($value): string
     {
-        return trim((string)($value ?: ''));
+        // 2025-03-19, AVS: заменил (string)$value ?: '' на (string)$value, т.к. ноль не проходит (#1275)
+        return trim((string)$value);
     }
 }

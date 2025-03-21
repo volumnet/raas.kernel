@@ -183,7 +183,7 @@ class FieldContainer extends FormElement
         $DATA = array();
         if (($_SERVER['REQUEST_METHOD'] ?? null) == 'POST') {
             $DATA = $_POST;
-        } elseif ($this->Form->Item && $this->Form->Item->__id()) {
+        } elseif ($this->Form && $this->Form->Item && $this->Form->Item->__id()) {
             foreach ($this->children as $row) {
                 if ($row instanceof Field) {
                     if ($row->name) {

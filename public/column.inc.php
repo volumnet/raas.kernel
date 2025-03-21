@@ -1,22 +1,34 @@
 <?php
-$_RAASTable_Header = function(\RAAS\Column $Column, $key) use (&$_RAASTable_Attrs) {
-    $Table = $Column->Parent;
+/**
+ * Функции для отображения колонок таблицы
+ */
+namespace RAAS;
+
+use SOME\HTTP;
+
+/**
+ * Отображает ячейку-заголовок таблицы
+ * @param Column $column Колонка
+ * @param string $key URN колонки
+ */
+$_RAASTable_Header = function (Column $column, string $key) {
+    $table = $column->Parent;
     ?>
-    <th<?php echo $_RAASTable_Attrs($Column)?>>
+    <th<?php echo $column->getAttrsString()?>>
       <?php
-      switch ($Column->sortable) {
-          case \RAAS\Column::SORTABLE_REVERSABLE:
-              $sortable = ($Table->sort == $key);
-              $desc = ($sortable ? ($Table->order == \RAAS\Column::SORT_DESC) : null);
-              $url = $Table->sortVar . '=' . $key . '&' . $Table->orderVar . '=' . ($sortable ? ($desc ? 'asc' : 'desc') : '');
-              echo '<a href="' . \SOME\HTTP::queryString($url) . ($Table->hashTag ? '#_' . $Table->hashTag : '') . '">' . ($Column->caption . ($sortable ? (' ' . ($desc ? '&#9660;' : '&#9650;')) : '')) . '</a>';
+      switch ($column->sortable) {
+          case Column::SORTABLE_REVERSABLE:
+              $sortable = ($table->sort == $key);
+              $desc = ($sortable ? ($table->order == Column::SORT_DESC) : null);
+              $url = $table->sortVar . '=' . $key . '&' . $table->orderVar . '=' . ($sortable ? ($desc ? 'asc' : 'desc') : '');
+              echo '<a href="' . HTTP::queryString($url) . ($table->hashTag ? '#_' . $table->hashTag : '') . '">' . ($column->caption . ($sortable ? (' ' . ($desc ? '&#9660;' : '&#9650;')) : '')) . '</a>';
               break;
-          case \RAAS\Column::SORTABLE_NON_REVERSABLE:
-              $url = $Table->sortVar . '=' . $key;
-              echo '<a href="' . \SOME\HTTP::queryString($url) . '">' . $Column->caption . '</a>';
+          case Column::SORTABLE_NON_REVERSABLE:
+              $url = $table->sortVar . '=' . $key;
+              echo '<a href="' . HTTP::queryString($url) . '">' . $column->caption . '</a>';
               break;
           default:
-              echo $Column->caption;
+              echo $column->caption;
               break;
       }
       ?>
@@ -25,6 +37,11 @@ $_RAASTable_Header = function(\RAAS\Column $Column, $key) use (&$_RAASTable_Attr
 
 };
 
-$_RAASTable_Cell = function(\RAAS\Column $Column, $val) use (&$_RAASTable_Attrs) {
-    echo '<td' . $_RAASTable_Attrs($Column) . '>' . $val . '</td>';
+/**
+ * Отображает ячейку таблицы
+ * @param Column $column Колонка
+ * @param string $val Текст таблицы
+ */
+$_RAASTable_Cell = function (Column $column, string $val) {
+    echo '<td' . $column->getAttrsString() . '>' . $val . '</td>';
 };

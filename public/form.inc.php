@@ -1,80 +1,33 @@
 <?php
-$_RAASForm_Attrs = function(\RAAS\FormElement $FormElement, $additional = array()) {
-    $arr = (array)$FormElement->attrs;
-    foreach ((array)$additional as $key => $val) {
-        if (($val === false) || (in_array($key, array('checked', 'selected', 'multiple', 'required')) && !$val)) {
-            unset($arr[$key]);
-        } else {
-            if (in_array($key, array('class', 'data-role'))) {
-                if (!isset($arr[$key])) {
-                    $arr[$key] = '';
-                }
-                $arr[$key] .= ' ' . $val;
-            } else {
-                $arr[$key] = $val;
-            }
-        }
-    }
-    foreach ($arr as $key => $val) {
-        $arr[$key] = trim((string)$val);
-    }
-    if (!(isset($arr['id']) && $arr['id']) && !$FormElement->multiple && isset($arr['name']) && $arr['name']) {
-        $arr['id'] = $arr['name'];
-    } elseif ($FormElement->multiple) {
-        unset($arr['id']);
-    }
-    if (isset($arr['name']) && $FormElement->multiple && !strstr($arr['name'], '[')) {
-        $arr['name'] .= '[]';
-    }
-    if ($FormElement->type != 'select') {
-        //unset($arr['multiple'], $arr['placeholder']); 2013-08-19 - Зачем??? // AVS
-    }
-    if ($FormElement->type == 'password') {
-        unset($arr['confirm']);
-    }
-    unset($arr['unit']);
-    if (!isset($arr['disabled']) || !$arr['disabled']) {
-        unset($arr['disabled']);
-    }
-    if (!isset($arr['selected']) || !$arr['selected']) {
-        unset($arr['selected']);
-    }
-    if (!isset($arr['readonly']) || !$arr['readonly']) {
-        unset($arr['readonly']);
-    }
-    if (!isset($arr['multiple']) || !$arr['multiple']) {
-        unset($arr['multiple']);
-    }
-    if (isset($arr['required']) && $arr['required']) {
-        $arr['data-required'] = 'required';
-    }
-    unset($arr['required']); // временно
-    $text = '';
-    foreach ($arr as $key => $val) {
-        $text .= ' ' . htmlspecialchars($key) . '="' . htmlspecialchars($val) . '"';
-    }
-    return $text;
+namespace RAAS;
+
+/**
+ * Возвращает строку атрибутов HTML-элемента
+ * @param FormElement $formElement HTML-элемент
+ * @param array $additional Дополнительные атрибуты
+ * @return string
+ * @deprecated Используем метод getAttrsString() - до 2026-03-19
+ */
+$_RAASForm_Attrs = function (FormElement $formElement, array $additional = []): string {
+    trigger_error('$_RAASForm_Attrs is deprecated. Use HTMLElement::getAttrsString instead.', E_USER_DEPRECATED);
+    return $formElement->getAttrsString($additional);
 };
 
-$_RAASForm_Form_Plain = function(\RAAS\FieldCollection $fields) use (&$_RAASForm_Form_Plain, &$_RAASForm_Form_Plain2, &$_RAASForm_Attrs) {
+/**
+ * Отображает список полей
+ * @param FieldCollection $fields Список полей для отображения
+ */
+$_RAASForm_Form_Plain = function (FieldCollection $fields) {
     ?>
     <div class="form-horizontal">
       <?php
       foreach ($fields as $row) {
-          if ($row instanceof \RAAS\FieldSet) {
-              include \RAAS\Application::i()->view->context->tmp('/fieldset.inc.php');
-          } elseif ($row instanceof \RAAS\Field) {
-              include \RAAS\Application::i()->view->context->tmp('/field.inc.php');
-          }
-          if ($row->template) {
-              include \RAAS\Application::i()->view->context->tmp($row->template);
-          }
-          if ($row instanceof \RAAS\FieldSet) {
-              $_RAASForm_FieldSet($row);
-          } elseif ($row instanceof \RAAS\Field) {
-              $_RAASForm_Field($row);
-          } else {
-              $_RAASForm_Form_Plain2($row->children);
+          if ($row instanceof FieldSet) {
+              echo $row->render();
+          } elseif ($row instanceof Field) {
+              echo $row->renderGroup();
+          } elseif ($row instanceof FieldCollection) {
+              echo $row->children->render();
           }
       }
       ?>
@@ -82,36 +35,84 @@ $_RAASForm_Form_Plain = function(\RAAS\FieldCollection $fields) use (&$_RAASForm
     <?php
 };
 
-$_RAASForm_Form_Plain2 = function(\RAAS\FieldCollection $fields) use (&$_RAASForm_Form_Plain, &$_RAASForm_Attrs) {
+/**
+ * Отображает список полей
+ * @param FieldCollection $fields Список полей для отображения
+ * @deprecated Используем метод FieldCollection::render - до 2026-03-20
+ */
+$_RAASForm_Form_Plain2 = function (FieldCollection $fields) use (&$_RAASForm_Form_Plain) {
+    trigger_error('$_RAASForm_Form_Plain2 is deprecated. Use FieldCollection::render instead.', E_USER_DEPRECATED);
     return $_RAASForm_Form_Plain($fields);
 };
 
-$_RAASForm_Form_Tabbed = function(\RAAS\FieldCollection $fields) use (&$_RAASForm_Form_Tabbed, &$_RAASForm_Form_Plain, &$_RAASForm_Attrs) {
+/**
+ * Отображает список вкладок
+ * @param FieldCollection $fields Список вкладок для отображения
+ */
+$_RAASForm_Form_Tabbed = function (FieldCollection $tabs) {
     ?>
     <div class="tabbable">
       <ul class="nav nav-tabs">
-        <?php $i = 0; foreach ($fields as $row) { ?>
+        <?php $i = 0; foreach ($tabs as $tab) { ?>
             <li<?php echo !$i ? ' class="active"' : ''?>>
-              <a href="#<?php echo htmlspecialchars($row->name)?>" data-toggle="tab"><?php echo htmlspecialchars($row->caption)?></a>
+              <a href="#<?php echo htmlspecialchars($tab->name)?>" data-toggle="tab">
+                <?php echo htmlspecialchars($tab->caption)?>
+              </a>
             </li>
         <?php $i++; } ?>
       </ul>
       <div class="tab-content">
-        <?php
-        $i = 0;
-        foreach ($fields as $row) {
-            ?>
-            <div<?php echo $_RAASForm_Attrs($row, array('class' => 'tab-pane' . (!$i ? ' active' : ''), 'id' => $row->name))?>>
-              <?php
-              include \RAAS\Application::i()->view->context->tmp('/formtab.inc.php');
-              if ($row->template) {
-                  include \RAAS\Application::i()->view->context->tmp($row->template);
-              }
-              $_RAASForm_FormTab($row);
-              ?>
+        <?php $i = 0; foreach ($tabs as $tab) { ?>
+            <div<?php echo $tab->getAttrsString(['class' => 'tab-pane' . (!$i ? ' active' : ''), 'id' => $tab->name])?>>
+              <?php echo $tab->render()?>
             </div>
         <?php $i++; } ?>
       </div>
     </div>
     <?php
+};
+
+/**
+ * Рендерит форму полностью
+ * @param Form $form Форма
+ */
+$_RAASForm = function (Form $form) {
+    ?>
+    <form<?php echo $form->getAttrsString()?>>
+      <?php echo $form->children->render(); ?>
+      <div class="form-horizontal">
+        <div class="control-group">
+          <div class="controls">
+            <button type="submit" class="btn btn-primary">
+              <?php echo $form->submitCaption ? htmlspecialchars($form->submitCaption) : SAVE?>
+            </button>
+            <?php if ($form->Item && $form->actionMenu) { ?>
+                <button type="submit" name="@cancel" class="btn">
+                  <?php echo $form->resetCaption ? htmlspecialchars($form->resetCaption) : RESET?>
+                </button>
+                <?php echo _AND?>
+                <select name="@oncommit">
+                  <?php
+                  $actions = [];
+                  $actions[Form::ONCOMMIT_EDIT] = ONCOMMIT_EDIT;
+                  $actions[Form::ONCOMMIT_RETURN] = ONCOMMIT_RETURN;
+                  if (!$form->Item->id) {
+                      $actions[Form::ONCOMMIT_NEW] = ONCOMMIT_NEW;
+                  }
+                  foreach ($actions as $key => $val) { ?>
+                      <option value="<?php echo (int)$key?>" <?php echo (isset($form->DATA['@oncommit']) && $form->DATA['@oncommit'] == $key) ? 'selected="selected"' : ''?>>
+                        <?php echo htmlspecialchars($val)?>
+                      </option>
+                  <?php } ?>
+                </select>
+            <?php } else { ?>
+                <button type="reset" class="btn">
+                  <?php echo $form->resetCaption ? htmlspecialchars($form->resetCaption) : RESET?>
+                </button>
+            <?php } ?>
+          </div>
+        </div>
+      </div>
+    </form>
+    <?
 };

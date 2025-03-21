@@ -353,4 +353,37 @@ class Form extends FieldContainer
             new Redirector($this->__get('selfUrl'));
         }
     }
+
+
+    /**
+     * Рендерит форму
+     * @return string
+     */
+    public function render(): string
+    {
+        $Form = $this;
+        $template = $this->template ?? null;
+        if (is_callable($template)) {
+            $result = $template($this);
+        } else {
+            ob_start();
+            include Application::i()->view->context->tmp($template);
+            $result = ob_get_clean();
+        }
+        return $result;
+    }
+
+
+    /**
+     * Рендерит форму полностью
+     * @return string
+     */
+    public function renderFull(): string
+    {
+        include Application::i()->view->tmp('/form.inc.php');
+        ob_start();
+        $_RAASForm($this);
+        $result = ob_get_clean();
+        return $result;
+    }
 }

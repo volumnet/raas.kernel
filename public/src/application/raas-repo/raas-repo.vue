@@ -39,10 +39,8 @@
 
 <script>
 import Repo from 'cms/application/raas-repo/raas-repo.vue.js';
-import RepoList from './raas-repo-list.vue';
 
 export default {
     mixins: [Repo],
-    components: { 'raas-repo-list': RepoList },
 };
 </script>

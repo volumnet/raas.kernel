@@ -77,4 +77,23 @@ class FieldCollection extends ArrayObject
             return null;
         }
     }
+
+
+    /**
+     * Рендерит коллекцию полей
+     * @return string
+     */
+    public function render(): string
+    {
+        $hasTabs = count(array_filter((array)$this, fn($x) => ($x instanceof FormTab)));
+        include Application::i()->view->tmp('/form.inc.php');
+        ob_start();
+        if ($hasTabs) {
+            $_RAASForm_Form_Tabbed($this);
+        } else {
+            $_RAASForm_Form_Plain($this);
+        }
+        $result = ob_get_clean();
+        return $result;
+    }
 }

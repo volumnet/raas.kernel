@@ -42,10 +42,8 @@
 <script>
 import 'jquery-ui/ui/widgets/sortable.js'; // Требуется для нормальной работы сортировки
 import RepoList from 'cms/application/raas-repo/raas-repo-list.vue.js';
-import RepoItem from './raas-repo-item.vue';
 
 export default {
     mixins: [RepoList],
-    components: { 'raas-repo-item': RepoItem },
 };
 </script>

@@ -23,6 +23,7 @@ class CheckboxDatatypeStrategyTest extends AbstractDatatypeStrategyTest
      */
     #[TestWith([' aaa ', 'aaa'])]
     #[TestWith([1, '1'])] // Проверка ошибки от 2024-05-14 15:56 : TypeError: trim(): Argument #1 ($string) must be of type string, int given, при передаче в export значения типа int
+    #[TestWith([0, '0'])] // Проверка ошибки от 2025-03-19 16:01 : '0' не проходит
     public function testExport($value, $expected)
     {
         $this->checkExport($value, $expected);
