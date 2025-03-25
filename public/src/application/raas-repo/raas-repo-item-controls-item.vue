@@ -1,6 +1,6 @@
 <style lang="scss">
 .raas-repo-item-controls-item {
-    @include center-alignment(14px, 14px);
+    @include center-alignment(16px, 14px);
     padding: 0 !important;
     border: none !important;
     cursor: pointer;
@@ -8,7 +8,13 @@
     &_drag {
         cursor: ns-resize;
         &:after {
-            @include fa('arrows-alt-v');
+            @include fa('arrows-up-down');
+        }
+        .raas-repo-list_horizontal & {
+            cursor: move;
+            &:after {
+                @include fa('arrows-up-down-left-right');
+            }
         }
     }
     &_delete:after {

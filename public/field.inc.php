@@ -25,19 +25,7 @@ $_RAASForm_Control = function (Field $field, bool $confirmPassword = false, arra
                 $Set = [$Set];
             }
             $Set = array_values(array_filter($Set, fn($x) => (int)$x->id));
-            $data = array_map(function ($att) use ($field) {
-                $result = [
-                    'id' => (int)$att->id,
-                    'fileURL' => '/' . $att->fileURL,
-                    'filename' => $att->filename,
-                ];
-                if ($field->type == 'image') {
-                    $result['tnURL'] = '/' . $att->tnURL;
-                } else {
-                    // $result['tnURL'] = '/' . $att->fileURL;
-                }
-                return $result;
-            }, $Set);
+            $data = array_map(fn($val) => $field->datatypeStrategy->importForJSON($val), $Set);
             if ($Set) { ?>
                 <thumbnails-list
                   :items="<?php echo htmlspecialchars(json_encode($data))?>"
@@ -85,9 +73,12 @@ $_RAASForm_Control = function (Field $field, bool $confirmPassword = false, arra
             }
 
             if ($field->multiple) {
-                $data = (array)($field->Form->DATA[$field->name] ?? []);
+                $data = array_map(
+                    fn($val) => $field->datatypeStrategy->importForJSON($val),
+                    (array)($field->Form->DATA[$field->name] ?? [])
+                );
             } else {
-                $data = $field->Form->DATA[$field->name] ?? null;
+                $data = $field->datatypeStrategy->importForJSON($field->Form->DATA[$field->name] ?? null);
             }
 
             if ($field->multiple &&

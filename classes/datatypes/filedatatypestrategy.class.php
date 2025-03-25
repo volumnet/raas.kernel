@@ -314,4 +314,15 @@ class FileDatatypeStrategy extends DatatypeStrategy
     {
         return true;
     }
+
+
+    public function importForJSON($value)
+    {
+        $result = [
+            'id' => (int)$value->id,
+            'fileURL' => '/' . $value->fileURL,
+            'filename' => $value->filename,
+        ];
+        return $result;
+    }
 }

@@ -145,6 +145,17 @@ abstract class DatatypeStrategy extends AbstractStrategy
 
 
     /**
+     * Обработка значения, импортированного из базы данных, для вывода в JSON
+     * @param mixed $value Импортированное значение
+     * @return mixed
+     */
+    public function importForJSON($value)
+    {
+        return $value;
+    }
+
+
+    /**
      * Массовая обработка значений, импортированных из базы данных
      * (удаляет null-значения, в случае индексированного массива реиндексирует)
      * @param array $values Импортированные значения

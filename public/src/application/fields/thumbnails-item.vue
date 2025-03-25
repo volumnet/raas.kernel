@@ -86,6 +86,7 @@
       {{ item.filename }}
     </div>
     <a
+      v-if="deleteUrl"
       class="thumbnails-item__delete" 
       :href="realDeleteUrl" 
       :onclick="'return confirm(\'' + $root.translations[item.tnURL ? 'DELETE_IMAGE_TEXT' : 'DELETE_FILE_TEXT'] + '\')'"

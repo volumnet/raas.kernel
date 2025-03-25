@@ -30,4 +30,12 @@ class ImageDatatypeStrategy extends FileDatatypeStrategy
         }
         throw new DatatypeImageTypeMismatchException();
     }
+
+
+    public function importForJSON($value)
+    {
+        $result = parent::importForJSON($value);
+        $result['tnURL'] = '/' . $value->tnURL;
+        return $result;
+    }
 }

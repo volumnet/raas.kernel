@@ -1,8 +1,11 @@
 <style lang="scss">
 .raas-repo-item {
+    $self: &;
+
     display: flex;
     align-items: center;
     gap: .25rem;
+    position: relative;
     @include viewport('<xs') {
         flex-direction: column;
         align-items: flex-start;
@@ -13,6 +16,19 @@
     }
     &__controls {
         flex-shrink: 0;
+        .raas-repo-list_horizontal & {
+            position: absolute;
+            right: 0;
+            top: 0;
+            padding: 5px;
+            opacity: 0.5;
+            background: transparent;
+            transition: all .25s;
+        }
+        .raas-repo-list_horizontal #{$self}:hover & {
+            opacity: 1;
+            background: white;
+        }
     }
     &__inner {
         max-width: 100%;

@@ -6,29 +6,15 @@
             margin-bottom: 0;
         }
     }
-    // display: flex;
-    // align-items: center;
-    // gap: .25rem;
-    // @include viewport('<xs') {
-    //     flex-direction: column;
-    //     align-items: flex-start;
-    // }
-    // .control-group_full & {
-    //     flex-direction: column;
-    //     align-items: flex-start;
-    // }
     &__controls {
-        width: 2rem;
+        .raas-repo-table_align-left & {
+            width: 100%;
+        }
+        // width: 2rem;
     }
-    // &__inner {
-    //     max-width: 100%;
-    //     &:has(.raas-field-ajax) {
-    //         width: 100%; // Костыль, чтобы автокомплит был на полную строку
-    //     }
-    //     @include viewport('<xs') {
-    //         width: 100%;
-    //     }
-    // }
+    .raas-repo-item-controls-list {
+        justify-content: flex-end;
+    }
 }
 </style>
 

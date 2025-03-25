@@ -260,7 +260,7 @@ class Field extends OptionContainer
                 return (string)$this->$var;
                 break;
             case 'datatypeStrategy':
-                return DatatypeStrategy::spawn($this->datatypeStrategyURN ?: $this->type);
+                return DatatypeStrategy::spawn($this->__get('datatypeStrategyURN') ?: $this->type);
                 break;
             default:
                 return parent::__get($var);

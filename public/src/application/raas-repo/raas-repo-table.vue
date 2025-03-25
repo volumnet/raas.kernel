@@ -1,23 +1,34 @@
 <style lang="scss">
 .raas-repo-table {
+    $self: &;
+    td, th {
+        #{$self}_align-left & {
+            white-space: nowrap;
+        }
+    }
     &__add {
         &:before {
             @include fa('plus');
             margin-right: 5px;
         }
     }
+    &__controls {
+        #{$self}_align-left & {
+            width: 100%;
+        }
+    }
 }
 </style>
 
 <template>
-  <table class="raas-repo-table">
+  <table class="raas-repo-table" :class="{ 'raas-repo-table_align-left': alignLeft }">
     <thead v-if="(columns && columns.length) || $slots.header">
       <slot name="header">
         <tr>
           <th v-for="column in columns">
             {{ column }}
           </th>
-          <th></th>
+          <th class="raas-repo-table__controls"></th>
         </tr>
       </slot>
     </thead>
@@ -66,6 +77,14 @@ export default {
          */
         columnsCounter: {
             type: Number,
+        },
+        /**
+         * Выравнивать колонки по левому краю (максимально увеличить controls)
+         * @type {Boolean}
+         */
+        alignLeft: {
+            type: Boolean,
+            default: false,
         },
     },
     data() {

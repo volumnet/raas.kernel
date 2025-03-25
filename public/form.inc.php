@@ -64,7 +64,7 @@ $_RAASForm_Form_Compound = function (FieldCollection $fieldsCollection) {
         if ($field->type != 'hidden') {
             $columns[] = $field->caption;
         }
-        $defval[$field->name] = null;
+        $defval[$field->name] = $field->default ?? null;
     }
 
     $repoData = [];
@@ -72,7 +72,7 @@ $_RAASForm_Form_Compound = function (FieldCollection $fieldsCollection) {
     foreach ((array)($DATA[$firstField->name] ?? []) as $i => $temp) {
         $repoRow = [];
         foreach ($fields as $field) {
-            $repoRow[$field->name] = $DATA[$field->name][$i] ?? null;
+            $repoRow[$field->name] = $field->datatypeStrategy->importForJSON($DATA[$field->name][$i] ?? null);
         }
         $repoData[] = $repoRow;
     }
@@ -97,7 +97,7 @@ $_RAASForm_Form_Compound = function (FieldCollection $fieldsCollection) {
                     <?php } ?>
                   </component>
               <?php } ?>
-              <component is="th"></component>
+              <component is="th" class="raas-repo-table__controls"></component>
             </component>
           </template>
       <?php } ?>
