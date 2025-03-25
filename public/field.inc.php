@@ -10,8 +10,9 @@ use SOME\HTTP;
  * Шаблон поля
  * @param Field $field Поле
  * @param bool $confirmPassword Подтверждающее поле для пароля
+ * @param array $additional Дополнительные атрибуты
  */
-$_RAASForm_Control = function (Field $field, bool $confirmPassword = false) {
+$_RAASForm_Control = function (Field $field, bool $confirmPassword = false, array $additional = []) {
     $attrs = [];
     $fieldType = $field->type ?: 'text';
     switch ($fieldType) {
@@ -47,6 +48,7 @@ $_RAASForm_Control = function (Field $field, bool $confirmPassword = false) {
             if ($field->type == 'image') {
                 $attrs['accept'] = 'image/jpeg,image/png,image/gif,image/webp,image/svg+xml';
             }
+            $attrs = array_merge($attrs, $additional);
             ?>
             <raas-field-file <?php echo $field->getAttrsString($attrs)?>></raas-field-file>
             <?php
@@ -89,9 +91,11 @@ $_RAASForm_Control = function (Field $field, bool $confirmPassword = false) {
             }
 
             if ($field->multiple &&
+                (!isset($additional['multiple']) || $additional['multiple']) &&
                 !in_array($field->type, ['password', 'checkbox']) &&
                 !$field->{'data-raas-multiselect'}
             ) {
+                $attrs = array_merge($attrs, $additional);
                 $attrs['multiple'] = null; // Чтобы перекрыть стандартный атрибут multiple="1"
                 $attrs[':model-value'] = 'repo.modelValue';
                 $attrs['@update:model-value'] = 'repo.emit(\'update:modelValue\', repo.modelValue = $event)';
@@ -110,6 +114,7 @@ $_RAASForm_Control = function (Field $field, bool $confirmPassword = false) {
                 <?php
             } else {
                 $attrs[':model-value'] = json_encode($data);
+                $attrs = array_merge($attrs, $additional);
                 ?>
                 <raas-field-<?php echo htmlspecialchars($fieldType)?>
                   <?php echo $field->getAttrsString($attrs)?>

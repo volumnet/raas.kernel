@@ -704,9 +704,10 @@ class Field extends OptionContainer
     /**
      * Рендерит контрол поля
      * @param bool $confirmPassword Подтверждающее поле для пароля
+     * @param array $attrs Дополнительные атрибуты
      * @return string
      */
-    public function render(bool $confirmPassword = false): string
+    public function render(bool $confirmPassword = false, array $attrs = []): string
     {
         $template = $this->template ?? null;
         if (is_callable($template)) {
@@ -718,7 +719,7 @@ class Field extends OptionContainer
                 include Application::i()->view->context->tmp($template);
             }
             ob_start();
-            $_RAASForm_Control($this, $confirmPassword);
+            $_RAASForm_Control($this, $confirmPassword, $attrs);
             $result = ob_get_clean();
         }
         return $result;

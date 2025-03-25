@@ -7,7 +7,7 @@
 </style>
 
 <template>
-  <button class="raas-hint btn btn-small" data-html="true" rel="popover">
+  <button type="button" class="raas-hint btn btn-small" data-html="true" rel="popover">
     <raas-icon icon="circle-question"></raas-icon>
     <div v-if="!loaded" class="raas-hint__inner" ref="slotContainer">
       <slot></slot>

@@ -96,4 +96,18 @@ class FieldCollection extends ArrayObject
         $result = ob_get_clean();
         return $result;
     }
+
+
+    /**
+     * Рендерит коллекцию полей в виде таблицы-репозитория
+     * @return string
+     */
+    public function renderCompound(): string
+    {
+        include Application::i()->view->tmp('/form.inc.php');
+        ob_start();
+        $_RAASForm_Form_Compound($this);
+        $result = ob_get_clean();
+        return $result;
+    }
 }

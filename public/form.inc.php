@@ -45,6 +45,97 @@ $_RAASForm_Form_Plain2 = function (FieldCollection $fields) use (&$_RAASForm_For
     return $_RAASForm_Form_Plain($fields);
 };
 
+
+/**
+ * Отображает список полей в виде таблицы-репозитория
+ * @param FieldCollection $fieldsCollection Список полей для отображения
+ */
+$_RAASForm_Form_Compound = function (FieldCollection $fieldsCollection) {
+    $fields = (array)$fieldsCollection;
+    $hiddenFields = array_filter($fields, fn($field) => ($field->type == 'hidden'));
+    $visibleFields = array_filter($fields, fn($field) => ($field->type != 'hidden'));
+    if (!$fields) {
+        return;
+    }
+    $DATA = $fieldsCollection->Form->DATA;
+
+    $columns = $defval = [];
+    foreach ($fields as $field) {
+        if ($field->type != 'hidden') {
+            $columns[] = $field->caption;
+        }
+        $defval[$field->name] = null;
+    }
+
+    $repoData = [];
+    $firstField = $fields[array_keys($fields)[0]];
+    foreach ((array)($DATA[$firstField->name] ?? []) as $i => $temp) {
+        $repoRow = [];
+        foreach ($fields as $field) {
+            $repoRow[$field->name] = $DATA[$field->name][$i] ?? null;
+        }
+        $repoData[] = $repoRow;
+    }
+
+    ?>
+    <raas-repo-table
+      class="table table-striped table-condensed"
+      :model-value="<?php echo htmlspecialchars(json_encode($repoData))?>"
+      :defval="<?php echo htmlspecialchars(json_encode($defval))?>"
+      :columns-counter="<?php echo count($columns)?>"
+      :sortable="true"
+    >
+      <?php if (array_filter($columns)) { ?>
+          <template #header>
+            <component is="tr">
+              <?php foreach ($visibleFields as $field) { ?>
+                  <component is="th">
+                    <?php
+                    echo htmlspecialchars($field->caption);
+                    if ($field->meta['hint'] ?? null) { ?>
+                        <raas-hint><?php echo $field->meta['hint']?></raas-hint>
+                    <?php } ?>
+                  </component>
+              <?php } ?>
+              <component is="th"></component>
+            </component>
+          </template>
+      <?php } ?>
+      <template #default="repo">
+        <?php $i = 0; foreach ($visibleFields as $field) { ?>
+            <component is="td">
+              <?php
+              if (!$i) {
+                  foreach ($hiddenFields as $hiddenField) {
+                      $hiddenFieldName = $hiddenField->name;
+                      if (!stristr($hiddenFieldName, '[')) {
+                          $hiddenFieldName .= '[]';
+                      }
+                      ?>
+                      <input
+                        type="hidden"
+                        name="<?php echo htmlspecialchars($hiddenFieldName)?>"
+                        :value="repo.modelValue.<?php echo htmlspecialchars($hiddenField->name)?>"
+                      >
+                  <?php }
+              }
+
+              $attrs = [
+                  ':model-value' => 'repo.modelValue.' . $field->name,
+                  '@update:model-value' => 'repo.emit(\'update:modelValue\', {...repo.modelValue, ' . $field->name . ': $event })',
+                  'multiple' => false,
+              ];
+              if ($field->type == 'checkbox') {
+                  $field->mask = '0';
+              }
+              echo $field->render(false, $attrs)?>
+            </component>
+        <?php $i++; } ?>
+      </template>
+    </raas-repo-table>
+    <?php
+};
+
 /**
  * Отображает список вкладок
  * @param FieldCollection $fields Список вкладок для отображения
