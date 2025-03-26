@@ -172,6 +172,9 @@ $_RAASTable_TableForm = function (Table $table, bool $insideForm = false) {
  * @param string $pagesHash Хэш-тег для постраничной разбивки
  */
 $_RAASTable = function (Table $table, bool $insideForm = false, string $pagesHash = '') {
+    if (!$pagesHash && ($table->meta['formHash'] ?? null)) {
+        $pagesHash = (string)$table->meta['formHash'];
+    }
     if ((array)$table->Set || ($table->emptyHeader && $table->header)) {
         echo $table->renderTableForm();
     }
