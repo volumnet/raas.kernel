@@ -73,7 +73,8 @@ export default class Flmngr extends FlmngrOriginal {
             setTimeout(() => {
 
                 let host = "http" + (Cookies.get("N1ED_HTTPS") === "false" ? "" : "s") + "://" + (!!Cookies.get("N1ED_PREFIX") ? (Cookies.get("N1ED_PREFIX") + ".") : "") + "cloud.n1ed.com";
-
+                // Flmngr.includeJS('//lab/flmngr/flmngr.js');
+                // Flmngr.includeJS('//lab/flmngr/imgpen.js');
                 Flmngr.includeJS(host + "/v/latest/sdk/flmngr.js?apiKey=" + apiKey);
                 Flmngr.includeJS(host + "/v/latest/sdk/imgpen.js?apiKey=" + apiKey);
             }, delay);

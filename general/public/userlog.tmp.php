@@ -15,20 +15,10 @@ include $VIEW->tmp('/table.inc.php');
           <input type="hidden" name="<?php echo htmlspecialchars($key)?>" value="<?php echo htmlspecialchars($val)?>" />
       <?php } ?>
   <?php } ?>
-  <table<?php echo $_RAASTable_Attrs($Table)?>>
+  <table<?php echo $Table->getAttrsString()?>>
     <?php if ($Table->header) { ?>
         <thead>
-          <tr>
-            <?php
-            foreach ($Table->columns as $key => $col) {
-                include \RAAS\Application::i()->view->context->tmp('/column.inc.php');
-                if ($col->template) {
-                    include \RAAS\Application::i()->view->context->tmp($col->template);
-                }
-                $_RAASTable_Header($col, $key);
-            }
-            ?>
-          </tr>
+          <?php echo $Table->renderHeaderRow(); ?>
           <tr>
             <th>
               <?php
@@ -89,21 +79,9 @@ include $VIEW->tmp('/table.inc.php');
             </th>
           </tr>
         </thead>
-    <?php } ?>
-    <?php if ((array)$Table->Set) { ?>
-        <tbody>
-          <?php
-          for ($i = 0; $i < count($Table->rows); $i++) {
-              $row = $Table->rows[$i];
-              include \RAAS\Application::i()->view->context->tmp('/row.inc.php');
-              if ($row->template) {
-                  include \RAAS\Application::i()->view->context->tmp($row->template);
-              }
-              $_RAASTable_Row($row, $i);
-              ?>
-          <?php } ?>
-        </tbody>
-    <?php } ?>
+    <?php }
+    echo $Table->renderBody();
+    ?>
   </table>
 </form>
 <?php if (!(array)$Table->Set && $Table->emptyString) { ?>

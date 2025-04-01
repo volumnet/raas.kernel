@@ -133,7 +133,9 @@ class CrontabTable extends Table
             ],
             'caption' => $this->view->_('CRONTAB'),
             'emptyString' => $this->view->_('NO_NOTES_FOUND'),
-            'template' => 'prioritytable.tmp.php'
+            'meta' => [
+                'priorityColumn' => 'priority',
+            ],
         );
         parent::__construct(array_merge($defaultParams, $params));
     }

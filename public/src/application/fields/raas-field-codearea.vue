@@ -3,6 +3,9 @@
     .cm-editor {
         max-height: 320px;
     }
+    .cm-scroller {
+        min-height: 100px;
+    }
 }
 </style>
 

@@ -9,6 +9,7 @@ import Cookie from 'js-cookie';
 import numTxt from 'cms/application/_libs/num-txt.js';
 import formatPrice from 'cms/application/_libs/format-price.js';
 import * as Vue from 'expose-loader?exposes=Vue!vue/dist/vue.esm-bundler.js'
+// import Flmngr from 'flmngr';
 
 import 'spectrum-colorpicker/spectrum.css'
 
@@ -29,6 +30,7 @@ import 'spectrum-colorpicker';
 import 'inputmask/dist/jquery.inputmask.js'
 
 window.Vue = Vue;
+// window.flmngr = Flmngr;
 
 import raasTreeComponents from './_blocks/raas-tree';
 import raasIconComponents from './_blocks/raas-icon';

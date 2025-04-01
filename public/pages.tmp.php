@@ -1,8 +1,13 @@
 <?php
-$pages_list = array();
+/**
+ * Виджет постраничной разбивки
+ */
+namespace RAAS;
+
+$pages_list = [];
 if ($Pages->pages > 1) {
     $trace = 2;
-    if (!$pagesVar) {
+    if (!($pagesVar ?? null)) {
         $pagesVar = 'page';
     }
     $pattern_active = '<li class="active"><span>{text}</span></li>';

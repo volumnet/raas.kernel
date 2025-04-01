@@ -81,10 +81,7 @@ $showModule = function(IRightsContext $context, Form $form) use (&$getSelect) {
 
 $_RAASForm_FormTab = function(FormTab $formTab) use (
     &$showModule,
-    &$getSelect,
-    &$_RAASForm_Form_Tabbed,
-    &$_RAASForm_Form_Plain,
-    &$_RAASForm_Attrs
+    &$getSelect
 ) {
     $form = $formTab->Form;
     $item = $form->Item;

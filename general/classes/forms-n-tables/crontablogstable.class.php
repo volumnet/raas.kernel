@@ -56,7 +56,6 @@ class CrontabLogsTable extends Table
                     }
                 ],
             ],
-            'template' => 'multitable.tmp.php',
             'caption' => $params['Item']->name . ':  ' . $this->view->_('LOGS'),
             'emptyString' => $this->view->_('NO_NOTES_FOUND'),
             'data-role' => 'multitable',

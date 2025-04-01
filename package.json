@@ -46,6 +46,7 @@
     "ckeditor5": "^44.2.1",
     "ckeditor5-custom-element": "^9.0.1",
     "codemirror": "^6.0.1",
+    "flmngr": "^2.0.13",
     "inputmask": "^5.0.9",
     "jquery": "^3.7.1",
     "jquery-form": "^4.3.0",
