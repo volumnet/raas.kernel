@@ -32,6 +32,7 @@
         #{$self}_active & {
             visibility: visible;
             pointer-events: all;
+            z-index: 1;
         }
     }
 }
@@ -52,7 +53,7 @@
       <option 
         :value="option.value" 
         v-for="option in flatSource" 
-        :selected="((pValue || []).indexOf(option.value) != -1)" 
+        :selected="((pValue || []).map(x => x.toString()).indexOf(option.value.toString()) != -1)" 
         :disabled="option.disabled"
         :data-group="option['data-group']"
         :style="option.style"

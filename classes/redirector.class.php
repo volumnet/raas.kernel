@@ -41,6 +41,10 @@ class Redirector
         } else {
             $url = '/';
         }
+        // 2025-04-14, AVS: добавил условие для исключения циклов
+        if ($url == ($_SERVER['REQUEST_URI'] ?? null)) {
+            exit;
+        }
         $url .= $hash;
         $this->setLocation($url);
     }

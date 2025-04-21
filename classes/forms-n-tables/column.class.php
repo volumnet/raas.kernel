@@ -24,6 +24,11 @@ class Column extends TableElement
     const SORT_DESC = -1;
 
     /**
+     * Не сортируемое
+     */
+    const NOT_SORTABLE = 0;
+
+    /**
      * Сортируемое только в одну сторону
      */
     const SORTABLE_NON_REVERSABLE = 1;
@@ -70,7 +75,7 @@ class Column extends TableElement
                 $this->$var = (bool)$val;
                 break;
             case 'sortable':
-                if (in_array($val, array(self::SORTABLE_NON_REVERSABLE, self::SORTABLE_REVERSABLE))) {
+                if (in_array($val, [self::NOT_SORTABLE, self::SORTABLE_NON_REVERSABLE, self::SORTABLE_REVERSABLE])) {
                     $this->$var = (int)$val;
                 }
                 break;
