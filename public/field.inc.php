@@ -122,6 +122,10 @@ $_RAASForm_Control = function (Field $field, bool $confirmPassword = false, arra
  * @param Field $field Поле
  */
 $_RAASForm_Field = function (Field $field) {
+    if (($field->type == 'password') && $field->confirm) {
+        $confirmField = clone $field; // Здесь, чтобы разделить кэши атрибутов
+    }
+
     $err = (bool)array_filter((array)($field->Form->localError ?? []), fn($x) => ($x['value'] == $field->name));
     if (in_array($field->type, ['htmlarea', 'codearea', 'htmlcodearea'])) { ?>
         <div class="control-group control-group_full<?php echo $err ? ' error' : ''?>">
@@ -173,7 +177,7 @@ $_RAASForm_Field = function (Field $field) {
             <?php echo PASSWORD_CONFIRM?>:
           </label>
           <div class="controls">
-            <?php echo $field->render(true)?>
+            <?php echo $confirmField->render(true);?>
           </div>
         </div>
         <?php
