@@ -70,14 +70,14 @@ class Sub_Processes extends Abstract_Sub_Controller
     {
         $tasks = Process::getSystemTasks();
         usort($tasks, function ($a, $b) {
-            if ($a['process'] && $b['process']) {
+            if (($a['process'] ?? null) && ($b['process'] ?? null)) {
                 return strcmp($a['process']->post_date, $b['process']->post_date);
-            } elseif ($a['process'] && !$b['process']) {
+            } elseif (($a['process'] ?? null) && !($b['process'] ?? null)) {
                 return -1;
-            } elseif (!$a['process'] && $b['process']) {
+            } elseif (!($a['process'] ?? null) && ($b['process'] ?? null)) {
                 return 1;
             }
-            if ($a['time'] && $b['time']) {
+            if (($a['time'] ?? null) && ($b['time'] ?? null)) {
                 return $b['time'] - $a['time'];
             }
         });

@@ -21,7 +21,7 @@ class Redirector
                 $hash = str_replace('history:back', '', $url);
                 $this->goBack('', $hash);
             } elseif (!$url) {
-                $this->setLocation($_SERVER['REQUEST_URI']);
+                $this->setLocation($_SERVER['REQUEST_URI'] ?? '');
             } else {
                 $this->setLocation($url);
             }
@@ -30,20 +30,16 @@ class Redirector
 
      /**
      * Перенаправляет обратно
-     * @param string $defaut_location если не удалось получить HTTP_REFERER
+     * @param string $default_location если не удалось получить HTTP_REFERER
      */
-    private function goBack($defaut_location = '', $hash = '')
+    private function goBack($default_location = '', $hash = '')
     {
-        if ($_SERVER['HTTP_REFERER']) {
-            $url = $_SERVER['HTTP_REFERER'];
+        if ($_SERVER['HTTP_REFERER'] ?? '') {
+            $url = $_SERVER['HTTP_REFERER'] ?? '';
         } elseif ($default_location) {
             $url = $default_location;
         } else {
             $url = '/';
-        }
-        // 2025-04-14, AVS: добавил условие для исключения циклов
-        if ($url == ($_SERVER['REQUEST_URI'] ?? null)) {
-            exit;
         }
         $url .= $hash;
         $this->setLocation($url);
@@ -57,6 +53,21 @@ class Redirector
     {
         if ($url[0] == '/') {
             $url = 'http' . (($_SERVER['HTTPS'] ?? '') == 'on' ? 's' : '') . '://' . ($_SERVER["SERVER_NAME"] ?? '') . $url;
+        }
+        // 2025-04-14, AVS: добавил условие для исключения циклов
+        if (($_SERVER['REQUEST_METHOD'] ?? '') == 'GET') {
+            // 2025-04-23, AVS: проверяем, только если был GET, т.к. возврат с POST на GET это нормально
+            $parsedUrl = parse_url($url);
+            $oldRequestUri = $_SERVER['REQUEST_URI'] ?? null;
+            if (
+                (($parsedUrl['host'] ?? '') == ($_SERVER['SERVER_NAME'] ?? '')) &&
+                (
+                    ($url == $oldRequestUri) ||
+                    ($parsedUrl['path'] . (($parsedUrl['query'] ?? null) ? ('?' . $parsedUrl['query']) : '') == $oldRequestUri)
+                )
+            ) {
+                exit;
+            }
         }
         header('Location: ' . $url);
         exit;

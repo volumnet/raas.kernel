@@ -313,7 +313,10 @@ final class Application extends Singleton implements IContext
             );
         }
         ob_start();
-        session_start();
+        // 2025-04-22, AVS: проверка, возможно сессия уже открыта
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
         $_SESSION['KCFINDER']['uploadURL'] = '/files/common/';
         $_SESSION['RAAS_STARTED'] = $this->startMicrotime;
 
