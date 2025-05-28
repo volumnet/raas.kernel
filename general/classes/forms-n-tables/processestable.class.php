@@ -36,7 +36,7 @@ class ProcessesTable extends Table
                     'caption' => $this->view->_('ID'),
                     'callback' => function ($item) {
                         return '<span' . (!($item['process'] ?? null) ? ' class="muted"' : '') . '>' .
-                                  (int)$item['pid'] .
+                                  (int)($item['pid'] ?? 0) .
                                '</span>';
                     }
                 ],
@@ -44,7 +44,7 @@ class ProcessesTable extends Table
                     'caption' => $this->view->_('NAME'),
                     'callback' => function ($item) {
                         $text = '<span' . (!($item['process'] ?? null) ? ' class="muted"' : '') . '>
-                                   ' . htmlspecialchars($item['file']) . '
+                                   ' . htmlspecialchars($item['file'] ?? '') . '
                                  </span>';
                         return $text;
                     }
@@ -54,7 +54,7 @@ class ProcessesTable extends Table
                     'callback' => function ($item) {
                         if (isset($item['cpu%'])) {
                             $text = '<span' . (!($item['process'] ?? null) ? ' class="muted"' : '') . '>
-                                       ' . htmlspecialchars($item['cpu%']) . '%
+                                       ' . htmlspecialchars($item['cpu%'] ?? '') . '%
                                      </span>';
                             return $text;
                         }

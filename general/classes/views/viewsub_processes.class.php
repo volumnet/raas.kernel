@@ -79,7 +79,7 @@ class ViewSub_Processes extends \RAAS\Abstract_Sub_View
         $arr = [[
             'name' => $this->_('STOP_COMMAND'),
             'href' => $this->url . '&action=delete&id='
-                   .  (int)$item['pid'] . '&back=1',
+                   .  (int)($item['pid'] ?? 0) . '&back=1',
             'onclick' => 'return confirm(\'' . $this->_('DELETE_PROCESS_HINT') . '\')',
             'icon' => 'stop',
         ]];

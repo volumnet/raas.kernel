@@ -64,7 +64,43 @@ class Process extends SOME
         if (stristr(PHP_OS, 'win')) {
             $cmd = 'tasklist /V /FO CSV';
         } else {
-            $cmd = 'ps ax -o %p, -o lstart -o ,%C, -o %mem -o ,%c';
+            // $cmd = 'ps ax -o %p, -o lstart -o ,%C, -o %mem -o ,%c';
+            $cmd = 'ps ax -o pid=PID,lstart="Start_Time",pcpu="CPU%",pmem="MEM%",comm="Command" | awk \'
+                    BEGIN {
+                        OFS = ",";
+                    }
+
+                    NR == 1 {
+                        # Сохраняем заголовки и выводим их как CSV
+                        for (i = 1; i <= NF; i++) {
+                            gsub(/"/, "\"\"", $i);   # Экранируем кавычки в заголовке
+                            header = header (i==1 ? "" : OFS) "\"" $i "\""
+                        }
+                        print header;
+                        next;
+                    }
+
+                    NR > 1 {
+                        # Объединяем поля lstart (они разбиты на несколько слов)
+                        start_time = "";
+                        for (i = 2; i <= 6; i++) {
+                            start_time = start_time (start_time == "" ? "" : " ") $i;
+                        }
+
+                        # Остальные поля
+                        cpu = $7;
+                        mem = $8;
+                        command = "";
+                        for (i = 9; i <= NF; i++) {
+                            command = command (command == "" ? "" : " ") $i;
+                        }
+
+                        # Экранируем кавычки и оборачиваем в кавычки для CSV
+                        gsub(/"/, "\"\"", command);
+
+                        # Выводим CSV-строку
+                        printf "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n", $1, start_time, cpu, mem, command;
+                    }\''; // 2025-05-20, AVS: обновленный формат
         }
         ob_start();
         system($cmd);
@@ -73,6 +109,7 @@ class Process extends SOME
             $rawTaskList = iconv('cp866', 'UTF-8', $rawTaskList);
         }
         $csv = new CSV($rawTaskList, ',');
+        // var_dump($csv->data); exit;
         for ($i = 1; $i < count($csv->data); $i++) {
             $row = $csv->data[$i];
             if (stristr(PHP_OS, 'win')) {
@@ -104,6 +141,9 @@ class Process extends SOME
             $sqlQuery = "DELETE FROM " . static::_tablename()
                       . " WHERE id NOT IN (" . implode(", ", array_map('intval', array_keys($tasks))) . ")";
             static::_SQL()->query($sqlQuery);
+        } else { // 2025-05-20, AVS: если процессов нет, просто чистим таблицу
+            $sqlQuery = "TRUNCATE TABLE " . static::_tablename();
+            static::_SQL()->query($sqlQuery);
         }
         $set = static::getSet();
         foreach ($set as $item) {
@@ -111,7 +151,7 @@ class Process extends SOME
             $tasks[trim($item->id)]['time'] = time() - strtotime($item->post_date);
         }
         $tasks = array_filter($tasks, function ($x) {
-            return stristr($x['file'], 'php') || ($x['process'] ?? false);
+            return stristr((string)($x['file'] ?? null), 'php') || ($x['process'] ?? false);
         });
 
         return $tasks;
