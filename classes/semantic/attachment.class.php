@@ -423,7 +423,7 @@ class Attachment extends SOME
      *     с таким именем и любым расширением (false - только с таким же)
      * @return string Сгенерированное имя
      */
-    protected function getUniqueFilename($ignoreExtension = true)
+    protected function getUniqueFilename($ignoreExtension = true): string
     {
         // 2020-03-10, AVS: Заменил pathinfo, т.к. некорректно работает с русскими буквами
         // 2023-05-02, AVS: убрал $initialFilename = $this->realname, т.к. иначе проблематично поменять имя уже загруженного файла
