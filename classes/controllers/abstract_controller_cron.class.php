@@ -139,6 +139,7 @@ abstract class Abstract_Controller_Cron extends Abstract_Controller
      */
     public function doLog($text)
     {
+        $text = (string)$text;
         if ($this->encoding) {
             $text = iconv('UTF-8', $this->encoding . '//IGNORE', $text);
         }

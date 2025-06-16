@@ -62,7 +62,7 @@ class AssetManager
             }
             $version = '';
             if ($isFile) {
-                $version = '?v=' . date('Y-m-d-H-i-s', filemtime($filepath));
+                $version = static::getVersionSuffix($filepath);
             }
             $link = $fileURL . $version;
             $renderer = new HTMLRenderer();
@@ -106,6 +106,21 @@ class AssetManager
                 return $renderer->getElement($tagName, $attrs);
             }
         }
+    }
+
+
+    /**
+     * Получает суффикс версии файла
+     * @param string $filepath Путь к файлу
+     * @return string
+     */
+    public static function getVersionSuffix(string $filepath): string
+    {
+        if (!is_file($filepath)) {
+            return '';
+        }
+        $result = '?v=' . date('Y-m-d-H-i-s', filemtime($filepath));
+        return $result;
     }
 
 
