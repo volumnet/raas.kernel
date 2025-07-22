@@ -71,7 +71,7 @@ $showModule = function(IRightsContext $context, Form $form) use (&$getSelect) {
       <td>
         <?php $getSelect($context, (array)$data)?>
         <?php if ($item->access($context)->selfRights) { ?>
-            <i class="icon-lock" title="<?php echo FINE_RIGHTS_CONFIG?>"></i>
+            <raas-icon icon="lock" title="<?php echo FINE_RIGHTS_CONFIG?>"></raas-icon>
         <?php } ?>
       </td>
       <td><?php echo $item->id ? rowContextMenu(\RAAS\General\ViewSub_Users::i()->$f($item, $context)) : ''?></td>

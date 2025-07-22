@@ -67,7 +67,7 @@ class CrontabTable extends Table
                     'style' => 'text-align: center',
                     'callback' => function ($item) {
                         if ($item->once) {
-                            return '<span class="fa fa-check"></span>';
+                            return '<raas-icon icon="check"></raas-icon>';
                         }
                     },
                 ],
@@ -97,7 +97,7 @@ class CrontabTable extends Table
                                 $className = 'text-warning';
                                 $title .= "\n" . $this->view->_('NOT_FOUND');
                             }
-                            return '<span class="' . $className . ' fa fa-circle" title="' . $title . '"></span>';
+                            return '<span class="' . $className . '" title="' . $title . '"><raas-icon icon="circle"></raas-icon></span>';
                         }
                         return '';
                     }

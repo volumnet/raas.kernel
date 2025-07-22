@@ -74,8 +74,8 @@ include $VIEW->tmp('/table.inc.php');
             </th>
             <th>
               <input type="text" name="element_id" class="span1" value="<?php echo $DATA['element_id'] ?? null?>" />
-              <button type="submit" class="btn" title="<?php echo $VIEW->context->_('DO_SEARCH')?>"><i class="icon-search"></i></button>
-              <a href="?mode=admin&sub=user_log" class="btn" title="<?php echo $VIEW->_('RESET')?>"><i class="fa fa-times"></i></button>
+              <button type="submit" class="btn" title="<?php echo $VIEW->context->_('DO_SEARCH')?>"><raas-icon icon="search"></raas-icon></button>
+              <a href="?mode=admin&sub=user_log" class="btn" title="<?php echo $VIEW->_('RESET')?>"><raas-icon icon="times"></raas-icon></button>
             </th>
           </tr>
         </thead>

@@ -68,7 +68,7 @@ class BackupsTable extends Table
                 'preserveFromDeletion' => [
                     'caption' => $this->view->_('PRESERVE_FROM_DELETION'),
                     'callback' => function ($item) {
-                        return ($item->preserveFromDeletion ? '<span class="fa fa-check"></span>' : '');
+                        return ($item->preserveFromDeletion ? '<raas-icon icon="check"></raas-icon>' : '');
                     },
                 ],
                 'size' => [
