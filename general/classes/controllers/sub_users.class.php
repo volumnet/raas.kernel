@@ -57,7 +57,7 @@ class Sub_Users extends Abstract_Sub_Controller
                     $item,
                     $this->url,
                     true,
-                    $item->id != $this->application->model->user->id
+                    true
                 );
                 break;
             case 'delete_group':
