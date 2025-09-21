@@ -15,8 +15,8 @@
       v-for="option in flatSource" 
       :selected="multiple ? ((pValue || []).indexOf(option.value) != -1) : (option.value == pValue)" 
       :disabled="option.disabled"
-      :data-group="option['data-group']"
       :style="option.style"
+      v-bind="getDataAttrs(option)"
     >
       <template v-for="n in option.level">
         &nbsp;&nbsp;&nbsp;
@@ -74,6 +74,15 @@ export default {
                 }
             }
             return result;
+        },
+        getDataAttrs(option) {
+            return Object
+              .keys(option)
+              .filter(key => /^data-/.test(key))
+              .reduce((acc, key) => { 
+                acc[key] = option[key];
+                return acc;
+              }, {});
         },
     },
     computed: {
