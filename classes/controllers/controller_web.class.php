@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package RAAS
  */
@@ -214,7 +215,7 @@ class Controller_Web extends Abstract_Controller
                     if ($this->model->user->access($pack)->canDo) {
                         $this->model->activePackage = $pack;
                         if ($this->moduleName && isset($pack->modules[$this->moduleName]) &&
-                            ($mod = $pack->modules[$this->moduleName])
+                        ($mod = $pack->modules[$this->moduleName])
                         ) {
                             if ($mod->registryGet('isActive') && $mod->isCompatible) {
                                 if ($this->model->user->access($mod)->canDo) {
@@ -237,6 +238,15 @@ class Controller_Web extends Abstract_Controller
                 }
                 FlmngrServer::flmngrRequest(['dirFiles' => $dir]);
                 exit;
+            }
+            if ($this->mode == 'files') {
+                if ($this instanceof Controller_Ajax) {
+                    $filemanager = new FileManager();
+                    $this->view->assignVars($filemanager->process());
+                    return;
+                } else {
+                    exit;
+                }
             }
         }
 
