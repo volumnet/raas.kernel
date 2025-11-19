@@ -6,12 +6,19 @@ use DirectoryIterator;
 use Exception;
 use SOME\File;
 use SOME\Text;
+use SOME\Thumbnail;
 
 /**
  * Файловый менеджер
+ * @property-read IContext $context Текущий контекст приложения
  */
 class FileManager
 {
+    /**
+     * Режим отладки (без проверки на то что файлы реально были загружены)
+     */
+    public bool $debug = false;
+
     /**
      * Запрещенные расширения
      */
@@ -51,7 +58,7 @@ class FileManager
             case 'rootDir':
                 return realpath($this->context->filesDir);
                 break;
-            case 'rootURL':
+            case 'rootUrl':
                 return '/' . $this->context->filesURL;
                 break;
         }
@@ -66,21 +73,33 @@ class FileManager
         try {
             $path = $this->getPath($_GET['path'] ?? '');
             $action = (string)($_GET['action'] ?? '');
+            // var_dump($path, $action);
+            // exit;
+            if (in_array($action, ['mkdir', 'delete', 'rename', 'move', 'upload']) &&
+                (($_SERVER['REQUEST_METHOD'] ?? '') != 'POST')
+            ) {
+                throw new Exception('FILEMANAGER_METHOD_NOT_ALLOWED', 405);
+            }
             switch ($action) {
                 case 'mkdir':
-                    $result = $this->makeDir($path);
+                    $dirName = (string)($_POST['name'] ?? '');
+                    $result = $this->makeDir($path, $dirName);
                     break;
                 case 'delete':
                     $result = $this->delete($path);
                     break;
                 case 'rename':
-                    $result = $this->rename($path);
+                    $newName = (string)($_POST['name'] ?? '');
+                    $result = $this->rename($path, $newName);
                     break;
                 case 'move':
-                    $result = $this->move($path);
+                    $newPath = $this->getPath($_POST['to'] ?? '');
+                    $result = $this->move($path, $newPath);
                     break;
                 case 'upload':
-                    $result = $this->upload($path);
+                    $files = FileDatatypeStrategy::i()->getFilesData('files', false, false, $_FILES);
+                    // var_dump($_FILES, $files);
+                    $result = $this->upload($path, $files);
                     break;
                 default:
                     $result = $this->pathInfo($path, true);
@@ -88,13 +107,16 @@ class FileManager
             }
             return ['result' => $result];
         } catch (Exception $e) {
-            http_response_code($e->getCode());
+            // @codeCoverageIgnoreStart
+            if (!$this->debug) {
+                http_response_code($e->getCode());
+            }
+            // @codeCoverageIgnoreEnd
             return ['error' => [
                 'code' => $e->getCode(),
                 'message' => $this->view->_($e->getMessage()),
             ]];
         }
-        return ['filemanager' => true];
     }
 
 
@@ -108,21 +130,21 @@ class FileManager
     {
         $rawPath = trim($rawPath, '/');
         if (!$rawPath) {
-            throw new Exception('PATH_NOT_FOUND', 404);
+            throw new Exception('FILEMANAGER_PATH_NOT_FOUND', 404);
         }
         $rawPath = str_replace('\\', '/', $rawPath);
         if (preg_match('/(^|\\/)\\.\\.(\\/|$)/umis', $rawPath)) {
-            throw new Exception('UPPER_DIRS_NOT_ALLOWED', 403);
+            throw new Exception('FILEMANAGER_UPPER_DIRS_NOT_ALLOWED', 403);
         }
         if (!preg_match('/^(file|image)(\\/|$)/umis', $rawPath)) {
-            throw new Exception('PATH_NOT_FOUND', 403);
+            throw new Exception('FILEMANAGER_PATH_NOT_FOUND', 404);
         }
         if (preg_match('/\\/\\./umis', $rawPath)) {
             throw new Exception('ACCESS_DENIED', 403);
         }
         $path = realpath($this->rootDir . '/' . $rawPath);
         if (!$path || !file_exists($path)) {
-            throw new Exception('PATH_NOT_FOUND', 404);
+            throw new Exception('FILEMANAGER_PATH_NOT_FOUND', 404);
         }
         if (in_array(pathinfo($path, PATHINFO_EXTENSION), static::$deniedExts)) {
             throw new Exception('ACCESS_DENIED', 403);
@@ -146,12 +168,13 @@ class FileManager
             'type' => $entryType,
             'name' => basename($path),
             'datetime' => date('Y-m-d H:i:s', filemtime($path)),
+            'datetimeFormatted' => date($this->view->_('DATETIMEFORMAT'), filemtime($path)),
         ];
         if ($extended) {
             $relPath = File::relpath($this->rootDir, $path);
             $relPath = str_replace('\\', '/', $relPath);
             $relPath = trim($relPath, '/');
-            $url = $this->rootURL . '/' . $relPath;
+            $url = $this->rootUrl . '/' . $relPath;
             $result['url'] = $url;
         }
         if ($entryType == 'file') {
@@ -161,9 +184,12 @@ class FileManager
             if ($extended) {
                 $glob = glob($path . '/*');
                 $glob = array_filter($glob, function ($childPath) {
+                    // @codeCoverageIgnoreStart
+                    // glob, предположительно, не выдает файлы, начинающиеся с '.' . На всякий случай проверку оставляю
                     if ($childPath[0] == '.') {
                         return false;
                     }
+                    // @codeCoverageIgnoreEnd
                     if (is_file($childPath) && in_array(pathinfo($childPath, PATHINFO_EXTENSION), static::$deniedExts)) {
                         return false;
                     }
@@ -184,27 +210,27 @@ class FileManager
     /**
      * Создает папку
      * @param string $path Путь
+     * @param string $dirName Название папки
      * @return array Данные по созданной папке
      * @throws Exception Если не удалось создать
      */
-    public function makeDir(string $path): array
+    public function makeDir(string $path, string $dirName): array
     {
-        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
-            throw new Exception('METHOD_NOT_ALLOWED', 405);
-        }
         if (!is_dir($path)) {
-            throw new Exception('PATH_IS_NOT_DIR', 400);
+            throw new Exception('FILEMANAGER_PATH_IS_NOT_DIR', 400);
         }
-        $dirName = (string)($_POST['name'] ?? '');
         $dirPath = $this->validateName($path, $dirName, true);
 
         if (file_exists($dirPath)) {
-            throw new Exception('DIR_OR_FILE_ALREADY_EXISTS', 403);
+            throw new Exception('FILEMANAGER_DIR_OR_FILE_ALREADY_EXISTS', 403);
         }
-        $result = mkdir($dirPath, 0777);
+        $result = @mkdir($dirPath, 0777);
+        // @codeCoverageIgnoreStart
+        // Не могу воспроизвести ситуацию, когда было бы невозможно создать, т.к. название бьютифицируется
         if (!$result) {
-            throw new Exception('CANNOT_CREATE_DIR', 500);
+            throw new Exception('FILEMANAGER_CANNOT_CREATE_DIR', 500);
         }
+        // @codeCoverageIgnoreEnd
         return $this->pathInfo($dirPath, true);
     }
 
@@ -217,16 +243,13 @@ class FileManager
      */
     public function delete(string $path): bool
     {
-        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
-            throw new Exception('METHOD_NOT_ALLOWED', 405);
-        }
         if (is_dir($path)) {
             if (glob($path . '/*')) {
-                throw new Exception('CANNOT_DELETE_DIR_NOT_EMPTY', 403);
+                throw new Exception('FILEMANAGER_CANNOT_DELETE_DIR_NOT_EMPTY', 403);
             }
-            $result = rmdir($path);
+            $result = @rmdir($path);
         } else {
-            $result = unlink($path);
+            $result = @unlink($path);
         }
         if (!$result) {
             throw new Exception('ACCESS_DENIED', 403);
@@ -238,22 +261,19 @@ class FileManager
     /**
      * Переименовывает файл или папку
      * @param string $path Путь
+     * @param string $newName Новое имя
      * @return array Данные файла или папки
      * @throws Exception Если не удалось переименовать
      */
-    public function rename(string $path): array
+    public function rename(string $path, string $newName): array
     {
-        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
-            throw new Exception('METHOD_NOT_ALLOWED', 405);
-        }
         $relPath = trim(File::relpath($this->rootDir, $path), '/');
         $relArr = explode('/', $relPath);
         if (count($relArr) <= 1) {
-            throw new Exception('CANNOT_RENAME_OR_MOVE_ROOT_DIR', 403);
+            throw new Exception('FILEMANAGER_CANNOT_RENAME_OR_MOVE_ROOT_DIR', 403);
         }
-        $newName = (string)($_POST['name'] ?? '');
         $newPath = $this->validateName(dirname($path), $newName, true);
-        $result = rename($path, $newPath);
+        $result = @rename($path, $newPath);
         if (!$result) {
             throw new Exception('ACCESS_DENIED', 403);
         }
@@ -264,25 +284,22 @@ class FileManager
     /**
      * Переносит файл или папку
      * @param string $path Путь
+     * @param string $newPath Новый путь для переноса
      * @return array Данные файла или папки
      * @throws Exception Если не удалось перенести
      */
-    public function move(string $path): array
+    public function move(string $path, string $newPath): array
     {
-        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
-            throw new Exception('METHOD_NOT_ALLOWED', 405);
-        }
         $relPath = trim(File::relpath($this->rootDir, $path), '/');
         $relArr = explode('/', $relPath);
         if (count($relArr) <= 1) {
-            throw new Exception('CANNOT_RENAME_OR_MOVE_ROOT_DIR', 403);
+            throw new Exception('FILEMANAGER_CANNOT_RENAME_OR_MOVE_ROOT_DIR', 403);
         }
-        $newPath = $this->getPath($_POST['to'] ?? '');
         if (!is_dir($newPath)) {
-            throw new Exception('TARGET_PATH_IS_NOT_DIR', 400);
+            throw new Exception('FILEMANAGER_TARGET_PATH_IS_NOT_DIR', 400);
         }
         $newFilePath = $newPath . '/' . basename($path);
-        $result = rename($path, $newFilePath);
+        $result = @rename($path, $newFilePath);
         if (!$result) {
             throw new Exception('ACCESS_DENIED', 403);
         }
@@ -293,16 +310,84 @@ class FileManager
     /**
      * Загружает файлы в папку
      * @param string $path Путь к папке
-     * @return array Данные файлов
+     * @param array $files <pre><code>array<
+     *     'tmp_name' => string,
+     *     'name' => string,
+     * ></code></pre> Данные загружаемых файлов
+     * @return array Данные загруженных файлов
      * @throws Exception Если не удалось загрузить ни один файл
      */
-    public function upload(string $path): array
+    public function upload(string $path, array $files): array
     {
-        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
-            throw new Exception('METHOD_NOT_ALLOWED', 405);
+        $uploadedFiles = [];
+        $isNotAnImageError = false;
+        $relPath = trim(File::relpath($this->rootDir, $path), '/');
+        $relArr = explode('/', $relPath);
+
+        // var_dump($files);
+        // exit;
+        foreach ($files as $file) {
+            $tmpName = $file['tmp_name'];
+            $origName = $file['name'];
+            // @codeCoverageIgnoreStart
+            if (!$this->debug && !is_uploaded_file($tmpName)) {
+                continue;
+            }
+            // @codeCoverageIgnoreEnd
+            $ext = pathinfo($origName, PATHINFO_EXTENSION);
+            $imgSize = getimagesize($tmpName);
+            if (($relArr[0] == 'image') && !$imgSize && ($ext != 'svg')) {
+                $isNotAnImageError = true;
+                continue;
+            }
+
+            // var_dump($file);
+            if ($imgSize && in_array($imgSize[2], [IMAGETYPE_GIF, IMAGETYPE_PNG, IMAGETYPE_JPEG, IMAGETYPE_WEBP])) {
+                $origNameWOExt = pathinfo($origName, PATHINFO_FILENAME);
+                $newExt = image_type_to_extension($imgSize[2], false);
+                $newExt = strtolower($newExt);
+                if ($newExt == 'jpeg') {
+                    $newExt = 'jpg';
+                }
+                $newPath = $this->validateName($path, $origNameWOExt . '.' . $newExt, false, true);
+                $maxSize = (int)Application::i()->context->registryGet('maxsize');
+                if ($maxSize && (($maxSize < $imgSize[0]) || ($maxSize < $imgSize[1]))) {
+                    Thumbnail::make($tmpName, $newPath, $maxSize ?: INF, $maxSize ?: -1);
+                    // @codeCoverageIgnoreStart
+                    if (!$this->debug) {
+                        unlink($tmpName);
+                    }
+                    // @codeCoverageIgnoreEnd
+                } elseif ($this->debug) {
+                    copy($tmpName, $newPath);
+                    // @codeCoverageIgnoreStart
+                } else {
+                    move_uploaded_file($tmpName, $newPath);
+                }
+                // @codeCoverageIgnoreEnd
+            } else {
+                $newPath = $this->validateName($path, $origName, false, true);
+                if ($this->debug) {
+                    copy($tmpName, $newPath);
+                    // @codeCoverageIgnoreStart
+                } else {
+                    move_uploaded_file($tmpName, $newPath);
+                }
+                // @codeCoverageIgnoreEnd
+            }
+            chmod($newPath, 0777);
+            if (is_file($newPath)) {
+                $uploadedFiles[] = $newPath;
+            }
         }
-        // @todo
-        throw new Exception('NOT_IMPLEMENTED', 501);
+        if (count($uploadedFiles) != count($files)) {
+            if (count($files) == 1 && $isNotAnImageError) {
+                throw new Exception('FILEMANAGER_FILE_IS_NOT_IMAGE', 400);
+            } else {
+                throw new Exception('FILEMANAGER_CANNOT_UPLOAD_ONE_OR_MORE_FILES', 400);
+            }
+        }
+        return array_map(fn ($file) => $this->pathInfo($file, true), $uploadedFiles);
     }
 
 
@@ -311,21 +396,23 @@ class FileManager
      * @param string $path Родительский путь
      * @param string $name Название папки/файла
      * @param bool $isDir Является ли папкой
+     * @param bool $findName Найти новое имя, если это занято
      * @return string Полный путь
      * @throws Exception
      */
-    public function validateName(string $path, string $name, bool $isDir): string
+    public function validateName(string $path, string $name, bool $isDir, bool $findName = false): string
     {
         if (!$name) {
             throw new Exception($isDir ? 'DIRNAME_REQUIRED' : 'FILENAME_REQUIRED', 400);
         }
         if (preg_match('/(\\\\|\\/|\\+|\\:)/umis', $name)) {
-            throw new Exception('INVALID_DIR_OR_FILE_NAME', 400);
+            throw new Exception('FILEMANAGER_INVALID_DIR_OR_FILE_NAME', 400);
         }
         if ($name[0] == '.') {
-            throw new Exception('INVALID_DIR_OR_FILE_NAME', 403);
+            throw new Exception('ACCESS_DENIED', 403);
         }
-        if (in_array(pathinfo($name, PATHINFO_EXTENSION), static::$deniedExts)) {
+        $ext = pathinfo($name, PATHINFO_EXTENSION);
+        if (in_array($ext, static::$deniedExts)) {
             throw new Exception('ACCESS_DENIED', 403);
         }
         $name = trim($name, '.');
@@ -333,7 +420,13 @@ class FileManager
         $arr = array_map(fn ($x) => Text::beautify($x), $arr);
         $arr = array_values(array_filter($arr));
         $name = implode('.', $arr);
-
+        if ($findName) {
+            while (file_exists($path . '/' . $name)) {
+                $chunkIndex = max(0, count($arr) - 2);
+                $arr[$chunkIndex] = Application::i()->getNewURN($arr[$chunkIndex]);
+                $name = implode('.', $arr);
+            }
+        }
         $result = $path . '/' . $name;
         return $result;
     }
@@ -344,15 +437,16 @@ class FileManager
      * @param string $path Путь к папке
      * @return bool
      */
-    protected function dirHasSubfolders(string $path): bool
+    public function dirHasSubfolders(string $path): bool
     {
         if (!is_dir($path)) {
             return false;
         }
+        $path = rtrim($path, '/');
         $iterator = new DirectoryIterator($path);
         foreach ($iterator as $fileinfo) {
             if (!$fileinfo->isDot() && $fileinfo->isDir()) {
-                return true; // Найден хотя бы один элемент
+                return true; // Найден хотя бы один элемент-папка
             }
         }
         return false;

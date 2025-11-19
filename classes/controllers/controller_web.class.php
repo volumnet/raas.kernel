@@ -240,7 +240,9 @@ class Controller_Web extends Abstract_Controller
                 exit;
             }
             if ($this->mode == 'files') {
-                if ($this instanceof Controller_Ajax) {
+                if ($this instanceof Controller_Ajax &&
+                    $this->model->user->access($this->model->activePackage)->canDo()
+                ) {
                     $filemanager = new FileManager();
                     $this->view->assignVars($filemanager->process());
                     return;

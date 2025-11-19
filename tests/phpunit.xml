@@ -65,6 +65,9 @@
     <testsuite name="YearDatatypeStrategy">
       <file>src/datatypes/YearDatatypeStrategyTest.php</file>
     </testsuite>
+    <testsuite name="FileManager">
+      <file>src/FileManagerTest.php</file>
+    </testsuite>
     <testsuite name="Field">
       <file>src/forms-n-tables/FieldTest.php</file>
     </testsuite>
