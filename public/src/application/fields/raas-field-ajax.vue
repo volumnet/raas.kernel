@@ -98,7 +98,12 @@
 
 <template>
   <div class="raas-field-ajax" :class="{ 'raas-field-ajax_busy': busy }">
-    <input type="hidden" :name="name" :value="(pValue && pValue.id) || 0" />
+    <input
+      type="hidden"
+      :name="name"
+      :value="(pValue && pValue.id) || 0"
+      :form="$attrs.form"
+    />
     <div v-if="pValue && pValue.id" class="raas-field-ajax__entity">
       <a
         :href="pValue.url"
@@ -131,6 +136,7 @@
         <input
           type="text"
           class="raas-field-ajax__input"
+          v-bind="$attrs"
           :name="searchName"
           :value="searchString"
           :placeholder="$attrs.placeholder"

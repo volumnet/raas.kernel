@@ -1,43 +1,48 @@
 {
-    "name": "volumnet/raas.kernel",
-    "description": "RAAS v4.5.25 Remote Automated Assistant",
-    "version": "4.5.25",
-    "license": "GPL-3.0-or-later",
-    "minimum-stability": "dev",
-    "prefer-stable": true,
-    "require": {
-        "php": ">=8.0",
-        "ext-session": ">=0",
-        "ext-iconv": ">=0",
-        "ext-intl": ">=0",
-        "ext-pcre": ">=0",
-        "ext-date": ">=0",
-        "ext-zlib": ">=0",
-        "ext-SimpleXML": ">=0",
-        "ext-xml": ">=0",
-        "ext-gd": ">=0",
-        "ext-PDO": ">=0",
-        "ext-mbstring": ">=0",
-        "phpmailer/phpmailer": "~6.1",
-        "edsdk/flmngr-server-php": "*",
-        "phpdocumentor/reflection-docblock": "*",
-        "volumnet/some4": ">=4.7.0"
-    },
-    "require-dev": {
-        "phpunit/phpunit": "*",
-        "volumnet/raas.cms.shop": "4.*",
-        "volumnet/raas.cms.users": "4.*"
-    },
-    "authors": [
-        {
-            "name": "Alex V. Surnin",
-            "email": "info@volumnet.ru"
-        }
-    ],
-    "autoload": {
-        "classmap": ["classes/", "general/classes/"] 
-    },
-    "autoload-dev": {
-        "classmap": ["tests"]
+  "name": "volumnet/raas.kernel",
+  "description": "RAAS v4.5.26 Remote Automated Assistant",
+  "version": "4.5.26",
+  "license": "GPL-3.0-or-later",
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "require": {
+    "php": ">=8.0",
+    "ext-session": ">=0",
+    "ext-iconv": ">=0",
+    "ext-intl": ">=0",
+    "ext-pcre": ">=0",
+    "ext-date": ">=0",
+    "ext-zlib": ">=0",
+    "ext-SimpleXML": ">=0",
+    "ext-xml": ">=0",
+    "ext-gd": ">=0",
+    "ext-PDO": ">=0",
+    "ext-mbstring": ">=0",
+    "phpmailer/phpmailer": "~6.1",
+    "edsdk/flmngr-server-php": "*",
+    "phpdocumentor/reflection-docblock": "*",
+    "volumnet/some4": ">=4.7.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "*",
+    "volumnet/raas.cms.shop": "4.*",
+    "volumnet/raas.cms.users": "4.*"
+  },
+  "authors": [
+    {
+      "name": "Alex V. Surnin",
+      "email": "info@volumnet.ru"
     }
+  ],
+  "autoload": {
+    "classmap": [
+      "classes/",
+      "general/classes/"
+    ]
+  },
+  "autoload-dev": {
+    "classmap": [
+      "tests"
+    ]
+  }
 }
