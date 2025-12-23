@@ -226,62 +226,66 @@ if ($USER) {
     <meta name="generator" content="RAAS4" />
     <title><?php echo $metaTitle?></title>
     <!-- Here will be in-text styles inserted -->
-    <!--styles--><!--/styles-->
-    <?php
+<!--styles--><!--/styles-->
+<?php
     AssetManager::requestCSS(array_merge([
         $VIEW->publicURL . '/header.css',
         $VIEW->publicURL . '/application.css',
         Application::i()->baseDir . '/css/ckeditor5.css',
         $VIEW->themeURL . ($VIEW->templateType ? '/' . $VIEW->templateType : '') . '/style.css',
     ], (array)$VIEW->css));
-    AssetManager::requestJS(array_merge([
-        $VIEW->publicURL . '/header.js'
-    ], (array)$VIEW->head_js), 'beforeApp');
+AssetManager::requestJS(array_merge([
+    $VIEW->publicURL . '/header.js'
+], (array)$VIEW->head_js), 'beforeApp');
 
-    AssetManager::requestJS([
-        $VIEW->publicURL . '/translations/' . $VIEW->language . '.js',
-        '/js/raas.config.js',
-        $VIEW->publicURL . '/ckeditor.config.js', // 2022-09-29, AVS: Эти и далее здесь, потому что адаптеры должны включаться после подключения CKEditor
-        '/js/ckeditor.config.js',
-    ]);
-    AssetManager::requestJS((array)$VIEW->js);
-    echo AssetManager::getRequestedCSS();
-    echo AssetManager::getRequestedJS('beforeApp');
-    echo AssetManager::getRequestedCSS('custom');
-    echo AssetManager::getRequestedJS('custom');
-    AssetManager::requestJS($VIEW->publicURL . '/application.js'); // Здесь, потому что последующие скрипты должны отрабатывать после подключения Vue
-    echo AssetManager::getRequestedJS();
-    ?>
-  </head>
-  <body class="body">
+AssetManager::requestJS([
+    $VIEW->publicURL . '/translations/' . $VIEW->language . '.js',
+    '/js/raas.config.js',
+    $VIEW->publicURL . '/ckeditor.config.js', // 2022-09-29, AVS: Эти и далее здесь, потому что адаптеры должны включаться после подключения CKEditor
+    '/js/ckeditor.config.js',
+]);
+AssetManager::requestJS((array)$VIEW->js);
+echo AssetManager::getRequestedCSS();
+echo AssetManager::getRequestedJS('beforeApp');
+echo AssetManager::getRequestedCSS('custom');
+echo AssetManager::getRequestedJS('custom');
+AssetManager::requestJS($VIEW->publicURL . '/application.js'); // Здесь, потому что последующие скрипты должны отрабатывать после подключения Vue
+echo AssetManager::getRequestedJS();
+?>
+</head>
+
+<body class="body">
     <div id="raas-app">
-      <raas-app v-bind="$data" :fixed-header="fixedHeader">
-        <?php if ($SUBTITLE) { ?>
+        <raas-app ref="raasApp" v-bind="$data" :fixed-header="fixedHeader">
+            <?php if ($SUBTITLE) { ?>
             <template v-slot:subtitle>
-              <?php echo $SUBTITLE?>
+                <?php echo $SUBTITLE?>
             </template>
-        <?php } ?>
-        <template v-slot:default>
-          <?php
-          if ($TEMPLATE) {
-              include $VIEW->tmp($TEMPLATE);
-          }
-          ?>
-        </template>
-      </raas-app>
+            <?php } ?>
+            <template v-slot:default>
+                <?php
+      if ($TEMPLATE) {
+          include $VIEW->tmp($TEMPLATE);
+      }
+?>
+            </template>
+        </raas-app>
     </div>
     <?php
     $content = separateScripts(
         ob_get_clean(),
         '/(maps.*?yandex.*constructor)|(type="text\\/html")/umis'
     );
-    $text = $content[0] . $content[1];
-    $text = str_replace('<!--styles--><!--/styles-->', $content[2], $text);
-    echo $text;
-    ?>
+$text = $content[0] . $content[1];
+$text = str_replace('<!--styles--><!--/styles-->', $content[2], $text);
+echo $text;
+?>
     <script>
-    window.raasApplicationData = <?php echo json_encode($raasApplicationData, JSON_UNESCAPED_UNICODE)?>;
+        window
+            .raasApplicationData = <?php echo json_encode($raasApplicationData, JSON_UNESCAPED_UNICODE)?> ;
     </script>
-  </body>
+</body>
+
 </html>
-<!-- <?php echo (float)(microtime(true) - Application::i()->startMicrotime)?>  -->
+<!-- <?php echo (float)(microtime(true) - Application::i()->startMicrotime)?>
+-->

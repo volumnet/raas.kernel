@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package RAAS
  */
@@ -36,17 +37,17 @@ abstract class CustomField extends SOME
     /**
      * Таблица данных
      */
-    const DATA_TABLE = '';
+    public const DATA_TABLE = '';
 
     /**
      * Класс справочника
      */
-    const DICTIONARY_CLASS = '';
+    public const DICTIONARY_CLASS = '';
 
     /**
      * Класс поля по умолчанию
      */
-    const DEFAULT_CLASSNAME = SOME::class;
+    public const DEFAULT_CLASSNAME = SOME::class;
 
     /**
      * Кэш значений
@@ -916,7 +917,7 @@ abstract class CustomField extends SOME
     {
         $result = [];
         foreach ($source as $key => $val) {
-            $result[$key] = $val['name'];
+            $result[$key] = $val['name'] ?? '';
             if (isset($val['children'])) {
                 $result += $this->getSourceAssoc($val['children']);
             }

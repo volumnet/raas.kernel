@@ -117,7 +117,9 @@ class FileManagerTest extends BaseTest
         @unlink(Application::i()->baseDir . '/files/cms/common/image/design/.htaccess');
         @unlink(Application::i()->baseDir . '/files/cms/common/image/design/nophoto.jpg');
         @unlink(Application::i()->baseDir . '/files/cms/common/image/design/nophoto2.jpg');
+        @unlink(Application::i()->baseDir . '/files/cms/common/image/test2/nophoto.jpg');
         @rmdir(Application::i()->baseDir . '/files/cms/common/image/design');
+        @rmdir(Application::i()->baseDir . '/files/cms/common/image/design/test');
         @rmdir(Application::i()->baseDir . '/files/cms/common/image/test');
         @rmdir(Application::i()->baseDir . '/files/cms/common/image/test2');
         parent::tearDown();
@@ -271,32 +273,49 @@ class FileManagerTest extends BaseTest
      * @param bool $extended Расширенный вариант
      * @param array $expected Ожидаемая запись
      */
-    #[TestWith(['image/design/nophoto.jpg', false, ['type' => 'file', 'name' => 'nophoto.jpg', 'size' => 0]])]
+    #[TestWith(['image/design/nophoto.jpg', false, [
+        'type' => 'file',
+        'name' => 'nophoto.jpg',
+        'path' => 'image/design/nophoto.jpg',
+        'url' => '/files/cms/common/image/design/nophoto.jpg',
+        'size' => 0
+    ]])]
     #[TestWith([
         'image/design/nophoto.jpg',
         true,
         [
             'type' => 'file',
             'name' => 'nophoto.jpg',
-            'size' => 0,
+            'path' => 'image/design/nophoto.jpg',
             'url' => '/files/cms/common/image/design/nophoto.jpg',
+            'size' => 0,
             'datetime' => '0000-00-00 00:00:00',
             'datetimeFormatted' => '00.00.0000 00:00:00',
         ]
     ])]
-    #[TestWith(['image/design', false, ['type' => 'dir', 'name' => 'design', 'hasSubfolders' => false]])]
+    #[TestWith(['image/design', false, [
+        'type' => 'dir',
+        'name' => 'design',
+        'path' => 'image/design',
+        'url' => '/files/cms/common/image/design/',
+        'hasSubfolders' => false,
+    ]])]
     #[TestWith([
         'image/design',
         true,
         [
             'type' => 'dir',
             'name' => 'design',
-            'url' => '/files/cms/common/image/design',
+            'path' => 'image/design',
+            'url' => '/files/cms/common/image/design/',
+            'hasSubfolders' => false,
             'datetime' => '0000-00-00 00:00:00',
             'datetimeFormatted' => '00.00.0000 00:00:00',
             'children' => [[
                 'type' => 'file',
                 'name' => 'nophoto.jpg',
+                'path' => 'image/design/nophoto.jpg',
+                'url' => '/files/cms/common/image/design/nophoto.jpg',
                 'size' => 0,
                 'datetime' => '0000-00-00 00:00:00',
                 'datetimeFormatted' => '00.00.0000 00:00:00',

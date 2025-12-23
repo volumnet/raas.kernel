@@ -44,6 +44,7 @@ class FileManager
         'pcgi4',
         'pcgi5',
         'pchi6',
+        'optipic-orig',
     ];
 
     public function __get($var)
@@ -167,16 +168,18 @@ class FileManager
         $result = [
             'type' => $entryType,
             'name' => basename($path),
+            'path' => $path,
             'datetime' => date('Y-m-d H:i:s', filemtime($path)),
             'datetimeFormatted' => date($this->view->_('DATETIMEFORMAT'), filemtime($path)),
         ];
-        if ($extended) {
-            $relPath = File::relpath($this->rootDir, $path);
-            $relPath = str_replace('\\', '/', $relPath);
-            $relPath = trim($relPath, '/');
-            $url = $this->rootUrl . '/' . $relPath;
-            $result['url'] = $url;
-        }
+
+        $relPath = File::relpath($this->rootDir, $path);
+        $relPath = str_replace('\\', '/', $relPath);
+        $relPath = trim($relPath, '/');
+        $url = $this->rootUrl . '/' . $relPath;
+        $result['path'] = $relPath;
+        $result['url'] = $url . ($entryType == 'dir' ? '/' : '');
+
         if ($entryType == 'file') {
             $result['size'] = filesize($path);
         }
@@ -197,7 +200,17 @@ class FileManager
                 });
                 $glob = array_values($glob);
                 $children = array_map(fn ($childPath) => $this->pathInfo($childPath), $glob);
+                usort($children, function ($a, $b) {
+                    if (($a['type'] == 'dir') && ($b['type'] != 'dir')) {
+                        return -1;
+                    }
+                    if (($a['type'] != 'dir') && ($b['type'] == 'dir')) {
+                        return 1;
+                    }
+                    return strnatcasecmp($a['name'], $b['name']);
+                });
                 $result['children'] = $children;
+                $result['hasSubfolders'] = (bool)array_filter($children, fn ($child) => $child['type'] == 'dir');
             } else {
                 $result['hasSubfolders'] = $this->dirHasSubfolders($path);
             }
