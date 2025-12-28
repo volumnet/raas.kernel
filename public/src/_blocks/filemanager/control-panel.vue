@@ -10,39 +10,48 @@
 
 <template>
   <div class="control-panel">
-    <control-button type="upload" title="Загрузить" />
+    <control-button
+      type="upload"
+      :title="$root.translations.FILEMANAGER_UPLOAD"
+      @click="$emit('upload')"
+    />
     <control-button
       type="new-folder"
-      title="Создать папку"
+      :title="$root.translations.FILEMANAGER_CREATE_FOLDER"
       @click="$emit('createFolder')"
     />
     <control-button
       v-if="selection?.length == 1"
       type="view"
-      title="Просмотр"
+      :title="$root.translations.FILEMANAGER_VIEW"
       @click="$emit('open')"
     />
 
-    <control-button type="select" title="Отметить" />
+    <!-- <control-button type="select" :title="$root.translations.FILEMANAGER_SELECT_CHECK" /> -->
     <control-button
       v-if="selection?.length"
       type="cut"
-      title="Вырезать"
+      :title="$root.translations.FILEMANAGER_CUT"
       @click="$emit('cut')"
     />
     <control-button
       v-if="clipboard && clipboard?.dir != currentPath"
       type="paste"
-      title="Вставить"
+      :title="$root.translations.FILEMANAGER_PASTE"
       @click="$emit('paste')"
     />
     <control-button
       v-if="selection?.length == 1"
       type="rename"
-      title="Переименовать"
+      :title="$root.translations.FILEMANAGER_RENAME"
       @click="$emit('rename')"
     />
-    <control-button v-if="selection?.length" type="delete" title="Удалить" />
+    <control-button
+      v-if="selection?.length"
+      type="delete"
+      :title="$root.translations.FILEMANAGER_DELETE"
+      @click="$emit('delete')"
+    />
   </div>
 </template>
 
@@ -80,6 +89,6 @@ export default {
   components: {
     "control-button": ControlButton,
   },
-  emits: ["createFolder", "open", "cut", "paste", "rename"],
+  emits: ["upload", "createFolder", "open", "cut", "paste", "rename", "delete"],
 };
 </script>

@@ -16,9 +16,6 @@ export default {
     }
     return result;
   },
-  mounted() {
-    // this.openFileManager("image");
-  },
   methods: {
     lightBoxInit(options = {}) {},
     /**

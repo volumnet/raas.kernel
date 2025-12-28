@@ -73,7 +73,11 @@
       {{ item.name }}
     </div>
     <div v-if="item.type == 'file'" class="image-item__description">
-      <div>{{ formatNumber(item.size) }} Б</div>
+      <div>
+        {{
+          formatNumber(item.size) + " " + $root.translations.FILEMANAGER_BYTES
+        }}
+      </div>
       <div v-if="width && height">{{ width }}x{{ height }}</div>
     </div>
   </div>

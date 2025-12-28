@@ -46,13 +46,13 @@
     <button
       type="button"
       class="btn current-path__button current-path__button_refresh"
-      title="Обновить"
+      :title="$root.translations.FILEMANAGER_REFRESH"
       @click="$emit('refresh')"
     ></button>
     <button
       type="button"
       class="btn current-path__button current-path__button_parent"
-      title="Наверх"
+      :title="$root.translations.FILEMANAGER_GO_TO_PARENT"
       :disabled="!parentAvailable"
       @click="$emit('parent')"
     ></button>

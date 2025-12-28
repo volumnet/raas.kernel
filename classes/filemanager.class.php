@@ -74,8 +74,6 @@ class FileManager
         try {
             $path = $this->getPath($_GET['path'] ?? '');
             $action = (string)($_GET['action'] ?? '');
-            // var_dump($path, $action);
-            // exit;
             if (in_array($action, ['mkdir', 'delete', 'rename', 'move', 'upload']) &&
                 (($_SERVER['REQUEST_METHOD'] ?? '') != 'POST')
             ) {

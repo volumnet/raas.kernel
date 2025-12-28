@@ -41,7 +41,11 @@
       {{ extension }}
     </td>
     <td>
-      {{ item.type == "dir" ? "Папка" : formatNumber(item.size) }}
+      {{
+        item.type == "dir"
+          ? $root.translations.FILEMANAGER_FOLDER
+          : formatNumber(item.size)
+      }}
     </td>
     <td>
       {{ item.datetimeFormatted }}

@@ -74,6 +74,7 @@ export default {
         "swg",
         "webp",
         "bmp",
+        "svg",
       ].includes(this.extension);
     },
   },

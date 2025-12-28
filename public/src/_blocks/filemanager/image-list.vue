@@ -2,13 +2,13 @@
 .image-list {
   display: grid;
   width: 100%;
+  font-size: relMin(14px, $min: 12px);
   @include viewport-props(
     (
       --items-in-row: (
         ">lg": 5,
         "md": 4,
-        "sm": 3,
-        "<xs": 2,
+        "<sm": 3,
       ),
     )
   );
@@ -21,7 +21,7 @@
 
 <template>
   <div class="image-list">
-    <template v-for="item in items" :key="item.path">
+    <template v-for="(item, index) in items" :key="item.path">
       <image-item
         :item="item"
         :selected="selection.includes(item.path)"

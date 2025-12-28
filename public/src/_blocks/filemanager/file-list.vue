@@ -68,14 +68,14 @@
       <tr
         class="raas-filemanager-file-list__row raas-filemanager-file-list__row_header"
       >
-        <th>Имя</th>
-        <th>Тип</th>
-        <th>Размер</th>
-        <th>Дата</th>
+        <th>{{ $root.translations.FILEMANAGER_NAME }}</th>
+        <th>{{ $root.translations.FILEMANAGER_TYPE }}</th>
+        <th>{{ $root.translations.FILEMANAGER_SIZE }}</th>
+        <th>{{ $root.translations.FILEMANAGER_DATE }}</th>
       </tr>
     </thead>
     <tbody>
-      <template v-for="item in items" :key="item.path">
+      <template v-for="(item, index) in items" :key="item.path">
         <file-item
           class="raas-filemanager-file-list__row"
           :item="item"
