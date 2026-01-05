@@ -110,6 +110,42 @@ export default {
      */
     onMounted($event) {
       this.instance = $event;
+
+      // 1. Переопределяем сам элемент imageInline
+      $event.conversion.for("downcast").elementToElement({
+        model: "imageInline",
+        view: (modelElement, { writer }) => {
+          return writer.createEmptyElement("img", {
+            src: modelElement.getAttribute("src") || "",
+            alt: modelElement.getAttribute("alt") || "",
+          });
+        },
+        priority: "high",
+      });
+
+      // 2. КЛЮЧЕВОЕ: отключаем конвертацию атрибутов width и height
+      $event.conversion.for("downcast").add((dispatcher) => {
+        // Отключаем width
+        dispatcher.on(
+          "attribute:width:imageInline",
+          (evt, data, conversionApi) => {
+            // Ничего не делаем — не добавляем width в DOM
+            evt.stop(); // останавливаем стандартный конвертер
+          },
+          { priority: "high" }
+        );
+
+        // Отключаем height
+        dispatcher.on(
+          "attribute:height:imageInline",
+          (evt, data, conversionApi) => {
+            // Ничего не делаем — не добавляем height в DOM
+            evt.stop();
+          },
+          { priority: "high" }
+        );
+      });
+
       const sourceEditing = $event.plugins.get("SourceEditing");
       sourceEditing.on(
         "change:isSourceEditingMode",

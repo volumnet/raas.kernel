@@ -28,26 +28,27 @@ export default class FileManagerImgCommand extends Command {
   }
 
   execute() {
-    const selection = this.editor.model.document.selection;
-    const el =
-      selection.getSelectedElement() || first(selection.getSelectedBlocks());
-
-    let currentUrl = null;
-    let elImg = null;
-    if (!!el && (el.name === "imageBlock" || el.name === "imageInline")) {
-      elImg = el;
-      currentUrl = elImg.getAttribute("src");
-    }
-
     window.app.openFileManager("image", true).then((url) => {
-      this.editor.model.change((writer) => {
-        const imageCommand = this.editor.commands.get("insertImage");
-        if (!imageCommand.isEnabled) {
-          return;
-        }
-        if (url) {
-          this.editor.execute("insertImage", { source: url });
-        }
+      if (!url) return;
+
+      const editor = this.editor;
+      const model = editor.model;
+      const selection = model.document.selection;
+
+      // Проверяем, можно ли вставить изображение в текущую позицию
+      if (!editor.commands.get("imageUpload").isEnabled) {
+        return;
+      }
+
+      editor.model.change((writer) => {
+        // Создаём элемент изображения БЕЗ width и height
+        const imageElement = writer.createElement("imageInline", {
+          src: url,
+          alt: "",
+        });
+
+        // Вставляем в текущую позицию
+        model.insertContent(imageElement, selection);
       });
     });
   }

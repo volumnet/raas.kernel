@@ -17,23 +17,6 @@ export default class FileManagerFileCommand extends Command {
   }
 
   execute() {
-    const selection = this.editor.model.document.selection;
-
-    let currentUrl = null;
-    let elA = null;
-    const position = selection.getFirstPosition();
-    if (selection.hasAttribute("linkHref")) {
-      elA = findAttributeRange(
-        position,
-        "linkHref",
-        selection.getAttribute("linkHref"),
-        this.editor.model
-      )
-        .getItems()
-        .next().value.textNode;
-      currentUrl = elA.getAttribute("linkHref");
-    }
-
     window.app.openFileManager("file", true).then((url) => {
       if (url) {
         const linkCommand = this.editor.commands.get("link");
