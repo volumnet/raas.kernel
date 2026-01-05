@@ -150,11 +150,11 @@
               'filemanager__file-list_empty': !currentFileList.length,
             }"
             ref="fileList"
-            @dragover.prevent="dragOver = true"
-            @dragleave="dragOver = false"
+            @dragover.prevent="handleDragStart"
+            @dragleave="handleDragLeave"
             @drop.prevent="
               handleUpload(Array.from($event?.dataTransfer?.files));
-              dragOver = false;
+              handleDragLeave();
             "
           >
             <template v-if="!currentFileList.length">
@@ -309,6 +309,10 @@ export default {
        * @type {boolean}
        */
       dragOver: false,
+      /**
+       * Таймаут потери перетаскивания
+       */
+      dragLeaveTimeout: null,
     };
   },
   mounted() {},
@@ -713,6 +717,26 @@ export default {
         }
       }
       this.handleOpen(path);
+    },
+    /**
+     * Обрабатывает событие начала перетаскивания
+     */
+    handleDragStart() {
+      if (this.dragLeaveTimeout) {
+        window.clearTimeout(this.dragLeaveTimeout);
+      }
+      this.dragOver = true;
+    },
+    /**
+     * Обрабатывает событие потери перетаскивания
+     */
+    handleDragLeave() {
+      if (this.dragLeaveTimeout) {
+        window.clearTimeout(this.dragLeaveTimeout);
+      }
+      this.dragLeaveTimeout = window.setTimeout(() => {
+        this.dragOver = false;
+      }, 250);
     },
     /**
      * Открывает файл/папку
