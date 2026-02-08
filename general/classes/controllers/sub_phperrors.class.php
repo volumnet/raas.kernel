@@ -1,7 +1,9 @@
 <?php
+
 /**
  * @package RAAS.General
  */
+
 namespace RAAS\General;
 
 use RAAS\Abstract_Sub_Controller;
@@ -17,11 +19,11 @@ class Sub_PHPErrors extends Abstract_Sub_Controller
 
     public function run()
     {
-        $filename = ini_get('error_log');
+        $filename = $this->getPHPErrorsFile();
         switch ($this->action) {
             case 'delete':
                 if ($filename && is_file($filename)) {
-                    @unlink($filename);
+                    file_put_contents($filename, '');
                 }
                 new Redirector('?mode=admin&sub=' . $this->sub);
                 break;
@@ -41,5 +43,15 @@ class Sub_PHPErrors extends Abstract_Sub_Controller
 
                 break;
         }
+    }
+
+
+    /**
+     * Получает файл с ошибками PHP
+     * @return string
+     */
+    public function getPHPErrorsFile(): string
+    {
+        return ini_get('error_log');
     }
 }

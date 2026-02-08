@@ -1,7 +1,9 @@
 <?php
+
 /**
  * @package RAAS
  */
+
 namespace RAAS;
 
 use Exception;

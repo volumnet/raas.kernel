@@ -1,10 +1,13 @@
 <?php
+
 /**
  * @todo
  */
+
 namespace RAAS;
 
 use DateTime;
+use Exception;
 use SOME\File;
 
 /**
@@ -12,6 +15,11 @@ use SOME\File;
  */
 class PHPErrorLogParser
 {
+    /**
+     * Формат даты (автоопределение, если пусто)
+     */
+    public const DATE_FORMAT = '';
+
     /**
      * Разбирает текст по ошибкам
      * @param string $text Текст лога
@@ -28,7 +36,7 @@ class PHPErrorLogParser
     public function parse(string $text): array
     {
         $rawErrors = $this->splitErrors($text);
-        $errors = array_map(fn($x) => $this->parseError($x), $rawErrors);
+        $errors = array_map(fn ($x) => $this->parseError($x), $rawErrors);
         $result = $this->mergeErrors($errors);
         return $result;
     }
@@ -82,7 +90,7 @@ class PHPErrorLogParser
      */
     public function parseError(string $error): array
     {
-        $result = [];
+        $result = ['type' => '', 'file' => '', 'line' => 0];
         $text = trim($error);
         // Найдем дату/время
         $indexOfOpenSquareBracket = mb_strpos($text, '[');
@@ -94,8 +102,16 @@ class PHPErrorLogParser
                 $indexOfCloseSquareBracket - $indexOfOpenSquareBracket - 1
             );
             $text = mb_substr($text, 0, $indexOfOpenSquareBracket) . mb_substr($text, $indexOfCloseSquareBracket + 1);
-            $datetime = new DateTime($timeRawString);
-            $result['datetime'] = $datetime->format(DateTime::ATOM);
+            try {
+                if (static::DATE_FORMAT) {
+                    $datetime = DateTime::createFromFormat(static::DATE_FORMAT, $timeRawString);
+                } else {
+                    $datetime = new DateTime($timeRawString);
+                }
+                $result['datetime'] = $datetime->format(DateTime::ATOM);
+            } catch (Exception $e) {
+                $result['datetime'] = date(DateTime::ATOM);
+            }
         }
 
         // Найдем тип ошибки
@@ -148,17 +164,17 @@ class PHPErrorLogParser
 
         $realFile = realpath($originalFile);
         $realFile = str_replace('\\', '/', (string)$realFile);
-        $realFile = preg_replace_callback('/^\\w+/umis', fn($regs) => mb_strtolower($regs[0]), $realFile);
+        $realFile = preg_replace_callback('/^\\w+/umis', fn ($regs) => mb_strtolower($regs[0]), $realFile);
         $baseDir = realpath(Application::i()->baseDir);
         $baseDir = str_replace('\\', '/', (string)$baseDir);
-        $baseDir = preg_replace_callback('/^\\w+/umis', fn($regs) => mb_strtolower($regs[0]), $baseDir);
+        $baseDir = preg_replace_callback('/^\\w+/umis', fn ($regs) => mb_strtolower($regs[0]), $baseDir);
         if ($realFile && $baseDir && (mb_stripos($realFile, $baseDir) === 0)) {
             $result['file'] = mb_substr($realFile, mb_strlen($baseDir));
         } else {
             $result['file'] = str_replace('\\', '/', (string)$originalFile);
             $result['file'] = preg_replace_callback(
                 '/^\\w+/umis',
-                fn($regs) => mb_strtolower($regs[0]),
+                fn ($regs) => mb_strtolower($regs[0]),
                 $result['file']
             );
         }
