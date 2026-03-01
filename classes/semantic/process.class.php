@@ -1,7 +1,9 @@
 <?php
+
 /**
  * @package RAAS
  */
+
 namespace RAAS;
 
 use Exception;
@@ -13,6 +15,11 @@ use SOME\CSV;
  */
 class Process extends SOME
 {
+    /**
+     * Частота очистки процессов, сек
+     */
+    public const PROCESSES_CHECK_INTERVAL = 86400;
+
     protected static $tablename = 'processes';
 
     protected static $defaultOrderBy = "post_date";
@@ -40,6 +47,11 @@ class Process extends SOME
         } catch (Exception $e) {
         }
         $process = new static($sqlArr);
+        $lastProcessesCheckTime = Application::i()->registryGet('lastProcessesCheckTime');
+        if ($lastProcessesCheckTime < time() - static::PROCESSES_CHECK_INTERVAL) {
+            static::getSystemTasks();
+            Application::i()->registrySet('lastProcessesCheckTime', time());
+        }
         return $process;
     }
 

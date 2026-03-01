@@ -133,14 +133,17 @@
     </div>
     <template v-else>
       <div class="raas-field-ajax__input-container">
-        <input
-          type="text"
+        <raas-field
+          :type="type"
           class="raas-field-ajax__input"
           v-bind="$attrs"
           :name="searchName"
-          :value="searchString"
+          :modelValue="searchString"
           :placeholder="$attrs.placeholder"
-          @input="searchString = $event.target.value"
+          @update:modelValue="
+            searchString = $event;
+            $emit('update:searchValue', $event);
+          "
         />
       </div>
       <ul class="raas-field-ajax__autocomplete" v-if="autocomplete">
@@ -170,9 +173,13 @@
 
 <script>
 import RAASField from "cms/application/fields/raas-field.vue.js";
+import RAASFieldComponent from "./raas-field.vue";
 
 export default {
   mixins: [RAASField],
+  components: {
+    "raas-field": RAASFieldComponent,
+  },
   props: {
     /**
      * Наименование поля
@@ -189,6 +196,13 @@ export default {
     searchName: {
       type: String,
       required: false,
+    },
+    /**
+     * Значение поля поиска
+     */
+    searchValue: {
+      type: String,
+      default: "",
     },
     /**
      * Множественное поле (убирает возможность очистки)
@@ -223,7 +237,7 @@ export default {
       default: 1000,
     },
   },
-  emits: ["autocomplete"],
+  emits: ["autocomplete", "update:searchValue"],
   data() {
     return {
       /**
@@ -235,7 +249,7 @@ export default {
        * Поисковая строка для автозаполнения
        * @type {String}
        */
-      searchString: "",
+      searchString: this.searchValue,
       /**
        * Происходит ли в данный момент автозаполнение
        * @type {Boolean}
@@ -276,6 +290,7 @@ export default {
           if (data.Set && data.Set.length == 1) {
             this.pValue = JSON.parse(JSON.stringify(data.Set[0]));
             this.$emit("update:modelValue", this.pValue);
+            this.$emit("update:searchValue", (this.searchString = ""));
           } else {
             this.autocomplete = data.Set;
             this.$emit("autocomplete", data.Set);
@@ -289,6 +304,7 @@ export default {
     clearSearchString() {
       this.pValue = {};
       this.$emit("update:modelValue", this.pValue);
+      this.$emit("update:searchValue", (this.searchString = ""));
     },
     /**
      * Выбирает элемент автозаполнения
@@ -297,6 +313,7 @@ export default {
     selectItem(item) {
       this.pValue = JSON.parse(JSON.stringify(item));
       this.$emit("update:modelValue", this.pValue);
+      this.$emit("update:searchValue", (this.searchString = ""));
       this.searchString = "";
       this.autocomplete = null;
     },
