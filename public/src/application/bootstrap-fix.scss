@@ -1,4 +1,3 @@
-
 @media (min-width: 1200px) {
   .row {
     margin-left: -30px;
@@ -278,41 +277,101 @@
   .controls-row [class*="span"] + [class*="span"] {
     margin-left: 30px;
   }
-  input.span12, textarea.span12, .uneditable-input.span12 {
-    width: 1156px;
+  input.span12,
+  textarea.span12,
+  .uneditable-input.span12 {
+    width: calc(min(100%, 1156px));
   }
-  input.span11, textarea.span11, .uneditable-input.span11 {
-    width: 1056px;
+  input.span11,
+  textarea.span11,
+  .uneditable-input.span11 {
+    width: calc(min(100%, 1056px));
   }
-  input.span10, textarea.span10, .uneditable-input.span10 {
-    width: 956px;
+  input.span10,
+  textarea.span10,
+  .uneditable-input.span10 {
+    width: calc(min(100%, 956px));
   }
-  input.span9, textarea.span9, .uneditable-input.span9 {
-    width: 856px;
+  input.span9,
+  textarea.span9,
+  .uneditable-input.span9 {
+    width: calc(min(100%, 856px));
   }
-  input.span8, textarea.span8, .uneditable-input.span8 {
-    width: 756px;
+  input.span8,
+  textarea.span8,
+  .uneditable-input.span8 {
+    width: calc(min(100%, 756px));
   }
-  input.span7, textarea.span7, .uneditable-input.span7 {
-    width: 656px;
+  input.span7,
+  textarea.span7,
+  .uneditable-input.span7 {
+    width: calc(min(100%, 656px));
   }
-  input.span6, textarea.span6, .uneditable-input.span6 {
-    width: 556px;
+  input.span6,
+  textarea.span6,
+  .uneditable-input.span6 {
+    width: calc(min(100%, 556px));
   }
-  input.span5, textarea.span5, .uneditable-input.span5 {
-    width: 456px;
+  input.span5,
+  textarea.span5,
+  .uneditable-input.span5 {
+    width: calc(min(100%, 456px));
   }
-  input.span4, textarea.span4, .uneditable-input.span4 {
-    width: 356px;
+  input.span4,
+  textarea.span4,
+  .uneditable-input.span4 {
+    width: calc(min(100%, 356px));
   }
-  input.span3, textarea.span3, .uneditable-input.span3 {
-    width: 256px;
+  input.span3,
+  textarea.span3,
+  .uneditable-input.span3 {
+    width: calc(min(100%, 256px));
   }
-  input.span2, textarea.span2, .uneditable-input.span2 {
-    width: 156px;
+  input.span2,
+  textarea.span2,
+  .uneditable-input.span2 {
+    width: calc(min(100%, 156px));
   }
-  input.span1, textarea.span1, .uneditable-input.span1 {
-    width: 56px;
+  input.span1,
+  textarea.span1,
+  .uneditable-input.span1 {
+    width: calc(min(100%, 56px));
+  }
+  select.span12 {
+    width: calc(min(100%, 1170px));
+  }
+  select.span11 {
+    width: calc(min(100%, 1070px));
+  }
+  select.span10 {
+    width: calc(min(100%, 970px));
+  }
+  select.span9 {
+    width: calc(min(100%, 870px));
+  }
+  select.span8 {
+    width: calc(min(100%, 770px));
+  }
+  select.span7 {
+    width: calc(min(100%, 670px));
+  }
+  select.span6 {
+    width: calc(min(100%, 570px));
+  }
+  select.span5 {
+    width: calc(min(100%, 470px));
+  }
+  select.span4 {
+    width: calc(min(100%, 370px));
+  }
+  select.span3 {
+    width: calc(min(100%, 270px));
+  }
+  select.span2 {
+    width: calc(min(100%, 170px));
+  }
+  select.span1 {
+    width: calc(min(100%, 70px));
   }
   .thumbnails {
     margin-left: -30px;
@@ -324,14 +383,15 @@
     margin-left: 0;
   }
 }
-@include viewport('<sm') {
-    .table {
-        td, th {
-            padding: 0.25rem;
-            font-size: 12px;
-        }
+@include viewport("<sm") {
+  .table {
+    td,
+    th {
+      padding: 0.25rem;
+      font-size: 12px;
     }
-    .pagination {
-        font-size: 12px;
-    }
+  }
+  .pagination {
+    font-size: 12px;
+  }
 }

@@ -182,6 +182,9 @@
       @include viewport(">lg") {
         grid-template-columns: 320px 1fr;
       }
+      @include viewport("<sm") {
+        padding-inline: 1rem;
+      }
     }
   }
   &__left {
@@ -503,7 +506,7 @@ export default {
       } else if (this.floatingMenuBottomEdge > this.floatingMenuBottom) {
         this.floatingMenuMargin = Math.min(
           this.floatingMenuMarginByTop,
-          this.floatingMenuMarginByBottom
+          this.floatingMenuMarginByBottom,
         );
       }
     },
